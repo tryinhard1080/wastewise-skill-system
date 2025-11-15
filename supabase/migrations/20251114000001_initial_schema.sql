@@ -413,12 +413,13 @@ create policy "Anyone can view ordinances"
 create policy "Service role can insert ordinances"
   on ordinance_database for insert
   to service_role
-  using (true);
+  with check (true);
 
 create policy "Service role can update ordinances"
   on ordinance_database for update
   to service_role
-  using (true);
+  using (true)
+  with check (true);
 
 -- Skills Config (Public Read, Admin Write)
 alter table skills_config enable row level security;
@@ -431,7 +432,8 @@ create policy "Anyone can view skills config"
 create policy "Service role can manage skills config"
   on skills_config for all
   to service_role
-  using (true);
+  using (true)
+  with check (true);
 
 -- ===========================
 -- TRIGGERS FOR UPDATED_AT
