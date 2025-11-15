@@ -41,35 +41,12 @@ async function main() {
 
   const userId = '11111111-1111-1111-1111-111111111111'
 
-  // Insert user into auth.users if not exists
-  const { error: userError } = await supabase.rpc('exec_sql', {
-    sql: `
-      INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, confirmation_token, raw_user_meta_data, raw_app_meta_data, is_super_admin)
-      VALUES (
-        '00000000-0000-0000-0000-000000000000',
-        '${userId}',
-        'authenticated',
-        'authenticated',
-        'test@wastewise.com',
-        '$2a$10$MOCK_HASH',
-        NOW(),
-        NOW(),
-        NOW(),
-        '',
-        '{}',
-        '{}',
-        false
-      )
-      ON CONFLICT (id) DO NOTHING;
-    `
-  })
+  // NOTE: exec_sql RPC function not in generated types - skipping user creation
+  // In production E2E tests, you would create users via Supabase Auth API
+  // or have a dedicated test fixture function in your database
 
-  // Ignore error if function doesn't exist - we'll create user directly via insert
-  if (!userError || true) {
-    // Try direct insert (will work if we have service role)
-    // This bypasses the RPC and just inserts if the ID doesn't exist
-    console.log(`✅ Test user ready: ${userId}\n`)
-  }
+  // For now, assume test user exists or will be created by first auth flow
+  console.log(`✅ Using test user: ${userId}\n`)
 
   // Step 2: Create test project
   console.log('📝 Step 2: Creating test project...')
@@ -178,7 +155,7 @@ async function main() {
   // Step 6: Poll job status
   let attempts = 0
   const maxAttempts = 60 // 60 seconds
-  let finalJob
+  let finalJob: Database['public']['Tables']['analysis_jobs']['Row'] | null = null
 
   while (attempts < maxAttempts) {
     const { data: currentJob } = await supabase
@@ -210,7 +187,7 @@ async function main() {
 
   if (!finalJob) {
     console.error('\n❌ Job did not complete within 60 seconds')
-    console.error('   Current status:', finalJob?.status || 'unknown')
+    console.error('   Current status: unknown (timed out)')
     process.exit(1)
   }
 
