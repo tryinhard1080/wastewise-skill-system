@@ -85,7 +85,7 @@ async function verifyDatabase() {
     const dumpsterYpd = conversionRates.dumpster_ypd
     const targetCapacity = conversionRates.target_capacity
 
-    if (compactorYpd !== 14.49 || dumpsterYpd !== 4.33 || targetCapacity !== 8.0) {
+    if (compactorYpd !== 14.49 || dumpsterYpd !== 4.33 || targetCapacity !== 8.5) {
       console.error(`❌ ${skill.skill_name}: Incorrect conversion rates`)
       allCorrect = false
     } else {
@@ -152,7 +152,7 @@ async function verifyDatabase() {
   console.log(`  • 9 tables created and accessible`)
   console.log(`  • 5 skills configured in skills_config`)
   console.log(`  • Compactor threshold: 6.0 tons ✓`)
-  console.log(`  • Conversion rates: 14.49, 4.33, 8.0 ✓`)
+  console.log(`  • Conversion rates: 14.49, 4.33, 8.5 ✓`)
   console.log(`  • Database ready for Phase 1 development ✓`)
   console.log('')
 }

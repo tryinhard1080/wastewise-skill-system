@@ -293,7 +293,7 @@ class SkillRegistry {
     const expected = {
       compactor_ypd: 14.49,
       dumpster_ypd: 4.33,
-      target_capacity: 8.0
+      target_capacity: 8.5
     };
 
     return (
@@ -486,7 +486,7 @@ export async function validateConversionRates(): Promise<ValidationResult> {
     const valid = (
       config.conversion_rates.compactor_ypd === 14.49 &&
       config.conversion_rates.dumpster_ypd === 4.33 &&
-      config.conversion_rates.target_capacity === 8.0
+      config.conversion_rates.target_capacity === 8.5
     );
 
     results.push({
@@ -616,7 +616,7 @@ export const compactorOptimization: Skill = {
 ### Conversion Accuracy
 - [ ] TypeScript output matches Python within 0.01%
 - [ ] All evals passing
-- [ ] Conversion rates validated (14.49, 4.33, 8.0)
+- [ ] Conversion rates validated (14.49, 4.33, 8.5)
 - [ ] Thresholds correct (6.0 tons per COMPACTOR_OPTIMIZATION_THRESHOLD, 3%, $500, -40%)
 
 ### Code Quality
