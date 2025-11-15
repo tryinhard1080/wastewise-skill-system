@@ -1,0 +1,102 @@
+/**
+ * Analysis Job Creation API
+ *
+ * POST /api/analyze - Create a new analysis job
+ *
+ * This endpoint creates a background job for long-running AI analysis operations.
+ * The client should poll /api/jobs/[id] for status updates.
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+
+const createJobSchema = z.object({
+  projectId: z.string().uuid(),
+  jobType: z.enum([
+    'invoice_extraction',
+    'regulatory_research',
+    'complete_analysis',
+    'report_generation',
+  ]),
+  inputData: z.record(z.any()).optional(),
+})
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+
+    // Check authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // Validate request body
+    const body = await request.json()
+    const validatedData = createJobSchema.parse(body)
+
+    // Verify project belongs to user
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('id', validatedData.projectId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (projectError || !project) {
+      return NextResponse.json(
+        { error: 'Project not found or access denied' },
+        { status: 404 }
+      )
+    }
+
+    // Create analysis job
+    const { data: job, error: jobError } = await supabase
+      .from('analysis_jobs')
+      .insert({
+        user_id: user.id,
+        project_id: validatedData.projectId,
+        job_type: validatedData.jobType,
+        status: 'pending',
+        input_data: validatedData.inputData || {},
+        progress_percent: 0,
+      })
+      .select()
+      .single()
+
+    if (jobError) {
+      throw jobError
+    }
+
+    // Return job ID for polling
+    return NextResponse.json(
+      {
+        jobId: job.id,
+        status: job.status,
+        message: 'Analysis job created. Poll /api/jobs/' + job.id + ' for status updates.',
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request data', details: error.errors },
+        { status: 400 }
+      )
+    }
+
+    console.error('Error creating analysis job:', error)
+    return NextResponse.json(
+      { error: 'Failed to create analysis job' },
+      { status: 500 }
+    )
+  }
+}

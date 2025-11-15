@@ -19,10 +19,12 @@ Specialized agent for porting Python business logic to TypeScript, ensuring calc
 
 ### 3. Conversion Rate Management
 - **CRITICAL**: Ensure consistent conversion rates across ALL skills:
-  - Compactor YPD: **14.49** (yards per door)
-  - Dumpster YPD: **4.33** (yards per door)
-  - Target compactor capacity: **8.0 tons**
-  - Optimization threshold: **<7.0 tons** (NOT 5 or 6)
+  - Compactor YPD: **14.49** (TONS_TO_YARDS from lib/constants/formulas.ts)
+  - Dumpster YPD: **4.33** (WEEKS_PER_MONTH from lib/constants/formulas.ts)
+  - Target compactor capacity: **8.5 tons** (COMPACTOR_TARGET_TONS from formulas.ts)
+  - Optimization threshold: **< 6.0 tons** (COMPACTOR_OPTIMIZATION_THRESHOLD from formulas.ts)
+  - **NEVER hardcode these values** - always import from lib/constants/formulas.ts
+  - Source of truth: WASTE_FORMULAS_REFERENCE.md v2.0
 - Validate rates on every skill execution
 - Update `skills_config` table when validated
 
@@ -55,10 +57,10 @@ waste-skills-complete/
 ### Critical Python Functions to Port
 
 1. **compactor_calculator.py**
-   - `calculate_yards_per_door()` - Uses 14.49 conversion
-   - `calculate_capacity_utilization()` - Target 8.0 tons
-   - `recommend_monitors()` - Threshold <7.0 tons
-   - `calculate_roi()` - Installation $300, monitoring $200/month
+   - `calculate_yards_per_door()` - Uses TONS_TO_YARDS (14.49) from formulas.ts
+   - `calculate_capacity_utilization()` - Uses COMPACTOR_TARGET_TONS (8.5) from formulas.ts
+   - `recommend_monitors()` - Uses COMPACTOR_OPTIMIZATION_THRESHOLD (6.0) from formulas.ts
+   - `calculate_roi()` - Uses DSQ_MONITOR_INSTALL ($300), DSQ_MONITOR_MONTHLY ($200) from formulas.ts
 
 2. **yards_per_door_formulas.py** (if exists)
    - Compactor: `(total_tons * 14.49) / units`
@@ -88,13 +90,170 @@ lib/skills/
 ├── executor.ts           // Dynamic skill execution
 ├── analyzer.ts           // Request type detection
 ├── validator.ts          // Conversion rate validation
-├── types.ts              // Shared TypeScript interfaces
+├── types.ts              // Core type definitions (Skill interface, contexts, results)
+├── base-skill.ts         // Abstract base class with common functionality
 └── skills/
     ├── wastewise-analytics.ts
     ├── compactor-optimization.ts
     ├── contract-extractor.ts
     ├── regulatory-research.ts
     └── batch-extractor.ts
+```
+
+### Type System (NEW - Phase 1.5)
+
+**Core Interfaces** (defined in `lib/skills/types.ts`):
+
+```typescript
+// Main Skill interface - all skills MUST implement this
+interface Skill<TResult = any> {
+  name: string              // Unique identifier
+  version: string           // Semantic version
+  description: string       // Human-readable description
+  execute(context: SkillContext): Promise<SkillResult<TResult>>
+  validate?(context: SkillContext): Promise<ValidationResult>
+}
+
+// Execution context - everything a skill needs
+interface SkillContext {
+  projectId: string
+  userId: string
+  project: ProjectRow
+  invoices: InvoiceDataRow[]
+  haulLog?: HaulLogRow[]
+  config: SkillConfig       // From skills_config table
+  onProgress?: (progress: SkillProgress) => Promise<void>
+  signal?: AbortSignal      // For cancellation
+}
+
+// Standardized result format
+interface SkillResult<TData = any> {
+  success: boolean
+  data: TData | null
+  error?: { message: string; code: string; details?: any }
+  metadata: {
+    skillName: string
+    skillVersion: string
+    durationMs: number
+    executedAt: string
+    aiUsage?: { requests: number; tokensInput: number; tokensOutput: number; costUsd: number }
+  }
+}
+
+// Skill configuration (loaded from database)
+interface SkillConfig {
+  conversionRates: {
+    compactorYpd: 14.49     // MUST match formulas.ts
+    dumpsterYpd: 4.33       // MUST match formulas.ts
+    targetCapacity: 8.5     // MUST match formulas.ts
+  }
+  thresholds: {
+    compactorTons: 6.0      // COMPACTOR_OPTIMIZATION_THRESHOLD
+    contaminationPct: 3.0   // CONTAMINATION_THRESHOLD_PCT
+    bulkMonthly: 500        // BULK_SUBSCRIPTION_THRESHOLD
+    leaseupVariance: -40    // LEASEUP_VARIANCE_THRESHOLD
+  }
+}
+```
+
+**Base Skill Class** (defined in `lib/skills/base-skill.ts`):
+
+```typescript
+abstract class BaseSkill<TResult = any> implements Skill<TResult> {
+  abstract readonly name: string
+  abstract readonly version: string
+  abstract readonly description: string
+
+  // Concrete skills implement this
+  protected abstract executeInternal(context: SkillContext): Promise<TResult>
+
+  // Provided by base class:
+  async execute(context: SkillContext): Promise<SkillResult<TResult>>
+  async validate(context: SkillContext): Promise<ValidationResult>
+  protected async updateProgress(context: SkillContext, progress: SkillProgress): Promise<void>
+  protected checkCancellation(context: SkillContext): void
+  protected validateFormulas(context: SkillContext): void // Ensures config matches formulas.ts
+}
+```
+
+**Example Concrete Skill**:
+
+```typescript
+import { BaseSkill } from '../base-skill'
+import type { SkillContext, CompactorOptimizationResult } from '../types'
+import { COMPACTOR_OPTIMIZATION_THRESHOLD, COMPACTOR_TARGET_TONS } from '@/lib/constants/formulas'
+
+export class CompactorOptimizationSkill extends BaseSkill<CompactorOptimizationResult> {
+  readonly name = 'compactor-optimization'
+  readonly version = '1.0.0'
+  readonly description = 'Analyze compactor performance and calculate savings opportunities'
+
+  protected async executeInternal(context: SkillContext): Promise<CompactorOptimizationResult> {
+    // Validate formulas match (throws if mismatch)
+    this.validateFormulas(context)
+
+    // Check cancellation before expensive operations
+    this.checkCancellation(context)
+
+    // Update progress
+    await this.updateProgress(context, { percent: 10, step: 'Analyzing haul data' })
+
+    // Get data
+    const { haulLog } = context
+    if (!haulLog || haulLog.length === 0) {
+      throw new InsufficientDataError('No haul log data available', ['haulLog'])
+    }
+
+    // Calculate metrics using canonical constants
+    const avgTons = haulLog.reduce((sum, h) => sum + h.tonnage, 0) / haulLog.length
+    const maxInterval = Math.max(...haulLog.map(h => h.days_since_last || 0))
+
+    await this.updateProgress(context, { percent: 50, step: 'Calculating ROI' })
+
+    // Check threshold (uses imported constant, NOT hardcoded value)
+    const recommend = avgTons < COMPACTOR_OPTIMIZATION_THRESHOLD && maxInterval <= 14
+
+    if (!recommend) {
+      return { recommend: false, avgTonsPerHaul: avgTons, /* ... */ }
+    }
+
+    // Calculate savings using COMPACTOR_TARGET_TONS constant
+    const currentAnnualHauls = (365 / maxInterval) * haulLog.length
+    const optimizedAnnualHauls = (currentAnnualHauls * avgTons) / COMPACTOR_TARGET_TONS
+    const haulsEliminated = currentAnnualHauls - optimizedAnnualHauls
+
+    await this.updateProgress(context, { percent: 90, step: 'Finalizing results' })
+
+    return {
+      recommend: true,
+      avgTonsPerHaul: avgTons,
+      targetTonsPerHaul: COMPACTOR_TARGET_TONS,
+      currentAnnualHauls,
+      optimizedAnnualHauls,
+      haulsEliminated,
+      // ... more fields
+    }
+  }
+
+  // Optional: Override validation for skill-specific checks
+  async validate(context: SkillContext): Promise<ValidationResult> {
+    const baseValidation = await super.validate(context)
+    if (!baseValidation.valid) return baseValidation
+
+    if (!context.haulLog || context.haulLog.length < 3) {
+      return {
+        valid: false,
+        errors: [{
+          field: 'haulLog',
+          message: 'At least 3 haul records required for compactor analysis',
+          code: 'INSUFFICIENT_HAUL_DATA'
+        }]
+      }
+    }
+
+    return { valid: true }
+  }
+}
 ```
 
 ### Skill Registry
@@ -223,33 +382,39 @@ export function analyzeRequest(input: string): SkillType {
 
 2. **Identify Key Functions**
    ```python
-   # Python reference
+   # Python reference (matches WASTE_FORMULAS_REFERENCE.md v2.0)
    def calculate_yards_per_door(total_tons, units):
-       return (total_tons * 14.49) / units
+       TONS_TO_YARDS = 14.49  # Canonical constant
+       return (total_tons * TONS_TO_YARDS) / units
 
    def should_recommend_monitors(avg_tons, max_interval):
-       return avg_tons < 7.0 and max_interval <= 14
+       COMPACTOR_OPTIMIZATION_THRESHOLD = 6.0  # Canonical (NOT 7.0)
+       return avg_tons < COMPACTOR_OPTIMIZATION_THRESHOLD and max_interval <= 14
    ```
 
 3. **Port to TypeScript**
    ```typescript
    // lib/calculations/compactor-optimization.ts
+   import {
+     TONS_TO_YARDS,
+     COMPACTOR_OPTIMIZATION_THRESHOLD,
+     COMPACTOR_MAX_DAYS_BETWEEN
+   } from '@/lib/constants/formulas'
 
    export function calculateYardsPerDoor(
      totalTons: number,
      units: number
    ): number {
-     // CRITICAL: Use exact conversion rate from Python
-     const COMPACTOR_YPD_CONVERSION = 14.49;
-     return (totalTons * COMPACTOR_YPD_CONVERSION) / units;
+     // CRITICAL: Import from canonical formulas.ts (NEVER hardcode)
+     return (totalTons * TONS_TO_YARDS) / units
    }
 
    export function shouldRecommendMonitors(
      avgTons: number,
      maxInterval: number
    ): boolean {
-     // CRITICAL: Threshold is 7.0 (NOT 5 or 6)
-     return avgTons < 7.0 && maxInterval <= 14;
+     // CRITICAL: Use 6.0 from formulas.ts (per WASTE_FORMULAS_REFERENCE.md v2.0)
+     return avgTons < COMPACTOR_OPTIMIZATION_THRESHOLD && maxInterval <= COMPACTOR_MAX_DAYS_BETWEEN
    }
    ```
 
@@ -269,9 +434,9 @@ export function analyzeRequest(input: string): SkillType {
      });
 
      test('monitor recommendation threshold', () => {
-       expect(shouldRecommendMonitors(6.8, 12)).toBe(true);  // Below 7.0
-       expect(shouldRecommendMonitors(7.1, 12)).toBe(false); // Above 7.0
-       expect(shouldRecommendMonitors(6.5, 15)).toBe(false); // Interval > 14
+       expect(shouldRecommendMonitors(5.8, 12)).toBe(true);  // Below 6.0
+       expect(shouldRecommendMonitors(6.1, 12)).toBe(false); // Above 6.0
+       expect(shouldRecommendMonitors(5.5, 15)).toBe(false); // Interval > 14
      });
    });
    ```
@@ -399,7 +564,7 @@ export const compactorOptimization: Skill = {
     // Get max interval
     const maxInterval = Math.max(...haul_log.map(h => h.days_since_last || 0));
 
-    // Check threshold (CRITICAL: 7.0, not 5 or 6)
+    // Check threshold (CRITICAL: Use COMPACTOR_OPTIMIZATION_THRESHOLD (6.0) from formulas.ts - per WASTE_FORMULAS_REFERENCE.md v2.0)
     const recommend = avgTons < config.thresholds.compactor_tons && maxInterval <= 14;
 
     if (!recommend) {
@@ -452,7 +617,7 @@ export const compactorOptimization: Skill = {
 - [ ] TypeScript output matches Python within 0.01%
 - [ ] All evals passing
 - [ ] Conversion rates validated (14.49, 4.33, 8.0)
-- [ ] Thresholds correct (7.0, 3%, $500, -40%)
+- [ ] Thresholds correct (6.0 tons per COMPACTOR_OPTIMIZATION_THRESHOLD, 3%, $500, -40%)
 
 ### Code Quality
 - [ ] TypeScript strict mode
