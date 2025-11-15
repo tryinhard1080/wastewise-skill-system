@@ -205,6 +205,23 @@ pnpm worker
 npx tsx scripts/test-e2e.ts
 ```
 
+### API Development
+
+```bash
+# Test API endpoints
+curl http://localhost:3000/api/jobs
+
+# Create analysis job
+curl -X POST http://localhost:3000/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"projectId": "uuid", "jobType": "complete_analysis"}'
+
+# Check job status
+curl http://localhost:3000/api/jobs/[job-id]
+```
+
+**Full API Documentation:** See [docs/API.md](docs/API.md)
+
 ---
 
 ## Formula Compliance
@@ -256,14 +273,19 @@ All waste calculations follow canonical formulas defined in `lib/constants/formu
 
 **Current Branch**: `skills/compactor-vertical-slice`
 
-### 🚧 Phase 2.2: API Endpoints (In Progress)
-**Goal**: REST API for job management and skill execution
+### ✅ Phase 2.2: API Endpoints (Complete)
+**Goal**: Production-ready REST API with enhanced error handling and rate limiting
 
-- `/api/analyze` - Create analysis jobs
-- `/api/jobs/[id]` - Poll job status
-- `/api/jobs/[id]/cancel` - Cancel running jobs
-- Error handling and validation
-- Rate limiting
+- ✅ `POST /api/analyze` - Create analysis jobs with rate limiting
+- ✅ `GET /api/jobs` - List jobs with filtering and pagination
+- ✅ `GET /api/jobs/[id]` - Poll job status (enhanced error details)
+- ✅ `PATCH /api/jobs/[id]` - Cancel running jobs
+- ✅ Standardized error handling
+- ✅ Rate limiting (10 jobs/min, 60 polls/min)
+- ✅ UUID validation
+- ✅ Comprehensive API documentation
+
+**Current Branch**: `feat/api-enhancements`
 
 ### ⏳ Phase 3: UI Components (Planned)
 **Goal**: React interface for property managers

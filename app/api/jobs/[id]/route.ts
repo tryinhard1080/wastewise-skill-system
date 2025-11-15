@@ -7,12 +7,21 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isValidUUID } from '@/lib/api/validation'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Validate UUID format
+    if (!isValidUUID(params.id)) {
+      return NextResponse.json(
+        { error: 'Invalid job ID format' },
+        { status: 400 }
+      )
+    }
+
     const supabase = await createClient()
 
     // Check authentication
@@ -68,6 +77,8 @@ export async function GET(
         ? {
             message: job.error_message,
             code: job.error_code,
+            details: job.error_details,
+            failedAt: job.failed_at,
           }
         : null,
       aiUsage: {
@@ -93,6 +104,14 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Validate UUID format
+    if (!isValidUUID(params.id)) {
+      return NextResponse.json(
+        { error: 'Invalid job ID format' },
+        { status: 400 }
+      )
+    }
+
     const supabase = await createClient()
 
     // Check authentication
