@@ -39,10 +39,12 @@ create table skills_config (
 
 ## 🚨 Critical Business Rules (NEVER VIOLATE)
 
+**Formula Reference**: All calculations MUST use formulas from `WASTE_FORMULAS_REFERENCE.md` (v2.0) - the canonical source of truth.
+
 ### Non-Negotiable Thresholds
 
-1. **Compactor Optimization**: Average tons/haul < **7.0** (NOT 5 or 6)
-   - If avg tons < 7.0 AND max interval ≤ 14 days → Recommend monitors
+1. **Compactor Optimization**: Average tons/haul < **6.0** (per WASTE_FORMULAS_REFERENCE.md v2.0)
+   - If avg tons < 6.0 AND max interval ≤ 14 days → Recommend monitors
    - Target optimization: 8.5 tons/haul
 
 2. **Contamination**: > **3%** of total spend
@@ -67,16 +69,16 @@ yardsPerDoor = (qty * size * frequency * 4.33) / units
 costPerDoor = monthlyTotal / units
 
 // Capacity Utilization (Compactor)
-utilization = (avgTonsPerHaul / 8.0) * 100
+utilization = (avgTonsPerHaul / 8.5) * 100  // 8.5 = target tons (industry standard)
 ```
 
 ### Conversion Rates (MUST BE CONSISTENT)
 
-**CRITICAL**: These MUST be identical across all skills:
-- **Compactor YPD**: 14.49 (from Python reference)
-- **Dumpster YPD**: 4.33 (from Python reference)
-- **Target compactor capacity**: 8.0 tons
-- **Optimization threshold**: <7.0 tons
+**CRITICAL**: These MUST be identical across all skills (per WASTE_FORMULAS_REFERENCE.md):
+- **Compactor YPD**: 14.49 (cubic yards per ton: 2000 lbs/ton ÷ 138 lbs/yd³)
+- **Dumpster YPD**: 4.33 (weeks per month constant)
+- **Target compactor capacity**: 8.5 tons (industry standard midpoint of 8-9)
+- **Optimization threshold**: <6.0 tons (canonical per v2.0)
 
 ### Benchmarks by Property Type
 
