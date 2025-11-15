@@ -1,0 +1,26 @@
+SKILL: wastewise-analytics-validated
+
+HOW TO USE:
+
+"I just uploaded waste invoices and a service contract. Property has 300 units. Run the validated analysis and make sure the contract tab is generated with all clause extractions."
+
+EXAMPLE:
+
+"Hey Claude—I just added the 'wastewise-analytics-validated' skill. I have 6 months of invoices plus a contract for Columbia Square Living (193 units). Please analyze with full validation checks."
+
+WHAT YOU'LL GET:
+- Complete Excel workbook (5-7 sheets depending on data)
+- CONTRACT_TERMS sheet with verbatim clause extraction (if contract provided)
+- HAUL_LOG sheet with tonnage tracking (if compactor present)
+- Comprehensive QUALITY_CHECK sheet showing all validation results
+- Detailed validation report showing which checks passed/failed
+
+VALIDATION FEATURES:
+✅ Ensures contract tab is generated when contract is uploaded
+✅ Verifies all 7 clause types are extracted with verbatim text
+✅ Validates optimization recommendations meet strict criteria
+✅ Confirms formula accuracy across all calculations
+✅ Checks data completeness and cross-sheet consistency
+✅ Halts output if ANY validation fails with detailed error report
+
+NOTE: This skill will NOT produce output unless ALL validations pass. You'll get a detailed report of any issues that need to be fixed.

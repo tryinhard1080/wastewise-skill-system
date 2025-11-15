@@ -1,0 +1,6 @@
+filename,property,vendor,document_type,expected_property_name
+ColumbiaSquare_WM_Invoice_Sep2024.pdf,Columbia Square Living,Waste Management,invoice,Columbia Square Living
+Jardine_Republic_Invoice_Sep2024.pdf,Jardine Apartments,Republic Services,invoice,Jardine Apartments
+CityView_WC_Invoice_Sep2024.pdf,CityView Towers,Waste Connections,invoice,CityView Towers
+Riverside_GFL_Invoice_Sep2024.pdf,Riverside Commons,GFL Environmental,invoice,Riverside Commons
+ColumbiaSquare_WM_Contract_2024.pdf,Columbia Square Living,Waste Management,contract,Columbia Square Living

@@ -1,0 +1,28 @@
+SKILL: waste-batch-extractor
+
+HOW TO USE:
+
+"I have a folder with waste invoices, contracts, and expense reports. Extract all the data, organize by location, and give me a validation report."
+
+EXAMPLE:
+
+"Hey Claude—I just added the 'waste-batch-extractor' skill. I've uploaded 20 waste documents from Columbia Square, Jardine, and three other properties. Can you process them all, organize the data by location in an Excel file with separate tabs, and let me know which documents need manual review?"
+
+WHAT YOU'LL GET:
+- waste_extraction_by_location.xlsx (multi-tab workbook with Summary, Property tabs, and Validation sheet)
+- validation_report.md (detailed quality assessment)
+- extraction_data.json (raw structured data)
+
+VALIDATION FEATURES:
+✅ Confidence scoring for each document
+✅ Cross-validation across properties
+✅ Automatic flagging of documents needing review
+✅ Line item total verification
+✅ Missing field detection
+✅ Vendor/address consistency checks
+
+TIPS:
+- Name files with property names for better organization
+- Upload all documents at once for batch processing
+- Check the Validation tab for red/yellow highlighted rows
+- Documents with confidence < 0.70 require manual review

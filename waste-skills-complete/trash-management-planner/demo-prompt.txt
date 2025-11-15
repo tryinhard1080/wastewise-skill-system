@@ -1,0 +1,39 @@
+SKILL: trash-management-planner
+
+HOW TO USE:
+
+"Generate a trash management plan for [property name] at [full address]. The property has [X] units across [Y] stories with [Z] ground floor units. Loading height is [X] feet. Goal: [cost-effective/sustainability/balanced]."
+
+EXAMPLE:
+
+"Hey Claude—I just added the 'trash-management-planner' skill. Can you generate a trash management plan for Lincoln Commons at 456 Oak Street, Dallas, TX 75201? It's 300 units across 7 stories with 12 ground floor units. Loading height is 18 feet. We want a cost-effective solution with good ROI."
+
+WHAT YOU'LL GET:
+- Complete 14-section professional report (15-20 pages)
+- Executive summary with ROI analysis
+- Regulatory compliance research (franchise hauler auto-discovered!)
+- Volume calculations and cost comparisons
+- Equipment specifications and recommendations
+- Service schedules and implementation plan
+- Professional formatting for stakeholders
+
+MINIMUM INFO NEEDED:
+- Property address (enables hauler research)
+- Unit count
+- Number of stories
+
+OPTIONAL (IMPROVES OUTPUT):
+- Ground floor unit count
+- Loading/ceiling height  
+- Multiple buildings
+- Project priorities
+
+TIPS:
+✅ Always include full address (street, city, state, zip)
+✅ Mention ground floor units if any (critical for design)
+✅ Note ceiling height if known (determines equipment placement)
+✅ State your priorities (cost/sustainability/balanced)
+✅ For multiple buildings, list each separately
+
+TRY IT NOW:
+"Generate a trash management plan for Test Towers at 123 Main St, Austin, TX 78701—200 units, 8 stories, 16 ground floor units, 18ft loading height. Cost-effective focus."

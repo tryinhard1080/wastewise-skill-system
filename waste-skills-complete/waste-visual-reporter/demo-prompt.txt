@@ -1,0 +1,17 @@
+SKILL: waste-visual-reporter
+
+HOW TO USE:
+
+"Create an interactive dashboard from my WasteWise analysis with 5 tabs: executive summary, expense breakdown, haul logs, optimization recommendations, and contract risks."
+
+EXAMPLE:
+
+"Hey Claude—I just added the 'waste-visual-reporter' skill. Can you generate an interactive dashboard from The Club at Millenia WasteWise analysis? I need both executive summary and operational detail for property managers."
+
+WHAT YOU'LL GET:
+- Interactive HTML dashboard with 5 tabs (Dashboard, Expense Analysis, Haul Log, Optimization, Contract Terms)
+- Chart.js visualizations (efficiency gauge, line charts, bar charts)
+- Filterable data tables with sticky headers
+- Color-coded status indicators (red/yellow/green)
+- Professional Advantage Waste / Greystar branding
+- Both executive summary AND operational drill-down in one tool

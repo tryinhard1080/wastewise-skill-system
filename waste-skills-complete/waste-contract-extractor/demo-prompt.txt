@@ -1,0 +1,227 @@
+SKILL: waste-contract-extractor v2.1
+
+=== WHAT'S NEW IN V2.1 ===
+
+✅ Granular expense tracking (month/account/category)
+✅ Transparent optimization calculations (4-section step-by-step)
+✅ Investigation tracker for variance follow-up
+✅ Vendor performance scorecards
+✅ Quarterly budget impacts for Asset Business Plans
+
+Based on real operational user feedback!
+
+===========================
+
+HOW TO USE:
+
+"Hey Claude, I uploaded our waste contract and 7 months of invoices. I need:
+ 1. Granular expense tracking so I can investigate variances
+ 2. Transparent optimization calculations to defend savings to my CFO
+ 3. Quarterly budget impacts for our Asset Business Plan"
+
+OPERATIONAL USER EXAMPLE (Property Manager - Trevor):
+
+"I've uploaded our Waste Connections contract and invoices from Jan-Jul 2025. 
+My boss keeps asking about expense spikes and I can't answer without digging 
+through PDFs for 30 minutes. I also need to explain optimization savings to 
+our CFO with math I can defend. Can you analyze this and give me:
+
+- Month-by-month expense tracking by account number
+- Auto-flagged variances (>20% changes)
+- Step-by-step optimization calculations showing the savings math
+- Implementation timeline with quarterly budget impacts for 2026 planning"
+
+EXECUTIVE USER EXAMPLE (Regional Director):
+
+"Analyze these contracts and invoices, focusing on optimization opportunities 
+and contract risks. I need an executive summary for my VP and detailed 
+operational analysis for my property managers."
+
+PROCUREMENT EXAMPLE:
+
+"We're negotiating a new contract. Can you analyze our current agreement and 
+7 months of invoices to build a vendor performance scorecard and identify 
+areas for cost reduction?"
+
+===========================
+
+WHAT YOU'LL GET:
+
+📊 12-Sheet Comprehensive Excel Workbook:
+
+OPERATIONAL FOCUS (For Property Managers, Regional Directors):
+
+1. **Historical Expense Detail** 🔥 NEW FORMAT
+   - Month | Account | Expense Category | Amount | Invoice # | Haul Count
+   - % Change from prior month
+   - 🚩 Auto-flag column (>20% variance)
+   - Investigation Tracker section
+
+2. **Optimization Analysis** 🔥 COMPLETELY REDESIGNED
+   - Section 1: Current State (36 hauls/year × $343 = $12,348)
+   - Section 2: Target State (18 hauls/year × $343 = $6,174)
+   - Section 3: Savings Calculation ($6,174 - $3,000 monitors = $3,174 net)
+   - Section 4: Visual Formula (step-by-step math)
+
+3. **Implementation Roadmap** 🔥 WITH QUARTERLY BUDGET IMPACTS
+   - IMMEDIATE (0-30 days): Q1 2025 impact $525
+   - SHORT-TERM (30-90 days): Q2 2025 impact $6,800
+   - MID-TERM (90-180 days): Q3 2025 impact $3,200
+   - LONG-TERM (180-365 days): 2026 Annual Budget $25,000 reduction
+
+4. **Vendor Performance** 🆕 NEW SHEET
+   - Service quality metrics
+   - Billing accuracy tracking
+   - Cost management analysis
+   - Communication effectiveness
+
+5. **Action Items** + **Red Flags**
+   - Priority tasks with owners
+   - Critical warnings with severity levels
+
+CONTRACT INTELLIGENCE:
+
+6. Contract Summary - Key terms
+7. Service Schedule - Recurring services
+8. On-Call Services - Extra pickup rates  
+9. Key Clauses - Contract language
+10. Recommended Vendors 🆕 - Advantage Waste preferred partners (DSQ Technologies, Ally Waste)
+
+EXECUTIVE FOCUS:
+
+11. **Executive Overview** 
+    - Clearly labeled "For Leadership Briefings"
+    - High-level summary ONLY
+    - Key findings and action dates
+
+===========================
+
+REAL-WORLD USE CASES:
+
+USE CASE 1: Investigate Expense Spike
+Boss: "Why did Pickup Service jump from $1,176 to $2,756 in March?"
+
+Your answer (in 2 minutes):
+1. Open "Historical Expense Detail"
+2. See: 🚩 INVESTIGATE - Account 0165447, 134% increase
+3. Invoice #0615-002318893
+4. Haul Count: 7 hauls vs. 4 average
+5. "We had 3 extra hauls in March. I'll ask the site team why."
+
+Time: 2 minutes (vs. 30 minutes digging through PDFs)
+
+---
+
+USE CASE 2: Defend Optimization Savings
+CFO: "How did you calculate $3,174 in savings?"
+
+Your answer (in 5 minutes):
+1. Open "Optimization Analysis"
+2. Section 1: "Currently 36 hauls/year at $343 each = $12,348"
+3. Section 2: "Monitors reduce to 18 hauls/year = $6,174"
+4. Section 3: "$6,174 savings - $3,000 monitors = $3,174 net"
+5. Section 4: "Here's the complete formula for verification"
+
+Time: 5 minutes (vs. 15 minutes scrambling)
+
+---
+
+USE CASE 3: Asset Business Plan
+Finance: "What are the quarterly budget impacts for 2026?"
+
+Your answer (in 10 minutes):
+1. Open "Implementation Roadmap"
+2. Q1: $525 savings (monitors start)
+3. Q2: $6,800 savings (optimized schedule)
+4. Q3: $3,200 additional (rate negotiation)
+5. 2026 Annual: $25,000 reduction
+6. Contact Keith Conrad at DSQ Technologies for monitor implementation
+
+Time: 10 minutes (vs. 1 hour building projections)
+
+===========================
+
+BEST RESULTS:
+
+Document Prep:
+✅ Upload 6-12 months of invoices for trend analysis
+✅ Include complete contract with all pages
+✅ Name files: PropertyName_Vendor_Type_Date.pdf
+✅ Ensure invoices show account numbers
+
+What to Expect:
+✅ Granular month/account/category expense tracking
+✅ Auto-flagged variances (>20% change)
+✅ Investigation tracker for follow-up
+✅ Transparent, step-by-step optimization math
+✅ Quarterly budget impacts aligned to fiscal calendar
+✅ Vendor performance scorecard for negotiations
+
+Key Features:
+✅ Traceable to source invoices (every number cites Invoice #)
+✅ Verifiable calculations (show every assumption)
+✅ Investigation-friendly (flag + track + resolve)
+✅ Budget-cycle aligned (Q1, Q2, Q3, Q4, 2026)
+
+===========================
+
+VALIDATION CHECKLIST:
+
+After running the skill, verify:
+
+□ Can you trace flagged variances to specific invoice numbers?
+□ Can you explain optimization math to a non-technical stakeholder?
+□ Do quarterly budget impacts align with your fiscal calendar?
+□ Are account numbers consistent across all invoices?
+□ Can you answer "Why did X change?" using Historical Expense Detail?
+
+===========================
+
+WHAT CHANGED FROM V2.0:
+
+❌ REMOVED: Redundant summary tabs (2025 Summary, Monthly Analysis)
+✅ ADDED: Investigation Tracker section
+✅ ENHANCED: Historical Expense Detail (month/account/haul count/% change/flags)
+✅ REDESIGNED: Optimization Analysis (4-section transparent calculations)
+✅ ENHANCED: Implementation Roadmap (quarterly budget impacts)
+✅ NEW SHEET: Vendor Performance (service quality metrics)
+✅ NEW SHEET: Monitor Vendors (vendor shortlist)
+✅ STREAMLINED: Single "Executive Overview" for leadership
+
+===========================
+
+OPERATIONAL FOCUS:
+
+v2.1 prioritizes DETAIL over SUMMARIES because:
+
+"When my boss asks 'Why did Account 0156898 have 5 hauls in May 
+when average is 2?', I need granular data to answer in 2 minutes, 
+not high-level summaries that require 30 minutes of PDF digging."
+
+- Real feedback from property manager "Trevor"
+
+===========================
+
+QUICK START:
+
+1. Download: waste-contract-extractor-v2.1.zip
+2. Install: Settings → Capabilities → Upload Skill
+3. Upload: Contract + 6-12 months of invoices
+4. Run: Use any of the example prompts above
+5. Review: Start with "Historical Expense Detail" and flagged variances
+
+===========================
+
+📁 OUTPUT FILES:
+
+- {PropertyName}_waste_analysis_operational.xlsx (12 sheets)
+- {PropertyName}_contract_data.json (for integrations)
+- {PropertyName}_executive_brief.md (1-page summary)
+
+===========================
+
+Need help? Check these docs:
+- README.md (quick start)
+- TREVOR_FEEDBACK.md (what changed and why)
+- SETUP.md (installation guide)
+- SKILL.md (technical details)

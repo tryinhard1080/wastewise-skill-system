@@ -1,0 +1,144 @@
+# Sample Property Input for Testing
+
+## Simple Test Property
+
+```
+Generate a trash management plan for:
+Property: Test Towers
+Address: 123 Test Street, Austin, TX 78701
+Building: 200 units, 8 stories, 16 ground floor units
+Loading height: 18 feet
+Goals: Cost-effective with good ROI
+```
+
+---
+
+## Realistic Example: Single Building
+
+```
+Generate a trash management plan for:
+
+Property: Lincoln Commons Apartments
+Address: 456 Oak Street, Dallas, TX 75201
+Building A: 300 units across 7 stories
+Ground floor units: 12 units
+Loading area ceiling height: 18 feet
+Access: Rear alley with 50-foot approach
+Goals: Cost-effective solution with reasonable payback period
+```
+
+---
+
+## Realistic Example: Multiple Buildings
+
+```
+Generate a comprehensive trash management plan for:
+
+Property: Riverside Towers
+Address: 789 River Road, Chicago, IL 60614
+
+Building A:
+- 180 units
+- 7 stories
+- 8 ground floor units
+- Loading height: 19 feet
+
+Building B:
+- 150 units
+- 6 stories  
+- 6 ground floor units
+- Loading height: 19 feet
+
+Site Details:
+- Shared alley access, tight turning radius
+- Combined trash room possible
+- City requires composting (over 25 units)
+
+Goals: Long-term ROI focus, LEED certification desired, sustainability important
+```
+
+---
+
+## Realistic Example: Large Development
+
+```
+Generate trash management plans for the following development:
+
+Property: Metro Square Living
+Address: 321 Downtown Boulevard, Denver, CO 80202
+
+Tower 1 (East):
+- 250 units
+- 12 stories
+- No ground floor residential units
+- Loading height: 20 feet
+- Underground parking access
+
+Tower 2 (West):
+- 200 units
+- 10 stories
+- No ground floor residential units  
+- Loading height: 20 feet
+- Shared service area with Tower 1
+
+Townhomes (Ground level):
+- 50 units
+- 2 stories each
+- All ground floor access
+- Separate trash enclosures needed
+
+Site Constraints:
+- Limited truck access (one-way alley)
+- HOA aesthetic requirements (screening needed)
+- Denver composting ordinance applies
+
+Goals: 
+- Minimize long-term operating costs
+- Maximize resident convenience
+- Meet sustainability requirements
+- Professional system for luxury development
+```
+
+---
+
+## Quick Test (Copy & Paste This)
+
+```
+Generate a trash management plan for Harbor View at 654 Bay Street, San Diego, CA 92101. Property has 220 units in a 9-story building with no ground floor residential units. Loading height is 17 feet. We want a balanced approach between cost-effectiveness and sustainability.
+```
+
+---
+
+## Using These Examples
+
+1. **Copy one of the examples above**
+2. **Paste into Claude** (make sure the skill is uploaded to your project)
+3. **Wait for Claude to generate the full report** (takes 1-3 minutes)
+4. **Review the 14-section output**
+
+## What You'll See
+
+Claude will:
+✅ Research the franchise hauler for that city
+✅ Research state and local waste regulations
+✅ Calculate waste, recycling, and compost volumes
+✅ Compare loose vs compacted service costs
+✅ Recommend equipment specifications
+✅ Create weekly service schedules
+✅ Generate cost analysis with payback period
+✅ Provide implementation plan
+✅ Format professionally for stakeholders
+
+## Customize for Your Needs
+
+After testing with these examples, create your own by including:
+- Full property address
+- Unit count and building configuration
+- Ground floor units (if any)
+- Loading/ceiling height
+- Special requirements or constraints
+- Your priorities (cost/sustainability/both)
+
+---
+
+**Ready to test? Pick an example above and try it now!**

@@ -1,0 +1,108 @@
+{
+  "property_info": {
+    "name": "Riverside Garden Apartments",
+    "address": "4567 Oak Grove Drive",
+    "city": "Austin, TX 78704",
+    "units": 285,
+    "property_type": "Garden-Style"
+  },
+  "analysis_period": "September 2025",
+  "current_vendor": "Republic Services",
+  "analysis_date": "2025-11-02",
+  "metrics": {
+    "monthly_cost": 7125,
+    "cost_per_door": 25.00,
+    "yards_per_door": 2.15,
+    "monthly_volume": 613,
+    "service_frequency": "5x Weekly",
+    "containers": "5 x 3 cu yd",
+    "pickup_count": 20
+  },
+  "benchmarks": {
+    "cost_per_door": {
+      "target": 8.00,
+      "max": 12.00,
+      "region": "Texas (Garden-Style)"
+    },
+    "yards_per_door": {
+      "target": 1.5,
+      "max": 2.0,
+      "property_type": "Garden-Style"
+    },
+    "fuel_fees_pct": {
+      "target": 5,
+      "max": 10,
+      "note": "Industry standard"
+    },
+    "service_frequency": {
+      "optimal": "2-3x Weekly",
+      "current": "5x Weekly"
+    }
+  },
+  "cost_breakdown": {
+    "base_service": 4200,
+    "fuel_environmental": 1750,
+    "overage_charges": 575,
+    "recycling": 350,
+    "contamination": 250
+  },
+  "performance_analysis": {
+    "cost_per_door_variance": 108.3,
+    "yards_per_door_variance": 7.5,
+    "fuel_fee_variance": 140.0,
+    "overage_incidents": 8,
+    "contamination_incidents": 3
+  },
+  "recommendations": [
+    {
+      "priority": 1,
+      "title": "Reduce Service Frequency to 3x Weekly",
+      "description": "Current 5x weekly service significantly exceeds volume needs. Property generates 2.15 yards per door monthly, within acceptable range for 3x weekly service. Reducing frequency will eliminate unnecessary pickups while maintaining service quality.",
+      "savings_monthly": "1400-1800",
+      "savings_annual": "16800-21600",
+      "implementation_timeline": "30 days",
+      "risk_level": "Low"
+    },
+    {
+      "priority": 2,
+      "title": "Renegotiate Fuel/Environmental Fee Structure",
+      "description": "Current fuel/environmental fees at 41.7% of base service are 3-4x industry standard of 8-12%. Contract renegotiation or vendor change could reduce fees to $500-600/month from current $1,750.",
+      "savings_monthly": "1100-1250",
+      "savings_annual": "13200-15000",
+      "implementation_timeline": "60-90 days",
+      "risk_level": "Low"
+    },
+    {
+      "priority": 3,
+      "title": "Implement Overage Management Program",
+      "description": "8 overage incidents monthly suggest container sizing or resident education issues. Implement monitoring system and resident education campaign to reduce overages by 75%.",
+      "savings_monthly": "400-450",
+      "savings_annual": "4800-5400",
+      "implementation_timeline": "45 days",
+      "risk_level": "Medium"
+    },
+    {
+      "priority": 4,
+      "title": "Address Contamination Through Education",
+      "description": "3 contamination incidents monthly at $83 average per incident. Resident education program and improved signage can reduce contamination by 60-80%.",
+      "savings_monthly": "150-200",
+      "savings_annual": "1800-2400",
+      "implementation_timeline": "30 days",
+      "risk_level": "Low"
+    }
+  ],
+  "critical_analysis": "Property is paying 108% above benchmark cost per door ($25.00 vs $12.00 target). Primary cost drivers: (1) Excessive service frequency at 5x weekly vs optimal 2-3x weekly adds $1,600+/month, (2) Fuel/environmental fees at 42% of base vs 8-12% industry standard adds $1,200+/month, (3) Recurring overages (8/month) indicate service design issues adding $575/month. Combined optimization potential: $3,050-3,700/month ($36,600-44,400 annually) representing 43-52% cost reduction while maintaining service quality.",
+  "vendor_comparison": {
+    "current_vendor": "Republic Services",
+    "current_monthly": 7125,
+    "market_rate_estimate": "3900-4500",
+    "savings_potential_pct": "37-45%"
+  },
+  "next_steps": [
+    "Schedule site assessment to validate container sizing and placement",
+    "Initiate contract renegotiation discussions with current vendor",
+    "Request competitive bids from Waste Management and local providers",
+    "Develop resident education materials for contamination reduction",
+    "Implement overage tracking and monitoring system"
+  ]
+}

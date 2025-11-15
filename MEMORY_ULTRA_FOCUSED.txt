@@ -1,0 +1,59 @@
+WasteWise Complete Suite is a comprehensive waste analysis platform branded as "WasteWise by THE Trash Hub" (never mention Advantage Waste in deliverables). Delivers Excel workbook (9 tabs) and HTML dashboard (6 tabs) with executive summary.
+
+Excel workbook structure (9 tabs): 
+1. SUMMARY_FULL - Starts with "Potential to Reduce 2026 Trash Expense by $X,XXX"
+2. EXPENSE_ANALYSIS - Row-based format where each invoice appears as separate row with columns: Month | Vendor | Service Type | Invoice Number | Amount | Cost/Door | Notes. Includes monthly subtotals with budget per door and grand total with average monthly budget
+3. HAUL_LOG - Compactor pickup details (only created if compactor detected)
+4. OPTIMIZATION - Three opportunities with full calculation breakdowns
+5. CONTRACT_TERMS - Risk analysis with calendar reminders (only created if contract provided)
+6. REGULATORY_COMPLIANCE - Orlando-style format with professional tables, color-coded status indicators (VERIFY=orange, RECOMMENDED=blue), priority levels (HIGH=red, MEDIUM=orange, LOW=green). Sections include: Overview, Mandatory Requirements, Compliance Checklist, Licensed Haulers, Penalties, Sources. Requires minimum 3-5 licensed haulers with confidence scoring (HIGH/MEDIUM/LOW)
+7. LEASE-UP_NOTES - Lease-up phase assessment (only created when property generates >40% below benchmark indicating not at stabilized occupancy)
+8. DOCUMENTATION_NOTES - Vendor contacts extracted from invoices and calculation formulas
+9. QUALITY_CHECK - Validation summary showing results of 40+ pre-output checks
+
+Critical optimization thresholds:
+- Compactor monitors: Recommend only if average <7 tons/haul AND max interval between pickups ≤14 days
+- Contamination reduction: Recommend only if contamination charges >3% of total spend
+- Bulk trash subscription: Recommend only if average bulk charges >$500/month
+- Lease-up detection: Properties >40% below benchmark (prevents false optimization recommendations)
+
+Property type benchmarks (yards per door per month):
+- Garden-style: 2.0-2.5 yards/door
+- Mid-rise: 1.8-2.3 yards/door  
+- High-rise: 1.5-2.0 yards/door
+- Compactor target: 8-9 tons per haul
+
+Key contacts for recommendations:
+- Report Author: Richard Bates, THE Trash Hub, Director
+- Compactor Monitors: Keith Conrad, DSQ Technologies, keith.conrad@dsqtech.com (compactor monitor installation and optimization)
+- Bulk Trash Services: Cole Myers, Ally Waste, cole@allywaste.com (supplemental bulk trash removal)
+
+Quality standards enforcement:
+- Every invoice number must be visible in EXPENSE_ANALYSIS for audit trail
+- Monthly cost per door must be prominently displayed in subtotal rows
+- Regulatory research confidence must be assessed and displayed (HIGH/MEDIUM/LOW)
+- Validation must pass all checks before workbook generation
+- Lease-up phase properties must be identified with LEASE-UP_NOTES tab explaining why optimization isn't recommended
+- QUALITY_CHECK tab shows transparent validation results
+
+Key principles:
+- Dumpster benchmarks are for comparison ONLY (never recommend service changes for dumpster properties)
+- Compactor optimization represents ACTIONABLE opportunities (increase tons/haul, reduce pickup frequency)
+- Remove ALL Energy Star references from analysis outputs
+- Lease-up properties require different evaluation criteria (low waste generation is expected and normal)
+- Cost per yard: Show metric but be cautious with comparisons unless strong regional data available
+- Branding: Always "WasteWise by THE Trash Hub" for external deliverables, never cross-reference Advantage Waste
+
+Project files location:
+- Main skill: /mnt/project/SKILL__2_UPDATED.md (3,064 lines, updated November 2025)
+- Template: /mnt/project/wastewise_expense_format_template_UPDATED.md (row-based format standard)
+
+Recent updates (November 2025):
+- Workbook expanded from 8 to 9 tabs
+- EXPENSE_ANALYSIS converted from column-based to row-based format
+- REGULATORY_COMPLIANCE converted to Orlando-style table format
+- Added three new tabs: LEASE-UP_NOTES (conditional), DOCUMENTATION_NOTES (always), QUALITY_CHECK (always)
+- Updated compactor threshold from 5-6 tons to <7 tons per haul
+- Enhanced validation framework with 40+ automated checks
+
+Communication preferences: Precise, data-driven, professional tone. Avoid excessive preamble or postamble in deliverables.
