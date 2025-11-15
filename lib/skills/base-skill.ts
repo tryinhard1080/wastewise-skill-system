@@ -14,6 +14,13 @@ import type {
   SkillProgress,
   ValidationResult,
 } from './types'
+import {
+  SkillExecutionError,
+  SkillCancelledError,
+  ValidationError as ValidationErrorType,
+  FormulaValidationError,
+  NotFoundError,
+} from '@/lib/types/errors'
 
 export abstract class BaseSkill<TResult = any> implements Skill<TResult> {
   /** Unique skill identifier */
@@ -216,56 +223,23 @@ export abstract class BaseSkill<TResult = any> implements Skill<TResult> {
 
     if (config.conversionRates.compactorYpd !== EXPECTED_COMPACTOR_YPD) {
       throw new FormulaValidationError(
+        this.name,
         `Compactor YPD mismatch: expected ${EXPECTED_COMPACTOR_YPD}, got ${config.conversionRates.compactorYpd}`
       )
     }
 
     if (config.conversionRates.dumpsterYpd !== EXPECTED_DUMPSTER_YPD) {
       throw new FormulaValidationError(
+        this.name,
         `Dumpster YPD mismatch: expected ${EXPECTED_DUMPSTER_YPD}, got ${config.conversionRates.dumpsterYpd}`
       )
     }
 
     if (config.conversionRates.targetCapacity !== EXPECTED_TARGET_CAPACITY) {
       throw new FormulaValidationError(
+        this.name,
         `Target capacity mismatch: expected ${EXPECTED_TARGET_CAPACITY}, got ${config.conversionRates.targetCapacity}`
       )
     }
-  }
-}
-
-/**
- * Custom error classes for skills
- */
-
-export class SkillExecutionError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public details?: any
-  ) {
-    super(message)
-    this.name = 'SkillExecutionError'
-  }
-}
-
-export class SkillCancelledError extends SkillExecutionError {
-  constructor(message: string) {
-    super(message, 'SKILL_CANCELLED')
-    this.name = 'SkillCancelledError'
-  }
-}
-
-export class FormulaValidationError extends SkillExecutionError {
-  constructor(message: string) {
-    super(message, 'FORMULA_VALIDATION_ERROR')
-    this.name = 'FormulaValidationError'
-  }
-}
-
-export class InsufficientDataError extends SkillExecutionError {
-  constructor(message: string, public requiredData: string[]) {
-    super(message, 'INSUFFICIENT_DATA', { requiredData })
-    this.name = 'InsufficientDataError'
   }
 }

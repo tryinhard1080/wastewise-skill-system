@@ -1,4 +1,3 @@
-Connecting to db 5432
 export type Json =
   | string
   | number
@@ -35,6 +34,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      analysis_jobs: {
+        Row: {
+          ai_cost_usd: number | null
+          ai_requests: number | null
+          ai_tokens_input: number | null
+          ai_tokens_output: number | null
+          completed_at: string | null
+          created_at: string | null
+          current_step: string | null
+          duration_seconds: number | null
+          error_code: string | null
+          error_details: Json | null
+          error_message: string | null
+          estimated_completion: string | null
+          failed_at: string | null
+          id: string
+          input_data: Json
+          job_type: string
+          max_retries: number | null
+          progress_percent: number | null
+          project_id: string
+          result_data: Json | null
+          retry_count: number | null
+          started_at: string | null
+          status: string
+          steps_completed: number | null
+          total_steps: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_cost_usd?: number | null
+          ai_requests?: number | null
+          ai_tokens_input?: number | null
+          ai_tokens_output?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_step?: string | null
+          duration_seconds?: number | null
+          error_code?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          estimated_completion?: string | null
+          failed_at?: string | null
+          id?: string
+          input_data?: Json
+          job_type: string
+          max_retries?: number | null
+          progress_percent?: number | null
+          project_id: string
+          result_data?: Json | null
+          retry_count?: number | null
+          started_at?: string | null
+          status?: string
+          steps_completed?: number | null
+          total_steps?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_cost_usd?: number | null
+          ai_requests?: number | null
+          ai_tokens_input?: number | null
+          ai_tokens_output?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_step?: string | null
+          duration_seconds?: number | null
+          error_code?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          estimated_completion?: string | null
+          failed_at?: string | null
+          id?: string
+          input_data?: Json
+          job_type?: string
+          max_retries?: number | null
+          progress_percent?: number | null
+          project_id?: string
+          result_data?: Json | null
+          retry_count?: number | null
+          started_at?: string | null
+          status?: string
+          steps_completed?: number | null
+          total_steps?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contract_terms: {
         Row: {
           calendar_reminders: Json | null
@@ -520,7 +617,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_analysis_jobs: {
+        Args: { days_to_keep?: number }
+        Returns: number
+      }
+      complete_analysis_job: {
+        Args: { ai_usage?: Json; job_id: string; result: Json }
+        Returns: undefined
+      }
+      fail_analysis_job: {
+        Args: { error_cd?: string; error_msg: string; job_id: string }
+        Returns: undefined
+      }
+      start_analysis_job: { Args: { job_id: string }; Returns: undefined }
+      update_job_progress: {
+        Args: {
+          job_id: string
+          new_progress: number
+          step_name?: string
+          step_num?: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -657,5 +775,3 @@ export const Constants = {
   },
 } as const
 
-A new version of Supabase CLI is available: v2.58.5 (currently installed v2.51.0)
-We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

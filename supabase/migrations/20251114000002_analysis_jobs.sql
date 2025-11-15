@@ -47,6 +47,8 @@ create table analysis_jobs (
   -- Error handling
   error_message text,
   error_code text,
+  error_details jsonb,
+  failed_at timestamp with time zone,
   retry_count integer default 0,
   max_retries integer default 3,
 
