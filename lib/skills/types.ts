@@ -331,21 +331,91 @@ export interface RegulatoryResearchResult {
 }
 
 export interface BatchExtractorResult {
-  filesProcessed: number
-  filesSuccess: number
-  filesFailed: number
-  totalInvoices: number
-  totalSpend: number
-  dateRange: {
-    start: string
-    end: string
+  // Summary
+  summary: {
+    totalFilesProcessed: number
+    invoicesExtracted: number
+    haulLogsExtracted: number
+    failedFiles: number
   }
-  validationReport: {
-    duplicates: number
-    missingDates: number
-    missingVendors: number
-    warnings: string[]
+
+  // Extracted data
+  invoices: InvoiceData[]
+  haulLogs: HaulLogEntry[]
+
+  // Processing details
+  processingDetails: ProcessingDetail[]
+
+  // AI usage
+  aiUsage: {
+    totalRequests: number
+    totalTokensInput: number
+    totalTokensOutput: number
+    totalCostUsd: number
   }
+}
+
+export interface InvoiceData {
+  // Source
+  sourceFile: string
+  extractionDate: string
+
+  // Property
+  propertyName: string
+  propertyAddress: string
+  units?: number
+
+  // Service
+  servicePeriodStart: string
+  servicePeriodEnd: string
+  invoiceNumber: string
+  billingDate: string
+
+  // Line items
+  lineItems: InvoiceLineItem[]
+
+  // Totals
+  subtotal: number
+  tax: number
+  total: number
+
+  // Vendor
+  vendorName: string
+  vendorContact?: string
+}
+
+export interface InvoiceLineItem {
+  description: string
+  containerType: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' | 'OTHER'
+  containerSize: number // cubic yards or tons
+  quantity: number
+  frequency: string // e.g., "2x/week", "1x/month"
+  unitPrice: number
+  totalPrice: number
+}
+
+export interface HaulLogEntry {
+  // Source
+  sourceFile: string
+
+  // Service details
+  date: string
+  time?: string
+  containerType: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' | 'OTHER'
+  containerSize: number
+  weight?: number // tons
+  volume?: number // cubic yards
+  serviceType: 'PICKUP' | 'DELIVERY' | 'EXCHANGE' | 'OTHER'
+  notes?: string
+}
+
+export interface ProcessingDetail {
+  fileId: string
+  fileName: string
+  fileType: string
+  status: 'success' | 'failed'
+  extractedRecords: number
+  error?: string
 }
 
 /**
