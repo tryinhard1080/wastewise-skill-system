@@ -347,3 +347,84 @@ export interface BatchExtractorResult {
     warnings: string[]
   }
 }
+
+/**
+ * WasteWise Analytics Complete Result
+ *
+ * Result from the main orchestrator that coordinates all sub-skills
+ * to deliver a complete waste management analysis.
+ */
+export interface WasteWiseAnalyticsCompleteResult {
+  /** Summary metrics across all analyses */
+  summary: {
+    /** Total potential savings identified */
+    totalSavingsPotential: number
+    /** Current monthly cost */
+    currentMonthlyCost: number
+    /** Optimized monthly cost (after recommendations) */
+    optimizedMonthlyCost: number
+    /** Savings percentage */
+    savingsPercentage: number
+    /** Analysis date range */
+    dateRange: {
+      start: string
+      end: string
+    }
+    /** Total invoices analyzed */
+    totalInvoices: number
+    /** Total hauls tracked (if compactor) */
+    totalHauls?: number
+  }
+
+  /** Invoice data extraction results */
+  invoiceData?: BatchExtractorResult
+
+  /** Contract terms extraction results (if contract provided) */
+  contractTerms?: ContractExtractorResult
+
+  /** Compactor optimization results (if applicable) */
+  compactorOptimization?: CompactorOptimizationResult
+
+  /** Regulatory compliance results (if location provided) */
+  regulatoryCompliance?: RegulatoryResearchResult
+
+  /** All optimization recommendations */
+  recommendations: Array<{
+    type: 'compactor_monitors' | 'contamination_reduction' | 'bulk_subscription' | 'other'
+    priority: 1 | 2 | 3 | 4 | 5
+    title: string
+    description: string
+    recommend: boolean
+    savings?: number
+    implementation?: string
+    confidence?: 'HIGH' | 'MEDIUM' | 'LOW'
+  }>
+
+  /** Generated reports */
+  reports: {
+    excelWorkbook: {
+      fileName: string
+      storagePath: string
+      downloadUrl: string
+      size: number
+    }
+    htmlDashboard: {
+      fileName: string
+      storagePath: string
+      downloadUrl: string
+      size: number
+    }
+  }
+
+  /** Execution metadata */
+  executionTime: number
+  aiUsage: {
+    totalRequests: number
+    totalTokensInput: number
+    totalTokensOutput: number
+    totalCostUsd: number
+  }
+
+  /** Property is in lease-up (prevents optimization recommendations) */
+  leaseUpDetected: boolean
+}

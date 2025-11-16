@@ -6,6 +6,7 @@
  */
 
 import { CompactorOptimizationSkill } from './compactor-optimization'
+import { WasteWiseAnalyticsSkill } from './wastewise-analytics'
 import { skillRegistry } from '../registry'
 import { logger } from '@/lib/observability/logger'
 
@@ -17,12 +18,15 @@ import { logger } from '@/lib/observability/logger'
 export function registerAllSkills(): void {
   logger.info('Registering all skills...')
 
-  // Phase 2.1: Only compactor optimization
+  // Phase 2.1: Compactor optimization
   const compactorSkill = new CompactorOptimizationSkill()
   skillRegistry.register(compactorSkill)
 
+  // Phase 2.2: WasteWise Analytics Orchestrator
+  const wastewiseSkill = new WasteWiseAnalyticsSkill()
+  skillRegistry.register(wastewiseSkill)
+
   // Future: Register other skills here as they are implemented
-  // skillRegistry.register(new WastewiseAnalyticsSkill())
   // skillRegistry.register(new ContractExtractorSkill())
   // skillRegistry.register(new RegulatoryResearchSkill())
   // skillRegistry.register(new BatchExtractorSkill())
@@ -33,4 +37,4 @@ export function registerAllSkills(): void {
 }
 
 // Export skills for direct use if needed
-export { CompactorOptimizationSkill }
+export { CompactorOptimizationSkill, WasteWiseAnalyticsSkill }
