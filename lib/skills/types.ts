@@ -285,31 +285,83 @@ export interface WastewiseAnalyticsResult {
 }
 
 export interface ContractExtractorResult {
+  // Summary
+  summary: {
+    contractsProcessed: number
+    termsExtracted: number
+    failedExtractions: number
+  }
+
+  // Extracted contract data
+  contracts: ContractData[]
+
+  // Processing details
+  processingDetails: ProcessingDetail[]
+
+  // AI usage
+  aiUsage: {
+    totalRequests: number
+    totalTokensInput: number
+    totalTokensOutput: number
+    totalCostUsd: number
+  }
+}
+
+export interface ContractData {
+  // Source
+  sourceFile: string
+  extractionDate: string
+
+  // Property & Vendor
+  property: {
+    name: string
+    address: string
+    units?: number
+  }
   vendor: {
     name: string
     contact?: string
     phone?: string
     email?: string
   }
-  serviceType: string
-  term: {
-    startDate: string
-    endDate: string
-    lengthMonths: number
+
+  // Contract Dates
+  contractDates: {
+    effectiveDate: string
+    expirationDate: string
+    termMonths: number
+    autoRenew: boolean
   }
+
+  // Services
+  services: ContractService[]
+
+  // Pricing
   pricing: {
-    baseRate: number
-    frequency: string
-    additionalFees: Array<{
-      name: string
-      amount: number
-    }>
+    monthlyBase?: number
+    perPickup?: number
+    perTon?: number
+    fuelSurcharge?: number
+    otherFees?: { description: string; amount: number }[]
+    escalationClause?: string
+    cpiAdjustment: boolean
   }
-  clauses: Array<{
-    type: string
-    text: string
-    favorable: boolean
-  }>
+
+  // Terms & Obligations
+  terms: {
+    terminationNoticeDays: number
+    earlyTerminationPenalty?: string
+    insuranceRequired: boolean
+    paymentTerms: string
+    latePenalty?: string
+  }
+}
+
+export interface ContractService {
+  containerType: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' | 'OTHER'
+  containerSize: number // cubic yards
+  frequency: string // e.g., "2x/week", "monthly"
+  serviceDays?: string // e.g., "Mon, Thu"
 }
 
 export interface RegulatoryResearchResult {
