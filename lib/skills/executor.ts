@@ -2,8 +2,7 @@
  * Skill Executor
  *
  * Executes skills with proper data loading and context building.
- * Phase 2.1: Hardcoded to compactor-optimization skill
- * Future: Dynamic skill routing based on job type
+ * Supports dynamic skill routing based on job type.
  */
 
 import { skillRegistry } from './registry'
@@ -11,22 +10,51 @@ import { SkillContext, SkillResult } from './types'
 import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
-import { NotFoundError, InsufficientDataError } from '@/lib/types/errors'
+import { NotFoundError, InsufficientDataError, AppError } from '@/lib/types/errors'
+
+/**
+ * Map job type to skill name
+ *
+ * @param jobType - Job type from analysis_jobs.job_type
+ * @returns Skill name to execute
+ * @throws AppError if job type is unknown
+ */
+function mapJobTypeToSkill(jobType: string): string {
+  const mapping: Record<string, string> = {
+    complete_analysis: 'wastewise-analytics',
+    invoice_extraction: 'batch-extractor',
+    regulatory_research: 'regulatory-research',
+    report_generation: 'wastewise-analytics',
+  }
+
+  const skillName = mapping[jobType]
+  if (!skillName) {
+    throw new AppError(
+      `Unknown job type: ${jobType}`,
+      'INVALID_JOB_TYPE',
+      400
+    )
+  }
+
+  return skillName
+}
 
 /**
  * Execute a skill for a given project
  *
- * Phase 2.1: Hardcoded to compactor-optimization
- * Loads all necessary data and builds SkillContext
+ * Dynamically routes to the appropriate skill based on job type.
+ * Loads all necessary data and builds SkillContext.
  *
  * @param projectId - Project UUID
+ * @param jobType - Job type from analysis_jobs.job_type
  * @returns SkillResult with success/failure and data
+ * @throws AppError if job type is unknown
  */
-export async function executeSkill(projectId: string): Promise<SkillResult> {
-  const executionLogger = logger.child({ projectId })
+export async function executeSkill(projectId: string, jobType: string): Promise<SkillResult> {
+  const executionLogger = logger.child({ projectId, jobType })
 
-  // Phase 2.1: Hardcoded to compactor-optimization
-  const skillName = 'compactor-optimization'
+  // Dynamic skill routing based on job type
+  const skillName = mapJobTypeToSkill(jobType)
 
   executionLogger.info(`Starting skill execution: ${skillName}`)
 
@@ -164,19 +192,24 @@ export async function executeSkill(projectId: string): Promise<SkillResult> {
 /**
  * Execute skill with progress callback
  *
- * Useful for long-running operations that need progress updates
+ * Useful for long-running operations that need progress updates.
+ * Dynamically routes to the appropriate skill based on job type.
  *
  * @param projectId - Project UUID
+ * @param jobType - Job type from analysis_jobs.job_type
  * @param onProgress - Callback for progress updates
  * @returns SkillResult
+ * @throws AppError if job type is unknown
  */
 export async function executeSkillWithProgress(
   projectId: string,
+  jobType: string,
   onProgress: (percent: number, step: string) => Promise<void>
 ): Promise<SkillResult> {
-  const executionLogger = logger.child({ projectId })
+  const executionLogger = logger.child({ projectId, jobType })
 
-  const skillName = 'compactor-optimization'
+  // Dynamic skill routing based on job type
+  const skillName = mapJobTypeToSkill(jobType)
 
   const skill = skillRegistry.get(skillName)
 

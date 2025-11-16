@@ -113,6 +113,7 @@ async function processJob(job: AnalysisJob): Promise<void> {
     // Execute skill with progress tracking
     const result = await executeSkillWithProgress(
       job.project_id,
+      job.job_type,
       async (percent: number, step: string) => {
         await updateJobStatus(job.id, 'processing', percent, step)
       }

@@ -148,7 +148,7 @@ describe('executeSkill', () => {
       const mockSkill = new MockSuccessSkill()
       vi.mocked(skillRegistry.get).mockReturnValue(mockSkill)
 
-      const result = await executeSkill('project-123')
+      const result = await executeSkill('project-123', 'complete_analysis')
 
       expect(result.success).toBe(true)
       expect(result.data).toBe('success')
@@ -161,7 +161,7 @@ describe('executeSkill', () => {
 
       const executeSpy = vi.spyOn(mockSkill, 'execute')
 
-      await executeSkill('project-123')
+      await executeSkill('project-123', 'complete_analysis')
 
       expect(executeSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -181,7 +181,7 @@ describe('executeSkill', () => {
 
       const executeSpy = vi.spyOn(mockSkill, 'execute')
 
-      await executeSkill('project-123')
+      await executeSkill('project-123', 'complete_analysis')
 
       expect(executeSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -211,7 +211,7 @@ describe('executeSkill', () => {
 
       const executeSpy = vi.spyOn(mockSkill, 'execute')
 
-      await executeSkill('project-123')
+      await executeSkill('project-123', 'complete_analysis')
 
       expect(executeSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -237,9 +237,9 @@ describe('executeSkill', () => {
     it('should throw NotFoundError when skill not in registry', async () => {
       vi.mocked(skillRegistry.get).mockReturnValue(undefined)
 
-      await expect(executeSkill('project-123')).rejects.toThrow(NotFoundError)
-      await expect(executeSkill('project-123')).rejects.toThrow(
-        "Skill 'compactor-optimization' not found in registry"
+      await expect(executeSkill('project-123', 'complete_analysis')).rejects.toThrow(NotFoundError)
+      await expect(executeSkill('project-123', 'complete_analysis')).rejects.toThrow(
+        "Skill 'wastewise-analytics' not found in registry"
       )
     })
 
@@ -247,7 +247,7 @@ describe('executeSkill', () => {
       const mockSkill = new MockFailSkill()
       vi.mocked(skillRegistry.get).mockReturnValue(mockSkill)
 
-      await expect(executeSkill('project-123')).rejects.toThrow(
+      await expect(executeSkill('project-123', 'complete_analysis')).rejects.toThrow(
         'Skill execution failed'
       )
     })
@@ -258,7 +258,7 @@ describe('executeSkill', () => {
       const mockSkill = new MockSuccessSkill()
       vi.mocked(skillRegistry.get).mockReturnValue(mockSkill)
 
-      const result = await executeSkill('project-123')
+      const result = await executeSkill('project-123', 'complete_analysis')
 
       expect(result.metadata.durationMs).toBeGreaterThan(0)
       expect(result.metadata.executedAt).toBeDefined()
