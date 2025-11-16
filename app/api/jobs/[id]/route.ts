@@ -77,7 +77,6 @@ export async function GET(
         ? {
             message: job.error_message,
             code: job.error_code,
-            details: job.error_details,
             failedAt: job.failed_at,
           }
         : null,

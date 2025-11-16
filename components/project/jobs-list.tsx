@@ -59,17 +59,22 @@ interface JobsListProps {
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export function JobsList({ projectId, jobs: initialJobs }: JobsListProps) {
-  // Use SWR for real-time updates (polls every 2 seconds for pending/processing jobs)
-  const hasActiveJobs = initialJobs.some(
-    (job: AnalysisJob) => job.status === 'pending' || job.status === 'processing'
-  )
-
+  // Use SWR for real-time updates with dynamic polling
   const { data, error } = useSWR(
-    hasActiveJobs ? `/api/jobs?projectId=${projectId}` : null,
+    `/api/jobs?projectId=${projectId}`,
     fetcher,
     {
-      refreshInterval: 2000, // Poll every 2 seconds
       fallbackData: { jobs: initialJobs },
+      // Dynamic refresh interval: poll if active jobs exist, else stop
+      refreshInterval: (latestData) => {
+        const currentJobs = latestData?.jobs || initialJobs
+        const hasActive = currentJobs.some(
+          (job: AnalysisJob) =>
+            job.status === 'pending' || job.status === 'processing'
+        )
+        // Poll every 2 seconds if active jobs, otherwise stop polling
+        return hasActive ? 2000 : 0
+      },
     }
   )
 

@@ -58,6 +58,10 @@ export function FileUpload({
     Map<string, UploadingFile>
   >(new Map())
 
+  // Get storage bucket name from environment variable (with fallback)
+  const storageBucket =
+    process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'project-files'
+
   const uploadFile = async (file: File) => {
     const fileId = `${file.name}-${Date.now()}`
 
@@ -77,7 +81,7 @@ export function FileUpload({
       const storagePath = `projects/${projectId}/${fileType}/${file.name}`
 
       const { error: uploadError } = await supabase.storage
-        .from('project-files')
+        .from(storageBucket)
         .upload(storagePath, file, {
           cacheControl: '3600',
           upsert: false,
