@@ -36,6 +36,7 @@ import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
+import { InvoiceRepository, HaulLogRepository, type InvoiceRecord, type HaulLogRecord, type InvoiceCharges } from '@/lib/db'
 
 /**
  * Container type validation
@@ -279,6 +280,20 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
       projectId: context.projectId,
     })
 
+    // Save extracted data to database
+    await this.updateProgress(context, {
+      percent: 96,
+      step: 'Saving extracted data to database',
+    })
+
+    await this.saveToDatabase(
+      context.projectId,
+      validatedInvoices,
+      validatedHaulLogs,
+      supabase,
+      executionLogger
+    )
+
     await this.updateProgress(context, {
       percent: 100,
       step: 'Extraction complete',
@@ -503,6 +518,159 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     } catch (error) {
       executionLogger.error(`Haul log validation failed: ${log.sourceFile}`, error as Error)
       return null
+    }
+  }
+
+  /**
+   * Save extracted data to database
+   *
+   * Uses repository pattern for type-safe database operations.
+   * Gracefully handles failures (logs but doesn't crash).
+   */
+  private async saveToDatabase(
+    projectId: string,
+    invoices: InvoiceData[],
+    haulLogs: HaulLogEntry[],
+    supabase: any,
+    executionLogger: any
+  ): Promise<void> {
+    executionLogger.info('Saving extracted data to database', {
+      invoiceCount: invoices.length,
+      haulLogCount: haulLogs.length,
+    })
+
+    try {
+      // Initialize repositories with Supabase client
+      const invoiceRepo = new InvoiceRepository(supabase)
+      const haulLogRepo = new HaulLogRepository(supabase)
+
+      // Convert and save invoices
+      if (invoices.length > 0) {
+        const invoiceRecords: InvoiceRecord[] = invoices.map((inv) => {
+          // Extract charges from line items by categorizing descriptions
+          const charges: InvoiceCharges = {
+            disposal: 0,
+            pickup_fees: 0,
+            rental: 0,
+            contamination: 0,
+            bulk_service: 0,
+            other: 0,
+          }
+
+          let totalTonnage = 0
+          let totalHauls = 0
+
+          // Parse line items to extract charges and metrics
+          inv.lineItems.forEach((item) => {
+            const desc = item.description.toLowerCase()
+
+            // Categorize charges by description keywords
+            if (desc.includes('disposal') || desc.includes('landfill') || desc.includes('dump')) {
+              charges.disposal! += item.totalPrice
+            } else if (desc.includes('pickup') || desc.includes('haul') || desc.includes('collection')) {
+              charges.pickup_fees! += item.totalPrice
+            } else if (desc.includes('rental') || desc.includes('lease')) {
+              charges.rental! += item.totalPrice
+            } else if (desc.includes('contamination') || desc.includes('contam')) {
+              charges.contamination! += item.totalPrice
+            } else if (desc.includes('bulk') || desc.includes('on-call') || desc.includes('extra')) {
+              charges.bulk_service! += item.totalPrice
+            } else {
+              charges.other! += item.totalPrice
+            }
+
+            // Extract tonnage and hauls from line items
+            // Tonnage: look for weight-based items (compactor services)
+            if (desc.includes('ton') || desc.includes('weight') || item.containerType === 'COMPACTOR') {
+              // For compactors, quantity often represents tons
+              if (item.quantity && item.quantity < 50) { // Sanity check (50 tons per line item max)
+                totalTonnage += item.quantity
+              }
+            }
+
+            // Hauls: count pickup/service events
+            if (desc.includes('haul') || desc.includes('pickup') || desc.includes('service')) {
+              totalHauls += item.quantity || 1 // Default to 1 if quantity not specified
+            }
+          })
+
+          return {
+            project_id: projectId,
+            invoice_number: inv.invoiceNumber,
+            invoice_date: inv.billingDate, // Use billingDate from InvoiceData
+            vendor_name: inv.vendorName,
+            service_type: inv.servicePeriodStart && inv.servicePeriodEnd
+              ? `${inv.servicePeriodStart} to ${inv.servicePeriodEnd}`
+              : undefined,
+            total_amount: inv.total, // Use total from InvoiceData
+            tonnage: totalTonnage > 0 ? totalTonnage : undefined,
+            hauls: totalHauls > 0 ? totalHauls : undefined,
+            charges,
+            notes: inv.vendorContact || undefined,
+          }
+        })
+
+        const invoiceResult = await invoiceRepo.batchInsert(invoiceRecords)
+
+        executionLogger.info('Invoices saved to database', {
+          inserted: invoiceResult.inserted,
+          failed: invoiceResult.failed,
+        })
+
+        if (invoiceResult.failed > 0) {
+          executionLogger.warn('Some invoices failed to save', {
+            failed: invoiceResult.failed,
+            errors: invoiceResult.errors.slice(0, 3), // Log first 3 errors
+          })
+        }
+
+        metrics.increment('batch_extractor.db.invoices_saved', invoiceResult.inserted, {
+          projectId,
+        })
+      }
+
+      // Convert and save haul logs (compactor projects only)
+      if (haulLogs.length > 0) {
+        const haulLogRecords: HaulLogRecord[] = haulLogs.map((log) => ({
+          project_id: projectId,
+          haul_date: log.date, // Use date from HaulLogEntry
+          tonnage: log.weight || 0, // Use weight as tonnage
+          status: log.weight && log.weight < 6.0 ? 'low_utilization' : 'normal',
+        }))
+
+        const haulLogResult = await haulLogRepo.batchInsert(haulLogRecords)
+
+        executionLogger.info('Haul logs saved to database', {
+          inserted: haulLogResult.inserted,
+          failed: haulLogResult.failed,
+        })
+
+        if (haulLogResult.failed > 0) {
+          executionLogger.warn('Some haul logs failed to save', {
+            failed: haulLogResult.failed,
+            errors: haulLogResult.errors.slice(0, 3), // Log first 3 errors
+          })
+        }
+
+        metrics.increment('batch_extractor.db.haul_logs_saved', haulLogResult.inserted, {
+          projectId,
+        })
+      }
+
+      executionLogger.info('Database save completed successfully')
+    } catch (error) {
+      // Log error but don't fail the entire extraction
+      executionLogger.error('Failed to save data to database', error as Error, {
+        projectId,
+        invoiceCount: invoices.length,
+        haulLogCount: haulLogs.length,
+      })
+
+      metrics.increment('batch_extractor.db.save_failed', 1, {
+        projectId,
+      })
+
+      // Don't throw - we want to return extracted data even if DB save fails
     }
   }
 }
