@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Instrument_Serif } from "next/font/google"
 import "./globals.css"
+import { ToastProvider } from "@/components/providers/toast-provider"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,10 +20,9 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: "Brillance - Effortless Custom Contract Billing",
+  title: "WasteWise - Multifamily Waste Management Optimization",
   description:
-    "Streamline your billing process with seamless automation for every custom contract, tailored by Brillance.",
-    generator: 'v0.app'
+    "Analyze waste service data, identify optimization opportunities, and reduce costs with AI-powered insights for multifamily properties.",
 }
 
 export default function RootLayout({
@@ -41,7 +41,10 @@ export default function RootLayout({
         />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400&display=swap" />
       </head>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        {children}
+        <ToastProvider />
+      </body>
     </html>
   )
 }

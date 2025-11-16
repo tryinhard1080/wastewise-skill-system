@@ -364,6 +364,146 @@ main (protected - requires PR + tests + evals)
 - **Retry logic** for API calls (max 3 attempts)
 - **Log errors** for debugging
 
+## 🔍 Quality Gates & Validation (MANDATORY)
+
+**Added**: 2025-11-14 after Phase 3 critical fixes
+
+**Purpose**: Prevent runtime failures by catching schema/type mismatches at development time
+
+**See**: `.claude/quality-checklist.md` for complete validation steps
+
+### Pre-Development Validation (REQUIRED)
+
+**BEFORE writing code, ALWAYS**:
+1. ✅ Read database schema in `supabase/migrations/` for exact constraints
+2. ✅ Read API contracts in `app/api/` for response shapes
+3. ✅ Import types from `lib/skills/types.ts` (never redefine)
+4. ✅ Import constants from `lib/constants/formulas.ts` (never hardcode)
+
+### Agent-Based Development (MANDATORY)
+
+**ALL development MUST use specialized agents** - Never make changes directly.
+
+**Agent Selection**:
+- **Frontend changes** → Use `frontend-dev` agent
+- **Backend changes** → Use `backend-dev` agent
+- **Before ANY commit** → Use `code-analyzer` agent (validates schema, types, API contracts)
+- **Complex tasks** → Use `planner` agent first
+
+### Common Pitfalls & Solutions
+
+#### 1. Schema Mismatch ⚠️ CRITICAL
+**Problem**: Form values don't match database CHECK constraints → 100% INSERT failures
+
+❌ **WRONG**:
+```typescript
+property_type: 'multifamily'  // Database expects 'Garden-Style'
+equipment_type: 'compactor'   // Database expects 'COMPACTOR' (uppercase)
+status: 'active'              // Database expects 'draft'
+```
+
+✅ **CORRECT**:
+```typescript
+// Read supabase/migrations/*.sql FIRST
+property_type: 'Garden-Style'  // Exact match to CHECK constraint
+equipment_type: 'COMPACTOR'    // Exact case match
+status: 'draft'                // Valid enum value
+```
+
+#### 2. API Shape Mismatch ⚠️ CRITICAL
+**Problem**: Component expects snake_case, API returns camelCase → SWR breaks
+
+❌ **WRONG**:
+```typescript
+interface Job {
+  job_type: string           // API returns jobType
+  progress_percent: number   // API returns progress.percent
+}
+```
+
+✅ **CORRECT**:
+```typescript
+interface Job {
+  jobType: string            // Matches API response
+  progress: {
+    percent: number          // Nested as API provides
+  }
+}
+```
+
+#### 3. Duplicate Type Definitions ⚠️ HIGH
+**Problem**: Redefining types causes field mismatches
+
+❌ **WRONG**:
+```typescript
+interface CompactorResult {
+  dsqMonitorCost?: { install: number }  // Skill doesn't return this
+}
+```
+
+✅ **CORRECT**:
+```typescript
+import type { CompactorOptimizationResult } from '@/lib/skills/types'
+import { DSQ_MONITOR_INSTALL } from '@/lib/constants/formulas'
+
+// Use imported types and constants
+const cost = DSQ_MONITOR_INSTALL
+```
+
+### Mandatory Build Checks
+
+#### Pre-Commit (MUST PASS)
+```bash
+# All must pass with 0 errors
+pnpm tsc --noEmit      # TypeScript validation
+pnpm lint              # ESLint
+pnpm test:unit         # Unit tests
+```
+
+#### Never Use
+```typescript
+// ❌ CRITICAL - These hide errors
+typescript: { ignoreBuildErrors: true }
+eslint: { ignoreDuringBuilds: true }
+```
+
+### Validation Workflow
+
+```
+┌─────────────────┐
+│ Start Feature   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Read Schema &   │  ← MANDATORY FIRST STEP
+│ API Contracts   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Use Agent       │  ← Frontend/Backend/Skills
+│ (Not Direct)    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Code Analyzer   │  ← BEFORE COMMIT
+│ Agent Review    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ tsc --noEmit    │  ← MUST PASS
+│ (0 errors)      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Commit          │
+└─────────────────┘
+```
+
 ### Phased Quality Enforcement (NEW - Phase 1.5)
 
 **Philosophy**: Start light, add rigor progressively as codebase matures.
