@@ -36,6 +36,7 @@ import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
+import { ContractRepository, type ContractRecord } from '@/lib/db'
 
 /**
  * Container type validation
@@ -274,6 +275,19 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
       projectId: context.projectId,
     })
 
+    // Save extracted contracts to database
+    await this.updateProgress(context, {
+      percent: 96,
+      step: 'Saving contract data to database',
+    })
+
+    await this.saveToDatabase(
+      context.projectId,
+      validatedContracts,
+      supabase,
+      executionLogger
+    )
+
     await this.updateProgress(context, {
       percent: 100,
       step: 'Contract extraction complete',
@@ -419,6 +433,94 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
         error as Error
       )
       return null
+    }
+  }
+
+  /**
+   * Save extracted contract data to database
+   *
+   * Uses ContractRepository with upsert logic (one contract per project).
+   * Gracefully handles failures (logs but doesn't crash).
+   */
+  private async saveToDatabase(
+    projectId: string,
+    contracts: ContractData[],
+    supabase: any,
+    executionLogger: any
+  ): Promise<void> {
+    executionLogger.info('Saving contract data to database', {
+      contractCount: contracts.length,
+    })
+
+    try {
+      const contractRepo = new ContractRepository(supabase)
+
+      // Save contracts (typically just one, but handle multiple)
+      for (const contract of contracts) {
+        const contractRecord: ContractRecord = {
+          project_id: projectId,
+          contract_start_date: contract.contractDates.effectiveDate,
+          contract_end_date: contract.contractDates.expirationDate,
+          term_length_years: contract.contractDates.termMonths / 12,
+          clauses: {
+            'Term & Renewal': contract.contractDates.autoRenew
+              ? [`Auto-renewal: Yes`, `Term: ${contract.contractDates.termMonths} months`]
+              : [`Term: ${contract.contractDates.termMonths} months`],
+            'Termination': [
+              `Notice period: ${contract.terms.terminationNoticeDays} days`,
+              contract.terms.earlyTerminationPenalty
+                ? `Early termination penalty: ${contract.terms.earlyTerminationPenalty}`
+                : 'No early termination penalty specified',
+            ],
+            'Pricing': [
+              contract.pricing.monthlyBase ? `Monthly base: $${contract.pricing.monthlyBase}` : '',
+              contract.pricing.perPickup ? `Per pickup: $${contract.pricing.perPickup}` : '',
+              contract.pricing.perTon ? `Per ton: $${contract.pricing.perTon}` : '',
+              contract.pricing.escalationClause || '',
+              contract.pricing.cpiAdjustment ? 'CPI adjustment: Yes' : '',
+            ].filter(Boolean),
+            'Payment Terms': [
+              contract.terms.paymentTerms,
+              contract.terms.latePenalty ? `Late penalty: ${contract.terms.latePenalty}` : '',
+            ].filter(Boolean),
+            'Insurance': contract.terms.insuranceRequired ? ['Insurance required'] : [],
+          },
+          calendar_reminders: contractRepo.generateCalendarReminders({
+            project_id: projectId,
+            contract_start_date: contract.contractDates.effectiveDate,
+            contract_end_date: contract.contractDates.expirationDate,
+            term_length_years: contract.contractDates.termMonths / 12,
+            clauses: {},
+          }),
+        }
+
+        const result = await contractRepo.upsert(contractRecord)
+
+        if (result.error) {
+          executionLogger.warn('Failed to save contract', {
+            error: result.error,
+            contractFile: contract.sourceFile,
+          })
+        } else {
+          executionLogger.info('Contract saved to database', {
+            contractId: result.data?.id,
+          })
+          metrics.increment('contract_extractor.db.contracts_saved', 1, {
+            projectId,
+          })
+        }
+      }
+
+      executionLogger.info('Database save completed successfully')
+    } catch (error) {
+      executionLogger.error('Failed to save contracts to database', error as Error, {
+        projectId,
+        contractCount: contracts.length,
+      })
+
+      metrics.increment('contract_extractor.db.save_failed', 1, {
+        projectId,
+      })
     }
   }
 }
