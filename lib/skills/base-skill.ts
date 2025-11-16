@@ -21,6 +21,11 @@ import {
   FormulaValidationError,
   NotFoundError,
 } from '@/lib/types/errors'
+import {
+  TONS_TO_YARDS,
+  WEEKS_PER_MONTH,
+  COMPACTOR_TARGET_TONS,
+} from '@/lib/constants/formulas'
 
 export abstract class BaseSkill<TResult = any> implements Skill<TResult> {
   /** Unique skill identifier */
@@ -216,29 +221,25 @@ export abstract class BaseSkill<TResult = any> implements Skill<TResult> {
   protected validateFormulas(context: SkillContext): void {
     const { config } = context
 
-    // Import canonical values from formulas.ts
-    const EXPECTED_COMPACTOR_YPD = 14.49
-    const EXPECTED_DUMPSTER_YPD = 4.33
-    const EXPECTED_TARGET_CAPACITY = 8.5
-
-    if (config.conversionRates.compactorYpd !== EXPECTED_COMPACTOR_YPD) {
+    // Use canonical values from formulas.ts
+    if (config.conversionRates.compactorYpd !== TONS_TO_YARDS) {
       throw new FormulaValidationError(
         this.name,
-        `Compactor YPD mismatch: expected ${EXPECTED_COMPACTOR_YPD}, got ${config.conversionRates.compactorYpd}`
+        `Compactor YPD mismatch: expected ${TONS_TO_YARDS}, got ${config.conversionRates.compactorYpd}`
       )
     }
 
-    if (config.conversionRates.dumpsterYpd !== EXPECTED_DUMPSTER_YPD) {
+    if (config.conversionRates.dumpsterYpd !== WEEKS_PER_MONTH) {
       throw new FormulaValidationError(
         this.name,
-        `Dumpster YPD mismatch: expected ${EXPECTED_DUMPSTER_YPD}, got ${config.conversionRates.dumpsterYpd}`
+        `Dumpster YPD mismatch: expected ${WEEKS_PER_MONTH}, got ${config.conversionRates.dumpsterYpd}`
       )
     }
 
-    if (config.conversionRates.targetCapacity !== EXPECTED_TARGET_CAPACITY) {
+    if (config.conversionRates.targetCapacity !== COMPACTOR_TARGET_TONS) {
       throw new FormulaValidationError(
         this.name,
-        `Target capacity mismatch: expected ${EXPECTED_TARGET_CAPACITY}, got ${config.conversionRates.targetCapacity}`
+        `Target capacity mismatch: expected ${COMPACTOR_TARGET_TONS}, got ${config.conversionRates.targetCapacity}`
       )
     }
   }
