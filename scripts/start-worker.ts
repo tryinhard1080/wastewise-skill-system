@@ -10,7 +10,7 @@
  *
  * Environment Variables Required:
  *   - NEXT_PUBLIC_SUPABASE_URL
- *   - SUPABASE_SERVICE_KEY
+ *   - SUPABASE_SERVICE_ROLE_KEY
  */
 
 import { AnalysisWorker } from '../lib/workers/analysis-worker'
@@ -25,7 +25,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') })
  * Validate required environment variables
  */
 function validateEnvironment(): void {
-  const required = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_KEY']
+  const required = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
 
   const missing = required.filter((key) => !process.env[key])
 
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
   // Create worker configuration
   const config = {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
     pollInterval: cliConfig.pollInterval || 2000,
     maxConcurrentJobs: cliConfig.maxConcurrentJobs || 1,
   }
