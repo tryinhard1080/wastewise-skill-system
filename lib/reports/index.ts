@@ -28,3 +28,12 @@ export {
   type HtmlGeneratorInput,
   type HtmlGeneratorOutput,
 } from './html-generator'
+
+// Report storage
+export {
+  uploadReport,
+  uploadReports,
+  deleteOldReports,
+  type UploadReportInput,
+  type UploadReportOutput,
+} from './storage'
