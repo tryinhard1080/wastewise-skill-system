@@ -24,7 +24,10 @@ export {
   assertWithinTolerance,
 } from './eval-utils'
 
-// Formula validation
+// Formula validation - import for local use
+import { validateFormulaConstants, formatValidationReport } from './formula-validator'
+
+// Formula validation - re-export for external consumers
 export {
   validateFormulaConstants,
   formatValidationReport,
@@ -32,11 +35,17 @@ export {
   runAndPrintValidation,
 } from './formula-validator'
 
-// Skill-specific evals
+// Skill-specific evals - import for local use
+import { runCompactorOptimizationEval } from './compactor-optimization-eval'
+
+// Skill-specific evals - re-export for external consumers
 export {
   runCompactorOptimizationEval,
   runAndPrintEval as runAndPrintCompactorEval,
 } from './compactor-optimization-eval'
+
+// Import types for type annotations
+import type { EvalSummary } from './types'
 
 /**
  * Run all evals and return summary
@@ -50,9 +59,9 @@ export async function runAllEvals() {
     // runWasteWiseAnalyticsEval(),
   ])
 
-  const totalTests = results.reduce((sum, r) => sum + r.totalTests, 0)
-  const passing = results.reduce((sum, r) => sum + r.passing, 0)
-  const failing = results.reduce((sum, r) => sum + r.failing, 0)
+  const totalTests = results.reduce((sum: number, r: EvalSummary) => sum + r.totalTests, 0)
+  const passing = results.reduce((sum: number, r: EvalSummary) => sum + r.passing, 0)
+  const failing = results.reduce((sum: number, r: EvalSummary) => sum + r.failing, 0)
 
   return {
     totalTests,

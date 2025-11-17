@@ -13,6 +13,15 @@ import type { Database, Tables } from '@/types/database.types'
 import { logger } from '@/lib/observability/logger'
 import { WasteWiseAnalyticsSkill } from '@/lib/skills/skills/wastewise-analytics'
 import type { SkillContext } from '@/lib/skills/types'
+import {
+  TONS_TO_YARDS,
+  WEEKS_PER_MONTH,
+  COMPACTOR_TARGET_TONS,
+  COMPACTOR_OPTIMIZATION_THRESHOLD,
+  CONTAMINATION_THRESHOLD_PCT,
+  BULK_SUBSCRIPTION_THRESHOLD,
+  LEASEUP_VARIANCE_THRESHOLD,
+} from '@/lib/constants/formulas'
 
 type AnalysisJob = Tables<'analysis_jobs'>
 
@@ -213,15 +222,15 @@ export class JobProcessor {
       : {
           // Default configuration (fallback if database config not found)
           conversionRates: {
-            compactorYpd: 14.49,
-            dumpsterYpd: 4.33,
-            targetCapacity: 8.5,
+            compactorYpd: TONS_TO_YARDS,
+            dumpsterYpd: WEEKS_PER_MONTH,
+            targetCapacity: COMPACTOR_TARGET_TONS,
           },
           thresholds: {
-            compactorTons: 6.0,
-            contaminationPct: 0.03,
-            bulkMonthly: 500,
-            leaseupVariance: -40,
+            compactorTons: COMPACTOR_OPTIMIZATION_THRESHOLD,
+            contaminationPct: CONTAMINATION_THRESHOLD_PCT,
+            bulkMonthly: BULK_SUBSCRIPTION_THRESHOLD,
+            leaseupVariance: LEASEUP_VARIANCE_THRESHOLD,
           },
         }
 

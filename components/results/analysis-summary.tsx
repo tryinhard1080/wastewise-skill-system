@@ -101,9 +101,9 @@ export function AnalysisSummary({ summary }: AnalysisSummaryProps) {
             {new Date(summary.dateRange.start).toLocaleDateString()} -{' '}
             {new Date(summary.dateRange.end).toLocaleDateString()}
           </span>
-          {summary.totalHauls && (
+          {summary.totalHauls != null && (
             <span className="ml-4">
-              Total Hauls:{' '}
+              Total Haul{summary.totalHauls !== 1 ? 's' : ''}:{' '}
               <span className="font-medium text-foreground">
                 {summary.totalHauls}
               </span>
