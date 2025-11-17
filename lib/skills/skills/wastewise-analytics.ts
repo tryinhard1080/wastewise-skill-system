@@ -516,7 +516,8 @@ export class WasteWiseAnalyticsSkill extends BaseSkill<WasteWiseAnalyticsComplet
   /**
    * Generate Excel and HTML reports
    *
-   * Placeholder implementation - will be enhanced with actual report generation
+   * Generates professional Excel workbook and interactive HTML dashboard
+   * with all analysis results, charts, and recommendations.
    */
   private async generateReports(
     context: SkillContext,
@@ -532,26 +533,138 @@ export class WasteWiseAnalyticsSkill extends BaseSkill<WasteWiseAnalyticsComplet
       projectId: context.projectId,
     })
 
-    executionLogger.info('Generating reports (placeholder implementation)')
+    executionLogger.info('Starting report generation', {
+      hasCompactorData: !!analysisData.compactorOptimization,
+      hasHaulLog: !!context.haulLog && context.haulLog.length > 0,
+      recommendationsCount: analysisData.recommendations.length,
+    })
 
-    // TODO: Implement actual report generation using ExcelJS and HTML templates
-    // For now, return placeholder data
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const projectName = context.project.property_name.replace(/[^a-zA-Z0-9]/g, '_')
+    try {
+      // Import report generators
+      const { generateExcelReport, generateHtmlDashboard, uploadReports } = await import(
+        '@/lib/reports'
+      )
 
-    return {
-      excelWorkbook: {
-        fileName: `${projectName}_Analysis_${timestamp}.xlsx`,
-        storagePath: `reports/${context.projectId}/workbook_${timestamp}.xlsx`,
-        downloadUrl: '#', // Placeholder - will be Supabase Storage signed URL
-        size: 0,
-      },
-      htmlDashboard: {
-        fileName: `${projectName}_Dashboard_${timestamp}.html`,
-        storagePath: `reports/${context.projectId}/dashboard_${timestamp}.html`,
-        downloadUrl: '#', // Placeholder - will be Supabase Storage signed URL
-        size: 0,
-      },
+      // Build complete result object for report generation
+      const totalSavingsPotential = analysisData.recommendations.reduce(
+        (sum, rec) => sum + (rec.savings || 0),
+        0
+      )
+
+      const result: WasteWiseAnalyticsCompleteResult = {
+        summary: {
+          totalSavingsPotential,
+          currentMonthlyCost: analysisData.invoiceMetrics.totalSpend,
+          optimizedMonthlyCost:
+            analysisData.invoiceMetrics.totalSpend - totalSavingsPotential / 12,
+          savingsPercentage:
+            analysisData.invoiceMetrics.totalSpend > 0
+              ? (totalSavingsPotential / (analysisData.invoiceMetrics.totalSpend * 12)) * 100
+              : 0,
+          dateRange: analysisData.invoiceMetrics.dateRange,
+          totalInvoices: context.invoices.length,
+          totalHauls: context.haulLog?.length,
+        },
+        compactorOptimization: analysisData.compactorOptimization,
+        recommendations: analysisData.recommendations,
+        reports: {
+          excelWorkbook: { fileName: '', storagePath: '', downloadUrl: '', size: 0 },
+          htmlDashboard: { fileName: '', storagePath: '', downloadUrl: '', size: 0 },
+        },
+        executionTime: 0,
+        aiUsage: {
+          totalRequests: 0,
+          totalTokensInput: 0,
+          totalTokensOutput: 0,
+          totalCostUsd: 0,
+        },
+        leaseUpDetected: analysisData.leaseUpDetected,
+      }
+
+      // Generate Excel workbook
+      executionLogger.info('Generating Excel workbook')
+      const excelOutput = await generateExcelReport({
+        result,
+        project: context.project,
+        invoices: context.invoices,
+        haulLogs: context.haulLog,
+      })
+
+      executionLogger.info('Excel workbook generated', {
+        size: excelOutput.size,
+        tabsGenerated: excelOutput.metadata.tabsGenerated,
+      })
+
+      // Generate HTML dashboard
+      executionLogger.info('Generating HTML dashboard')
+      const htmlOutput = await generateHtmlDashboard({
+        result,
+        project: context.project,
+        invoices: context.invoices,
+        haulLogs: context.haulLog,
+      })
+
+      executionLogger.info('HTML dashboard generated', {
+        size: htmlOutput.size,
+        tabsIncluded: htmlOutput.metadata.tabsIncluded,
+      })
+
+      // Upload both reports to Supabase Storage
+      executionLogger.info('Uploading reports to storage')
+      const uploadedReports = await uploadReports(
+        excelOutput.buffer,
+        excelOutput.filename,
+        htmlOutput.html,
+        htmlOutput.filename,
+        context.projectId
+      )
+
+      executionLogger.info('Reports uploaded successfully', {
+        excelUrl: uploadedReports.excel.downloadUrl,
+        htmlUrl: uploadedReports.html.downloadUrl,
+      })
+
+      // Return report metadata
+      return {
+        excelWorkbook: {
+          fileName: uploadedReports.excel.filename,
+          storagePath: uploadedReports.excel.storagePath,
+          downloadUrl: uploadedReports.excel.downloadUrl,
+          size: uploadedReports.excel.size,
+        },
+        htmlDashboard: {
+          fileName: uploadedReports.html.filename,
+          storagePath: uploadedReports.html.storagePath,
+          downloadUrl: uploadedReports.html.downloadUrl,
+          size: uploadedReports.html.size,
+        },
+      }
+    } catch (error) {
+      executionLogger.error('Report generation failed', error as Error, {
+        projectId: context.projectId,
+      })
+
+      // Report generation failure should not fail entire analysis
+      // Return placeholder data so analysis can still complete
+      executionLogger.warn('Returning placeholder report data due to generation failure')
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      const projectName = context.project.property_name.replace(/[^a-zA-Z0-9]/g, '_')
+
+      return {
+        excelWorkbook: {
+          fileName: `${projectName}_Analysis_${timestamp}.xlsx`,
+          storagePath: `reports/${context.projectId}/workbook_${timestamp}.xlsx`,
+          downloadUrl: '', // Empty URL indicates generation failed
+          size: 0,
+        },
+        htmlDashboard: {
+          fileName: `${projectName}_Dashboard_${timestamp}.html`,
+          storagePath: `reports/${context.projectId}/dashboard_${timestamp}.html`,
+          downloadUrl: '', // Empty URL indicates generation failed
+          size: 0,
+        },
+      }
     }
   }
 }

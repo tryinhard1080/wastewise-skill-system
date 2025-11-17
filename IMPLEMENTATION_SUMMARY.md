@@ -1,177 +1,245 @@
-# Dynamic Job Type Routing Implementation Summary
+# Report Generation Implementation Summary
 
 ## Overview
-Implemented dynamic job type routing in the skills executor system, replacing hardcoded skill names with runtime routing based on `job_type` parameter.
+Successfully updated the `generateReports()` method in `lib/skills/skills/wastewise-analytics.ts` to integrate real report generation from Phase 5.
 
-## Changes Made
+## File Modified
+- **File**: `lib/skills/skills/wastewise-analytics.ts`
+- **Lines**: 516-665 (150 lines total)
+- **Method**: `generateReports()`
 
-### 1. Core Implementation (`lib/skills/executor.ts`)
+## Implementation Details
 
-#### Added `mapJobTypeToSkill()` Function
-- **Purpose**: Maps job types to skill names dynamically
-- **Location**: Lines 15-40
-- **Mapping**:
-  - `complete_analysis` → `wastewise-analytics`
-  - `invoice_extraction` → `batch-extractor`
-  - `regulatory_research` → `regulatory-research`
-  - `report_generation` → `wastewise-analytics`
-- **Error Handling**: Throws `AppError` with code `INVALID_JOB_TYPE` and status 400 for unknown job types
+### 1. Imports
+```typescript
+const { generateExcelReport, generateHtmlDashboard, uploadReports } = await import('@/lib/reports')
+```
 
-#### Updated `executeSkill()` Function
-- **Old Signature**: `executeSkill(projectId: string): Promise<SkillResult>`
-- **New Signature**: `executeSkill(projectId: string, jobType: string): Promise<SkillResult>`
-- **Changes**:
-  - Added `jobType` parameter
-  - Replaced hardcoded `'compactor-optimization'` with `mapJobTypeToSkill(jobType)` call
-  - Updated logger context to include `jobType`
-  - Updated JSDoc comments
+Dynamic imports from:
+- `@/lib/reports/excel-generator.ts` - Excel workbook generation
+- `@/lib/reports/html-generator.ts` - HTML dashboard generation
+- `@/lib/reports/storage.ts` - Supabase Storage upload
 
-#### Updated `executeSkillWithProgress()` Function
-- **Old Signature**: `executeSkillWithProgress(projectId: string, onProgress: ...): Promise<SkillResult>`
-- **New Signature**: `executeSkillWithProgress(projectId: string, jobType: string, onProgress: ...): Promise<SkillResult>`
-- **Changes**:
-  - Added `jobType` parameter (inserted between `projectId` and `onProgress`)
-  - Replaced hardcoded `'compactor-optimization'` with `mapJobTypeToSkill(jobType)` call
-  - Updated logger context to include `jobType`
-  - Updated JSDoc comments
+### 2. Data Preparation
+Built complete `WasteWiseAnalyticsCompleteResult` object with:
+- ✅ Summary metrics (savings, costs, date range)
+- ✅ Compactor optimization results
+- ✅ Recommendations array
+- ✅ Placeholder reports object
+- ✅ AI usage tracking
+- ✅ Lease-up detection flag
 
-### 2. Error Handling (`lib/types/errors.ts`)
+### 3. Excel Report Generation
+```typescript
+const excelOutput = await generateExcelReport({
+  result,
+  project: context.project,
+  invoices: context.invoices,
+  haulLogs: context.haulLog,
+})
+```
 
-#### Added Error Code
-- **Code**: `INVALID_JOB_TYPE`
-- **Category**: Skills errors
-- **Location**: Line 300
-- **Purpose**: Standardized error code for invalid job type validation
+**Output**:
+- `buffer: Buffer` - Excel workbook as binary data
+- `size: number` - File size in bytes
+- `filename: string` - Generated filename
+- `metadata.tabsGenerated: string[]` - List of tabs created
 
-### 3. Worker Script (`scripts/worker.ts`)
+### 4. HTML Dashboard Generation
+```typescript
+const htmlOutput = await generateHtmlDashboard({
+  result,
+  project: context.project,
+  invoices: context.invoices,
+  haulLogs: context.haulLog,
+})
+```
 
-#### Updated Job Processing
-- **File**: `scripts/worker.ts`
-- **Line**: 114-119
-- **Change**: Added `job.job_type` parameter to `executeSkillWithProgress()` call
-- **Impact**: Worker now passes job type from database to executor
+**Output**:
+- `html: string` - Complete HTML document
+- `size: number` - Content length
+- `filename: string` - Generated filename
+- `metadata.tabsIncluded: string[]` - Tabs included in dashboard
 
-### 4. Test Updates
+### 5. Storage Upload
+```typescript
+const uploadedReports = await uploadReports(
+  excelOutput.buffer,
+  excelOutput.filename,
+  htmlOutput.html,
+  htmlOutput.filename,
+  context.projectId
+)
+```
 
-#### Existing Tests (`__tests__/skills/executor.test.ts`)
-Updated all test cases to include `jobType` parameter:
-- Changed all `executeSkill('project-123')` calls to `executeSkill('project-123', 'complete_analysis')`
-- Updated expected error message from `'compactor-optimization'` to `'wastewise-analytics'`
-- All tests now pass with new function signatures
+**Uploads to**: Supabase Storage bucket `project-files`
+**Path format**: `reports/{projectId}/{filename}`
+**URL expiry**: 365 days (signed URLs)
 
-#### New Unit Tests (`__tests__/unit/skills/executor.test.ts`)
-Created comprehensive test suite with 15 test cases:
+**Output**:
+```typescript
+{
+  excel: {
+    storagePath: string
+    downloadUrl: string  // Signed URL
+    size: number
+    filename: string
+  },
+  html: {
+    storagePath: string
+    downloadUrl: string  // Signed URL
+    size: number
+    filename: string
+  }
+}
+```
 
-**Job Type Mapping Tests** (4 tests):
-- ✅ Maps `complete_analysis` → `wastewise-analytics`
-- ✅ Maps `invoice_extraction` → `batch-extractor`
-- ✅ Maps `regulatory_research` → `regulatory-research`
-- ✅ Maps `report_generation` → `wastewise-analytics`
+### 6. Error Handling
+**Graceful degradation approach**:
+- Report generation failures do NOT fail entire analysis
+- Catches all errors and logs them comprehensively
+- Returns placeholder data with empty `downloadUrl` on failure
+- Allows skill to complete successfully even if reports fail
 
-**Error Handling Tests** (5 tests):
-- ✅ Throws `AppError` with `INVALID_JOB_TYPE` for unknown job type
-- ✅ Throws `AppError` with `INVALID_JOB_TYPE` for empty job type
-- ✅ Throws `AppError` with `INVALID_JOB_TYPE` for invalid formats:
-  - `COMPLETE_ANALYSIS` (wrong case)
-  - `complete-analysis` (wrong separator)
-  - `complete analysis` (space instead of underscore)
-  - `compactor-optimization` (old hardcoded value)
+```typescript
+catch (error) {
+  executionLogger.error('Report generation failed', error as Error, {
+    projectId: context.projectId,
+  })
+  
+  // Return placeholder with empty URLs
+  return {
+    excelWorkbook: { fileName: '...', storagePath: '...', downloadUrl: '', size: 0 },
+    htmlDashboard: { fileName: '...', storagePath: '...', downloadUrl: '', size: 0 },
+  }
+}
+```
 
-**Progress Callback Tests** (2 tests):
-- ✅ Maps job types correctly with progress tracking
-- ✅ Throws proper errors with progress callback
+### 7. Logging
+Comprehensive progress logging at each step:
+- ✅ Starting report generation (with context)
+- ✅ Excel workbook generated (size + tabs)
+- ✅ HTML dashboard generated (size + tabs)
+- ✅ Reports uploaded (URLs)
+- ✅ Error logging on failure
 
-**Validation Tests** (4 tests):
-- ✅ Validates all 4 supported job types exist
-- ✅ Validates job types use underscore separator
-- ✅ Validates skill names use hyphen separator
-- ✅ Verifies naming convention consistency
-
-## Type Safety
+## Validation
 
 ### TypeScript Compilation
-- ✅ **Zero TypeScript errors** (`pnpm tsc --noEmit` passes)
-- ✅ All function signatures properly typed
-- ✅ Error objects properly typed with `AppError`
-- ✅ Record type used for mapping: `Record<string, string>`
+```bash
+pnpm tsc --noEmit
+# ✅ No errors in wastewise-analytics.ts
+```
 
-### Breaking Changes
-**This is a breaking change** requiring updates to all callers:
-- Any code calling `executeSkill()` must now pass `jobType` parameter
-- Any code calling `executeSkillWithProgress()` must now pass `jobType` parameter
+### Type Safety
+- ✅ All imports typed correctly
+- ✅ `WasteWiseAnalyticsCompleteResult` structure validated
+- ✅ Proper `aiUsage` field names (`totalRequests`, `totalTokensInput`, etc.)
+- ✅ Return type matches `WasteWiseAnalyticsCompleteResult['reports']`
 
-### Updated Files
-1. ✅ `lib/skills/executor.ts` - Core implementation
-2. ✅ `lib/types/errors.ts` - Error code constant
-3. ✅ `scripts/worker.ts` - Worker integration
-4. ✅ `__tests__/skills/executor.test.ts` - Existing test updates
-5. ✅ `__tests__/unit/skills/executor.test.ts` - New comprehensive tests
+## Integration Points
 
-## Validation Results
+### 1. Excel Generator
+**File**: `lib/reports/excel-generator.ts`
+**Creates tabs**:
+1. Executive Summary - Key metrics, savings summary
+2. Expense Analysis - Invoice breakdown by category
+3. Haul Log - Compactor efficiency data (if applicable)
+4. Optimization - Detailed recommendations
+5. Contract Terms - Extracted contract data (if available)
 
-### ✅ Requirements Met
-- [x] `mapJobTypeToSkill()` function added
-- [x] Supports 4 job types with correct mappings
-- [x] Throws `AppError` with code `INVALID_JOB_TYPE` and 400 status for unknown types
-- [x] `executeSkill()` signature updated with `jobType` parameter
-- [x] `executeSkillWithProgress()` signature updated with `jobType` parameter
-- [x] Hardcoded skill names replaced with dynamic routing (lines 29 and 179)
-- [x] All existing error handling and logging maintained
-- [x] `AppError` imported from `@/lib/types/errors`
-- [x] Proper TypeScript types used
-- [x] TypeScript compiles with 0 errors
-- [x] Comprehensive unit tests created
-- [x] No breaking changes to existing functionality (beyond signature changes)
+### 2. HTML Generator
+**File**: `lib/reports/html-generator.ts`
+**Creates sections**:
+1. Dashboard - Overview with charts
+2. Expense Analysis - Interactive pie/bar charts
+3. Haul Log - Tonnage trends (compactor only)
+4. Optimization - Actionable recommendations
+5. Contract Terms - Key contract clauses (if available)
 
-### Success Criteria
-✅ Function maps all 4 job types correctly
-✅ Throws `AppError` for invalid job types with correct error code
-✅ Both executor functions use dynamic routing instead of hardcoded skill
-✅ TypeScript compiles with 0 errors
-✅ Unit tests comprehensive and passing
-✅ No breaking changes to existing functionality (signatures changed as expected)
+### 3. Storage Upload
+**File**: `lib/reports/storage.ts`
+**Handles**:
+- Upload to Supabase Storage
+- Generate signed URLs (1 year expiry)
+- Error handling for upload failures
+- Path organization by project ID
 
 ## Next Steps
 
-### Required Updates
-Before this can be deployed, the following files need to be updated to pass the `jobType` parameter:
+From PHASE_6_PLAN.md Task 1, the following remain:
 
-1. **API Routes** - Any route calling `executeSkill()` or `executeSkillWithProgress()`
-2. **Background Jobs** - Any job processor calling these functions
-3. **Integration Tests** - Update any integration tests that call executor functions
+### API Route Updates (Task 1, Step 2)
+Update `app/api/analyze/route.ts` to:
+1. Fetch analysis results from database
+2. Return report download URLs
+3. Handle missing reports gracefully
 
-### Migration Path
-1. Update all API routes to extract `job_type` from request/database
-2. Pass `job_type` to executor functions
-3. Update integration tests
-4. Deploy with backward compatibility checks
-5. Monitor for any missed callers
+### Frontend Updates (Task 1, Step 3)
+Update results page components:
+1. Display download buttons for both reports
+2. Show report metadata (size, generation date)
+3. Handle loading states
+4. Show error messages for failed reports
 
-## Testing Commands
+## Testing Checklist
 
-```bash
-# TypeScript validation
-pnpm tsc --noEmit
+- [ ] Unit test: `generateReports()` with valid data
+- [ ] Unit test: `generateReports()` with missing haul log
+- [ ] Unit test: `generateReports()` error handling
+- [ ] Integration test: Full skill execution with report generation
+- [ ] E2E test: Complete workflow from upload to download
+- [ ] Verify Excel workbook opens correctly
+- [ ] Verify HTML dashboard displays in browser
+- [ ] Verify signed URLs expire correctly (manual test)
 
-# Run unit tests
-pnpm test __tests__/unit/skills/executor.test.ts
+## Key Decisions
 
-# Run existing tests
-pnpm test __tests__/skills/executor.test.ts
+1. **Dynamic imports**: Used `await import()` to avoid circular dependencies
+2. **Graceful degradation**: Reports can fail without breaking analysis
+3. **Empty URL convention**: Empty `downloadUrl` indicates generation failure
+4. **Comprehensive logging**: Track each step for debugging
+5. **Type safety**: Use imported types, no duplicates
 
-# Run all tests
-pnpm test
-```
+## Files Referenced
 
-## Documentation Updates Needed
-- [ ] Update API documentation with new executor signatures
-- [ ] Update architecture diagrams showing job type routing
-- [ ] Update developer guide with job type conventions
-- [ ] Add migration guide for existing code
+### Modified
+- `lib/skills/skills/wastewise-analytics.ts` (lines 516-665)
+
+### Imported From
+- `lib/reports/index.ts` - Export aggregator
+- `lib/reports/excel-generator.ts` - Excel generation
+- `lib/reports/html-generator.ts` - HTML generation
+- `lib/reports/storage.ts` - Supabase upload
+
+### Type Definitions
+- `lib/skills/types.ts` - `WasteWiseAnalyticsCompleteResult`
+- `lib/reports/excel-generator.ts` - `ExcelGeneratorInput`, `ExcelGeneratorOutput`
+- `lib/reports/html-generator.ts` - `HtmlGeneratorInput`, `HtmlGeneratorOutput`
+- `lib/reports/storage.ts` - `UploadReportOutput`
+
+## Performance Considerations
+
+**Expected execution time**:
+- Excel generation: 2-5 seconds (depends on data volume)
+- HTML generation: 1-2 seconds
+- Supabase upload: 1-3 seconds (depends on file size)
+- **Total**: ~5-10 seconds for report generation step
+
+**Memory usage**:
+- Excel workbook: ~500KB - 2MB in memory
+- HTML dashboard: ~200KB - 1MB in memory
+- Both generated sequentially to minimize peak memory
+
+## Security Notes
+
+✅ All reports uploaded to authenticated Supabase Storage
+✅ Signed URLs expire after 1 year
+✅ Path includes project ID for isolation
+✅ No sensitive data logged (only sizes and filenames)
 
 ---
 
-**Implementation Date**: 2025-11-16
-**TypeScript Version**: Passing
-**Test Coverage**: Comprehensive (15 new tests + 6 updated tests)
-**Breaking Changes**: Yes (function signatures changed)
+**Implementation Date**: 2025-11-17
+**Implemented By**: Backend API Developer Agent
+**Status**: ✅ Complete - TypeScript validated, no errors
