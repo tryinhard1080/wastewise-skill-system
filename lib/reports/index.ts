@@ -22,5 +22,9 @@ export { generateHaulLog } from './excel-tabs/haul-log'
 export { generateOptimization } from './excel-tabs/optimization'
 export { generateContractTerms } from './excel-tabs/contract-terms'
 
-// HTML generation (to be implemented in Phase 5 Task 3)
-// export { generateHtmlDashboard } from './html-generator'
+// HTML generation
+export {
+  generateHtmlDashboard,
+  type HtmlGeneratorInput,
+  type HtmlGeneratorOutput,
+} from './html-generator'
