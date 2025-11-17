@@ -311,23 +311,44 @@ async function createContractTerms(
 
   const { error } = await supabase.from('contract_terms').insert({
     project_id: projectId,
-    vendor_name: VENDOR_NAME,
-    service_type: 'Compactor Service',
-    frequency: 'As Needed (Target 2x/week)',
-    pricing_structure: {
-      rental: 200,
-      disposal_per_ton: 85,
-      pickup_fee: 150,
-      contamination_fee: 50,
+    contract_start_date: '2025-01-01',
+    contract_end_date: '2025-12-31',
+    term_length_years: 1.0,
+    clauses: {
+      'Term & Renewal': [
+        'Initial term: 12 months starting January 1, 2025',
+        'Auto-renewal for successive 12-month periods',
+        '60-day written notice required for non-renewal',
+      ],
+      'Rate Increases': [
+        'Annual price adjustment based on Consumer Price Index (CPI)',
+        'Maximum increase capped at 5% per year',
+      ],
+      'Service Level': [
+        'Compactor service provided on as-needed basis',
+        'Target frequency: 2 pickups per week',
+        'Additional pickups available upon request',
+      ],
+      'Termination': [
+        'Either party may terminate with 60-day written notice',
+        'Early termination fee: $500 if terminated before initial term end',
+      ],
+      'Liability': [
+        'Vendor maintains $2M general liability insurance',
+        'Property owner not liable for contamination originating from vendor equipment',
+      ],
     },
-    term_start: '2025-01-01',
-    term_end: '2025-12-31',
-    auto_renewal: true,
-    clauses: [
-      'Service provided on an as-needed basis',
-      'Target frequency: 2 pickups per week',
-      'Contamination fees apply for non-approved waste',
-      'Pricing subject to annual CPI adjustment',
+    calendar_reminders: [
+      {
+        type: 'renewal_notice',
+        date: '2025-11-01',
+        description: '60-day renewal notice deadline',
+      },
+      {
+        type: 'rate_review',
+        date: '2025-10-01',
+        description: 'Annual rate review and CPI adjustment',
+      },
     ],
   })
 
