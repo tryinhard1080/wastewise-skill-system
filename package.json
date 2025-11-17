@@ -9,7 +9,8 @@
     "start": "next start",
     "worker": "tsx scripts/start-worker.ts",
     "seed": "tsx scripts/seed-test-project.ts",
-    "test:e2e": "tsx scripts/test-e2e.ts"
+    "test:e2e": "tsx scripts/test-e2e.ts",
+    "test:ui": "tsx scripts/test-e2e-ui.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.69.0",
