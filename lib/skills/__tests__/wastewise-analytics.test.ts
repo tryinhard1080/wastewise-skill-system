@@ -16,41 +16,50 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { WasteWiseAnalyticsSkill } from '../skills/wastewise-analytics'
 import type { SkillContext, SkillProgress } from '../types'
+import { skillRegistry } from '../registry'
 
-// Mock the compactor optimization skill
-vi.mock('../skills/compactor-optimization', () => ({
-  CompactorOptimizationSkill: vi.fn().mockImplementation(() => ({
-    name: 'compactor-optimization',
-    execute: vi.fn().mockResolvedValue({
-      success: true,
-      data: {
-        recommend: true,
-        avgTonsPerHaul: 5.2,
-        targetTonsPerHaul: 8.5,
-        currentAnnualHauls: 156,
-        optimizedAnnualHauls: 95,
-        haulsEliminated: 61,
-        grossAnnualSavings: 51850.0,
-        netYear1Savings: 49150.0,
-        netAnnualSavingsYear2Plus: 49450.0,
-        roiPercent: 1819.44,
-        paybackMonths: 0.7,
-      },
-      metadata: {
-        skillName: 'compactor-optimization',
-        skillVersion: '1.0.0',
-        durationMs: 1000,
-        executedAt: new Date().toISOString(),
-        aiUsage: {
-          requests: 0,
-          tokensInput: 0,
-          tokensOutput: 0,
-          costUsd: 0,
-        },
-      },
-    }),
-  })),
+// Mock the registry
+vi.mock('../registry', () => ({
+  skillRegistry: {
+    get: vi.fn(),
+    getConfig: vi.fn(),
+  }
 }))
+
+// Create a mock compactor skill
+const mockCompactorSkill = {
+  name: 'compactor-optimization',
+  version: '1.0.0',
+  description: 'Mock compactor skill',
+  execute: vi.fn().mockResolvedValue({
+    success: true,
+    data: {
+      recommend: true,
+      avgTonsPerHaul: 5.2,
+      targetTonsPerHaul: 8.5,
+      currentAnnualHauls: 156,
+      optimizedAnnualHauls: 95,
+      haulsEliminated: 61,
+      grossAnnualSavings: 51850.0,
+      netYear1Savings: 49150.0,
+      netAnnualSavingsYear2Plus: 49450.0,
+      roiPercent: 1819.44,
+      paybackMonths: 0.7,
+    },
+    metadata: {
+      skillName: 'compactor-optimization',
+      skillVersion: '1.0.0',
+      durationMs: 1000,
+      executedAt: new Date().toISOString(),
+      aiUsage: {
+        requests: 0,
+        tokensInput: 0,
+        tokensOutput: 0,
+        costUsd: 0,
+      },
+    },
+  }),
+}
 
 // Helper to create mock context
 function createMockContext(overrides?: Partial<SkillContext>): SkillContext {
@@ -172,6 +181,13 @@ describe('WasteWiseAnalyticsSkill', () => {
   beforeEach(() => {
     skill = new WasteWiseAnalyticsSkill()
     vi.clearAllMocks()
+    // Setup registry mock
+    vi.mocked(skillRegistry.get).mockImplementation((name) => {
+      if (name === 'compactor-optimization') {
+        return mockCompactorSkill as any
+      }
+      return undefined
+    })
   })
 
   describe('Metadata', () => {
@@ -323,11 +339,13 @@ describe('WasteWiseAnalyticsSkill', () => {
     it('should add bulk subscription recommendation when threshold exceeded', async () => {
       const context = createMockContext()
       // Increase bulk service charges
+      // Need high enough value to exceed $500 average across all invoices
+      // Default has 2 invoices. So need > $1000 total.
       context.invoices[0].charges = {
         disposal: 1500.0,
-        bulk_service: 600.0, // Exceeds $500 threshold
+        bulk_service: 1200.0, // High enough to pull average > 500
       }
-      context.invoices[0].total_amount = 2100.0
+      context.invoices[0].total_amount = 2700.0
 
       const result = await skill.execute(context)
 
@@ -368,12 +386,18 @@ describe('WasteWiseAnalyticsSkill', () => {
 
   describe('Error Handling', () => {
     it('should handle sub-skill failures gracefully', async () => {
-      // Mock compactor skill to fail
-      const { CompactorOptimizationSkill } = await import('../skills/compactor-optimization')
-      vi.mocked(CompactorOptimizationSkill).mockImplementationOnce(() => ({
-        name: 'compactor-optimization',
-        execute: vi.fn().mockRejectedValue(new Error('Compactor analysis failed')),
-      }) as any)
+      // Mock registry to return failing skill
+      vi.mocked(skillRegistry.get).mockImplementation((name) => {
+        if (name === 'compactor-optimization') {
+          return {
+            name: 'compactor-optimization',
+            version: '1.0.0',
+            description: 'Mock failing skill',
+            execute: vi.fn().mockRejectedValue(new Error('Compactor analysis failed')),
+          } as any
+        }
+        return undefined
+      })
 
       const context = createMockContext()
       const result = await skill.execute(context)

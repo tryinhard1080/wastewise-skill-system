@@ -31,10 +31,12 @@ import {
   LEASEUP_VARIANCE_THRESHOLD,
   CONTAMINATION_THRESHOLD_PCT,
   BULK_SUBSCRIPTION_THRESHOLD,
+  BENCHMARK_YARDS_PER_DOOR,
 } from '@/lib/constants/formulas'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { InsufficientDataError, ValidationError } from '@/lib/types/errors'
+import { skillRegistry } from '../registry'
 
 /**
  * Invoice metrics calculated from invoice data
@@ -179,34 +181,38 @@ export class WasteWiseAnalyticsSkill extends BaseSkill<WasteWiseAnalyticsComplet
           totalSteps: 5,
         })
 
-        const { CompactorOptimizationSkill } = await import('./compactor-optimization')
-        const compactorSkill = new CompactorOptimizationSkill()
+        // Use registry to get skill instance instead of direct instantiation
+        const compactorSkill = skillRegistry.get('compactor-optimization')
 
-        const result = await compactorSkill.execute(context)
+        if (!compactorSkill) {
+           executionLogger.warn('Compactor optimization skill not found in registry')
+        } else {
+          const result = await compactorSkill.execute(context)
 
-        if (result.success && result.data) {
-          compactorOptimization = result.data
+          if (result.success && result.data) {
+            compactorOptimization = result.data as CompactorOptimizationResult
 
-          // Add to recommendations if recommended
-          if (compactorOptimization.recommend && !leaseUpDetected) {
-            recommendations.push({
-              type: 'compactor_monitors',
-              priority: 1,
-              title: 'Install DSQ Waste Monitoring System',
-              description: `Reduce pickups by optimizing compactor fill levels. Current average: ${compactorOptimization.avgTonsPerHaul.toFixed(2)} tons/haul. Target: ${compactorOptimization.targetTonsPerHaul} tons/haul.`,
-              recommend: true,
-              savings: compactorOptimization.netYear1Savings,
-              implementation: `${compactorOptimization.paybackMonths.toFixed(1)} month payback period`,
-              confidence: 'HIGH',
-            })
-          }
+            // Add to recommendations if recommended
+            if (compactorOptimization.recommend && !leaseUpDetected) {
+              recommendations.push({
+                type: 'compactor_monitors',
+                priority: 1,
+                title: 'Install DSQ Waste Monitoring System',
+                description: `Reduce pickups by optimizing compactor fill levels. Current average: ${compactorOptimization.avgTonsPerHaul.toFixed(2)} tons/haul. Target: ${compactorOptimization.targetTonsPerHaul} tons/haul.`,
+                recommend: true,
+                savings: compactorOptimization.netYear1Savings,
+                implementation: `${compactorOptimization.paybackMonths.toFixed(1)} month payback period`,
+                confidence: 'HIGH',
+              })
+            }
 
-          // Track AI usage if present
-          if (result.metadata.aiUsage) {
-            aiUsageTracker.totalRequests += result.metadata.aiUsage.requests
-            aiUsageTracker.totalTokensInput += result.metadata.aiUsage.tokensInput
-            aiUsageTracker.totalTokensOutput += result.metadata.aiUsage.tokensOutput
-            aiUsageTracker.totalCostUsd += result.metadata.aiUsage.costUsd
+            // Track AI usage if present
+            if (result.metadata.aiUsage) {
+              aiUsageTracker.totalRequests += result.metadata.aiUsage.requests
+              aiUsageTracker.totalTokensInput += result.metadata.aiUsage.tokensInput
+              aiUsageTracker.totalTokensOutput += result.metadata.aiUsage.tokensOutput
+              aiUsageTracker.totalCostUsd += result.metadata.aiUsage.costUsd
+            }
           }
         }
       } catch (error) {
@@ -429,7 +435,7 @@ export class WasteWiseAnalyticsSkill extends BaseSkill<WasteWiseAnalyticsComplet
     metrics: InvoiceMetrics
   ): boolean {
     // Industry benchmark for yards per door
-    const benchmarkYardsPerDoor = 2.2
+    const benchmarkYardsPerDoor = BENCHMARK_YARDS_PER_DOOR
 
     // Calculate variance from benchmark
     const variance = ((metrics.yardsPerDoor - benchmarkYardsPerDoor) / benchmarkYardsPerDoor) * 100

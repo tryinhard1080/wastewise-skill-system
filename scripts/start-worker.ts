@@ -15,6 +15,7 @@
 
 import { AnalysisWorker } from '../lib/workers/analysis-worker'
 import { logger } from '../lib/observability/logger'
+import { registerAllSkills } from '../lib/skills/skills'
 import dotenv from 'dotenv'
 import path from 'path'
 
@@ -136,6 +137,10 @@ async function main(): Promise<void> {
 
   // Start worker
   try {
+    console.log('Registering skills...')
+    logger.info('Registering all skills')
+    registerAllSkills()
+
     console.log('Starting worker...\n')
     logger.info('Starting worker process')
 

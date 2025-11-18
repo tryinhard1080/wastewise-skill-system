@@ -185,6 +185,11 @@ export const UTILIZATION_BENCHMARKS = {
   poor: 0, // <50%
 } as const;
 
+/**
+ * Industry Benchmark for Lease-up Detection
+ */
+export const BENCHMARK_YARDS_PER_DOOR = 2.2; // Industry average yards per door
+
 // ============================================================================
 // CALCULATION FUNCTIONS
 // ============================================================================

@@ -98,7 +98,7 @@ function recordResult(result: TestResult) {
 async function takeScreenshot(name: string): Promise<string> {
   const screenshotPath = join(CONFIG.screenshotDir, `${name}.png`)
   await page.screenshot({
-    path: screenshotPath,
+    path: screenshotPath as any,
     fullPage: true,
   })
   return screenshotPath
@@ -126,6 +126,16 @@ async function testLandingPage(): Promise<void> {
       waitUntil: 'networkidle2',
       timeout: CONFIG.timeout.navigation,
     })
+
+    console.log('  → Waiting for page content to load...')
+    // Wait for React to render by checking for any visible text content
+    await page.waitForFunction(
+      () => document.body.innerText.length > 100,
+      { timeout: CONFIG.timeout.element }
+    )
+
+    // Additional wait to ensure all components have mounted
+    await sleep(2000)
 
     console.log('  → Taking screenshot...')
     const screenshotPath = await takeScreenshot('01-landing-page')

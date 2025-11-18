@@ -41,32 +41,46 @@ vi.mock('@/lib/supabase/server', () => ({
             return { data: null, error: new Error('Not found') }
           }),
           order: vi.fn(() => ({
-            // For haul_log query
-            then: vi.fn(async (callback: any) =>
-              callback({
-                data: [
-                  {
-                    id: 'haul-1',
-                    project_id: 'project-123',
-                    haul_date: '2025-01-01',
-                    tonnage: 5.2,
-                  },
-                  {
-                    id: 'haul-2',
-                    project_id: 'project-123',
-                    haul_date: '2025-01-08',
-                    tonnage: 5.4,
-                  },
-                  {
-                    id: 'haul-3',
-                    project_id: 'project-123',
-                    haul_date: '2025-01-15',
-                    tonnage: 5.1,
-                  },
-                ],
-                error: null,
-              })
-            ),
+            then: vi.fn(async (callback: any) => {
+              if (table === 'haul_log') {
+                return callback({
+                  data: [
+                    {
+                      id: 'haul-1',
+                      project_id: 'project-123',
+                      haul_date: '2025-01-01',
+                      tonnage: 5.2,
+                    },
+                    {
+                      id: 'haul-2',
+                      project_id: 'project-123',
+                      haul_date: '2025-01-08',
+                      tonnage: 5.4,
+                    },
+                    {
+                      id: 'haul-3',
+                      project_id: 'project-123',
+                      haul_date: '2025-01-15',
+                      tonnage: 5.1,
+                    },
+                  ],
+                  error: null,
+                })
+              } else if (table === 'invoice_data') {
+                return callback({
+                  data: [
+                    {
+                      id: 'invoice-1',
+                      project_id: 'project-123',
+                      total_amount: 850,
+                      hauls: 1,
+                    },
+                  ],
+                  error: null,
+                })
+              }
+              return callback({ data: [], error: null })
+            }),
           })),
         })),
         // For invoice_data query
@@ -239,7 +253,7 @@ describe('executeSkill', () => {
 
       await expect(executeSkill('project-123', 'complete_analysis')).rejects.toThrow(NotFoundError)
       await expect(executeSkill('project-123', 'complete_analysis')).rejects.toThrow(
-        "Skill 'wastewise-analytics' not found in registry"
+        "Skill 'wastewise-analytics' not found"
       )
     })
 

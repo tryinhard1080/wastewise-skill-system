@@ -64,14 +64,13 @@ export function StartAnalysisButton({ projectId }: StartAnalysisButtonProps) {
       const data = await response.json()
 
       // Show success toast
-      toast.success('Analysis job started successfully!')
+      toast.success('Analysis started!')
 
-      // Close dialog and refresh
+      // Close dialog
       setOpen(false)
-      router.refresh()
 
-      // Optional: Navigate to job monitoring page
-      // router.push(`/jobs/${data.jobId}`)
+      // Navigate to processing page
+      router.push(`/projects/${projectId}/processing`)
     } catch (error) {
       console.error('Error starting analysis:', error)
       toast.error(

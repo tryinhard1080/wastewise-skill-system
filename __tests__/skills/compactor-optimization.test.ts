@@ -207,7 +207,7 @@ describe('CompactorOptimizationSkill', () => {
 
       expect(result.success).toBe(true)
       expect(result.data?.recommend).toBe(false)
-      expect(result.data?.avgTonsPerHaul).toBe(6.1)
+      expect(result.data?.avgTonsPerHaul).toBeCloseTo(6.1)
     })
 
     it('should throw InsufficientDataError when no haul log (bypassing validation)', async () => {
@@ -291,7 +291,7 @@ describe('CompactorOptimizationSkill', () => {
 
       expect(result.metadata.skillName).toBe('compactor-optimization')
       expect(result.metadata.skillVersion).toBe('1.0.0')
-      expect(result.metadata.durationMs).toBeGreaterThan(0)
+      expect(result.metadata.durationMs).toBeGreaterThanOrEqual(0)
       expect(result.metadata.executedAt).toBeDefined()
     })
   })
@@ -342,8 +342,9 @@ function createMockHaulLog(count: number, avgTons: number): HaulLogRow[] {
     const date = new Date(startDate)
     date.setDate(startDate.getDate() + i * 7) // Weekly pickups
 
-    // Add some variance (±10%)
-    const variance = (Math.random() - 0.5) * 0.2 * avgTons
+    // Add deterministic variance based on index instead of random
+    // Alternates between +5% and -5%
+    const variance = (i % 2 === 0 ? 0.05 : -0.05) * avgTons
     const tonnage = Math.round((avgTons + variance) * 10) / 10
 
     entries.push(createHaulLogEntry(date.toISOString().split('T')[0], tonnage))

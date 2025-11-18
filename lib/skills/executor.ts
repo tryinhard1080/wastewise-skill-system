@@ -1,16 +1,10 @@
-/**
- * Skill Executor
- *
- * Executes skills with proper data loading and context building.
- * Supports dynamic skill routing based on job type.
- */
-
 import { skillRegistry } from './registry'
 import { SkillContext, SkillResult } from './types'
 import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
-import { NotFoundError, InsufficientDataError, AppError } from '@/lib/types/errors'
+import { NotFoundError, AppError } from '@/lib/types/errors'
+import { HaulLogRepository, InvoiceRepository } from '@/lib/db'
 
 /**
  * Map job type to skill name
@@ -40,6 +34,86 @@ function mapJobTypeToSkill(jobType: string): string {
 }
 
 /**
+ * Build skill execution context with data from repositories
+ * 
+ * @param projectId - Project UUID
+ * @param userId - User UUID
+ * @param skillName - Name of the skill to configure
+ * @param onProgress - Optional progress callback
+ * @returns Populated SkillContext
+ */
+export async function buildSkillContext(
+  projectId: string, 
+  userId: string, 
+  skillName: string,
+  onProgress?: (percent: number, step: string) => Promise<void>
+): Promise<SkillContext> {
+  const contextLogger = logger.child({ projectId, skillName })
+  const supabase = await createClient()
+  
+  // Initialize repositories
+  const haulLogRepo = new HaulLogRepository(supabase)
+  const invoiceRepo = new InvoiceRepository(supabase)
+
+  contextLogger.debug('Loading project data', { userId })
+
+  // Load project
+  const { data: project, error: projectError } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', projectId)
+    .single()
+
+  if (projectError || !project) {
+    const error = new NotFoundError('Project', projectId)
+    contextLogger.error('Project not found', error)
+    throw error
+  }
+
+  // Load invoices
+  const { data: invoices, error: invoicesError } = await invoiceRepo.getByProjectId(projectId)
+
+  if (invoicesError) {
+    contextLogger.error('Failed to load invoices', new Error(invoicesError))
+    throw new Error(`Failed to load invoices: ${invoicesError}`)
+  }
+
+  // Load haul log (optional - specific skills will validate if they need it)
+  const { data: haulLog, error: haulLogError } = await haulLogRepo.getByProjectId(projectId)
+
+  if (haulLogError) {
+    // Log warning but don't fail - haul logs might not exist for non-compactor projects
+    contextLogger.warn('Failed to load haul log', new Error(haulLogError))
+  }
+
+  contextLogger.debug('Data loaded successfully', {
+    invoicesCount: invoices?.length || 0,
+    haulLogCount: haulLog?.length || 0,
+  })
+
+  // Get skill config from registry (backed by database)
+  const config = await skillRegistry.getConfig(skillName)
+
+  contextLogger.debug('Skill config loaded', {
+    compactorYpd: config.conversionRates.compactorYpd,
+    targetCapacity: config.conversionRates.targetCapacity,
+  })
+
+  // Build SkillContext
+  return {
+    projectId,
+    userId,
+    project,
+    invoices: invoices || [],
+    haulLog: haulLog || [],
+    config,
+    onProgress: onProgress ? async (p) => {
+      await onProgress(p.percent, p.step)
+    } : undefined
+  }
+}
+
+/**
  * Execute a skill for a given project
  *
  * Dynamically routes to the appropriate skill based on job type.
@@ -58,7 +132,7 @@ export async function executeSkill(projectId: string, jobType: string): Promise<
 
   executionLogger.info(`Starting skill execution: ${skillName}`)
 
-  // 1. Get skill from registry
+  // Get skill from registry
   const skill = skillRegistry.get(skillName)
 
   if (!skill) {
@@ -67,9 +141,8 @@ export async function executeSkill(projectId: string, jobType: string): Promise<
     throw error
   }
 
-  // 2. Load data from database
+  // Get current user
   const supabase = await createClient()
-
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
@@ -78,79 +151,10 @@ export async function executeSkill(projectId: string, jobType: string): Promise<
     throw error
   }
 
-  executionLogger.debug('Loading project data', { userId: user.id })
+  // Build context
+  const context = await buildSkillContext(projectId, user.id, skillName)
 
-  // Load project
-  const { data: project, error: projectError } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', projectId)
-    .single()
-
-  if (projectError || !project) {
-    const error = new NotFoundError('Project', projectId)
-    executionLogger.error('Project not found', error)
-    throw error
-  }
-
-  // Load invoices
-  const { data: invoices, error: invoicesError } = await supabase
-    .from('invoice_data')
-    .select('*')
-    .eq('project_id', projectId)
-
-  if (invoicesError) {
-    executionLogger.error('Failed to load invoices', invoicesError as Error)
-    throw invoicesError
-  }
-
-  // Load haul log (required for compactor optimization)
-  const { data: haulLog, error: haulLogError } = await supabase
-    .from('haul_log')
-    .select('*')
-    .eq('project_id', projectId)
-    .order('haul_date', { ascending: true })
-
-  if (haulLogError) {
-    executionLogger.error('Failed to load haul log', haulLogError as Error)
-    throw haulLogError
-  }
-
-  if (!haulLog || haulLog.length === 0) {
-    const error = new InsufficientDataError(
-      'compactor-optimization',
-      ['haulLog'],
-      { message: 'No haul log data found for compactor optimization' }
-    )
-    executionLogger.error('Missing haul log data', error)
-    throw error
-  }
-
-  executionLogger.debug('Data loaded successfully', {
-    invoicesCount: invoices?.length || 0,
-    haulLogCount: haulLog?.length || 0,
-  })
-
-  // 3. Get skill config from database
-  const config = await skillRegistry.getConfig(skillName)
-
-  executionLogger.debug('Skill config loaded', {
-    compactorYpd: config.conversionRates.compactorYpd,
-    targetCapacity: config.conversionRates.targetCapacity,
-    compactorThreshold: config.thresholds.compactorTons,
-  })
-
-  // 4. Build SkillContext
-  const context: SkillContext = {
-    projectId,
-    userId: user.id,
-    project,
-    invoices: invoices || [],
-    haulLog,
-    config,
-  }
-
-  // 5. Execute skill with metrics tracking
+  // Execute skill with metrics tracking
   const timerId = metrics.startTimer('skill.execution', { skill: skillName })
 
   try {
@@ -198,13 +202,15 @@ export async function executeSkill(projectId: string, jobType: string): Promise<
  * @param projectId - Project UUID
  * @param jobType - Job type from analysis_jobs.job_type
  * @param onProgress - Callback for progress updates
+ * @param userId - Optional user ID (for worker context). If not provided, gets from auth session.
  * @returns SkillResult
  * @throws AppError if job type is unknown
  */
 export async function executeSkillWithProgress(
   projectId: string,
   jobType: string,
-  onProgress: (percent: number, step: string) => Promise<void>
+  onProgress: (percent: number, step: string) => Promise<void>,
+  userId?: string
 ): Promise<SkillResult> {
   const executionLogger = logger.child({ projectId, jobType })
 
@@ -217,58 +223,26 @@ export async function executeSkillWithProgress(
     throw new NotFoundError('Skill', skillName)
   }
 
-  // Load data (same as executeSkill)
-  const supabase = await createClient()
+  // Get user ID: use provided userId (worker context) or get from auth session (web context)
+  let currentUserId: string
+  if (userId) {
+    // Worker context: use provided user ID
+    currentUserId = userId
+    executionLogger.info('Using provided user ID (worker context)', { userId: currentUserId })
+  } else {
+    // Web context: get from authenticated session
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    throw new NotFoundError('User')
+    if (authError || !user) {
+      throw new NotFoundError('User')
+    }
+    currentUserId = user.id
+    executionLogger.info('Using authenticated user ID (web context)', { userId: currentUserId })
   }
-
-  const { data: project, error: projectError } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', projectId)
-    .single()
-
-  if (projectError || !project) {
-    throw new NotFoundError('Project', projectId)
-  }
-
-  const { data: invoices } = await supabase
-    .from('invoice_data')
-    .select('*')
-    .eq('project_id', projectId)
-
-  const { data: haulLog } = await supabase
-    .from('haul_log')
-    .select('*')
-    .eq('project_id', projectId)
-    .order('haul_date', { ascending: true })
-
-  if (!haulLog || haulLog.length === 0) {
-    throw new InsufficientDataError(
-      'compactor-optimization',
-      ['haulLog'],
-      { message: 'No haul log data found for compactor optimization' }
-    )
-  }
-
-  const config = await skillRegistry.getConfig(skillName)
 
   // Build context with progress callback
-  const context: SkillContext = {
-    projectId,
-    userId: user.id,
-    project,
-    invoices: invoices || [],
-    haulLog,
-    config,
-    onProgress: async progress => {
-      await onProgress(progress.percent, progress.step)
-    },
-  }
+  const context = await buildSkillContext(projectId, currentUserId, skillName, onProgress)
 
   const timerId = metrics.startTimer('skill.execution', { skill: skillName })
 
