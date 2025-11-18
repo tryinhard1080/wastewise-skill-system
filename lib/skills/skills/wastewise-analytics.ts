@@ -248,6 +248,64 @@ export class WasteWiseAnalyticsSkill extends BaseSkill<WasteWiseAnalyticsComplet
       recommendations.push(bulkOpportunity)
     }
 
+    // Check for regulatory compliance (optional - only if location data available)
+    let regulatoryCompliance: any = undefined
+    if (context.project?.city && context.project?.state) {
+      try {
+        await this.updateProgress(context, {
+          percent: 55,
+          step: 'Researching municipal ordinances',
+          stepNumber: 2,
+          totalSteps: 5,
+        })
+
+        executionLogger.info('Running regulatory research')
+
+        const regulatorySkill = skillRegistry.get('regulatory-research')
+
+        if (!regulatorySkill) {
+          executionLogger.warn('Regulatory research skill not found in registry')
+        } else {
+          const result = await regulatorySkill.execute(context)
+
+          if (result.success && result.data) {
+            regulatoryCompliance = result.data
+
+            // Add compliance issues as recommendations if non-compliant
+            if (regulatoryCompliance.compliance?.status === 'NON_COMPLIANT') {
+              const complianceIssues = regulatoryCompliance.compliance.issues || []
+
+              complianceIssues.forEach((issue: any, index: number) => {
+                if (issue.severity === 'HIGH' || issue.severity === 'MEDIUM') {
+                  recommendations.push({
+                    type: 'regulatory_compliance',
+                    priority: issue.severity === 'HIGH' ? 2 : 3,
+                    title: `Compliance Issue: ${issue.issue}`,
+                    description: issue.recommendation,
+                    recommend: true,
+                    savings: 0, // Avoiding penalties, not direct savings
+                    implementation: `Requirement: ${issue.requirement}`,
+                    confidence: regulatoryCompliance.confidence === 'HIGH' ? 'HIGH' : 'MEDIUM',
+                  })
+                }
+              })
+            }
+
+            // Track AI usage
+            if (result.metadata.aiUsage) {
+              aiUsageTracker.totalRequests += result.metadata.aiUsage.requests
+              aiUsageTracker.totalTokensInput += result.metadata.aiUsage.tokensInput
+              aiUsageTracker.totalTokensOutput += result.metadata.aiUsage.tokensOutput
+              aiUsageTracker.totalCostUsd += result.metadata.aiUsage.costUsd
+            }
+          }
+        }
+      } catch (error) {
+        executionLogger.error('Regulatory research failed', error as Error)
+        // Continue with analysis - this is non-blocking
+      }
+    }
+
     await this.updateProgress(context, {
       percent: 60,
       step: 'Analysis complete',

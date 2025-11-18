@@ -9,6 +9,7 @@ import { CompactorOptimizationSkill } from './compactor-optimization'
 import { WasteWiseAnalyticsSkill } from './wastewise-analytics'
 import { BatchExtractorSkill } from './batch-extractor'
 import { ContractExtractorSkill } from './contract-extractor'
+import { RegulatoryResearchSkill } from './regulatory-research'
 import { skillRegistry } from '../registry'
 import { logger } from '@/lib/observability/logger'
 
@@ -36,8 +37,9 @@ export function registerAllSkills(): void {
   const contractExtractorSkill = new ContractExtractorSkill()
   skillRegistry.register(contractExtractorSkill)
 
-  // Future: Register other skills here as they are implemented
-  // skillRegistry.register(new RegulatoryResearchSkill())
+  // Phase 9: Regulatory Research
+  const regulatorySkill = new RegulatoryResearchSkill()
+  skillRegistry.register(regulatorySkill)
 
   logger.info(`Registered ${skillRegistry.count()} skill(s)`, {
     skills: skillRegistry.list(),
@@ -50,4 +52,5 @@ export {
   WasteWiseAnalyticsSkill,
   BatchExtractorSkill,
   ContractExtractorSkill,
+  RegulatoryResearchSkill,
 }

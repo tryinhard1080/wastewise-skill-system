@@ -364,24 +364,6 @@ export interface ContractService {
   serviceDays?: string // e.g., "Mon, Thu"
 }
 
-export interface RegulatoryResearchResult {
-  city: string
-  state: string
-  ordinances: Array<{
-    title: string
-    requirement: string
-    compliance: 'compliant' | 'non-compliant' | 'unknown'
-    source: string
-    url?: string
-  }>
-  recyclingRequired: boolean
-  contaminationLimits?: {
-    percentage: number
-    penalties: string
-  }
-  reportingRequired: boolean
-}
-
 export interface BatchExtractorResult {
   // Summary
   summary: {
@@ -512,7 +494,7 @@ export interface WasteWiseAnalyticsCompleteResult {
 
   /** All optimization recommendations */
   recommendations: Array<{
-    type: 'compactor_monitors' | 'contamination_reduction' | 'bulk_subscription' | 'other'
+    type: 'compactor_monitors' | 'contamination_reduction' | 'bulk_subscription' | 'regulatory_compliance' | 'other'
     priority: 1 | 2 | 3 | 4 | 5
     title: string
     description: string
@@ -549,4 +531,118 @@ export interface WasteWiseAnalyticsCompleteResult {
 
   /** Property is in lease-up (prevents optimization recommendations) */
   leaseUpDetected: boolean
+}
+
+/**
+ * Regulatory Research Result
+ *
+ * Contains municipal ordinance information and compliance assessment
+ * for a specific property location.
+ */
+export interface RegulatoryResearchResult {
+  /** Property location */
+  location: {
+    city: string
+    state: string
+    county?: string
+  }
+
+  /** Ordinances found and analyzed */
+  ordinances: OrdinanceInfo[]
+
+  /** Waste management requirements extracted from ordinances */
+  requirements: {
+    waste: WasteRequirement[]
+    recycling: RecyclingRequirement[]
+    composting: CompostingRequirement[]
+  }
+
+  /** Compliance assessment */
+  compliance: {
+    status: 'COMPLIANT' | 'NON_COMPLIANT' | 'UNKNOWN'
+    issues: ComplianceIssue[]
+    recommendations: string[]
+  }
+
+  /** Penalties for non-compliance */
+  penalties: {
+    type: string
+    description: string
+    amount?: string
+  }[]
+
+  /** Licensed haulers (if applicable) */
+  licensedHaulers: {
+    name: string
+    licenseNumber?: string
+    contact?: string
+  }[]
+
+  /** Regulatory contacts */
+  contacts: {
+    department: string
+    phone?: string
+    email?: string
+    website?: string
+  }[]
+
+  /** Confidence in the research results */
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW'
+
+  /** Sources consulted */
+  sources: {
+    title: string
+    url: string
+    accessedDate: string
+    relevance: number
+  }[]
+
+  /** Metadata */
+  researchDate: string
+  expirationDate: string // When research should be refreshed
+}
+
+export interface OrdinanceInfo {
+  title: string
+  url: string
+  jurisdiction: string // e.g., "City of Austin"
+  chapter?: string
+  section?: string
+  effectiveDate?: string
+  summary: string
+  fullText?: string
+  relevantExcerpts: string[]
+}
+
+export interface WasteRequirement {
+  requirement: string
+  mandatory: boolean
+  frequency?: string // e.g., "2x per week minimum"
+  containerType?: string
+  source: string // Which ordinance/section
+}
+
+export interface RecyclingRequirement {
+  requirement: string
+  mandatory: boolean
+  materials: string[] // e.g., ["cardboard", "plastic", "metal"]
+  frequency?: string
+  containerType?: string
+  source: string
+}
+
+export interface CompostingRequirement {
+  requirement: string
+  mandatory: boolean
+  materials: string[] // e.g., ["food waste", "yard waste"]
+  frequency?: string
+  source: string
+}
+
+export interface ComplianceIssue {
+  severity: 'HIGH' | 'MEDIUM' | 'LOW'
+  issue: string
+  requirement: string
+  currentStatus: string
+  recommendation: string
 }
