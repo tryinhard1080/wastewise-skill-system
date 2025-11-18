@@ -42,6 +42,7 @@ describe('CompactorOptimizationSkill', () => {
     baseContext = {
       projectId: 'project-123',
       userId: 'user-123',
+      supabase: {} as any,
       project: mockProject,
       invoices: [],
       haulLog: [],

@@ -111,13 +111,15 @@ async function processJob(job: AnalysisJob): Promise<void> {
     await updateJobStatus(job.id, 'processing', 0, 'Initializing...')
 
     // Execute skill with progress tracking
-    const result = await executeSkillWithProgress(
-      job.project_id,
-      job.job_type,
-      async (percent: number, step: string) => {
-        await updateJobStatus(job.id, 'processing', percent, step)
-      }
-    )
+  const result = await executeSkillWithProgress(
+    job.project_id,
+    job.job_type,
+    async (percent: number, step: string) => {
+      await updateJobStatus(job.id, 'processing', percent, step)
+    },
+    job.user_id,
+    supabase
+  )
 
     if (result.success) {
       jobLogger.info('Job completed successfully', {

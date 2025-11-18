@@ -32,11 +32,12 @@ import {
   extractContractData,
   calculateAnthropicCost,
 } from '@/lib/ai/vision-extractor'
-import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
 import { ContractRepository, type ContractRecord } from '@/lib/db'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database.types'
 
 /**
  * Container type validation
@@ -63,8 +64,7 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
     const errors: Array<{ field: string; message: string; code: string }> = []
 
     // Get contract files from database
-    const supabase = await createClient()
-    const { data: files, error: filesError } = await supabase
+    const { data: files, error: filesError } = await context.supabase
       .from('project_files')
       .select('*')
       .eq('project_id', context.projectId)
@@ -126,7 +126,7 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
       step: 'Fetching contract files',
     })
 
-    const supabase = await createClient()
+    const supabase = context.supabase
     const { data: files, error: filesError } = await supabase
       .from('project_files')
       .select('*')
@@ -445,7 +445,7 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
   private async saveToDatabase(
     projectId: string,
     contracts: ContractData[],
-    supabase: any,
+    supabase: SupabaseClient<Database>,
     executionLogger: any
   ): Promise<void> {
     executionLogger.info('Saving contract data to database', {

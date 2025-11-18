@@ -5,6 +5,7 @@
  * All skills must conform to these interfaces to ensure consistency.
  */
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database.types'
 
 // Database type aliases
@@ -69,6 +70,9 @@ export interface SkillContext {
 
   /** User ID executing the skill */
   userId: string
+
+  /** Supabase client scoped to this execution */
+  supabase: SupabaseClient<Database>
 
   /** Project data from database */
   project: ProjectRow
