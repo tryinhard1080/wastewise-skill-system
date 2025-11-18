@@ -84,58 +84,70 @@ export class AnalysisWorker {
    * Main polling loop
    *
    * Continuously checks database for pending jobs and processes them
+   * Uses atomic job claiming to prevent race conditions between multiple workers
    */
   private async run(): Promise<void> {
     logger.info('Worker polling loop started')
 
+    let backoff = this.pollInterval // Start with configured interval
+
     while (this.isRunning) {
       try {
-        // Fetch pending jobs from database
-        const { data: jobs, error: fetchError } = await this.supabase
-          .from('analysis_jobs')
-          .select('id, job_type, project_id, created_at')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: true })
-          .limit(this.maxConcurrentJobs)
+        // Atomically claim jobs using database function to prevent race conditions
+        const processingPromises: Promise<void>[] = []
 
-        if (fetchError) {
-          logger.error('Failed to fetch pending jobs', fetchError as Error)
-          await this.sleep(this.pollInterval)
-          continue
-        }
+        for (let i = 0; i < this.maxConcurrentJobs; i++) {
+          // Use RPC to call claim_next_analysis_job() function
+          const { data: claimedJob, error: claimError } = await this.supabase.rpc(
+            'claim_next_analysis_job'
+          )
 
-        if (!jobs || jobs.length === 0) {
-          // No pending jobs - wait before checking again
-          await this.sleep(this.pollInterval)
-          continue
-        }
-
-        logger.info('Found pending jobs', undefined, { count: jobs.length })
-
-        // Process each job
-        const processingPromises = jobs.map(async (job) => {
-          const jobLogger = logger.child({ jobId: job.id })
-
-          try {
-            jobLogger.info('Starting job processing', {
-              jobType: job.job_type,
-              projectId: job.project_id,
-            })
-
-            await this.processor.processJob(job.id)
-
-            jobLogger.info('Job processing completed successfully')
-          } catch (error) {
-            jobLogger.error('Job processing failed', error as Error, {
-              jobType: job.job_type,
-              projectId: job.project_id,
-            })
-            // Continue processing other jobs even if one fails
+          if (claimError) {
+            logger.error('Failed to claim job', claimError as Error)
+            break
           }
-        })
 
-        // Wait for all jobs to complete
-        await Promise.all(processingPromises)
+          if (!claimedJob) {
+            // No more pending jobs available
+            break
+          }
+
+          // Process claimed job
+          const jobLogger = logger.child({ jobId: claimedJob.id })
+
+          const processingPromise = (async () => {
+            try {
+              jobLogger.info('Starting job processing', {
+                jobType: claimedJob.job_type,
+                projectId: claimedJob.project_id,
+              })
+
+              await this.processor.processJob(claimedJob.id)
+
+              jobLogger.info('Job processing completed successfully')
+            } catch (error) {
+              jobLogger.error('Job processing failed', error as Error, {
+                jobType: claimedJob.job_type,
+                projectId: claimedJob.project_id,
+              })
+              // Continue processing other jobs even if one fails
+            }
+          })()
+
+          processingPromises.push(processingPromise)
+        }
+
+        // Wait for all claimed jobs to complete
+        if (processingPromises.length > 0) {
+          logger.info('Processing claimed jobs', undefined, { count: processingPromises.length })
+          await Promise.all(processingPromises)
+          backoff = this.pollInterval // Reset backoff on successful job processing
+        } else {
+          // No jobs found - use exponential backoff to reduce database load
+          await this.sleep(backoff)
+          backoff = Math.min(backoff * 1.5, 30000) // Max 30 seconds
+          continue
+        }
 
         // Brief pause before next poll
         await this.sleep(this.pollInterval)
