@@ -97,7 +97,7 @@ export default function LandingPage() {
                 <div className="flex justify-center items-center">
                   <div className="flex justify-start items-center">
                     <div className="flex flex-col justify-center text-[#2F3037] text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-5 font-sans">
-                      Brillance
+                      WasteWise
                     </div>
                   </div>
                   <div className="pl-3 sm:pl-4 md:pl-5 lg:pl-5 flex justify-start items-start hidden sm:flex flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-4">
@@ -119,11 +119,11 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="h-6 sm:h-7 md:h-8 flex justify-start items-start gap-2 sm:gap-3">
-                  <div className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center">
+                  <a href="/login" className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center no-underline hover:bg-gray-50 transition-colors">
                     <div className="flex flex-col justify-center text-[#37322F] text-xs md:text-[13px] font-medium leading-5 font-sans">
                       Log in
                     </div>
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>
@@ -133,26 +133,34 @@ export default function LandingPage() {
               <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                 <div className="self-stretch rounded-[3px] flex flex-col justify-center items-center gap-4 sm:gap-5 md:gap-6 lg:gap-8">
                   <div className="w-full max-w-[748.71px] lg:w-[748.71px] text-center flex justify-center flex-col text-[#37322F] text-[24px] xs:text-[28px] sm:text-[36px] md:text-[52px] lg:text-[80px] font-normal leading-[1.1] sm:leading-[1.15] md:leading-[1.2] lg:leading-24 font-serif px-2 sm:px-4 md:px-0">
-                    Effortless custom contract
+                    Reduce Waste Costs
                     <br />
-                    billing by Brillance
+                    by Up to 30%
                   </div>
                   <div className="w-full max-w-[506.08px] lg:w-[506.08px] text-center flex justify-center flex-col text-[rgba(55,50,47,0.80)] sm:text-lg md:text-xl leading-[1.4] sm:leading-[1.45] md:leading-[1.5] lg:leading-7 font-sans px-2 sm:px-4 md:px-0 lg:text-lg font-medium text-sm">
-                    Streamline your billing process with seamless automation
+                    Data-driven waste management analysis for multifamily properties.
                     <br className="hidden sm:block" />
-                    for every custom contract, tailored by Brillance.
+                    Upload invoices, get insights in minutes.
                   </div>
                 </div>
               </div>
 
               <div className="w-full max-w-[497px] lg:w-[497px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12">
-                <div className="backdrop-blur-[8.25px] flex justify-start items-center gap-4">
-                  <div className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#37322F] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center">
-                    <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0)] to-[rgba(0,0,0,0.10)] mix-blend-multiply"></div>
+                <div className="backdrop-blur-[8.25px] flex justify-start items-center gap-4 flex-col sm:flex-row">
+                  <a href="/login" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#22C55E] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center hover:bg-[#16A34A] transition-colors cursor-pointer no-underline">
+                    <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0.1)] to-[rgba(0,0,0,0.05)] mix-blend-multiply"></div>
                     <div className="flex flex-col justify-center text-white text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
-                      Start for free
+                      START FREE ANALYSIS →
                     </div>
-                  </div>
+                  </a>
+                  <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-transparent border-2 border-[#37322F] overflow-hidden rounded-full flex justify-center items-center hover:bg-[rgba(55,50,47,0.05)] transition-colors cursor-pointer no-underline">
+                    <div className="flex flex-row justify-center items-center gap-2 text-[#37322F] text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 2L13 8L3 14V2Z" />
+                      </svg>
+                      Watch 2-Min Demo
+                    </div>
+                  </a>
                 </div>
               </div>
 
@@ -176,9 +184,8 @@ export default function LandingPage() {
                       <div className="relative w-full h-full overflow-hidden">
                         {/* Product Image 1 - Plan your schedules */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                            activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                          }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                            }`}
                         >
                           <img
                             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dsadsadsa.jpg-xTHS4hGwCWp2H5bTj8np6DXZUyrxX7.jpeg"
@@ -189,9 +196,8 @@ export default function LandingPage() {
 
                         {/* Product Image 2 - Data to insights */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                            activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                          }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                            }`}
                         >
                           <img
                             src="/analytics-dashboard-with-charts-graphs-and-data-vi.jpg"
@@ -202,9 +208,8 @@ export default function LandingPage() {
 
                         {/* Product Image 3 - Data visualization */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                            activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                          }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                            }`}
                         >
                           <img
                             src="/data-visualization-dashboard-with-interactive-char.jpg"
@@ -234,22 +239,22 @@ export default function LandingPage() {
                 <div className="flex-1 px-0 sm:px-2 md:px-0 flex flex-col md:flex-row justify-center items-stretch gap-0">
                   {/* Feature Cards */}
                   <FeatureCard
-                    title="Plan your schedules"
-                    description="Streamline customer subscriptions and billing with automated scheduling tools."
+                    title="Automated Invoice Processing"
+                    description="Upload PDFs, AI extracts service data, tonnage, and charges automatically."
                     isActive={activeCard === 0}
                     progress={activeCard === 0 ? progress : 0}
                     onClick={() => handleCardClick(0)}
                   />
                   <FeatureCard
-                    title="Analytics & insights"
-                    description="Transform your business data into actionable insights with real-time analytics."
+                    title="AI-Powered Optimization"
+                    description="Identify over-servicing, right-size contracts, and reduce contamination fees."
                     isActive={activeCard === 1}
                     progress={activeCard === 1 ? progress : 0}
                     onClick={() => handleCardClick(1)}
                   />
                   <FeatureCard
-                    title="Collaborate seamlessly"
-                    description="Keep your team aligned with shared dashboards and collaborative workflows."
+                    title="Professional Reports"
+                    description="Download Excel workbooks and interactive HTML dashboards instantly."
                     isActive={activeCard === 2}
                     progress={activeCard === 2 ? progress : 0}
                     onClick={() => handleCardClick(2)}
@@ -293,12 +298,23 @@ export default function LandingPage() {
                       text="Social Proof"
                     />
                     <div className="w-full max-w-[472.55px] text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-                      Confidence backed by results
+                      Trusted by 850+ Properties Nationwide
                     </div>
                     <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
-                      Our customers achieve more each day
-                      <br className="hidden sm:block" />
-                      because their tools are simple, powerful, and clear.
+                      <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12 mt-4">
+                        <div className="flex flex-col items-center">
+                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">$2.4M+</div>
+                          <div className="text-sm text-[#605A57]">Saved</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">850+</div>
+                          <div className="text-sm text-[#605A57]">Properties Analyzed</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">95%</div>
+                          <div className="text-sm text-[#605A57]">Client Satisfaction</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -384,15 +400,15 @@ export default function LandingPage() {
                           <rect x="7" y="7" width="4" height="4" stroke="#37322F" strokeWidth="1" fill="none" />
                         </svg>
                       }
-                      text="Bento grid"
+                      text="How It Works"
                     />
                     <div className="w-full max-w-[598.06px] lg:w-[598.06px] text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-                      Built for absolute clarity and focused work
+                      From Invoice to Insights in 4 Steps
                     </div>
                     <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
-                      Stay focused with tools that organize, connect
+                      Upload your waste data and get actionable recommendations
                       <br />
-                      and turn information into confident decisions.
+                      in minutes, not weeks.
                     </div>
                   </div>
                 </div>
@@ -412,92 +428,132 @@ export default function LandingPage() {
                   </div>
 
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-r border-[rgba(55,50,47,0.12)]">
-                    {/* Top Left - Smart. Simple. Brilliant. */}
+                    {/* Step 1 - Upload Files */}
                     <div className="border-b border-r-0 md:border-r border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6">
                       <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
-                          Smart. Simple. Brilliant.
-                        </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">1</div>
+                          <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
+                            Upload Files
+                          </h3>
+                        </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Your data is beautifully organized so you see everything clearly without the clutter.
+                          Drag and drop invoices, contracts, or haul logs. We support PDF, Excel, and CSV formats.
                         </p>
                       </div>
-                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex items-center justify-center overflow-hidden">
-                        <SmartSimpleBrilliant
-                          width="100%"
-                          height="100%"
-                          theme="light"
-                          className="scale-50 sm:scale-65 md:scale-75 lg:scale-90"
-                        />
+                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg border-2 border-dashed border-[rgba(55,50,47,0.2)] bg-white flex items-center justify-center flex-col gap-4">
+                        <svg className="w-16 h-16 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <div className="text-[#605A57] text-sm text-center">
+                          <span className="font-medium text-[#22C55E]">Click to browse</span> or drag files here
+                        </div>
                       </div>
                     </div>
 
-                    {/* Top Right - Your work, in sync */}
+                    {/* Step 2 - Property Info */}
                     <div className="border-b border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6">
                       <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] font-semibold leading-tight font-sans text-lg sm:text-xl">
-                          Your work, in sync
-                        </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">2</div>
+                          <h3 className="text-[#37322F] font-semibold leading-tight font-sans text-lg sm:text-xl">
+                            Enter Property Info
+                          </h3>
+                        </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Every update flows instantly across your team and keeps collaboration effortless and fast.
+                          Property name, units, location, and equipment type help us tailor the analysis.
                         </p>
                       </div>
-                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden text-right items-center justify-center">
-                        <YourWorkInSync
-                          width="400"
-                          height="250"
-                          theme="light"
-                          className="scale-60 sm:scale-75 md:scale-90"
-                        />
+                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg bg-white p-6 flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                          <div className="text-xs font-medium text-[#605A57]">Property Name</div>
+                          <div className="h-10 rounded border border-[rgba(55,50,47,0.2)] bg-[#F7F5F3] px-3 flex items-center text-sm text-[#37322F]">
+                            Columbia Square Apartments
+                          </div>
+                        </div>
+                        <div className="flex gap-3">
+                          <div className="flex-1 flex flex-col gap-2">
+                            <div className="text-xs font-medium text-[#605A57]">Units</div>
+                            <div className="h-10 rounded border border-[rgba(55,50,47,0.2)] bg-[#F7F5F3] px-3 flex items-center text-sm text-[#37322F]">
+                              308
+                            </div>
+                          </div>
+                          <div className="flex-1 flex flex-col gap-2">
+                            <div className="text-xs font-medium text-[#605A57]">City</div>
+                            <div className="h-10 rounded border border-[rgba(55,50,47,0.2)] bg-[#F7F5F3] px-3 flex items-center text-sm text-[#37322F]">
+                              McKinney, TX
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Bottom Left - Effortless integration */}
+                    {/* Step 3 - AI Analysis */}
                     <div className="border-r-0 md:border-r border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6 bg-transparent">
                       <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
-                          Effortless integration
-                        </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">3</div>
+                          <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
+                            AI Analysis
+                          </h3>
+                        </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          All your favorite tools connect in one place and work together seamlessly by design.
+                          Claude Vision extracts data, analyzes patterns, and calculates savings opportunities.
                         </p>
                       </div>
-                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden justify-center items-center relative bg-transparent">
-                        <div className="w-full h-full flex items-center justify-center bg-transparent">
-                          <EffortlessIntegration width={400} height={250} className="max-w-full max-h-full" />
+                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg bg-white p-6 flex flex-col gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-[#22C55E] flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <span className="text-sm text-[#37322F]">Processing Invoices</span>
                         </div>
-                        {/* Gradient mask for soft bottom edge */}
-                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F7F5F3] to-transparent pointer-events-none"></div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full border-2 border-[#22C55E] flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></div>
+                          </div>
+                          <span className="text-sm text-[#37322F]">Regulatory Research</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full border-2 border-[rgba(55,50,47,0.2)]"></div>
+                          <span className="text-sm text-[#605A57]">Generating Reports</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Bottom Right - Numbers that speak */}
+                    {/* Step 4 - Download Reports */}
                     <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6">
                       <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
-                          Numbers that speak
-                        </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">4</div>
+                          <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
+                            Download Reports
+                          </h3>
+                        </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Track growth with precision and turn raw data into confident decisions you can trust.
+                          Get Excel workbooks and interactive HTML dashboards with actionable recommendations.
                         </p>
                       </div>
-                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden items-center justify-center relative">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <NumbersThatSpeak
-                            width="100%"
-                            height="100%"
-                            theme="light"
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        {/* Gradient mask for soft bottom edge */}
-                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F7F5F3] to-transparent pointer-events-none"></div>
-                        {/* Fallback content if component doesn't render */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-20 hidden">
-                          <div className="flex flex-col items-center gap-2 p-4">
-                            <div className="w-3/4 h-full bg-green-500 rounded-full"></div>
+                      <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg bg-white p-6 flex flex-col gap-4">
+                        <div className="flex items-center gap-3 p-3 rounded border border-[rgba(55,50,47,0.1)] hover:border-[#22C55E] transition-colors cursor-pointer">
+                          <svg className="w-8 h-8 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                          </svg>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-[#37322F]">Excel Workbook</div>
+                            <div className="text-xs text-[#605A57]">Complete analysis spreadsheet</div>
                           </div>
-                          <div className="text-sm text-green-600">Growth Rate</div>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 rounded border border-[rgba(55,50,47,0.1)] hover:border-[#22C55E] transition-colors cursor-pointer">
+                          <svg className="w-8 h-8 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                          </svg>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-[#37322F]">HTML Dashboard</div>
+                            <div className="text-xs text-[#605A57]">Interactive charts & graphs</div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -558,11 +614,10 @@ function FeatureCard({
 }) {
   return (
     <div
-      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${
-        isActive
-          ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
-          : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
-      }`}
+      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${isActive
+        ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
+        : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
+        }`}
       onClick={onClick}
     >
       {isActive && (

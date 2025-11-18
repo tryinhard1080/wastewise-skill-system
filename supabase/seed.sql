@@ -1,0 +1,3 @@
+-- WasteWise Seed Data
+-- Skills config data is handled in migrations (20251114000001_initial_schema.sql)
+-- This file is reserved for additional seed data as needed

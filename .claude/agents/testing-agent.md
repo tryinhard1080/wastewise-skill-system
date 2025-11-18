@@ -189,20 +189,20 @@ describe('Compactor Optimization Evals', () => {
   });
 
   test('Eval: Monitor recommendation threshold', async () => {
-    // Test case 1: Below 7.0 tons (should recommend)
-    expect(shouldRecommendMonitors(6.8, 12)).toBe(true);
+    // Test case 1: Below 6.0 tons (should recommend) - per WASTE_FORMULAS_REFERENCE.md v2.0
+    expect(shouldRecommendMonitors(5.8, 12)).toBe(true);
 
-    // Test case 2: At 7.0 tons exactly (should NOT recommend)
-    expect(shouldRecommendMonitors(7.0, 12)).toBe(false);
+    // Test case 2: At 6.0 tons exactly (should NOT recommend)
+    expect(shouldRecommendMonitors(6.0, 12)).toBe(false);
 
-    // Test case 3: Above 7.0 tons (should NOT recommend)
-    expect(shouldRecommendMonitors(7.2, 12)).toBe(false);
+    // Test case 3: Above 6.0 tons (should NOT recommend)
+    expect(shouldRecommendMonitors(6.2, 12)).toBe(false);
 
-    // Test case 4: Below 7.0 but interval > 14 (should NOT recommend)
-    expect(shouldRecommendMonitors(6.5, 15)).toBe(false);
+    // Test case 4: Below 6.0 but interval > 14 (should NOT recommend)
+    expect(shouldRecommendMonitors(5.5, 15)).toBe(false);
 
     // Test case 5: Edge case - exactly at threshold
-    expect(shouldRecommendMonitors(6.999, 14)).toBe(true);
+    expect(shouldRecommendMonitors(5.999, 14)).toBe(true);
   });
 
   test('Eval: ROI calculation matches Python', async () => {

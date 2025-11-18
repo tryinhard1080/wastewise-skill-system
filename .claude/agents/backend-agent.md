@@ -92,11 +92,11 @@ create table skills_config (
   created_at timestamp with time zone default now()
 );
 
--- Seed initial config
+-- Seed initial config (CRITICAL: Use 6.0 tons per WASTE_FORMULAS_REFERENCE.md v2.0)
 insert into skills_config (skill_name, skill_version, conversion_rates, thresholds) values
 ('compactor-optimization', '1.0.0',
   '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}',
-  '{"compactor_tons": 7.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'
+  '{"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'
 );
 ```
 
@@ -380,7 +380,9 @@ OUTPUT:
 - roi_percent: number
 - payback_months: number
 
-THRESHOLD: avg_tons_per_haul < 7.0 (NOT 5 or 6)
+THRESHOLD: avg_tons_per_haul < 6.0 (per WASTE_FORMULAS_REFERENCE.md v2.0)
+IMPORT: Use COMPACTOR_OPTIMIZATION_THRESHOLD from lib/constants/formulas.ts
+NEVER hardcode this value - always import from canonical source
 
 PYTHON REFERENCE: waste-skills-complete/compactor-optimization/scripts/compactor_calculator.py
 

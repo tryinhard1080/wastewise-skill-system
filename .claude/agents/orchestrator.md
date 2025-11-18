@@ -42,10 +42,12 @@ Central coordinator for all WasteWise development activities. Manages task alloc
 ### 4. Quality Enforcement
 - Verify all code follows CLAUDE.md standards
 - Ensure critical business rules are never violated:
-  - 7-ton compactor threshold (NOT 5 or 6)
-  - 3% contamination threshold
-  - $500 bulk subscription threshold
-  - 40% lease-up detection
+  - Compactor threshold: < 6.0 tons (per WASTE_FORMULAS_REFERENCE.md v2.0)
+  - Use `COMPACTOR_OPTIMIZATION_THRESHOLD` from lib/constants/formulas.ts
+  - **NEVER hardcode thresholds** - always import from formulas.ts
+  - 3% contamination threshold (CONTAMINATION_THRESHOLD_PCT from formulas.ts)
+  - $500 bulk subscription threshold (BULK_SUBSCRIPTION_THRESHOLD from formulas.ts)
+  - -40% lease-up detection (LEASEUP_VARIANCE_THRESHOLD from formulas.ts)
 - Monitor conversion rate consistency across all skills
 - Track technical debt and code quality metrics
 

@@ -227,7 +227,7 @@ create table skills_config (
   -- {
   --   "compactor_ypd": 14.49,
   --   "dumpster_ypd": 4.33,
-  --   "target_capacity": 8.0
+  --   "target_capacity": 8.5
   -- }
   thresholds jsonb not null,
   -- CRITICAL values:
@@ -250,19 +250,19 @@ create index idx_skills_config_name on skills_config(skill_name);
 -- ===========================
 insert into skills_config (skill_name, skill_version, conversion_rates, thresholds) values
 ('wastewise-analytics', '1.0.0',
-  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}'::jsonb,
+  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.5}'::jsonb,
   '{"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'::jsonb),
 ('compactor-optimization', '1.0.0',
-  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}'::jsonb,
+  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.5}'::jsonb,
   '{"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'::jsonb),
 ('contract-extractor', '1.0.0',
-  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}'::jsonb,
+  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.5}'::jsonb,
   '{"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'::jsonb),
 ('regulatory-research', '1.0.0',
-  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}'::jsonb,
+  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.5}'::jsonb,
   '{"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'::jsonb),
 ('batch-extractor', '1.0.0',
-  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}'::jsonb,
+  '{"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.5}'::jsonb,
   '{"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}'::jsonb);
 
 -- ===========================
@@ -413,12 +413,13 @@ create policy "Anyone can view ordinances"
 create policy "Service role can insert ordinances"
   on ordinance_database for insert
   to service_role
-  using (true);
+  with check (true);
 
 create policy "Service role can update ordinances"
   on ordinance_database for update
   to service_role
-  using (true);
+  using (true)
+  with check (true);
 
 -- Skills Config (Public Read, Admin Write)
 alter table skills_config enable row level security;
@@ -431,7 +432,8 @@ create policy "Anyone can view skills config"
 create policy "Service role can manage skills config"
   on skills_config for all
   to service_role
-  using (true);
+  using (true)
+  with check (true);
 
 -- ===========================
 -- TRIGGERS FOR UPDATED_AT
@@ -465,5 +467,5 @@ comment on table regulatory_compliance is 'Researched ordinance requirements per
 comment on table ordinance_database is 'Cached ordinance data to minimize API calls';
 comment on table skills_config is 'CRITICAL: Conversion rates and thresholds for all skills - ensures consistency';
 
-comment on column skills_config.conversion_rates is 'MUST BE: {"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.0}';
-comment on column skills_config.thresholds is 'MUST BE: {"compactor_tons": 7.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}';
+comment on column skills_config.conversion_rates is 'MUST BE: {"compactor_ypd": 14.49, "dumpster_ypd": 4.33, "target_capacity": 8.5}';
+comment on column skills_config.thresholds is 'MUST BE: {"compactor_tons": 6.0, "contamination_pct": 3.0, "bulk_monthly": 500, "leaseup_variance": -40}';
