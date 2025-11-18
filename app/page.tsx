@@ -119,11 +119,11 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="h-6 sm:h-7 md:h-8 flex justify-start items-start gap-2 sm:gap-3">
-                  <div className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center">
+                  <a href="/login" className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center no-underline hover:bg-gray-50 transition-colors">
                     <div className="flex flex-col justify-center text-[#37322F] text-xs md:text-[13px] font-medium leading-5 font-sans">
                       Log in
                     </div>
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>
@@ -147,20 +147,20 @@ export default function LandingPage() {
 
               <div className="w-full max-w-[497px] lg:w-[497px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12">
                 <div className="backdrop-blur-[8.25px] flex justify-start items-center gap-4 flex-col sm:flex-row">
-                  <div className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#22C55E] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center hover:bg-[#16A34A] transition-colors cursor-pointer">
+                  <a href="/login" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#22C55E] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center hover:bg-[#16A34A] transition-colors cursor-pointer no-underline">
                     <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0.1)] to-[rgba(0,0,0,0.05)] mix-blend-multiply"></div>
                     <div className="flex flex-col justify-center text-white text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
                       START FREE ANALYSIS →
                     </div>
-                  </div>
-                  <div className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-transparent border-2 border-[#37322F] overflow-hidden rounded-full flex justify-center items-center hover:bg-[rgba(55,50,47,0.05)] transition-colors cursor-pointer">
+                  </a>
+                  <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-transparent border-2 border-[#37322F] overflow-hidden rounded-full flex justify-center items-center hover:bg-[rgba(55,50,47,0.05)] transition-colors cursor-pointer no-underline">
                     <div className="flex flex-row justify-center items-center gap-2 text-[#37322F] text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 2L13 8L3 14V2Z" />
                       </svg>
                       Watch 2-Min Demo
                     </div>
-                  </div>
+                  </a>
                 </div>
               </div>
 
@@ -184,9 +184,8 @@ export default function LandingPage() {
                       <div className="relative w-full h-full overflow-hidden">
                         {/* Product Image 1 - Plan your schedules */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                            activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                          }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                            }`}
                         >
                           <img
                             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dsadsadsa.jpg-xTHS4hGwCWp2H5bTj8np6DXZUyrxX7.jpeg"
@@ -197,9 +196,8 @@ export default function LandingPage() {
 
                         {/* Product Image 2 - Data to insights */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                            activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                          }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                            }`}
                         >
                           <img
                             src="/analytics-dashboard-with-charts-graphs-and-data-vi.jpg"
@@ -210,9 +208,8 @@ export default function LandingPage() {
 
                         {/* Product Image 3 - Data visualization */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                            activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                          }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                            }`}
                         >
                           <img
                             src="/data-visualization-dashboard-with-interactive-char.jpg"
@@ -617,11 +614,10 @@ function FeatureCard({
 }) {
   return (
     <div
-      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${
-        isActive
-          ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
-          : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
-      }`}
+      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${isActive
+        ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
+        : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
+        }`}
       onClick={onClick}
     >
       {isActive && (

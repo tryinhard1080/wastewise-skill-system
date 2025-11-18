@@ -30,7 +30,24 @@ import { cookies } from 'next/headers'
 import { Database } from '@/types/database.types'
 
 export async function createClient() {
-  const cookieStore = await cookies()
+  let cookieStore: any
+
+  try {
+    cookieStore = await cookies()
+  } catch (error) {
+    // Called outside request context (e.g. worker)
+    // Return client without cookie handling
+    return createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => [],
+          setAll: () => { },
+        },
+      }
+    )
+  }
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -78,7 +95,7 @@ export function createServiceClient() {
     {
       cookies: {
         getAll: () => [],
-        setAll: () => {},
+        setAll: () => { },
       },
     }
   )
