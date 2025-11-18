@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Plus, Building2, Calendar, TrendingDown, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { sortAnalysisJobsByCreatedAtDesc } from '@/lib/analysis-jobs'
 
 export default async function ProjectsPage() {
   const supabase = await createClient()
@@ -36,7 +37,7 @@ export default async function ProjectsPage() {
     .from('projects')
     .select(`
       *,
-      analysis_jobs(
+      analysis_jobs(order:created_at.desc)(
         id,
         status,
         created_at,
@@ -89,10 +90,13 @@ export default async function ProjectsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => {
-            const latestAnalysis = project.analysis_jobs?.[0]
-            const completedAnalyses = project.analysis_jobs?.filter(
-              (job: any) => job.status === 'completed'
-            ).length || 0
+            const sortedAnalysisJobs = sortAnalysisJobsByCreatedAtDesc(
+              project.analysis_jobs as any
+            )
+            const latestAnalysis = sortedAnalysisJobs[0]
+            const completedAnalyses =
+              sortedAnalysisJobs.filter((job) => job.status === 'completed')
+                .length || 0
 
             return (
               <Card key={project.id} className="flex flex-col">
