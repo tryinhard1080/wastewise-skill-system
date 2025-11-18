@@ -15,6 +15,56 @@ import { BatchExtractorSkill } from '../skills/batch-extractor'
 import type { SkillContext, InvoiceData, HaulLogEntry } from '../types'
 import Anthropic from '@anthropic-ai/sdk'
 
+const {
+  mockSupabaseEq,
+  mockSupabaseFrom,
+  mockSupabaseSelect,
+  mockStorageFrom,
+  mockStorageDownload,
+  mockCreateClient,
+} = vi.hoisted(() => {
+  const eq = vi.fn().mockResolvedValue({
+    data: [
+      {
+        id: 'file-1',
+        file_name: 'invoice-2024-01.pdf',
+        file_type: 'invoice',
+        mime_type: 'application/pdf',
+        storage_path: 'projects/proj-1/invoice-2024-01.pdf',
+      },
+    ],
+    error: null,
+  })
+  const from = vi.fn().mockReturnThis()
+  const select = vi.fn().mockReturnThis()
+  const storageFrom = vi.fn().mockReturnThis()
+  const storageDownload = vi.fn().mockResolvedValue({
+    data: new Blob(['mock file data']),
+    error: null,
+  })
+
+  const supabaseClient = {
+    from,
+    select,
+    eq,
+    storage: {
+      from: storageFrom,
+      download: storageDownload,
+    },
+  }
+
+  const createClient = vi.fn().mockResolvedValue(supabaseClient)
+
+  return {
+    mockSupabaseEq: eq,
+    mockSupabaseFrom: from,
+    mockSupabaseSelect: select,
+    mockStorageFrom: storageFrom,
+    mockStorageDownload: storageDownload,
+    mockCreateClient: createClient,
+  }
+})
+
 // Mock Anthropic SDK
 vi.mock('@anthropic-ai/sdk', () => {
   return {
@@ -28,29 +78,7 @@ vi.mock('@anthropic-ai/sdk', () => {
 
 // Mock Supabase
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn().mockResolvedValue({
-    from: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockResolvedValue({
-      data: [
-        {
-          id: 'file-1',
-          file_name: 'invoice-2024-01.pdf',
-          file_type: 'invoice',
-          mime_type: 'application/pdf',
-          storage_path: 'projects/proj-1/invoice-2024-01.pdf',
-        },
-      ],
-      error: null,
-    }),
-    storage: {
-      from: vi.fn().mockReturnThis(),
-      download: vi.fn().mockResolvedValue({
-        data: new Blob(['mock file data']),
-        error: null,
-      }),
-    },
-  }),
+  createClient: mockCreateClient,
 }))
 
 // Mock logger
@@ -74,14 +102,33 @@ vi.mock('@/lib/observability/metrics', () => ({
   metrics: {
     increment: vi.fn(),
     gauge: vi.fn(),
+    record: vi.fn(),
   },
 }))
+
+function mockAnthropicWithCreate(mockCreate: ReturnType<typeof vi.fn>) {
+  // @ts-ignore - Mocking the SDK constructor behavior
+  Anthropic.mockImplementation(function () {
+    return {
+      messages: {
+        create: mockCreate,
+      },
+    }
+  })
+}
 
 describe('BatchExtractorSkill', () => {
   let skill: BatchExtractorSkill
   let mockContext: SkillContext
 
   beforeEach(() => {
+    mockSupabaseEq.mockClear()
+    mockSupabaseFrom.mockClear()
+    mockSupabaseSelect.mockClear()
+    mockStorageFrom.mockClear()
+    mockStorageDownload.mockClear()
+    mockCreateClient.mockClear()
+
     skill = new BatchExtractorSkill()
 
     // Setup mock context
@@ -154,6 +201,13 @@ describe('BatchExtractorSkill', () => {
       // Restore API key
       process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key'
     })
+
+    it('should only fetch project files once per execution', async () => {
+      const result = await skill.execute(mockContext)
+
+      expect(result.success).toBe(true)
+      expect(mockSupabaseEq).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('Invoice Extraction', () => {
@@ -207,12 +261,7 @@ describe('BatchExtractorSkill', () => {
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const result = await skill.execute(mockContext)
 
@@ -229,12 +278,7 @@ describe('BatchExtractorSkill', () => {
       // Mock API failure
       const mockCreate = vi.fn().mockRejectedValue(new Error('API error'))
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const result = await skill.execute(mockContext)
 
@@ -294,12 +338,7 @@ describe('BatchExtractorSkill', () => {
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const result = await skill.execute(mockContext)
 
@@ -355,12 +394,7 @@ describe('BatchExtractorSkill', () => {
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const result = await skill.execute(mockContext)
 
@@ -407,12 +441,7 @@ describe('BatchExtractorSkill', () => {
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const result = await skill.execute(mockContext)
 
@@ -454,12 +483,7 @@ describe('BatchExtractorSkill', () => {
         usage: { input_tokens: 1000, output_tokens: 500 },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const progressUpdates: any[] = []
       mockContext.onProgress = vi.fn((progress) => {
@@ -511,12 +535,7 @@ describe('BatchExtractorSkill', () => {
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockAnthropicWithCreate(mockCreate)
 
       const result = await skill.execute(mockContext)
 

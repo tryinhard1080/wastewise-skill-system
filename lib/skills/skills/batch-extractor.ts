@@ -25,6 +25,7 @@ import type {
   InvoiceData,
   HaulLogEntry,
   ProcessingDetail,
+  ProjectFileMetadata,
 } from '../types'
 import {
   extractInvoiceWithVision,
@@ -67,7 +68,7 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     const supabase = await createClient()
     const { data: files, error: filesError } = await supabase
       .from('project_files')
-      .select('*')
+      .select('id, file_name, file_type, mime_type, storage_path')
       .eq('project_id', context.projectId)
 
     if (filesError) {
@@ -82,6 +83,8 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
         message: 'No files found for this project. Upload files before running extraction.',
         code: 'NO_FILES',
       })
+    } else {
+      context.projectFiles = files as ProjectFileMetadata[]
     }
 
     // Check API key
@@ -121,25 +124,23 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     let totalTokensInput = 0
     let totalTokensOutput = 0
 
-    // Get files from database
-    await this.updateProgress(context, {
-      percent: 5,
-      step: 'Fetching project files',
-    })
+    // Use files loaded during validation
+    const files = context.projectFiles
 
-    const supabase = await createClient()
-    const { data: files, error: filesError } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', context.projectId)
-
-    if (filesError || !files || files.length === 0) {
+    if (!files || files.length === 0) {
       throw new SkillExecutionError(
         this.name,
         'NO_FILES',
         'No files found to process'
       )
     }
+
+    await this.updateProgress(context, {
+      percent: 5,
+      step: 'Preparing to download files',
+    })
+
+    const supabase = await createClient()
 
     executionLogger.info('Files retrieved', { fileCount: files.length })
 
