@@ -51,6 +51,42 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResearchResult>
     this.exaClient = getExaClient()
   }
 
+  /**
+   * Validate that we have the required location data
+   */
+  async validate(context: SkillContext): Promise<import('../types').ValidationResult> {
+    const errors: Array<{ field: string; message: string; code: string }> = []
+
+    // Call base validation first
+    const baseValidation = await super.validate(context)
+    if (!baseValidation.valid && baseValidation.errors) {
+      errors.push(...baseValidation.errors)
+    }
+
+    // Check for city
+    if (!context.project?.city || context.project.city.trim() === '') {
+      errors.push({
+        field: 'city',
+        message: 'City is required for regulatory research',
+        code: 'MISSING_CITY',
+      })
+    }
+
+    // Check for state
+    if (!context.project?.state || context.project.state.trim() === '') {
+      errors.push({
+        field: 'state',
+        message: 'State is required for regulatory research',
+        code: 'MISSING_STATE',
+      })
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined,
+    }
+  }
+
   protected async executeInternal(context: SkillContext): Promise<RegulatoryResearchResult> {
     const { project, projectId } = context
 
