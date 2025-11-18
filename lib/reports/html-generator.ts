@@ -104,6 +104,7 @@ function generateHtmlContent(input: HtmlGeneratorInput, tabsIncluded: string[]):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
     <title>WasteWise Analysis - ${escapeHtml(project.property_name)}</title>
 
     <!-- Chart.js -->
@@ -972,9 +973,9 @@ function generateJavaScript(
                 new Chart(savingsCtx, {
                     type: 'pie',
                     data: {
-                        labels: ${JSON.stringify(result.recommendations.filter((r) => r.recommend && r.savings).map((r) => r.title))},
+                        labels: ${safeJsonStringify(result.recommendations.filter((r) => r.recommend && r.savings).map((r) => r.title))},
                         datasets: [{
-                            data: ${JSON.stringify(result.recommendations.filter((r) => r.recommend && r.savings).map((r) => r.savings))},
+                            data: ${safeJsonStringify(result.recommendations.filter((r) => r.recommend && r.savings).map((r) => r.savings))},
                             backgroundColor: [
                                 '#10B981',
                                 '#F59E0B',
@@ -999,7 +1000,7 @@ function generateJavaScript(
             // Expense trend line chart
             const expenseCtx = document.getElementById('expenseTrendChart');
             if (expenseCtx) {
-                const sortedInvoices = ${JSON.stringify(
+                const sortedInvoices = ${safeJsonStringify(
                   invoices
                     .sort((a, b) => new Date(a.invoice_date).getTime() - new Date(b.invoice_date).getTime())
                     .map((inv) => ({
@@ -1056,7 +1057,7 @@ function generateJavaScript(
                     other: 0
                 };
 
-                ${JSON.stringify(invoices)}.forEach(inv => {
+                ${safeJsonStringify(invoices)}.forEach(inv => {
                     if (inv.charges) {
                         chargesSummary.disposal += inv.charges.disposal || 0;
                         chargesSummary.pickup_fees += inv.charges.pickup_fees || 0;
@@ -1105,7 +1106,7 @@ function generateJavaScript(
             // Haul trend chart
             const haulCtx = document.getElementById('haulTrendChart');
             if (haulCtx) {
-                const sortedHauls = ${JSON.stringify(
+                const sortedHauls = ${safeJsonStringify(
                   haulLogs
                     .sort((a, b) => new Date(a.haul_date).getTime() - new Date(b.haul_date).getTime())
                     .map((h) => ({
@@ -1191,6 +1192,19 @@ function escapeHtml(text: string): string {
     "'": '&#039;',
   }
   return text.replace(/[&<>"']/g, (m) => map[m])
+}
+
+/**
+ * Safely embed JSON in JavaScript context
+ * Prevents XSS by escaping </script> and other dangerous sequences
+ */
+function safeJsonStringify(data: unknown): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/\//g, '\\u002f')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
 }
 
 function formatNumber(num: number): string {
