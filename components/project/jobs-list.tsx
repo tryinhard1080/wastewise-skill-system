@@ -6,9 +6,7 @@
  * Displays list of analysis jobs with real-time status updates using SWR
  */
 
-import { useState } from 'react'
 import useSWR from 'swr'
-import { createClient } from '@/lib/supabase/client'
 import {
   Card,
   CardContent,
