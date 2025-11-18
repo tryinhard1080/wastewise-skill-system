@@ -79,6 +79,7 @@
     "@types/react-dom": "^18",
     "@vitest/ui": "^4.0.9",
     "postcss": "^8.5",
+    "puppeteer": "^24.30.0",
     "tailwindcss": "^4.1.9",
     "tsx": "^4.20.6",
     "tw-animate-css": "1.3.3",

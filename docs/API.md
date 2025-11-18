@@ -1,8 +1,10 @@
 # WasteWise API Documentation
 
-**Base URL:** `http://localhost:3000/api` (development)
+**Version**: 1.0.0
+**Base URL**: `http://localhost:3000` (development) | `https://your-domain.com` (production)
+**Last Updated**: 2025-11-18 (Phase 7)
 
-All API endpoints require authentication via Supabase Auth (JWT token in cookie).
+All API endpoints require authentication via Supabase Auth (JWT token).
 
 ---
 
@@ -12,10 +14,11 @@ All API endpoints require authentication via Supabase Auth (JWT token in cookie)
 2. [Rate Limiting](#rate-limiting)
 3. [Error Responses](#error-responses)
 4. [Endpoints](#endpoints)
-   - [Create Analysis Job](#create-analysis-job)
-   - [List Jobs](#list-jobs)
+   - [Start Analysis Job](#start-analysis-job)
    - [Get Job Status](#get-job-status)
    - [Cancel Job](#cancel-job)
+5. [Workflow Example](#workflow-example)
+6. [Development Notes](#development-notes)
 
 ---
 
@@ -88,131 +91,52 @@ All errors follow this format:
 
 ## Endpoints
 
-### Create Analysis Job
+### Start Analysis Job
 
-Creates a new background analysis job.
+Creates a new complete analysis job for a specific project.
 
-**Endpoint:** `POST /api/analyze`
+**Endpoint:** `POST /api/projects/{projectId}/analyze`
 
-**Request Body:**
-```json
-{
-  "projectId": "550e8400-e29b-41d4-a716-446655440000",
-  "jobType": "complete_analysis",
-  "inputData": {
-    "optional": "metadata"
-  }
-}
-```
+**Path Parameters:**
 
-**Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `projectId` | UUID | Project ID to analyze |
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `projectId` | UUID | Yes | Project ID to analyze |
-| `jobType` | Enum | Yes | Type of analysis job |
-| `inputData` | Object | No | Optional metadata for the job |
-
-**Job Types:**
-- `invoice_extraction` - Extract data from invoices using Claude Vision
-- `regulatory_research` - Research local waste regulations
-- `complete_analysis` - Full WasteWise analysis workflow
-- `report_generation` - Generate analysis report
+**Request Body:** None required
 
 **Success Response:**
 ```json
 {
   "jobId": "123e4567-e89b-12d3-a456-426614174000",
   "status": "pending",
-  "message": "Analysis job created. Poll /api/jobs/123e4567-e89b-12d3-a456-426614174000 for status updates."
-}
-```
-**Status Code:** `201 Created`
-
-**Error Responses:**
-
-- **401 Unauthorized** - Not authenticated
-- **400 Validation Error** - Invalid request data
-- **404 Not Found** - Project not found or access denied
-- **429 Rate Limit** - Too many job creation requests
-- **500 Internal Error** - Server error
-
-**Example:**
-```bash
-curl -X POST http://localhost:3000/api/analyze \
-  -H "Content-Type: application/json" \
-  -d '{
-    "projectId": "550e8400-e29b-41d4-a716-446655440000",
-    "jobType": "complete_analysis"
-  }'
-```
-
----
-
-### List Jobs
-
-List all analysis jobs for the authenticated user with filtering and pagination.
-
-**Endpoint:** `GET /api/jobs`
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `status` | Enum | No | Filter by job status |
-| `jobType` | Enum | No | Filter by job type |
-| `projectId` | UUID | No | Filter by project ID |
-| `limit` | Integer | No | Items per page (default: 20, max: 100) |
-| `offset` | Integer | No | Number of items to skip (default: 0) |
-
-**Status Values:**
-- `pending` - Waiting for worker to pick up
-- `processing` - Currently being processed
-- `completed` - Successfully completed
-- `failed` - Failed with error
-- `cancelled` - Cancelled by user
-
-**Success Response:**
-```json
-{
-  "jobs": [
-    {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "projectId": "550e8400-e29b-41d4-a716-446655440000",
-      "jobType": "complete_analysis",
-      "status": "completed",
-      "progress": {
-        "percent": 100,
-        "currentStep": "Analysis complete"
-      },
-      "timing": {
-        "createdAt": "2025-01-15T10:30:00Z",
-        "startedAt": "2025-01-15T10:30:05Z",
-        "completedAt": "2025-01-15T10:32:15Z",
-        "durationSeconds": 130
-      },
-      "hasError": false,
-      "hasResult": true
-    }
-  ],
-  "pagination": {
-    "total": 45,
-    "limit": 20,
-    "offset": 0,
-    "hasMore": true
-  }
+  "message": "Analysis started. Use job ID to check progress."
 }
 ```
 **Status Code:** `200 OK`
 
+**Error Responses:**
+
+| Status Code | Error Code | Description |
+|-------------|------------|-------------|
+| 400 | `NO_INVOICE_DATA` | Project has no invoice data to analyze |
+| 401 | `UNAUTHORIZED` | Missing or invalid authentication token |
+| 404 | `PROJECT_NOT_FOUND` | Project doesn't exist or user doesn't own it |
+| 409 | `DUPLICATE_JOB` | Job already pending or processing for this project |
+| 500 | `INTERNAL_ERROR` | Server error during job creation |
+
 **Example:**
 ```bash
-# Get all completed jobs for a project
-curl http://localhost:3000/api/jobs?status=completed&projectId=550e8400-e29b-41d4-a716-446655440000
-
-# Get first page of all jobs
-curl http://localhost:3000/api/jobs?limit=10&offset=0
+curl -X POST http://localhost:3000/api/projects/550e8400-e29b-41d4-a716-446655440000/analyze \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json"
 ```
+
+**Notes:**
+- The job type is automatically set to `complete_analysis`
+- Only one analysis job can be pending/processing per project at a time
+- Background worker will pick up the job within 2 seconds
+- Use the returned `jobId` to poll for status updates at `/api/jobs/{jobId}`
 
 ---
 
@@ -228,7 +152,36 @@ Get detailed status and results for a specific job.
 |-----------|------|-------------|
 | `id` | UUID | Job ID |
 
-**Success Response:**
+**Success Response (Processing):**
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "projectId": "550e8400-e29b-41d4-a716-446655440000",
+  "jobType": "complete_analysis",
+  "status": "processing",
+  "progress": {
+    "percent": 45,
+    "currentStep": "Running optimization analyses",
+    "stepsCompleted": 2,
+    "totalSteps": 5
+  },
+  "timing": {
+    "startedAt": "2025-11-18T10:30:00.000Z",
+    "completedAt": null,
+    "durationSeconds": null
+  },
+  "result": null,
+  "error": null,
+  "aiUsage": {
+    "requests": 0,
+    "tokensInput": 0,
+    "tokensOutput": 0,
+    "costUsd": 0
+  }
+}
+```
+
+**Success Response (Completed):**
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -237,34 +190,65 @@ Get detailed status and results for a specific job.
   "status": "completed",
   "progress": {
     "percent": 100,
-    "currentStep": "Analysis complete",
-    "totalSteps": 5,
-    "stepsCompleted": 5
+    "currentStep": "Analysis completed",
+    "stepsCompleted": 5,
+    "totalSteps": 5
   },
   "timing": {
-    "startedAt": "2025-01-15T10:30:05Z",
-    "completedAt": "2025-01-15T10:32:15Z",
-    "estimatedCompletion": null,
-    "durationSeconds": 130
+    "startedAt": "2025-11-18T10:30:00.000Z",
+    "completedAt": "2025-11-18T10:33:45.000Z",
+    "durationSeconds": 225
   },
   "result": {
-    "recommend": true,
-    "avgTonsPerHaul": 5.2,
-    "targetTonsPerHaul": 8.5,
-    "grossAnnualSavings": 12500.00,
-    "netYear1Savings": 11500.00,
-    "roiPercent": 145.5,
-    "paybackMonths": 8.2
+    "summary": {
+      "totalSavingsPotential": 42500,
+      "currentMonthlyCost": 3200,
+      "optimizedMonthlyCost": 2500,
+      "savingsPercentage": 21.875,
+      "dateRange": {
+        "start": "2025-01-01",
+        "end": "2025-06-30"
+      },
+      "totalHauls": 22
+    },
+    "recommendations": [
+      {
+        "priority": 1,
+        "title": "Install DSQ Compactor Monitors",
+        "description": "Property is under-utilizing compactor capacity...",
+        "estimatedAnnualSavings": 28500,
+        "implementationTimeline": "2-4 weeks",
+        "confidenceLevel": "HIGH"
+      }
+    ],
+    "reports": {
+      "excelWorkbook": {
+        "fileName": "wastewise-analysis-abc-123-2025-11-18.xlsx",
+        "storagePath": "analysis-reports/...",
+        "downloadUrl": "https://...",
+        "size": 245678
+      },
+      "htmlDashboard": {
+        "fileName": "wastewise-dashboard-abc-123-2025-11-18.html",
+        "storagePath": "analysis-reports/...",
+        "downloadUrl": "https://...",
+        "size": 156432
+      }
+    },
+    "aiUsage": {
+      "totalRequests": 0,
+      "totalTokensInput": 0,
+      "totalTokensOutput": 0,
+      "totalCostUsd": 0
+    }
   },
   "error": null,
   "aiUsage": {
-    "requests": 3,
-    "tokensInput": 15420,
-    "tokensOutput": 2834,
-    "costUsd": 0.045
-  },
-  "createdAt": "2025-01-15T10:30:00Z",
-  "updatedAt": "2025-01-15T10:32:15Z"
+    "requests": 0,
+    "tokensInput": 0,
+    "tokensOutput": 0,
+    "costUsd": 0
+  }
 }
 ```
 **Status Code:** `200 OK`
@@ -321,51 +305,46 @@ async function pollJobStatus(jobId) {
 
 ### Cancel Job
 
-Cancel a pending or processing job.
+Cancel a pending or processing analysis job.
 
-**Endpoint:** `PATCH /api/jobs/[id]`
+**Endpoint:** `DELETE /api/jobs/{jobId}`
 
 **Path Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `id` | UUID | Job ID |
+| `jobId` | UUID | Job ID to cancel |
 
-**Request Body:**
-```json
-{
-  "action": "cancel"
-}
-```
+**Request Body:** None required
 
 **Success Response:**
 ```json
 {
   "success": true,
-  "job": {
-    "id": "123e4567-e89b-12d3-a456-426614174000",
-    "status": "cancelled"
-  }
+  "message": "Job cancelled successfully",
+  "jobId": "123e4567-e89b-12d3-a456-426614174000"
 }
 ```
 **Status Code:** `200 OK`
 
 **Error Responses:**
 
-- **400 Bad Request** - Invalid UUID format or action
-- **401 Unauthorized** - Not authenticated
-- **404 Not Found** - Job not found, access denied, or cannot be cancelled
-- **500 Internal Error** - Server error
+| Status Code | Error Code | Description |
+|-------------|------------|-------------|
+| 400 | `INVALID_STATUS` | Job is already completed, failed, or cancelled |
+| 401 | `UNAUTHORIZED` | Missing or invalid authentication token |
+| 404 | `JOB_NOT_FOUND` | Job doesn't exist or user doesn't own it |
+| 500 | `INTERNAL_ERROR` | Server error during cancellation |
 
 **Notes:**
 - Only jobs with status `pending` or `processing` can be cancelled
-- Completed, failed, or already cancelled jobs cannot be cancelled
+- Cancelling a processing job will stop execution immediately
+- Cancelled jobs retain their partial progress data
 
 **Example:**
 ```bash
-curl -X PATCH http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-426614174000 \
-  -H "Content-Type: application/json" \
-  -d '{"action": "cancel"}'
+curl -X DELETE http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-426614174000 \
+  -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 ---
@@ -375,44 +354,63 @@ curl -X PATCH http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-42661417400
 ### Complete Analysis Flow
 
 ```javascript
-// 1. Create analysis job
-const createResponse = await fetch('/api/analyze', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    projectId: 'project-uuid',
-    jobType: 'complete_analysis'
+import { createClient } from '@/lib/supabase/client'
+
+async function analyzeProject(projectId) {
+  const supabase = createClient()
+
+  // 1. Get authentication token
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+
+  // 2. Start analysis job
+  const createResponse = await fetch(`/api/projects/${projectId}/analyze`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
   })
-})
 
-const { jobId } = await createResponse.json()
+  const { jobId } = await createResponse.json()
+  console.log('Analysis started:', jobId)
 
-// 2. Poll for completion
-let status = 'pending'
-while (status === 'pending' || status === 'processing') {
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  // 3. Poll for completion (every 2 seconds)
+  let status = 'pending'
+  while (status === 'pending' || status === 'processing') {
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
-  const statusResponse = await fetch(`/api/jobs/${jobId}`)
-  const job = await statusResponse.json()
+    const statusResponse = await fetch(`/api/jobs/${jobId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
 
-  status = job.status
-  console.log(`Progress: ${job.progress.percent}% - ${job.progress.currentStep}`)
+    const job = await statusResponse.json()
+    status = job.status
 
-  if (status === 'completed') {
-    console.log('Results:', job.result)
-    break
-  }
+    console.log(`Progress: ${job.progress.percent}% - ${job.progress.currentStep}`)
 
-  if (status === 'failed') {
-    console.error('Job failed:', job.error)
-    break
+    if (status === 'completed') {
+      console.log('Analysis completed!')
+      console.log('Savings:', job.result.summary.totalSavingsPotential)
+      console.log('Excel:', job.result.reports.excelWorkbook.downloadUrl)
+      console.log('HTML:', job.result.reports.htmlDashboard.downloadUrl)
+      return job.result
+    }
+
+    if (status === 'failed') {
+      console.error('Job failed:', job.error.message)
+      throw new Error(job.error.message)
+    }
   }
 }
 
-// 3. Optional: List all jobs for project
-const listResponse = await fetch(`/api/jobs?projectId=${projectId}&status=completed`)
-const { jobs } = await listResponse.json()
-console.log(`Project has ${jobs.length} completed analyses`)
+// Usage
+try {
+  const result = await analyzeProject('your-project-id')
+  console.log('Total recommendations:', result.recommendations.length)
+} catch (error) {
+  console.error('Analysis error:', error)
+}
 ```
 
 ---
@@ -441,14 +439,16 @@ For local testing, you can use Supabase's test users or create users via the Sup
 
 ---
 
-## Future Enhancements
+## Support
 
-- **Webhooks**: Optional callback URLs for job completion
-- **Bulk Operations**: Create multiple jobs in a single request
-- **Job Templates**: Save and reuse job configurations
-- **Advanced Filtering**: Date ranges, search, sorting
-- **Real-time Updates**: WebSocket support for live progress
+For API support or to report issues:
+- **GitHub Issues**: Report bugs or feature requests
+- **Documentation**: Full project documentation in `.claude/CLAUDE.md`
+- **Testing**: Use test credentials from `PHASE_7_TEST_RESULTS.md`
 
 ---
 
-**Last Updated:** Phase 2.2 - January 2025
+**Last Updated:** 2025-11-18 (Phase 7 - Integration Testing)
+**Version:** 1.0.0
+
+**Generated with [Claude Code](https://claude.com/claude-code)**

@@ -9,34 +9,34 @@ interface FAQItem {
 
 const faqData: FAQItem[] = [
   {
-    question: "What is Brillance and who is it for?",
+    question: "What is WasteWise and who is it for?",
     answer:
-      "Brillance is a comprehensive billing automation platform designed for businesses that need custom contract management. It's perfect for SaaS companies, service providers, and enterprises looking to streamline their billing processes.",
+      "WasteWise is a data-driven waste management optimization platform designed for multifamily property managers. It's perfect for apartment communities, property management companies, and real estate portfolios looking to reduce waste costs and improve service efficiency.",
   },
   {
-    question: "How does the custom contract billing work?",
+    question: "How does the waste analysis work?",
     answer:
-      "Our platform automatically processes your custom contracts, calculates billing amounts based on your specific terms, and generates invoices. You can set up complex pricing structures, usage-based billing, and custom billing cycles.",
+      "Our platform uses AI to extract data from your waste invoices, haul logs, and contracts. We analyze service patterns, identify over-servicing, calculate yards per door metrics, and provide actionable recommendations to optimize your waste management costs.",
   },
   {
-    question: "Can I integrate Brillance with my existing tools?",
+    question: "Can I integrate WasteWise with my existing tools?",
     answer:
-      "Yes! Brillance integrates seamlessly with popular CRM systems, accounting software, and payment processors. We support APIs and webhooks for custom integrations with your existing workflow.",
+      "Yes! WasteWise works with your existing waste management data. Simply upload invoices (PDF or Excel), haul logs, and contracts. We also integrate with property management systems and accounting software for seamless data flow.",
   },
   {
     question: "What kind of support do you provide?",
     answer:
-      "We offer 24/7 customer support, dedicated account managers for enterprise clients, comprehensive documentation, and onboarding assistance to help you get started quickly.",
+      "We offer dedicated support for multifamily property managers, including analysis review consultations, optimization recommendations, and onboarding assistance to help you maximize your savings quickly.",
   },
   {
-    question: "Is my data secure with Brillance?",
+    question: "Is my data secure with WasteWise?",
     answer:
-      "Absolutely. We use enterprise-grade security measures including end-to-end encryption, SOC 2 compliance, and regular security audits. Your data is stored in secure, redundant data centers.",
+      "Absolutely. We use enterprise-grade security measures including end-to-end encryption, SOC 2 compliance, and regular security audits. Your property and vendor data is stored in secure, redundant data centers.",
   },
   {
-    question: "How do I get started with Brillance?",
+    question: "How do I get started with WasteWise?",
     answer:
-      "Getting started is simple! Sign up for our free trial, connect your existing systems, and our onboarding team will help you set up your first custom billing workflow within 24 hours.",
+      "Getting started is simple! Create a project, upload your waste invoices and property details, and our AI will analyze your data within minutes. You'll receive detailed reports with cost-saving recommendations instantly.",
   },
 ]
 

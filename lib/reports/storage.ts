@@ -12,7 +12,7 @@
  * - Error handling and logging
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 
 export interface UploadReportInput {
@@ -57,7 +57,7 @@ export async function uploadReport(input: UploadReportInput): Promise<UploadRepo
   })
 
   try {
-    const supabase = await createClient()
+    const supabase = createServiceClient()
 
     // Generate storage path: reports/{projectId}/{filename}
     const storagePath = `reports/${projectId}/${filename}`
@@ -172,7 +172,7 @@ export async function deleteOldReports(projectId: string): Promise<void> {
   logger.info('Deleting old reports', { projectId })
 
   try {
-    const supabase = await createClient()
+    const supabase = createServiceClient()
 
     // List all files in project's reports folder
     const { data: files, error: listError } = await supabase.storage
