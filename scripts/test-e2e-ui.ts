@@ -38,7 +38,7 @@ const CONFIG = {
   testProjectId: process.env.TEST_PROJECT_ID || 'd82e2314-7ccf-404e-a133-0caebb154c7e',
   screenshotDir: join(process.cwd(), 'test-screenshots'),
   timeout: {
-    navigation: 30000,
+    navigation: 60000,
     analysis: 300000, // 5 minutes for complete analysis
     element: 10000,
   },

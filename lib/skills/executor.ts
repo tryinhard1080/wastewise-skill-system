@@ -1,6 +1,6 @@
 import { skillRegistry } from './registry'
 import { SkillContext, SkillResult } from './types'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { NotFoundError, AppError } from '@/lib/types/errors'
@@ -43,14 +43,17 @@ function mapJobTypeToSkill(jobType: string): string {
  * @returns Populated SkillContext
  */
 export async function buildSkillContext(
-  projectId: string, 
-  userId: string, 
+  projectId: string,
+  userId: string,
   skillName: string,
-  onProgress?: (percent: number, step: string) => Promise<void>
+  onProgress?: (percent: number, step: string) => Promise<void>,
+  supabaseClient?: ReturnType<typeof createClient> | any // Accept injected client
 ): Promise<SkillContext> {
   const contextLogger = logger.child({ projectId, skillName })
-  const supabase = await createClient()
-  
+
+  // Use injected client (service role) or create default client (user session)
+  const supabase = supabaseClient || await createClient()
+
   // Initialize repositories
   const haulLogRepo = new HaulLogRepository(supabase)
   const invoiceRepo = new InvoiceRepository(supabase)
@@ -225,10 +228,15 @@ export async function executeSkillWithProgress(
 
   // Get user ID: use provided userId (worker context) or get from auth session (web context)
   let currentUserId: string
+  let supabaseClient = undefined
+
   if (userId) {
-    // Worker context: use provided user ID
+    // Worker context: use provided user ID and Service Role client
     currentUserId = userId
-    executionLogger.info('Using provided user ID (worker context)', { userId: currentUserId })
+    // Create service role client to bypass RLS since we don't have a user session
+    supabaseClient = createServiceClient()
+    executionLogger.info('Using provided user ID and Service Role client (worker context)', { userId: currentUserId })
+    console.log('Worker context detected, creating service client')
   } else {
     // Web context: get from authenticated session
     const supabase = await createClient()
@@ -239,15 +247,20 @@ export async function executeSkillWithProgress(
     }
     currentUserId = user.id
     executionLogger.info('Using authenticated user ID (web context)', { userId: currentUserId })
+    console.log('User context detected, creating regular client')
   }
 
+  console.log('Building skill context...')
   // Build context with progress callback
-  const context = await buildSkillContext(projectId, currentUserId, skillName, onProgress)
+  const context = await buildSkillContext(projectId, currentUserId, skillName, onProgress, supabaseClient)
+  console.log('Skill context built successfully')
 
   const timerId = metrics.startTimer('skill.execution', { skill: skillName })
 
   try {
+    console.log(`Executing skill ${skillName}...`)
     const result = await skill.execute(context)
+    console.log('Skill execution completed')
 
     const duration = metrics.stopTimer(timerId)
 
@@ -267,6 +280,7 @@ export async function executeSkillWithProgress(
 
     return result
   } catch (error) {
+    console.error('Skill execution failed:', error)
     metrics.stopTimer(timerId)
     executionLogger.error(
       'Skill execution with progress failed',

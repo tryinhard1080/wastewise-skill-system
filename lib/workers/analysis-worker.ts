@@ -98,13 +98,53 @@ export class AnalysisWorker {
 
         for (let i = 0; i < this.maxConcurrentJobs; i++) {
           // Use RPC to call claim_next_analysis_job() function
-          const { data: claimedJob, error: claimError } = await this.supabase.rpc(
-            'claim_next_analysis_job'
-          )
+          let claimedJob = null
 
-          if (claimError) {
-            logger.error('Failed to claim job', claimError as Error)
-            break
+          try {
+            // logger.debug('Polling for jobs...')
+            console.log('Worker polling for jobs...')
+            const { data, error: claimError } = await this.supabase.rpc(
+              'claim_next_analysis_job'
+            )
+
+            if (claimError) {
+              // Check if error is "function not found"
+              if (claimError.message && (
+                claimError.message.includes('function') ||
+                claimError.message.includes('not found') ||
+                claimError.code === '42883' // Undefined function
+              )) {
+                logger.warn('RPC function not found, falling back to manual claim', { error: claimError.message })
+
+                // Fallback: Manual claim
+                const { data: jobs, error } = await this.supabase
+                  .from('analysis_jobs')
+                  .select('*')
+                  .eq('status', 'pending')
+                  .limit(1)
+
+                if (error) {
+                  console.error('Error fetching pending jobs:', error)
+                }
+                if (jobs && jobs.length > 0) {
+                  console.log('Found pending job:', jobs[0].id)
+                  // Try to claim it
+                  const job = jobs[0] as any
+                  // Note: We don't update status here because JobProcessor expects 'pending'
+                  // This relies on JobProcessor updating the status to 'processing'
+                  claimedJob = job
+                } else {
+                  console.log('No pending jobs found in fallback')
+                }
+              } else {
+                logger.error('Failed to claim job', claimError as Error)
+                break
+              }
+            } else {
+              claimedJob = data
+            }
+          } catch (err) {
+            logger.error('Unexpected error claiming job', err as Error)
           }
 
           if (!claimedJob) {

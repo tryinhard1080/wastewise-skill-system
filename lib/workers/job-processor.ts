@@ -61,20 +61,44 @@ export class JobProcessor {
         status: job.status,
       })
 
-      // Skip if job is not in pending status
-      if (job.status !== 'pending') {
-        jobLogger.warn('Job is not pending, skipping', { status: job.status })
+      // Accept jobs in 'pending' or 'processing' status
+      // (RPC claim function may have already set to 'processing')
+      if (job.status !== 'pending' && job.status !== 'processing') {
+        jobLogger.warn('Job is not in processable state, skipping', { status: job.status })
         return
       }
 
-      // Mark job as processing
-      jobLogger.info('Marking job as processing')
-      const { error: startError } = await this.supabase.rpc('start_analysis_job', {
-        job_id: jobId,
-      })
+      // Mark job as processing (skip if already processing from RPC claim)
+      if (job.status === 'pending') {
+        jobLogger.info('Marking job as processing')
+        try {
+          const { error: startError } = await this.supabase.rpc('start_analysis_job', {
+            job_id: jobId,
+          })
 
-      if (startError) {
-        throw new Error(`Failed to start job: ${startError.message}`)
+          if (startError) {
+            if (startError.message && (startError.message.includes('function') || startError.code === '42883')) {
+              throw new Error('RPC_MISSING')
+            }
+            throw new Error(`Failed to start job: ${startError.message}`)
+          }
+        } catch (err) {
+          if ((err as Error).message === 'RPC_MISSING') {
+            jobLogger.warn('RPC function not found, falling back to manual update')
+            const { error: updateError } = await this.supabase
+              .from('analysis_jobs')
+              .update({
+                status: 'processing',
+              })
+              .eq('id', jobId)
+
+            if (updateError) throw new Error(`Failed to start job (fallback): ${updateError.message}`)
+          } else {
+            throw err
+          }
+        }
+      } else {
+        jobLogger.info('Job already processing, skipping status update')
       }
 
       // Route to appropriate handler based on job type
@@ -113,14 +137,30 @@ export class JobProcessor {
 
       jobLogger.info('Marking job as failed', { errorCode, errorMessage })
 
-      const { error: failError } = await this.supabase.rpc('fail_analysis_job', {
-        job_id: jobId,
-        error_msg: errorMessage,
-        error_cd: errorCode,
-      })
+      try {
+        const { error: failError } = await this.supabase.rpc('fail_analysis_job', {
+          job_id: jobId,
+          error_msg: errorMessage,
+          error_cd: errorCode,
+        })
 
-      if (failError) {
-        jobLogger.error('Failed to mark job as failed', failError as Error)
+        if (failError) {
+          if (failError.message && (failError.message.includes('function') || failError.code === '42883')) {
+            throw new Error('RPC_MISSING')
+          }
+          jobLogger.error('Failed to mark job as failed', failError as Error)
+        }
+      } catch (err) {
+        if ((err as Error).message === 'RPC_MISSING') {
+          await this.supabase
+            .from('analysis_jobs')
+            .update({
+              status: 'failed',
+              error_message: errorMessage,
+              completed_at: new Date().toISOString()
+            })
+            .eq('id', jobId)
+        }
       }
 
       throw error
@@ -152,16 +192,31 @@ export class JobProcessor {
       async (percent, step) => {
         jobLogger.debug('Updating job progress', { percent, step })
 
-        const { error: progressError } = await this.supabase.rpc('update_job_progress', {
-          job_id: job.id,
-          new_progress: percent,
-          step_name: step,
-        })
-
-        if (progressError) {
-          jobLogger.warn('Failed to update job progress', undefined, {
-            error: progressError.message,
+        try {
+          const { error: progressError } = await this.supabase.rpc('update_job_progress', {
+            job_id: job.id,
+            new_progress: percent,
+            step_name: step,
           })
+
+          if (progressError) {
+            if (progressError.message && (progressError.message.includes('function') || progressError.code === '42883')) {
+              throw new Error('RPC_MISSING')
+            }
+            jobLogger.warn('Failed to update job progress', undefined, {
+              error: progressError.message,
+            })
+          }
+        } catch (err) {
+          if ((err as Error).message === 'RPC_MISSING') {
+            await this.supabase
+              .from('analysis_jobs')
+              .update({
+                progress_percent: percent,
+                current_step: step
+              })
+              .eq('id', job.id)
+          }
         }
       },
       job.user_id // Pass user_id from job record for worker context
@@ -179,21 +234,44 @@ export class JobProcessor {
     // Mark job as complete with result data
     jobLogger.info('Marking job as complete')
 
-    const { error: completeError } = await this.supabase.rpc('complete_analysis_job', {
-      job_id: job.id,
-      result: result.data as any, // JSONB
-      ai_usage: result.metadata.aiUsage
-        ? {
+    try {
+      const { error: completeError } = await this.supabase.rpc('complete_analysis_job', {
+        job_id: job.id,
+        result: result.data as any, // JSONB
+        ai_usage: result.metadata.aiUsage
+          ? {
             requests: result.metadata.aiUsage.requests,
             tokens_input: result.metadata.aiUsage.tokensInput,
             tokens_output: result.metadata.aiUsage.tokensOutput,
             cost_usd: result.metadata.aiUsage.costUsd,
           }
-        : null,
-    })
+          : null,
+      })
 
-    if (completeError) {
-      throw new Error(`Failed to complete job: ${completeError.message}`)
+      if (completeError) {
+        if (completeError.message && (completeError.message.includes('function') || completeError.code === '42883')) {
+          throw new Error('RPC_MISSING')
+        }
+        throw new Error(`Failed to complete job: ${completeError.message}`)
+      }
+    } catch (err) {
+      if ((err as Error).message === 'RPC_MISSING') {
+        jobLogger.warn('RPC function not found, falling back to manual completion')
+        const { error: updateError } = await this.supabase
+          .from('analysis_jobs')
+          .update({
+            status: 'completed',
+            result_data: result.data as any,
+            completed_at: new Date().toISOString(),
+            progress_percent: 100,
+            current_step: 'Completed'
+          })
+          .eq('id', job.id)
+
+        if (updateError) throw new Error(`Failed to complete job (fallback): ${updateError.message}`)
+      } else {
+        throw err
+      }
     }
 
     jobLogger.info('Job marked as complete successfully')
