@@ -157,8 +157,16 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResearchResult>
         expirationDate: expirationDate.toISOString(),
       }
 
-      // Step 6: Save to database
-      await this.saveToDatabase(projectId, result)
+      // Step 6: Save to database (non-blocking - log errors but continue)
+      try {
+        await this.saveToDatabase(projectId, result)
+      } catch (dbError) {
+        // Database save is optional - log error but don't fail the skill execution
+        logger.warn('Failed to save to database (non-critical)', {
+          projectId,
+          error: (dbError as Error).message,
+        })
+      }
 
       metrics.stopTimer(timer)
       metrics.increment('skill.regulatory_research.success')
@@ -236,6 +244,30 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResearchResult>
   }
 
   /**
+   * Strip markdown code blocks from JSON response
+   *
+   * Claude often wraps JSON in markdown like:
+   * ```json
+   * { ... }
+   * ```
+   *
+   * This function extracts the JSON content.
+   */
+  private stripMarkdownCodeBlocks(content: string): string {
+    let jsonString = content.trim()
+
+    // Check if wrapped in markdown code blocks
+    if (jsonString.startsWith('```')) {
+      // Remove opening ```json or ```
+      jsonString = jsonString.replace(/^```(json)?\s*\n?/, '')
+      // Remove closing ```
+      jsonString = jsonString.replace(/\s*\n?```\s*$/, '')
+    }
+
+    return jsonString.trim()
+  }
+
+  /**
    * Extract waste management requirements from ordinances using Claude
    */
   private async extractRequirements(
@@ -269,8 +301,9 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResearchResult>
       throw new Error('Unexpected response type from Claude')
     }
 
-    // Parse the JSON response
-    const extracted = JSON.parse(content.text)
+    // Parse the JSON response (strip markdown code blocks if present)
+    const jsonString = this.stripMarkdownCodeBlocks(content.text)
+    const extracted = JSON.parse(jsonString)
 
     return {
       waste: extracted.wasteRequirements || [],

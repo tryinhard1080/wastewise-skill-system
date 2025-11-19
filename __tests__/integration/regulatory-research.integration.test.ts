@@ -33,8 +33,8 @@ describe.skipIf(!runIntegrationTests)('RegulatoryResearchSkill - Integration Tes
     skill = new RegulatoryResearchSkill()
 
     const austinProject: ProjectRow = {
-      id: 'austin-test',
-      user_id: 'user-123',
+      id: 'd82e2314-7ccf-404e-a133-0caebb154c7e', // Austin test project UUID
+      user_id: 'b9d24307-f0b2-439a-9f84-7e2f23978ba6', // Test user UUID
       property_name: 'Austin Test Property',
       units: 250,
       city: 'Austin',
@@ -51,8 +51,8 @@ describe.skipIf(!runIntegrationTests)('RegulatoryResearchSkill - Integration Tes
     }
 
     const chicagoProject: ProjectRow = {
-      id: 'chicago-test',
-      user_id: 'user-123',
+      id: 'e93d3425-8dcf-415f-b244-0dbfcc265d8f', // Chicago test project UUID
+      user_id: 'b9d24307-f0b2-439a-9f84-7e2f23978ba6', // Test user UUID
       property_name: 'Chicago Test Property',
       units: 300,
       city: 'Chicago',
@@ -69,8 +69,8 @@ describe.skipIf(!runIntegrationTests)('RegulatoryResearchSkill - Integration Tes
     }
 
     austinContext = {
-      projectId: 'austin-test',
-      userId: 'user-123',
+      projectId: 'd82e2314-7ccf-404e-a133-0caebb154c7e',
+      userId: 'b9d24307-f0b2-439a-9f84-7e2f23978ba6',
       project: austinProject,
       invoices: [],
       haulLog: [],
@@ -90,8 +90,8 @@ describe.skipIf(!runIntegrationTests)('RegulatoryResearchSkill - Integration Tes
     }
 
     chicagoContext = {
-      projectId: 'chicago-test',
-      userId: 'user-123',
+      projectId: 'e93d3425-8dcf-415f-b244-0dbfcc265d8f',
+      userId: 'b9d24307-f0b2-439a-9f84-7e2f23978ba6',
       project: chicagoProject,
       invoices: [],
       haulLog: [],
