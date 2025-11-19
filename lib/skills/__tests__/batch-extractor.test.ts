@@ -13,18 +13,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { BatchExtractorSkill } from '../skills/batch-extractor'
 import type { SkillContext, InvoiceData, HaulLogEntry } from '../types'
-import Anthropic from '@anthropic-ai/sdk'
 
-// Mock Anthropic SDK
-vi.mock('@anthropic-ai/sdk', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      messages: {
-        create: vi.fn(),
-      },
-    })),
-  }
-})
+// Create mock functions using vi.hoisted() for proper hoisting
+const { mockExtractInvoiceWithVision, mockExtractHaulLogWithVision, mockDetectDocumentType, mockCalculateAnthropicCost } = vi.hoisted(() => ({
+  mockExtractInvoiceWithVision: vi.fn(),
+  mockExtractHaulLogWithVision: vi.fn(),
+  mockDetectDocumentType: vi.fn(),
+  mockCalculateAnthropicCost: vi.fn(),
+}))
+
+// Mock vision-extractor module (the skill uses these functions)
+vi.mock('@/lib/ai/vision-extractor', () => ({
+  extractInvoiceWithVision: mockExtractInvoiceWithVision,
+  extractHaulLogWithVision: mockExtractHaulLogWithVision,
+  detectDocumentType: mockDetectDocumentType,
+  calculateAnthropicCost: mockCalculateAnthropicCost,
+}))
 
 // Mock Supabase
 vi.mock('@/lib/supabase/server', () => ({
@@ -74,6 +78,7 @@ vi.mock('@/lib/observability/metrics', () => ({
   metrics: {
     increment: vi.fn(),
     gauge: vi.fn(),
+    record: vi.fn(),
   },
 }))
 
@@ -158,19 +163,20 @@ describe('BatchExtractorSkill', () => {
 
   describe('Invoice Extraction', () => {
     it('should extract invoice data from PDF using vision API', async () => {
-      // Mock invoice data response
-      const mockInvoiceData = {
-        property: {
-          name: 'Sunset Apartments',
-          address: '123 Main St, Austin, TX',
-          units: 200,
-        },
-        service: {
-          periodStart: '2024-01-01',
-          periodEnd: '2024-01-31',
-          invoiceNumber: 'INV-2024-001',
-          billingDate: '2024-02-01',
-        },
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
+
+      // Mock invoice data
+      const mockInvoice: InvoiceData = {
+        sourceFile: 'invoice-2024-01.pdf',
+        extractionDate: new Date().toISOString(),
+        propertyName: 'Sunset Apartments',
+        propertyAddress: '123 Main St, Austin, TX',
+        units: 200,
+        servicePeriodStart: '2024-01-01',
+        servicePeriodEnd: '2024-01-31',
+        invoiceNumber: 'INV-2024-001',
+        billingDate: '2024-02-01',
         lineItems: [
           {
             description: 'Compactor Service',
@@ -182,39 +188,31 @@ describe('BatchExtractorSkill', () => {
             totalPrice: 850.0,
           },
         ],
-        totals: {
-          subtotal: 850.0,
-          tax: 68.0,
-          total: 918.0,
-        },
-        vendor: {
-          name: 'Waste Services Inc',
-          contact: 'contact@wasteservices.com',
-        },
+        subtotal: 850.0,
+        tax: 68.0,
+        total: 918.0,
+        vendorName: 'Waste Services Inc',
+        vendorContact: 'contact@wasteservices.com',
       }
 
-      // Mock Anthropic API response
-      const mockCreate = vi.fn().mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(mockInvoiceData),
-          },
-        ],
+      // Mock vision extraction
+      mockExtractInvoiceWithVision.mockResolvedValue({
+        invoice: mockInvoice,
         usage: {
           input_tokens: 1500,
           output_tokens: 800,
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      // Mock cost calculation
+      mockCalculateAnthropicCost.mockReturnValue(10.5)
 
       const result = await skill.execute(mockContext)
+
+      // Debug: log error if test fails
+      if (!result.success) {
+        console.error('Skill execution failed:', result.error)
+      }
 
       expect(result.success).toBe(true)
       expect(result.data).toBeDefined()
@@ -226,15 +224,14 @@ describe('BatchExtractorSkill', () => {
     })
 
     it('should handle extraction failures gracefully', async () => {
-      // Mock API failure
-      const mockCreate = vi.fn().mockRejectedValue(new Error('API error'))
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      // Mock extraction failure
+      mockExtractInvoiceWithVision.mockRejectedValue(new Error('API error'))
+
+      // Mock cost calculation (won't be called but needed for type safety)
+      mockCalculateAnthropicCost.mockReturnValue(0)
 
       const result = await skill.execute(mockContext)
 
@@ -247,22 +244,24 @@ describe('BatchExtractorSkill', () => {
 
   describe('Data Validation', () => {
     it('should validate container types', async () => {
-      const mockInvoiceData = {
-        property: {
-          name: 'Test Property',
-          address: '123 Test St',
-          units: null,
-        },
-        service: {
-          periodStart: '2024-01-01',
-          periodEnd: '2024-01-31',
-          invoiceNumber: 'INV-001',
-          billingDate: '2024-02-01',
-        },
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
+
+      // Mock invoice with invalid container type
+      const mockInvoice: InvoiceData = {
+        sourceFile: 'invoice-001.pdf',
+        extractionDate: new Date().toISOString(),
+        propertyName: 'Test Property',
+        propertyAddress: '123 Test St',
+        units: undefined,
+        servicePeriodStart: '2024-01-01',
+        servicePeriodEnd: '2024-01-31',
+        invoiceNumber: 'INV-001',
+        billingDate: '2024-02-01',
         lineItems: [
           {
             description: 'Invalid container',
-            containerType: 'INVALID_TYPE', // Invalid type
+            containerType: 'INVALID_TYPE' as any, // Invalid type
             containerSize: 40,
             quantity: 1,
             frequency: '1x/week',
@@ -270,36 +269,22 @@ describe('BatchExtractorSkill', () => {
             totalPrice: 500.0,
           },
         ],
-        totals: {
-          subtotal: 500.0,
-          tax: 40.0,
-          total: 540.0,
-        },
-        vendor: {
-          name: 'Vendor',
-          contact: null,
-        },
+        subtotal: 500.0,
+        tax: 40.0,
+        total: 540.0,
+        vendorName: 'Vendor',
+        vendorContact: undefined,
       }
 
-      const mockCreate = vi.fn().mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(mockInvoiceData),
-          },
-        ],
+      mockExtractInvoiceWithVision.mockResolvedValue({
+        invoice: mockInvoice,
         usage: {
           input_tokens: 1000,
           output_tokens: 500,
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockCalculateAnthropicCost.mockReturnValue(5.0)
 
       const result = await skill.execute(mockContext)
 
@@ -308,18 +293,20 @@ describe('BatchExtractorSkill', () => {
     })
 
     it('should warn about subtotal mismatches', async () => {
-      const mockInvoiceData = {
-        property: {
-          name: 'Test Property',
-          address: '123 Test St',
-          units: null,
-        },
-        service: {
-          periodStart: '2024-01-01',
-          periodEnd: '2024-01-31',
-          invoiceNumber: 'INV-001',
-          billingDate: '2024-02-01',
-        },
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
+
+      // Mock invoice with subtotal mismatch
+      const mockInvoice: InvoiceData = {
+        sourceFile: 'invoice-001.pdf',
+        extractionDate: new Date().toISOString(),
+        propertyName: 'Test Property',
+        propertyAddress: '123 Test St',
+        units: undefined,
+        servicePeriodStart: '2024-01-01',
+        servicePeriodEnd: '2024-01-31',
+        invoiceNumber: 'INV-001',
+        billingDate: '2024-02-01',
         lineItems: [
           {
             description: 'Service',
@@ -331,36 +318,22 @@ describe('BatchExtractorSkill', () => {
             totalPrice: 500.0,
           },
         ],
-        totals: {
-          subtotal: 600.0, // Mismatch - should be 500
-          tax: 48.0,
-          total: 648.0,
-        },
-        vendor: {
-          name: 'Vendor',
-          contact: null,
-        },
+        subtotal: 600.0, // Mismatch - should be 500
+        tax: 48.0,
+        total: 648.0,
+        vendorName: 'Vendor',
+        vendorContact: undefined,
       }
 
-      const mockCreate = vi.fn().mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(mockInvoiceData),
-          },
-        ],
+      mockExtractInvoiceWithVision.mockResolvedValue({
+        invoice: mockInvoice,
         usage: {
           input_tokens: 1000,
           output_tokens: 500,
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockCalculateAnthropicCost.mockReturnValue(5.0)
 
       const result = await skill.execute(mockContext)
 
@@ -370,49 +343,37 @@ describe('BatchExtractorSkill', () => {
     })
 
     it('should filter out invalid invoices', async () => {
-      const mockInvoiceData = {
-        property: {
-          name: '', // Missing required field
-          address: '123 Test St',
-          units: null,
-        },
-        service: {
-          periodStart: '2024-01-01',
-          periodEnd: '2024-01-31',
-          invoiceNumber: 'INV-001',
-          billingDate: '2024-02-01',
-        },
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
+
+      // Mock invalid invoice (missing required fields)
+      const mockInvoice: InvoiceData = {
+        sourceFile: 'invoice-001.pdf',
+        extractionDate: new Date().toISOString(),
+        propertyName: '', // Missing required field
+        propertyAddress: '123 Test St',
+        units: undefined,
+        servicePeriodStart: '2024-01-01',
+        servicePeriodEnd: '2024-01-31',
+        invoiceNumber: 'INV-001',
+        billingDate: '2024-02-01',
         lineItems: [], // No line items
-        totals: {
-          subtotal: 0,
-          tax: 0,
-          total: 0,
-        },
-        vendor: {
-          name: 'Vendor',
-          contact: null,
-        },
+        subtotal: 0,
+        tax: 0,
+        total: 0,
+        vendorName: 'Vendor',
+        vendorContact: undefined,
       }
 
-      const mockCreate = vi.fn().mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(mockInvoiceData),
-          },
-        ],
+      mockExtractInvoiceWithVision.mockResolvedValue({
+        invoice: mockInvoice,
         usage: {
           input_tokens: 1000,
           output_tokens: 500,
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockCalculateAnthropicCost.mockReturnValue(5.0)
 
       const result = await skill.execute(mockContext)
 
@@ -423,43 +384,44 @@ describe('BatchExtractorSkill', () => {
 
   describe('Progress Tracking', () => {
     it('should update progress throughout execution', async () => {
-      const mockCreate = vi.fn().mockResolvedValue({
-        content: [
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
+
+      // Mock invoice data
+      const mockInvoice: InvoiceData = {
+        sourceFile: 'invoice-001.pdf',
+        extractionDate: new Date().toISOString(),
+        propertyName: 'Test Property',
+        propertyAddress: '123 Test St',
+        units: undefined,
+        servicePeriodStart: '2024-01-01',
+        servicePeriodEnd: '2024-01-31',
+        invoiceNumber: 'INV-001',
+        billingDate: '2024-02-01',
+        lineItems: [
           {
-            type: 'text',
-            text: JSON.stringify({
-              property: { name: 'Test', address: 'Test', units: null },
-              service: {
-                periodStart: '2024-01-01',
-                periodEnd: '2024-01-31',
-                invoiceNumber: 'INV-001',
-                billingDate: '2024-02-01',
-              },
-              lineItems: [
-                {
-                  description: 'Service',
-                  containerType: 'COMPACTOR',
-                  containerSize: 40,
-                  quantity: 1,
-                  frequency: '1x/week',
-                  unitPrice: 500.0,
-                  totalPrice: 500.0,
-                },
-              ],
-              totals: { subtotal: 500.0, tax: 40.0, total: 540.0 },
-              vendor: { name: 'Vendor', contact: null },
-            }),
+            description: 'Service',
+            containerType: 'COMPACTOR',
+            containerSize: 40,
+            quantity: 1,
+            frequency: '1x/week',
+            unitPrice: 500.0,
+            totalPrice: 500.0,
           },
         ],
+        subtotal: 500.0,
+        tax: 40.0,
+        total: 540.0,
+        vendorName: 'Vendor',
+        vendorContact: undefined,
+      }
+
+      mockExtractInvoiceWithVision.mockResolvedValue({
+        invoice: mockInvoice,
         usage: { input_tokens: 1000, output_tokens: 500 },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      mockCalculateAnthropicCost.mockReturnValue(5.0)
 
       const progressUpdates: any[] = []
       mockContext.onProgress = vi.fn((progress) => {
@@ -477,46 +439,48 @@ describe('BatchExtractorSkill', () => {
 
   describe('Cost Calculation', () => {
     it('should calculate AI usage costs accurately', async () => {
-      const mockCreate = vi.fn().mockResolvedValue({
-        content: [
+      // Mock document type detection
+      mockDetectDocumentType.mockReturnValue('invoice')
+
+      // Mock invoice data
+      const mockInvoice: InvoiceData = {
+        sourceFile: 'invoice-001.pdf',
+        extractionDate: new Date().toISOString(),
+        propertyName: 'Test Property',
+        propertyAddress: '123 Test St',
+        units: undefined,
+        servicePeriodStart: '2024-01-01',
+        servicePeriodEnd: '2024-01-31',
+        invoiceNumber: 'INV-001',
+        billingDate: '2024-02-01',
+        lineItems: [
           {
-            type: 'text',
-            text: JSON.stringify({
-              property: { name: 'Test', address: 'Test', units: null },
-              service: {
-                periodStart: '2024-01-01',
-                periodEnd: '2024-01-31',
-                invoiceNumber: 'INV-001',
-                billingDate: '2024-02-01',
-              },
-              lineItems: [
-                {
-                  description: 'Service',
-                  containerType: 'COMPACTOR',
-                  containerSize: 40,
-                  quantity: 1,
-                  frequency: '1x/week',
-                  unitPrice: 500.0,
-                  totalPrice: 500.0,
-                },
-              ],
-              totals: { subtotal: 500.0, tax: 40.0, total: 540.0 },
-              vendor: { name: 'Vendor', contact: null },
-            }),
+            description: 'Service',
+            containerType: 'COMPACTOR',
+            containerSize: 40,
+            quantity: 1,
+            frequency: '1x/week',
+            unitPrice: 500.0,
+            totalPrice: 500.0,
           },
         ],
+        subtotal: 500.0,
+        tax: 40.0,
+        total: 540.0,
+        vendorName: 'Vendor',
+        vendorContact: undefined,
+      }
+
+      mockExtractInvoiceWithVision.mockResolvedValue({
+        invoice: mockInvoice,
         usage: {
           input_tokens: 1000000, // 1M tokens
           output_tokens: 500000, // 500k tokens
         },
       })
 
-      // @ts-ignore - Mocking the SDK
-      Anthropic.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      }))
+      // Mock cost calculation: (1M * $3/M) + (500k * $15/M) = $3 + $7.5 = $10.50
+      mockCalculateAnthropicCost.mockReturnValue(10.5)
 
       const result = await skill.execute(mockContext)
 
