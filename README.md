@@ -1,5 +1,11 @@
 # WasteWise Skill System
 
+[![PR Checks](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
+[![Phase](https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg)](#development-phases)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+
 > Intelligent skill execution platform for multifamily waste optimization
 
 **Current Status:** Phase 7 In Progress - Integration Testing & Production Deployment (85% Complete) 🚀

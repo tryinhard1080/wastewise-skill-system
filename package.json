@@ -10,6 +10,9 @@
     "worker": "tsx scripts/start-worker.ts",
     "seed": "tsx scripts/seed-test-project.ts",
     "test": "vitest run",
+    "test:unit": "vitest run __tests__/skills/ __tests__/calculations/ --exclude '**/*.integration.test.ts'",
+    "test:integration": "vitest run __tests__/integration/",
+    "test:watch": "vitest",
     "test:e2e": "tsx scripts/test-e2e.ts",
     "test:ui": "tsx scripts/test-e2e-ui.ts"
   },
