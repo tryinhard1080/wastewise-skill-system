@@ -343,6 +343,7 @@ function buildSkillContext(input: CompactorTestInput): SkillContext {
   return {
     projectId: 'test-project',
     userId: 'test-user',
+    supabase: {} as any,
     project: mockProject,
     invoices,
     haulLog,

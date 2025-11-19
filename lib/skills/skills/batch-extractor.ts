@@ -32,11 +32,12 @@ import {
   detectDocumentType,
   calculateAnthropicCost,
 } from '@/lib/ai/vision-extractor'
-import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
 import { InvoiceRepository, HaulLogRepository, type InvoiceRecord, type HaulLogRecord, type InvoiceCharges } from '@/lib/db'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database.types'
 
 /**
  * Container type validation
@@ -64,8 +65,7 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     const errors: Array<{ field: string; message: string; code: string }> = []
 
     // Get files from database
-    const supabase = await createClient()
-    const { data: files, error: filesError } = await supabase
+    const { data: files, error: filesError } = await context.supabase
       .from('project_files')
       .select('*')
       .eq('project_id', context.projectId)
@@ -127,7 +127,7 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
       step: 'Fetching project files',
     })
 
-    const supabase = await createClient()
+    const supabase = context.supabase
     const { data: files, error: filesError } = await supabase
       .from('project_files')
       .select('*')
@@ -531,7 +531,7 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     projectId: string,
     invoices: InvoiceData[],
     haulLogs: HaulLogEntry[],
-    supabase: any,
+    supabase: SupabaseClient<Database>,
     executionLogger: any
   ): Promise<void> {
     executionLogger.info('Saving extracted data to database', {

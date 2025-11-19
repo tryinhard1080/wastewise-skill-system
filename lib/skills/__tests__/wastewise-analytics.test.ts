@@ -66,6 +66,10 @@ function createMockContext(overrides?: Partial<SkillContext>): SkillContext {
   return {
     projectId: 'test-project-123',
     userId: 'test-user-456',
+    supabase: {
+      from: vi.fn(),
+      storage: { from: vi.fn() },
+    } as any,
     project: {
       id: 'test-project-123',
       user_id: 'test-user-456',

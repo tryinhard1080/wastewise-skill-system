@@ -1,6 +1,8 @@
 import { skillRegistry } from './registry'
 import { SkillContext, SkillResult } from './types'
 import { createClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database.types'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { NotFoundError, AppError } from '@/lib/types/errors'
@@ -43,13 +45,14 @@ function mapJobTypeToSkill(jobType: string): string {
  * @returns Populated SkillContext
  */
 export async function buildSkillContext(
-  projectId: string, 
-  userId: string, 
+  projectId: string,
+  userId: string,
   skillName: string,
-  onProgress?: (percent: number, step: string) => Promise<void>
+  onProgress?: (percent: number, step: string) => Promise<void>,
+  supabaseClient?: SupabaseClient<Database>
 ): Promise<SkillContext> {
   const contextLogger = logger.child({ projectId, skillName })
-  const supabase = await createClient()
+  const supabase = supabaseClient ?? (await createClient())
   
   // Initialize repositories
   const haulLogRepo = new HaulLogRepository(supabase)
@@ -103,6 +106,7 @@ export async function buildSkillContext(
   return {
     projectId,
     userId,
+    supabase,
     project,
     invoices: invoices || [],
     haulLog: haulLog || [],
@@ -124,7 +128,11 @@ export async function buildSkillContext(
  * @returns SkillResult with success/failure and data
  * @throws AppError if job type is unknown
  */
-export async function executeSkill(projectId: string, jobType: string): Promise<SkillResult> {
+export async function executeSkill(
+  projectId: string,
+  jobType: string,
+  supabaseClient?: SupabaseClient<Database>
+): Promise<SkillResult> {
   const executionLogger = logger.child({ projectId, jobType })
 
   // Dynamic skill routing based on job type
@@ -152,7 +160,7 @@ export async function executeSkill(projectId: string, jobType: string): Promise<
   }
 
   // Build context
-  const context = await buildSkillContext(projectId, user.id, skillName)
+  const context = await buildSkillContext(projectId, user.id, skillName, undefined, supabaseClient)
 
   // Execute skill with metrics tracking
   const timerId = metrics.startTimer('skill.execution', { skill: skillName })
@@ -210,7 +218,8 @@ export async function executeSkillWithProgress(
   projectId: string,
   jobType: string,
   onProgress: (percent: number, step: string) => Promise<void>,
-  userId?: string
+  userId?: string,
+  supabaseClient?: SupabaseClient<Database>
 ): Promise<SkillResult> {
   const executionLogger = logger.child({ projectId, jobType })
 
@@ -242,7 +251,13 @@ export async function executeSkillWithProgress(
   }
 
   // Build context with progress callback
-  const context = await buildSkillContext(projectId, currentUserId, skillName, onProgress)
+  const context = await buildSkillContext(
+    projectId,
+    currentUserId,
+    skillName,
+    onProgress,
+    supabaseClient
+  )
 
   const timerId = metrics.startTimer('skill.execution', { skill: skillName })
 

@@ -9,6 +9,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Tables } from '@/types/database.types'
 import { logger } from '@/lib/observability/logger'
 import { executeSkillWithProgress } from '@/lib/skills/executor'
@@ -22,7 +23,7 @@ interface AnalysisJobInput {
 }
 
 export class JobProcessor {
-  private supabase: ReturnType<typeof createClient<Database>>
+  private supabase: SupabaseClient<Database>
 
   constructor(supabaseUrl: string, supabaseServiceKey: string) {
     this.supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
@@ -164,7 +165,8 @@ export class JobProcessor {
           })
         }
       },
-      job.user_id // Pass user_id from job record for worker context
+      job.user_id, // Pass user_id from job record for worker context
+      this.supabase
     )
 
     if (!result.success || !result.data) {
