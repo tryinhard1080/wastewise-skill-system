@@ -278,7 +278,7 @@ jobs:
           echo "✅ No hardcoded formula values detected"
 
       - name: Run calculation tests
-        run: pnpm test __tests__/calculations/
+        run: pnpm test __tests__/unit/constants/formulas.test.ts
         if: always()
         env:
           NODE_ENV: test
