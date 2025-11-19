@@ -11,11 +11,12 @@ import type { Database } from '@/types/database.types'
 
 type ProjectRow = Database['public']['Tables']['projects']['Row']
 
-// Create mock functions
-const mockSearchOrdinances = vi.fn()
-const mockGetContents = vi.fn()
-const mockAnthropicCreate = vi.fn()
-const mockSupabaseInsert = vi.fn()
+// Create mock functions using vi.hoisted() for proper hoisting
+const { mockSearchOrdinances, mockGetContents, mockAnthropicCreate } = vi.hoisted(() => ({
+  mockSearchOrdinances: vi.fn(),
+  mockGetContents: vi.fn(),
+  mockAnthropicCreate: vi.fn(),
+}))
 
 // Mock dependencies
 vi.mock('@/lib/api/exa-client', () => ({
@@ -23,15 +24,22 @@ vi.mock('@/lib/api/exa-client', () => ({
     searchOrdinances: mockSearchOrdinances,
     getContents: mockGetContents,
   }),
+  ExaClient: vi.fn().mockImplementation(() => ({
+    searchOrdinances: mockSearchOrdinances,
+    getContents: mockGetContents,
+  })),
 }))
 
-vi.mock('@anthropic-ai/sdk', () => ({
-  default: class MockAnthropic {
+vi.mock('@anthropic-ai/sdk', () => {
+  const MockAnthropic = class {
     messages = {
       create: mockAnthropicCreate,
     }
-  },
-}))
+  }
+  return {
+    default: MockAnthropic,
+  }
+})
 
 vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: () => ({
