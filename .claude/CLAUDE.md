@@ -291,8 +291,10 @@ This project uses **specialized agents** coordinated by an orchestrator:
 
 ### GitHub Branch Strategy
 
+**Note**: This repository uses `master` as the main branch (not `main`).
+
 ```
-main (protected - requires PR + tests + evals)
+master (protected - requires PR + tests + evals)
 ├── frontend/landing-rebrand
 ├── frontend/auth-ui
 ├── frontend/dashboard-shell
@@ -315,15 +317,28 @@ main (protected - requires PR + tests + evals)
 
 1. Agent creates feature branch
 2. Agent commits work
-3. Agent opens PR to main
-4. **Automated checks** run:
-   - Unit tests pass
-   - Integration tests pass
+3. Agent opens PR to main (template auto-fills from `.github/PULL_REQUEST_TEMPLATE.md`)
+4. **Complete ALL PR checklist items**:
+   - Type of change specified
+   - Related phase checked
+   - Testing completed (unit, TypeScript, lint)
+   - **Formula validation** (if calculations changed - CRITICAL!)
+   - Database changes documented (if schema changed)
+   - Code quality checks passed
+   - WasteWise-specific validations (container types, conversion rates)
+   - Agent context specified
+5. **Automated checks** run (once GitHub Actions configured):
+   - Unit tests pass (`pnpm test`)
+   - TypeScript compiles (`pnpm tsc --noEmit`)
+   - Linting passes (`pnpm lint`)
    - **Evals pass** (calculations match Python within 0.01%)
    - **Conversion rates validated** (must match reference)
-   - No lint errors
-5. Orchestrator reviews and approves
-6. Merge to main
+6. Self-review or orchestrator reviews
+7. Merge to master
+
+**Git Workflow Documentation**: See `docs/git/` for complete workflow guides:
+- `GIT_QUICK_REFERENCE.md` - Daily workflow cheatsheet
+- `GIT_VISUAL_WORKFLOW.md` - Visual diagrams and examples
 
 ## 🔧 MCP Integration
 
