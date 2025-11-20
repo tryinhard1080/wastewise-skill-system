@@ -12,6 +12,11 @@ export type SkillConfigRow = Database['public']['Tables']['skills_config']['Row'
 export type ProjectRow = Database['public']['Tables']['projects']['Row']
 export type InvoiceDataRow = Database['public']['Tables']['invoice_data']['Row']
 export type HaulLogRow = Database['public']['Tables']['haul_log']['Row']
+export type ProjectFileRow = Database['public']['Tables']['project_files']['Row']
+export type ProjectFileMetadata = Pick<
+  ProjectFileRow,
+  'id' | 'file_name' | 'file_type' | 'mime_type' | 'storage_path'
+>
 
 /**
  * Skill execution result
@@ -78,6 +83,9 @@ export interface SkillContext {
 
   /** Haul log data (for compactor projects) */
   haulLog?: HaulLogRow[]
+
+  /** Project files available for extraction */
+  projectFiles?: ProjectFileMetadata[]
 
   /** Skill configuration from skills_config table */
   config: SkillConfig
