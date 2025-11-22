@@ -1,0 +1,269 @@
+name: Performance Tests
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'next.config.mjs'
+      - 'package.json'
+  push:
+    branches: [master]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+      - name: Analyze bundle size
+        run: pnpm perf:bundle
+        continue-on-error: true
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: bundle-reports/
+          retention-days: 30
+
+  lighthouse-audit:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wastewise_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+      - name: Start Next.js server
+        run: pnpm start &
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          PORT: 3000
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Lighthouse audits
+        run: pnpm perf:lighthouse
+        continue-on-error: true
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: lighthouse-reports/
+          retention-days: 30
+
+      - name: Comment PR with Lighthouse results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const summary = JSON.parse(fs.readFileSync('lighthouse-reports/summary.json', 'utf8'))
+
+            const comment = `## 📊 Lighthouse Performance Report
+
+            **Average Performance Score**: ${summary.averagePerformanceScore}/100
+            **Pages Scoring ≥90**: ${summary.passingPages}/${summary.totalPages}
+
+            ### Results by Page:
+
+            ${summary.results.map(r => `
+            #### ${r.name}
+            - Performance: ${r.scores.performance}/100
+            - Accessibility: ${r.scores.accessibility}/100
+            - Best Practices: ${r.scores.bestPractices}/100
+            - SEO: ${r.scores.seo}/100
+
+            **Metrics:**
+            - FCP: ${r.metrics.fcp.display}
+            - LCP: ${r.metrics.lcp.display}
+            - TBT: ${r.metrics.tbt.display}
+            - CLS: ${r.metrics.cls.display}
+            `).join('\n')}
+
+            ${summary.averagePerformanceScore >= 90 ? '✅ Performance target met!' : '⚠️ Performance below target (90)'}
+            `
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+  load-testing:
+    name: Load Testing
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wastewise_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+      - name: Start Next.js server
+        run: pnpm start &
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          PORT: 3000
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run load tests
+        run: pnpm perf:load
+        continue-on-error: true
+
+      - name: Upload load test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-reports
+          path: load-test-reports/
+          retention-days: 30
+
+      - name: Comment PR with load test results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const summary = JSON.parse(fs.readFileSync('load-test-reports/summary.json', 'utf8'))
+
+            const heavyLoad = summary.results.find(r => r.scenario.includes('Heavy Load'))
+
+            const comment = `## 🔥 Load Test Results
+
+            **Total Scenarios**: ${summary.totalScenarios}
+
+            ### Heavy Load Test (100 concurrent users):
+            ${heavyLoad ? `
+            - Total Requests: ${heavyLoad.totalRequests}
+            - Avg Latency: ${heavyLoad.avgLatency}ms
+            - p95 Latency: ${heavyLoad.p95Latency}ms
+            - p99 Latency: ${heavyLoad.p99Latency}ms
+            - Error Rate: ${heavyLoad.errorRate}
+
+            ${heavyLoad.p95Latency <= 2000 && parseFloat(heavyLoad.errorRate) <= 0.1 ?
+              '✅ Load test passed! System handles 100 concurrent users within targets.' :
+              '⚠️ Load test failed. System does not meet performance targets under load.'}
+            ` : '⚠️ Heavy load scenario not found'}
+
+            ### All Scenarios:
+            ${summary.results.map((r, i) => `
+            ${i + 1}. **${r.scenario}**
+               - Requests: ${r.totalRequests}
+               - Avg Latency: ${r.avgLatency}ms
+               - p95 Latency: ${r.p95Latency}ms
+               - Error Rate: ${r.errorRate}
+            `).join('\n')}
+            `
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })

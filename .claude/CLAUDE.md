@@ -355,6 +355,136 @@ master (protected - requires PR + tests + evals)
 - Checking for console errors
 - Automated browser testing
 
+## 🔒 Sandboxing Configuration
+
+### Why Sandbox for WasteWise?
+
+**Security Benefits**:
+- ✅ Protection against prompt injection attacks targeting AI agents
+- ✅ Automatic blocking of .env, credentials.json, and secrets
+- ✅ Network isolation to prevent unauthorized API calls
+- ✅ 84% reduction in permission prompts = faster development
+
+**Productivity Benefits**:
+- ✅ Agents work autonomously within defined boundaries
+- ✅ No interruptions for file operations within project directories
+- ✅ Pre-approved network access to Anthropic, Supabase, Upstash
+
+### Quick Start
+
+```
+# Enable sandbox with WasteWise defaults
+/sandbox
+```
+
+This automatically:
+- Grants write access to project directories (app, components, lib, tests, docs)
+- Denies access to sensitive files (.env, credentials, config.toml)
+- Allows network requests to approved domains only
+- Excludes git/supabase/docker from sandbox (use standard permissions)
+
+### Sandbox Profiles
+
+WasteWise includes 4 predefined profiles in `.claude/profiles/`:
+
+1. **wastewise-dev.json** (Default)
+   - Full project write access
+   - All approved APIs
+   - For frontend-dev, backend-dev, coder agents
+
+2. **wastewise-testing.json**
+   - Test directories only
+   - No production databases
+   - For tester, reviewer agents
+
+3. **wastewise-docs.json**
+   - Documentation directories only
+   - No network access needed
+   - For documentation work
+
+4. **wastewise-readonly.json**
+   - Read-only access
+   - Full network for research
+   - For Explore, researcher, code-analyzer agents
+
+### Configuration Files
+
+**Main Config**: `.claude/sandbox.json`
+- Defines allowed/denied filesystem paths
+- Lists approved network domains
+- Specifies excluded commands
+
+**Profiles**: `.claude/profiles/*.json`
+- Task-specific boundary definitions
+- Agent type recommendations
+- Security notes and restrictions
+
+### Protected Resources
+
+**Always Denied** (all profiles):
+- `.env` and `.env.*` (environment variables)
+- `.credentials.json` (OAuth tokens)
+- `supabase/config.toml` (database credentials)
+- `node_modules/` (dependency modifications)
+- `.git/` (version control internals)
+- Build artifacts (`.next/`, `dist/`)
+
+**Approved Domains** (dev profile):
+- `api.anthropic.com` (Claude AI services)
+- `*.supabase.co` (Database and storage)
+- `*.upstash.io` (Redis rate limiting)
+- `cdn.jsdelivr.net` (Chart.js for reports)
+- `api.exa.ai`, `api.tavily.com`, `api.brave.com` (Search APIs)
+- `registry.npmjs.org` (Package management)
+- `*.github.com` (Version control)
+
+### Violation Monitoring
+
+**Audit Logging**: `lib/observability/sandbox-logger.ts`
+- Tracks all boundary violation attempts
+- Records approved vs denied access
+- Detects suspicious patterns
+- Integrates with existing logger
+
+**Access Logs**:
+```typescript
+import { logFilesystemViolation, getSandboxStats } from '@/lib/observability/sandbox-logger'
+
+// Violations are automatically logged
+// View stats via getSandboxStats()
+```
+
+### Integration with Security Layers
+
+Sandboxing is **Layer 1** in WasteWise defense-in-depth:
+
+```
+Layer 1: Sandbox (filesystem + network isolation)
+Layer 2: IAM permissions (tool-level approval)
+Layer 3: RLS policies (database-level)
+Layer 4: Input sanitization (application-level)
+Layer 5: CSP headers (browser-level)
+```
+
+All layers work together - sandbox blocks unauthorized access before it reaches other layers.
+
+### Testing Sandbox Compliance
+
+**Test Suite**: `__tests__/security/sandbox-compliance.test.ts`
+
+```bash
+# Run sandbox compliance tests
+pnpm test __tests__/security/sandbox-compliance.test.ts
+```
+
+**Validates**:
+- Denied file access actually fails
+- Allowed paths work without permission
+- Unapproved domains trigger permission requests
+- Excluded commands use standard flow
+
+*See docs/SANDBOXING.md for complete configuration guide*
+
 ## 📝 Code Quality Standards
 
 ### Modularity
@@ -626,10 +756,87 @@ async validate(context: SkillContext): Promise<ValidationResult> {
 
 ## 🧪 Testing & Validation
 
-### Test Coverage Requirements
-- **Unit tests**: 100% coverage for calculations
-- **Integration tests**: All API routes
-- **E2E tests**: Complete workflows (signup → analysis → download)
+### The /validate Command
+
+**Philosophy**: "If `/validate` passes, WasteWise is production-ready"
+
+**Purpose**: Provides 100% confidence that WasteWise works correctly through comprehensive automated testing across five critical phases.
+
+**Quick Start**:
+```bash
+# Full validation (all 5 phases) - Use before PRs
+pnpm validate
+
+# Fast validation (skip E2E tests) - Use before commits
+pnpm validate:skip-e2e
+
+# Run specific phase only
+pnpm validate:phase=1  # Linting
+pnpm validate:phase=2  # Type checking
+pnpm validate:phase=3  # Style checking
+pnpm validate:phase=4  # Unit tests
+pnpm validate:phase=5  # E2E tests
+```
+
+**Complete Documentation**: See `docs/VALIDATION.md` for full guide.
+
+### The Five Validation Phases
+
+#### Phase 1: Linting
+- **Command**: `pnpm lint`
+- **Purpose**: Enforce code quality, catch common errors
+- **Expected**: 0 errors, 0 warnings
+
+#### Phase 2: Type Checking
+- **Command**: `pnpm tsc --noEmit`
+- **Purpose**: Ensure type safety across codebase
+- **Expected**: 0 type errors
+- **Note**: TypeScript strict mode enabled
+
+#### Phase 3: Style Checking
+- **Command**: `pnpm prettier --check .`
+- **Purpose**: Maintain consistent code formatting
+- **Expected**: All files properly formatted
+- **Fix**: Run `pnpm prettier --write .`
+
+#### Phase 4: Unit Testing
+- **Command**: `pnpm test:unit`
+- **Purpose**: Test calculations, utilities, business logic
+- **Expected**: All tests pass, <0.01% deviation from Python reference
+- **Critical Tests**:
+  - `lib/evals/` - Calculation accuracy
+  - `__tests__/skills/` - Skills logic
+  - `__tests__/security/` - Security hardening (XSS, file upload, RLS)
+
+#### Phase 5: End-to-End Testing
+- **Command**: `pnpm test:e2e`
+- **Purpose**: Test complete user workflows
+- **Expected**: All 66 E2E tests pass across 8 test suites
+- **Workflows Tested**:
+  1. User Registration & Login
+  2. Create Project
+  3. Upload Files
+  4. Run Analysis (with job processing)
+  5. View Results & Download Reports
+  6. Error Handling
+
+### Test Coverage
+
+**Unit Tests** (Phase 4):
+- **Skills**: 100% coverage for all 5 skills
+- **Calculations**: <0.01% deviation from Python reference
+- **Security**: XSS, file upload, RLS, rate limiting
+
+**E2E Tests** (Phase 5):
+- **66 total tests** across 8 test suites
+- **Complete workflows**: Auth, projects, uploads, analysis, results
+- **Performance**: Lighthouse audits, load testing
+- **Responsiveness**: 6 viewport sizes
+
+**Integration Tests**:
+- **API endpoints**: All routes tested with real data
+- **Database**: RLS policies, cascade deletes, constraints
+- **External services**: Anthropic AI, Supabase Storage
 
 ### Evals Framework
 
@@ -655,23 +862,70 @@ export async function evaluateCompactorOptimization(
 }
 ```
 
-**Run Before Every Merge**:
-- All evals must pass
-- Conversion rates must match
-- No deviation >0.01%
+**Run Evals**:
+```bash
+pnpm eval  # Standalone evals
+pnpm validate:phase=4  # Evals + all unit tests
+```
+
+### Success Criteria
+
+**If all 5 phases pass**:
+- ✅ WasteWise is production-ready
+- ✅ All critical user workflows tested
+- ✅ All calculations verified accurate
+- ✅ All security measures validated
+- ✅ Safe to deploy
+
+**If any phase fails**:
+- ❌ Do NOT deploy to production
+- ❌ Fix failing tests first
+- ❌ Re-run `/validate` until all pass
+
+### When to Run Validation
+
+- ✅ **Before every commit**: `pnpm validate:skip-e2e` (30 seconds)
+- ✅ **Before every PR**: `pnpm validate` (3-5 minutes)
+- ✅ **After major changes**: `pnpm validate`
+- ✅ **Before deploying**: `pnpm validate`
+- ✅ **In CI/CD**: Automated on PR and merge to master
 
 ### Continuous Validation
 
 **Pre-merge checks** (automated in CI/CD):
 ```yaml
 # .github/workflows/validate-merge.yml
-- Run unit tests
-- Run integration tests
-- Run calculation evals
-- Validate conversion rates
-- Check Lighthouse score >90
+- Phase 1: Linting (pnpm lint)
+- Phase 2: Type checking (pnpm tsc --noEmit)
+- Phase 3: Style checking (pnpm prettier --check .)
+- Phase 4: Unit tests + evals (pnpm test:unit)
+- Phase 5: E2E tests (pnpm test:e2e)
 - Block merge if any fail
 ```
+
+**Git Pre-commit Hook** (optional):
+```bash
+# .husky/pre-commit
+pnpm validate:skip-e2e || exit 1
+```
+
+### Troubleshooting
+
+**Common Issues**:
+- Supabase not running → `supabase start`
+- Database migrations → `supabase db reset`
+- E2E timeouts → Increase timeout in `playwright.config.ts`
+- Calculation evals failing → Verify Python reference matches
+- Rate limiting tests → Check Upstash Redis configured
+
+**Phase-Specific**:
+- Phase 1 failures → `pnpm lint --fix`
+- Phase 2 failures → Review TypeScript errors, fix type mismatches
+- Phase 3 failures → `pnpm prettier --write .`
+- Phase 4 failures → Check test output, verify evals pass
+- Phase 5 failures → Run `pnpm test:e2e:debug` to see browser
+
+**Full Troubleshooting Guide**: See `docs/VALIDATION.md`
 
 ## 📦 File Structure
 
@@ -786,6 +1040,11 @@ NODE_ENV=development
 ## 🚀 Quick Commands
 
 ```bash
+# Validation (Most Important)
+pnpm validate               # Full validation (all 5 phases) - Before PRs
+pnpm validate:skip-e2e      # Fast validation (skip E2E) - Before commits
+pnpm validate:phase=1       # Run specific phase only
+
 # Development
 pnpm dev                    # Start dev server
 pnpm test                   # Run all tests
@@ -895,6 +1154,6 @@ Data: 6 invoices (Jan-Jun 2025), 22 haul log entries
 
 ---
 
-**Last Updated**: 2025-11-18
-**Version**: 7.0.0
+**Last Updated**: 2025-11-22 (Added comprehensive validation system)
+**Version**: 7.1.0
 **Maintained By**: Orchestrator Agent

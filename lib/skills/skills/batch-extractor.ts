@@ -37,6 +37,8 @@ import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
 import { InvoiceRepository, HaulLogRepository, type InvoiceRecord, type HaulLogRecord, type InvoiceCharges } from '@/lib/db'
+import ExcelJS from 'exceljs'
+import Papa from 'papaparse'
 
 /**
  * Container type validation
@@ -340,23 +342,23 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
       return this.processWithVision(file, fileBuffer, mimeType, executionLogger)
     }
 
-    // Handle Excel files (TODO: Implement Excel parsing)
+    // Handle Excel files
     if (
       mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
       mimeType === 'application/vnd.ms-excel'
     ) {
-      executionLogger.warn('Excel parsing not yet implemented', {
+      executionLogger.info('Parsing Excel file', {
         fileName: file.file_name,
       })
-      throw new Error('Excel file processing not yet implemented')
+      return this.processExcelFile(file, fileBuffer, executionLogger)
     }
 
-    // Handle CSV files (TODO: Implement CSV parsing)
+    // Handle CSV files
     if (mimeType === 'text/csv') {
-      executionLogger.warn('CSV parsing not yet implemented', {
+      executionLogger.info('Parsing CSV file', {
         fileName: file.file_name,
       })
-      throw new Error('CSV file processing not yet implemented')
+      return this.processCSVFile(file, fileBuffer, executionLogger)
     }
 
     throw new Error(`Unsupported file type: ${mimeType}`)
@@ -671,6 +673,312 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
       })
 
       // Don't throw - we want to return extracted data even if DB save fails
+    }
+  }
+
+  /**
+   * Process Excel file (.xlsx, .xls)
+   * Extracts tabular data and sends to Claude for structured extraction
+   */
+  private async processExcelFile(
+    file: any,
+    fileBuffer: Buffer,
+    executionLogger: any
+  ): Promise<{
+    invoices?: InvoiceData[]
+    haulLogs?: HaulLogEntry[]
+    usage?: { input_tokens: number; output_tokens: number }
+  }> {
+    try {
+      // Validate file size (max 10MB for spreadsheets)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+      if (fileBuffer.length > MAX_FILE_SIZE) {
+        throw new Error(`Excel file too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`)
+      }
+
+      executionLogger.info('Parsing Excel file', {
+        fileName: file.file_name,
+        sizeBytes: fileBuffer.length,
+      })
+
+      // Load workbook
+      const workbook = new ExcelJS.Workbook()
+      await workbook.xlsx.load(fileBuffer as any)
+
+      // Find first non-empty worksheet
+      let targetWorksheet: ExcelJS.Worksheet | null = null
+      for (const worksheet of workbook.worksheets) {
+        if (worksheet.rowCount > 0) {
+          targetWorksheet = worksheet
+          break
+        }
+      }
+
+      if (!targetWorksheet) {
+        throw new Error('No data found in Excel file (all sheets are empty)')
+      }
+
+      executionLogger.debug('Processing worksheet', {
+        sheetName: targetWorksheet.name,
+        rowCount: targetWorksheet.rowCount,
+        columnCount: targetWorksheet.columnCount,
+      })
+
+      // Extract data from worksheet
+      const rows: any[][] = []
+      const MAX_ROWS = 100 // Limit to first 100 rows to control token usage
+      let rowsProcessed = 0
+
+      targetWorksheet.eachRow((row, rowNumber) => {
+        if (rowsProcessed >= MAX_ROWS) {
+          return
+        }
+
+        // Convert row to array of values, handling various cell types
+        const rowValues: any[] = []
+        row.eachCell({ includeEmpty: true }, (cell) => {
+          // Sanitize cell values (remove formulas for security)
+          if (cell.type === ExcelJS.ValueType.Formula) {
+            rowValues.push(cell.result?.toString() || '')
+          } else {
+            rowValues.push(cell.value?.toString() || '')
+          }
+        })
+
+        rows.push(rowValues)
+        rowsProcessed++
+      })
+
+      if (rows.length === 0) {
+        throw new Error('No data rows found in Excel file')
+      }
+
+      // Format data for LLM extraction
+      const formattedData = this.formatTableDataForLLM(rows, file.file_name)
+
+      if (rows.length >= MAX_ROWS) {
+        executionLogger.warn('Excel file truncated to control token usage', {
+          fileName: file.file_name,
+          totalRows: targetWorksheet.rowCount,
+          processedRows: rows.length,
+        })
+      }
+
+      // Send to Claude for structured extraction
+      return this.extractStructuredDataWithClaude(
+        formattedData,
+        file.file_name,
+        executionLogger
+      )
+    } catch (error) {
+      executionLogger.error('Excel parsing failed', error as Error, {
+        fileName: file.file_name,
+      })
+      throw new Error(`Failed to parse Excel file: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Process CSV file
+   * Extracts tabular data and sends to Claude for structured extraction
+   */
+  private async processCSVFile(
+    file: any,
+    fileBuffer: Buffer,
+    executionLogger: any
+  ): Promise<{
+    invoices?: InvoiceData[]
+    haulLogs?: HaulLogEntry[]
+    usage?: { input_tokens: number; output_tokens: number }
+  }> {
+    try {
+      // Validate file size (max 10MB for CSVs)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+      if (fileBuffer.length > MAX_FILE_SIZE) {
+        throw new Error(`CSV file too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`)
+      }
+
+      executionLogger.info('Parsing CSV file', {
+        fileName: file.file_name,
+        sizeBytes: fileBuffer.length,
+      })
+
+      // Convert buffer to string
+      const csvContent = fileBuffer.toString('utf-8')
+
+      // Parse CSV with PapaParse
+      const parseResult = Papa.parse<string[]>(csvContent, {
+        skipEmptyLines: true,
+        header: false, // We'll handle headers manually
+        delimiter: '', // Auto-detect delimiter
+      })
+
+      if (parseResult.errors.length > 0) {
+        executionLogger.warn('CSV parsing errors', {
+          fileName: file.file_name,
+          errors: parseResult.errors.slice(0, 3), // Log first 3 errors
+        })
+      }
+
+      const rows = parseResult.data
+      if (rows.length === 0) {
+        throw new Error('No data rows found in CSV file')
+      }
+
+      // Truncate to first 100 rows to control token usage
+      const MAX_ROWS = 100
+      const truncatedRows = rows.slice(0, MAX_ROWS)
+
+      if (rows.length > MAX_ROWS) {
+        executionLogger.warn('CSV file truncated to control token usage', {
+          fileName: file.file_name,
+          totalRows: rows.length,
+          processedRows: truncatedRows.length,
+        })
+      }
+
+      // Format data for LLM extraction
+      const formattedData = this.formatTableDataForLLM(truncatedRows, file.file_name)
+
+      // Send to Claude for structured extraction
+      return this.extractStructuredDataWithClaude(
+        formattedData,
+        file.file_name,
+        executionLogger
+      )
+    } catch (error) {
+      executionLogger.error('CSV parsing failed', error as Error, {
+        fileName: file.file_name,
+      })
+      throw new Error(`Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Format tabular data into a concise text format for LLM processing
+   */
+  private formatTableDataForLLM(rows: any[][], fileName: string): string {
+    if (rows.length === 0) {
+      return 'Empty table'
+    }
+
+    const rowCount = rows.length
+    const colCount = Math.max(...rows.map(r => r.length))
+
+    // Assume first row is header
+    const header = rows[0]
+    const dataRows = rows.slice(1)
+
+    let formatted = `Spreadsheet: ${fileName}\n`
+    formatted += `Table with ${dataRows.length} data rows and ${colCount} columns\n\n`
+    formatted += `Header: ${header.join(' | ')}\n`
+    formatted += `${'-'.repeat(80)}\n`
+
+    // Add data rows
+    dataRows.forEach((row, idx) => {
+      formatted += `Row ${idx + 1}: ${row.join(' | ')}\n`
+    })
+
+    return formatted
+  }
+
+  /**
+   * Extract structured data using Claude from formatted table text
+   */
+  private async extractStructuredDataWithClaude(
+    formattedData: string,
+    fileName: string,
+    executionLogger: any
+  ): Promise<{
+    invoices?: InvoiceData[]
+    haulLogs?: HaulLogEntry[]
+    usage?: { input_tokens: number; output_tokens: number }
+  }> {
+    // Detect document type from filename
+    const docType = detectDocumentType(fileName)
+
+    executionLogger.debug('Extracting structured data with Claude', {
+      fileName,
+      detectedType: docType,
+      dataLength: formattedData.length,
+    })
+
+    // Use Anthropic SDK to extract structured data
+    const anthropic = new (await import('@anthropic-ai/sdk')).default({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+
+    const systemPrompt = docType === 'haul-log'
+      ? `Extract waste haul log data from this spreadsheet. Return JSON array with fields:
+- date (YYYY-MM-DD)
+- time (HH:MM, optional)
+- container_type (COMPACTOR, DUMPSTER, OPEN_TOP, or OTHER)
+- tons (number)
+- location (string, optional)
+- notes (string, optional)
+
+Return only valid JSON array, no markdown.`
+      : `Extract invoice data from this spreadsheet. Return JSON object with fields:
+- invoice_number (string)
+- invoice_date (YYYY-MM-DD)
+- service_period_start (YYYY-MM-DD, optional)
+- service_period_end (YYYY-MM-DD, optional)
+- vendor_name (string)
+- total_amount (number)
+- service_type (string, e.g. "Waste Collection")
+- charges (array of {description, amount, quantity, unit_price})
+
+Return only valid JSON object, no markdown.`
+
+    const response = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: formattedData,
+        },
+      ],
+    })
+
+    // Extract JSON from response
+    const textContent = response.content.find((c) => c.type === 'text')
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text response from Claude')
+    }
+
+    let extractedText = textContent.text.trim()
+    // Remove markdown code blocks if present
+    extractedText = extractedText.replace(/^```json\n?/i, '').replace(/\n?```$/i, '')
+
+    const usage = {
+      input_tokens: response.usage.input_tokens,
+      output_tokens: response.usage.output_tokens,
+    }
+
+    try {
+      if (docType === 'haul-log') {
+        const haulLogs = JSON.parse(extractedText) as HaulLogEntry[]
+        executionLogger.info('Extracted haul logs from spreadsheet', {
+          fileName,
+          count: haulLogs.length,
+        })
+        return { haulLogs, usage }
+      } else {
+        const invoice = JSON.parse(extractedText) as InvoiceData
+        executionLogger.info('Extracted invoice from spreadsheet', {
+          fileName,
+          invoiceNumber: invoice.invoiceNumber,
+        })
+        return { invoices: [invoice], usage }
+      }
+    } catch (error) {
+      executionLogger.error('Failed to parse Claude response as JSON', error as Error, {
+        fileName,
+        response: extractedText.substring(0, 200),
+      })
+      throw new Error('Failed to parse extracted data as JSON')
     }
   }
 }

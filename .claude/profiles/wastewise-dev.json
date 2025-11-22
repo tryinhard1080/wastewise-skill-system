@@ -1,0 +1,59 @@
+{
+  "profile_name": "wastewise-dev",
+  "description": "Full development access for WasteWise project - default profile for agent-driven development",
+  "use_cases": [
+    "Frontend development (UI components, pages, forms)",
+    "Backend development (API routes, database queries)",
+    "Skills development (calculation logic, AI integrations)",
+    "General development tasks"
+  ],
+  "filesystem": {
+    "allowed_write_paths": [
+      "./app/**",
+      "./components/**",
+      "./lib/**",
+      "./__tests__/**",
+      "./docs/**",
+      "./scripts/**",
+      "./public/**",
+      "./supabase/migrations/**",
+      "./supabase/seed.sql",
+      "./.claude/**"
+    ],
+    "denied_paths": [
+      "./.env",
+      "./.env.*",
+      "./.credentials.json",
+      "./supabase/config.toml",
+      "./node_modules/**",
+      "./.git/**",
+      "./.next/**",
+      "./dist/**"
+    ]
+  },
+  "network": {
+    "allowed_domains": [
+      "api.anthropic.com",
+      "*.supabase.co",
+      "*.upstash.io",
+      "cdn.jsdelivr.net",
+      "api.exa.ai",
+      "api.tavily.com",
+      "api.brave.com",
+      "registry.npmjs.org",
+      "*.github.com"
+    ]
+  },
+  "commands": {
+    "excluded": ["git", "supabase", "docker"],
+    "auto_approve_in_sandbox": true
+  },
+  "agents": {
+    "recommended_for": [
+      "frontend-dev",
+      "backend-dev",
+      "coder",
+      "skills-agent"
+    ]
+  }
+}

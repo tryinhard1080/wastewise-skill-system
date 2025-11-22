@@ -1,0 +1,113 @@
+{
+  "version": "1.0.0",
+  "description": "WasteWise sandboxing configuration - balances security with development productivity",
+  "filesystem": {
+    "allowed_write_paths": [
+      "./app/**",
+      "./components/**",
+      "./lib/**",
+      "./__tests__/**",
+      "./docs/**",
+      "./scripts/**",
+      "./public/**",
+      "./supabase/migrations/**",
+      "./supabase/seed.sql",
+      "./.claude/**"
+    ],
+    "denied_paths": [
+      "./.env",
+      "./.env.*",
+      "./.credentials.json",
+      "./supabase/config.toml",
+      "./node_modules/**",
+      "./.git/**",
+      "./.next/**",
+      "./dist/**",
+      "./.vercel/**",
+      "./worker.log"
+    ],
+    "explanation": {
+      "allowed_write": "Development, testing, and documentation directories require write access for agent-driven development",
+      "denied": "Sensitive credentials, build artifacts, and dependency directories are protected"
+    }
+  },
+  "network": {
+    "allowed_domains": [
+      "api.anthropic.com",
+      "*.supabase.co",
+      "*.upstash.io",
+      "cdn.jsdelivr.net",
+      "api.exa.ai",
+      "api.tavily.com",
+      "api.brave.com",
+      "registry.npmjs.org",
+      "*.github.com"
+    ],
+    "explanation": {
+      "anthropic": "Claude AI services for invoice extraction and regulatory research",
+      "supabase": "Backend database and storage",
+      "upstash": "Redis for rate limiting",
+      "cdn_jsdelivr": "Chart.js for HTML report visualizations",
+      "search_apis": "Exa, Tavily, Brave for regulatory ordinance research",
+      "npm": "Package registry for dependency management",
+      "github": "Version control and CI/CD"
+    }
+  },
+  "commands": {
+    "excluded": [
+      "git",
+      "supabase",
+      "docker"
+    ],
+    "auto_approve_in_sandbox": true,
+    "explanation": {
+      "git": "Git operations require flexible filesystem access for branch management",
+      "supabase": "Database CLI needs access to config and credentials",
+      "docker": "Container operations require host-level access",
+      "auto_approve": "Commands within sandbox boundaries are auto-approved for productivity"
+    }
+  },
+  "security_notes": [
+    "This configuration follows WasteWise security hardening requirements",
+    "All sensitive files (.env, credentials, config.toml) are explicitly denied",
+    "Network access restricted to approved services only",
+    "Integrates with existing security layers: RLS, input sanitization, CSP",
+    "Sandbox violations are logged via lib/observability/sandbox-logger.ts"
+  ],
+  "profiles": {
+    "dev": {
+      "description": "Full development access - default profile",
+      "filesystem": "all allowed_write_paths",
+      "network": "all allowed_domains"
+    },
+    "testing": {
+      "description": "Testing only - limited scope",
+      "filesystem": ["./__tests__/**"],
+      "network": ["api.anthropic.com"]
+    },
+    "docs": {
+      "description": "Documentation updates only",
+      "filesystem": ["./docs/**", "./.claude/**"],
+      "network": []
+    },
+    "readonly": {
+      "description": "Code analysis and research",
+      "filesystem": [],
+      "network": "all allowed_domains"
+    }
+  },
+  "validation": {
+    "test_command": "pnpm test __tests__/security/sandbox-compliance.test.ts",
+    "verify_boundaries": [
+      "Attempt to read .env should fail",
+      "Attempt to write to node_modules should fail",
+      "Attempt to access unapproved domain should require permission",
+      "Commands within sandbox should auto-approve"
+    ]
+  },
+  "maintenance": {
+    "review_schedule": "Monthly",
+    "last_updated": "2025-11-21",
+    "next_review": "2025-12-21"
+  }
+}

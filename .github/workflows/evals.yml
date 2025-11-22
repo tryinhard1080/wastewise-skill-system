@@ -1,0 +1,123 @@
+name: Formula Validation Evals
+
+on:
+  # Run on pull requests to master
+  pull_request:
+    branches: [master]
+    paths:
+      - 'lib/calculations/**'
+      - 'lib/constants/formulas.ts'
+      - 'lib/skills/**'
+      - 'lib/evals/**'
+      - 'scripts/run-evals.ts'
+      - '.github/workflows/evals.yml'
+
+  # Run on pushes to master
+  push:
+    branches: [master]
+    paths:
+      - 'lib/calculations/**'
+      - 'lib/constants/formulas.ts'
+      - 'lib/skills/**'
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  formula-validation:
+    name: Validate Formula Accuracy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run formula validation evals
+        id: evals
+        run: pnpm eval
+        continue-on-error: true
+
+      - name: Check eval results
+        if: steps.evals.outcome == 'failure'
+        run: |
+          echo "::error::Formula validation evals failed! Calculations do not match reference implementation."
+          exit 1
+
+      - name: Comment on PR (if failed)
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const comment = `## ❌ Formula Validation Evals Failed
+
+            **Calculations do not match reference implementation within tolerance (<0.01%).**
+
+            ### What This Means
+            One or more calculation formulas in your changes deviate from the canonical specifications in \`WASTE_FORMULAS_REFERENCE.md\` or produce results that differ from the Python reference implementation.
+
+            ### Required Actions
+            1. Review the [eval execution logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for specific failures
+            2. Ensure all formulas use constants from \`lib/constants/formulas.ts\`
+            3. Verify calculations match \`WASTE_FORMULAS_REFERENCE.md\` v2.0
+            4. Run \`pnpm eval\` locally to validate fixes
+            5. Review \`docs/FORMULA_VALIDATION.md\` for guidance
+
+            ### Common Issues
+            - Hardcoded formula values instead of using constants
+            - Incorrect conversion rates (compactor: 14.49, dumpster: 4.33)
+            - Wrong optimization threshold (must be 6.0, not 7.0)
+            - Rounding errors accumulating across calculations
+
+            **This PR cannot be merged until all evals pass.**`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: comment
+            });
+
+      - name: Comment on PR (if passed)
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `## ✅ Formula Validation Evals Passed
+
+            All calculation formulas match the canonical specifications and produce results within <0.01% tolerance of the Python reference implementation.
+
+            **Calculations are production-ready!**`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: comment
+            });
+
+      - name: Set status check
+        if: always()
+        run: |
+          if [ "${{ steps.evals.outcome }}" == "success" ]; then
+            echo "✅ All formula validation evals passed"
+            exit 0
+          else
+            echo "❌ Formula validation evals failed"
+            exit 1
+          fi

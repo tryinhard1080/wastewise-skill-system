@@ -283,6 +283,37 @@ jobs:
         env:
           NODE_ENV: test
 
+      - name: Run formula validation evals
+        run: pnpm eval
+        if: always()
+        continue-on-error: true
+        id: evals
+
+      - name: Check eval results
+        if: steps.evals.outcome == 'failure'
+        run: |
+          echo "::error::Formula validation evals failed! Calculations do not match reference implementation."
+          exit 1
+
+      - name: Comment on PR (if evals failed)
+        if: steps.evals.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ **Formula Validation Evals Failed**\n\n' +
+                    'Calculations do not match reference implementation within <0.01% tolerance.\n\n' +
+                    '**Required Actions:**\n' +
+                    '1. Review eval execution logs for specific failures\n' +
+                    '2. Ensure all formulas use constants from `lib/constants/formulas.ts`\n' +
+                    '3. Verify calculations match `WASTE_FORMULAS_REFERENCE.md` v2.0\n' +
+                    '4. Run `pnpm eval` locally to validate fixes\n\n' +
+                    'See `docs/FORMULA_VALIDATION.md` for guidance.'
+            })
+
       - name: Comment on PR (if hardcoded values found)
         if: failure() && github.event_name == 'pull_request'
         uses: actions/github-script@v7

@@ -1,0 +1,5 @@
+Invoice Number,Invoice Date,Service Period Start,Service Period End,Vendor Name,Service Type,Description,Amount
+INV-2025-001,2025-01-15,2025-01-01,2025-01-31,Waste Management Services,Waste Collection,Monthly Compactor Service,1250.00
+INV-2025-001,2025-01-15,2025-01-01,2025-01-31,Waste Management Services,Waste Collection,Environmental Fee,75.00
+INV-2025-001,2025-01-15,2025-01-01,2025-01-31,Waste Management Services,Waste Collection,Fuel Surcharge,42.50
+INV-2025-001,2025-01-15,2025-01-01,2025-01-31,Waste Management Services,Waste Collection,Administrative Fee,25.00

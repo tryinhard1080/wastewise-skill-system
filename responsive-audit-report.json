@@ -1,0 +1,541 @@
+[
+  {
+    "file": "app\\(auth)\\layout.tsx",
+    "line": 43,
+    "issue": "grid-cols-2 should have responsive variants (e.g., grid-cols-1 md:grid-cols-2)",
+    "code": "<div className=\"grid grid-cols-2 gap-6\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\dashboard\\page.tsx",
+    "line": 46,
+    "issue": "grid-cols-4 should have responsive variants (e.g., grid-cols-1 md:grid-cols-4)",
+    "code": "<div className=\"grid gap-4 md:grid-cols-2 lg:grid-cols-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\dashboard\\page.tsx",
+    "line": 48,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\dashboard\\page.tsx",
+    "line": 63,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\dashboard\\page.tsx",
+    "line": 78,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\dashboard\\page.tsx",
+    "line": 93,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\dashboard\\page.tsx",
+    "line": 145,
+    "issue": "grid-cols-3 should have responsive variants (e.g., grid-cols-1 md:grid-cols-3)",
+    "code": "<div className=\"grid gap-4 md:grid-cols-3\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\jobs\\[id]\\page.tsx",
+    "line": 101,
+    "issue": "grid-cols-3 should have responsive variants (e.g., grid-cols-1 md:grid-cols-3)",
+    "code": "<div className=\"grid gap-4 md:grid-cols-3\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\jobs\\[id]\\page.tsx",
+    "line": 103,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\jobs\\[id]\\page.tsx",
+    "line": 121,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\jobs\\[id]\\page.tsx",
+    "line": 142,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 84,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-none px-4 sm:px-6 md:px-8 lg:px-0 lg:max-w-[1060px] lg:w-[1060px] relative flex flex-col justify-start items-start min-h-screen\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 96,
+    "issue": "Hardcoded width w-[700px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[calc(100%-32px)] sm:max-w-[calc(100%-48px)] md:max-w-[calc(100%-64px)] lg:max-w-[700px] lg:w-[700px] h-10 sm:h-11 md:h-12 py-1.5 sm:py-2 px-3 sm:px-4 md:px-4 pr-2 sm:pr-3 bg-[#F7F5F3] backdrop-blur-sm shadow-[0px_0px_0px_2px_white] overflow-hidden rounded-[50px] flex justify-between items-center relative z-30\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 103,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<div className=\"pl-3 sm:pl-4 md:pl-5 lg:pl-5 flex justify-start items-start hidden sm:flex flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 133,
+    "issue": "Hardcoded width w-[937px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 148,
+    "issue": "Hardcoded width w-[497px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[497px] lg:w-[497px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 157,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<div className=\"flex flex-row justify-center items-center gap-2 text-[#37322F] text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 171,
+    "issue": "Hardcoded width w-[2808px] should use responsive classes or max-w-*",
+    "code": "className=\"w-[936px] sm:w-[1404px] md:w-[2106px] lg:w-[2808px] h-auto opacity-30 sm:opacity-40 md:opacity-50 mix-blend-multiply\"",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 178,
+    "issue": "Hardcoded width w-[960px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[960px] lg:w-[960px] pt-2 sm:pt-4 pb-6 sm:pb-8 md:pb-10 px-2 sm:px-4 md:px-6 lg:px-11 flex flex-col justify-center items-center gap-2 relative z-5 my-8 sm:my-12 md:my-16 lg:my-16 mb-0 lg:pb-0\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 179,
+    "issue": "Hardcoded width w-[960px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[960px] lg:w-[960px] h-[200px] sm:h-[280px] md:h-[450px] lg:h-[695.55px] bg-white shadow-[0px_0px_0px_0.9056603908538818px_rgba(0,0,0,0.08)] overflow-hidden rounded-[6px] sm:rounded-[8px] lg:rounded-[9.06px] flex flex-col justify-start items-start\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 280,
+    "issue": "Hardcoded width w-[586px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[586px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4 shadow-none\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 336,
+    "issue": "grid-cols-4 should have responsive variants (e.g., grid-cols-1 md:grid-cols-4)",
+    "code": "<div className=\"flex-1 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-0 border-l border-r border-[rgba(55,50,47,0.12)]\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 392,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"self-stretch px-4 sm:px-6 md:px-8 lg:px-0 lg:max-w-[1060px] lg:w-[1060px] py-8 sm:py-12 md:py-16 border-b border-[rgba(55,50,47,0.12)] flex justify-center items-center gap-6\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 393,
+    "issue": "Hardcoded width w-[616px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[616px] lg:w-[616px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4 shadow-none\">",
+    "severity": "warning"
+  },
+  {
+    "file": "app\\page.tsx",
+    "line": 430,
+    "issue": "grid-cols-2 should have responsive variants (e.g., grid-cols-1 md:grid-cols-2)",
+    "code": "<div className=\"flex-1 grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-r border-[rgba(55,50,47,0.12)]\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\new\\page.tsx",
+    "line": 177,
+    "issue": "grid-cols-2 should have responsive variants (e.g., grid-cols-1 md:grid-cols-2)",
+    "code": "<div className=\"grid grid-cols-2 gap-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\new\\page.tsx",
+    "line": 328,
+    "issue": "Submit buttons should be w-full on mobile",
+    "code": "<Button type=\"submit\" disabled={isSubmitting}>",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\page.tsx",
+    "line": 90,
+    "issue": "grid-cols-3 should have responsive variants (e.g., grid-cols-1 md:grid-cols-3)",
+    "code": "<div className=\"grid gap-6 md:grid-cols-2 lg:grid-cols-3\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\page.tsx",
+    "line": 117,
+    "issue": "grid-cols-2 should have responsive variants (e.g., grid-cols-1 md:grid-cols-2)",
+    "code": "<div className=\"grid grid-cols-2 gap-4 text-sm\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\[id]\\page.tsx",
+    "line": 120,
+    "issue": "grid-cols-4 should have responsive variants (e.g., grid-cols-1 md:grid-cols-4)",
+    "code": "<div className=\"grid gap-4 md:grid-cols-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\[id]\\page.tsx",
+    "line": 122,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\[id]\\page.tsx",
+    "line": 135,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\[id]\\page.tsx",
+    "line": 146,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\[id]\\page.tsx",
+    "line": 159,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "app\\projects\\[id]\\page.tsx",
+    "line": 211,
+    "issue": "grid-cols-2 should have responsive variants (e.g., grid-cols-1 md:grid-cols-2)",
+    "code": "<div className=\"grid grid-cols-2 gap-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\cta-section.tsx",
+    "line": 24,
+    "issue": "Hardcoded width w-[586px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[586px] px-6 py-5 md:py-8 overflow-hidden rounded-lg flex flex-col justify-start items-center gap-6 relative z-20\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\cta-section.tsx",
+    "line": 35,
+    "issue": "Hardcoded width w-[497px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[497px] flex flex-col justify-center items-center gap-12\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\dashboard-preview.tsx",
+    "line": 5,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"max-w-[1060px] mx-auto px-4\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\dashboard-preview.tsx",
+    "line": 43,
+    "issue": "grid-cols-6 should have responsive variants (e.g., grid-cols-1 md:grid-cols-6)",
+    "code": "<div className=\"grid grid-cols-6 gap-4 p-4 bg-[#fbfaf9] border-b border-[#e0dedb] text-sm font-medium text-[#605a57]\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\dashboard-preview.tsx",
+    "line": 54,
+    "issue": "grid-cols-6 should have responsive variants (e.g., grid-cols-1 md:grid-cols-6)",
+    "code": "<div key={i} className=\"grid grid-cols-6 gap-4 p-4 border-b border-[#e0dedb] text-sm\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\documentation-section.tsx",
+    "line": 58,
+    "issue": "Hardcoded width w-[586px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[586px] px-6 py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-4 shadow-none\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\documentation-section.tsx",
+    "line": 80,
+    "issue": "Hardcoded width w-[400px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full md:w-auto md:max-w-[400px] flex flex-col justify-center items-center gap-4 order-2 md:order-1\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\documentation-section.tsx",
+    "line": 117,
+    "issue": "Hardcoded width w-[580px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full md:w-[580px] h-[250px] md:h-[420px] bg-white shadow-[0px_0px_0px_0.9056603908538818px_rgba(0,0,0,0.08)] overflow-hidden rounded-lg flex flex-col justify-start items-start\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\effortless-integration-updated.tsx",
+    "line": 63,
+    "issue": "Fixed width 320px should be responsive or use CSS variables",
+    "code": "width: \"320px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\effortless-integration-updated.tsx",
+    "line": 77,
+    "issue": "Fixed width 240px should be responsive or use CSS variables",
+    "code": "width: \"240px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\effortless-integration-updated.tsx",
+    "line": 102,
+    "issue": "Fixed width 500px should be responsive or use CSS variables",
+    "code": "width: \"500px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\feature-cards.tsx",
+    "line": 22,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"max-w-[1060px] mx-auto px-4\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\feature-cards.tsx",
+    "line": 23,
+    "issue": "grid-cols-3 should have responsive variants (e.g., grid-cols-1 md:grid-cols-3)",
+    "code": "<div className=\"grid grid-cols-1 md:grid-cols-3 gap-4 py-8\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\footer-section.tsx",
+    "line": 136,
+    "issue": "Hardcoded width w-[300px] should use responsive classes or max-w-*",
+    "code": "className=\"absolute w-[300px] h-16 border border-[rgba(3,7,18,0.08)]\"",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\header.tsx",
+    "line": 6,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"max-w-[1060px] mx-auto px-4\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\hero-section.tsx",
+    "line": 6,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"max-w-[1060px] mx-auto px-4\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\hero-section.tsx",
+    "line": 9,
+    "issue": "Hardcoded width w-[937px] should use responsive classes or max-w-*",
+    "code": "<div className=\"max-w-[937px] flex flex-col items-center gap-3\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\hero-section.tsx",
+    "line": 11,
+    "issue": "Hardcoded width w-[748px] should use responsive classes or max-w-*",
+    "code": "<h1 className=\"max-w-[748px] text-center text-[#37322f] text-5xl md:text-[80px] font-normal leading-tight md:leading-[96px] font-serif\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\hero-section.tsx",
+    "line": 14,
+    "issue": "Hardcoded width w-[506px] should use responsive classes or max-w-*",
+    "code": "<p className=\"max-w-[506px] text-center text-[#37322f]/80 text-lg font-medium leading-7\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\job\\results-dashboard.tsx",
+    "line": 153,
+    "issue": "grid-cols-4 should have responsive variants (e.g., grid-cols-1 md:grid-cols-4)",
+    "code": "<div className=\"grid gap-4 md:grid-cols-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\job\\results-dashboard.tsx",
+    "line": 155,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\job\\results-dashboard.tsx",
+    "line": 172,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\job\\results-dashboard.tsx",
+    "line": 187,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\job\\results-dashboard.tsx",
+    "line": 200,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "<CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\job\\results-dashboard.tsx",
+    "line": 216,
+    "issue": "grid-cols-2 should have responsive variants (e.g., grid-cols-1 md:grid-cols-2)",
+    "code": "<div className=\"grid gap-6 md:grid-cols-2\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\numbers-that-speak.tsx",
+    "line": 84,
+    "issue": "Fixed width 270px should be responsive or use CSS variables",
+    "code": "width: \"270px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\numbers-that-speak.tsx",
+    "line": 95,
+    "issue": "Fixed width 270px should be responsive or use CSS variables",
+    "code": "width: \"270px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\numbers-that-speak.tsx",
+    "line": 123,
+    "issue": "Fixed width 330px should be responsive or use CSS variables",
+    "code": "width: \"330px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\numbers-that-speak.tsx",
+    "line": 134,
+    "issue": "Fixed width 330px should be responsive or use CSS variables",
+    "code": "width: \"330px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\numbers-that-speak.tsx",
+    "line": 162,
+    "issue": "Fixed width 360px should be responsive or use CSS variables",
+    "code": "width: \"360px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\numbers-that-speak.tsx",
+    "line": 173,
+    "issue": "Fixed width 360px should be responsive or use CSS variables",
+    "code": "width: \"360px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\pricing-section.tsx",
+    "line": 27,
+    "issue": "Hardcoded width w-[586px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[586px] px-6 py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-4 shadow-none\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\pricing-section.tsx",
+    "line": 63,
+    "issue": "Hardcoded width w-[1060px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[1060px] h-0 absolute left-1/2 transform -translate-x-1/2 top-[63px] border-t border-[rgba(55,50,47,0.12)] z-0\"></div>",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\pricing-section.tsx",
+    "line": 132,
+    "issue": "Hardcoded width w-[242px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[242px] text-[rgba(41,37,35,0.70)] text-sm font-normal leading-5 font-sans\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\pricing-section.tsx",
+    "line": 212,
+    "issue": "Hardcoded width w-[242px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[242px] text-[#B2AEA9] text-sm font-normal leading-5 font-sans\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\pricing-section.tsx",
+    "line": 294,
+    "issue": "Hardcoded width w-[242px] should use responsive classes or max-w-*",
+    "code": "<div className=\"w-full max-w-[242px] text-[rgba(41,37,35,0.70)] text-sm font-normal leading-5 font-sans\">",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\results\\analysis-summary.tsx",
+    "line": 69,
+    "issue": "grid-cols-4 should have responsive variants (e.g., grid-cols-1 md:grid-cols-4)",
+    "code": "<div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4\">",
+    "severity": "info"
+  },
+  {
+    "file": "components\\ui\\pagination.tsx",
+    "line": 30,
+    "issue": "flex-row might need flex-col on mobile (flex-col sm:flex-row)",
+    "code": "className={cn('flex flex-row items-center gap-1', className)}",
+    "severity": "info"
+  },
+  {
+    "file": "components\\your-work-in-sync.tsx",
+    "line": 78,
+    "issue": "Fixed width 356px should be responsive or use CSS variables",
+    "code": "width: \"356px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\your-work-in-sync.tsx",
+    "line": 83,
+    "issue": "Fixed width 356px should be responsive or use CSS variables",
+    "code": "<div style={{ width: \"356px\", height: \"216px\", position: \"relative\", transform: \"scale(1.1)\" }}>",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\your-work-in-sync.tsx",
+    "line": 93,
+    "issue": "Fixed width 356px should be responsive or use CSS variables",
+    "code": "width: \"356px\",",
+    "severity": "warning"
+  },
+  {
+    "file": "components\\your-work-in-sync.tsx",
+    "line": 200,
+    "issue": "Fixed width 210px should be responsive or use CSS variables",
+    "code": "width: \"210px\",",
+    "severity": "warning"
+  }
+]

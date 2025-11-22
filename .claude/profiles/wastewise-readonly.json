@@ -1,0 +1,81 @@
+{
+  "profile_name": "wastewise-readonly",
+  "description": "Read-only access - for code analysis, research, and security audits without modifications",
+  "use_cases": [
+    "Code exploration and analysis",
+    "Security audits",
+    "Performance profiling",
+    "Research and learning",
+    "Answering questions about codebase structure"
+  ],
+  "filesystem": {
+    "allowed_write_paths": [],
+    "allowed_read_paths": [
+      "./app/**",
+      "./components/**",
+      "./lib/**",
+      "./__tests__/**",
+      "./docs/**",
+      "./scripts/**",
+      "./public/**",
+      "./supabase/migrations/**",
+      "./.claude/**",
+      "./package.json",
+      "./tsconfig.json",
+      "./next.config.mjs",
+      "./*.md"
+    ],
+    "denied_paths": [
+      "./.env",
+      "./.env.*",
+      "./.credentials.json",
+      "./supabase/config.toml",
+      "./node_modules/**"
+    ]
+  },
+  "network": {
+    "allowed_domains": [
+      "api.anthropic.com",
+      "*.supabase.co",
+      "*.github.com",
+      "api.exa.ai"
+    ],
+    "explanation": "Full network access for research purposes - can fetch documentation, search for patterns, etc."
+  },
+  "commands": {
+    "excluded": [],
+    "auto_approve_in_sandbox": true,
+    "allowed_readonly_commands": [
+      "grep",
+      "find",
+      "cat",
+      "less",
+      "head",
+      "tail",
+      "pnpm list",
+      "git log",
+      "git diff"
+    ]
+  },
+  "agents": {
+    "recommended_for": [
+      "Explore",
+      "researcher",
+      "code-analyzer",
+      "security-auditor"
+    ]
+  },
+  "security_notes": [
+    "NO write access anywhere - completely safe for exploration",
+    "Read access to source code for analysis",
+    "Sensitive files still protected (.env, credentials)",
+    "Full network access for research and documentation lookups",
+    "Ideal for code reviews and security audits"
+  ],
+  "restrictions": {
+    "no_file_modifications": true,
+    "no_git_commits": true,
+    "no_package_installations": true,
+    "no_database_modifications": true
+  }
+}

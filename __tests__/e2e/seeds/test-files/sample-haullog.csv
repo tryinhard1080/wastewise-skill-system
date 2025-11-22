@@ -1,0 +1,9 @@
+Date,Time,Container Type,Tons,Location,Notes
+2025-01-05,08:15,COMPACTOR,6.8,Building A,Normal pickup
+2025-01-08,09:30,COMPACTOR,7.2,Building A,
+2025-01-12,08:45,COMPACTOR,6.5,Building A,Light load
+2025-01-15,10:00,COMPACTOR,8.1,Building A,
+2025-01-19,08:00,COMPACTOR,7.8,Building A,Normal pickup
+2025-01-22,09:15,COMPACTOR,6.9,Building A,
+2025-01-26,08:30,COMPACTOR,7.5,Building A,
+2025-01-29,09:45,COMPACTOR,8.3,Building A,Heavy load

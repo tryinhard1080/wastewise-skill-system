@@ -1,0 +1,57 @@
+{
+  "profile_name": "wastewise-testing",
+  "description": "Testing-only access - restricted scope for running tests and creating test fixtures",
+  "use_cases": [
+    "Writing unit tests",
+    "Creating test fixtures",
+    "Running test suites",
+    "Test-driven development"
+  ],
+  "filesystem": {
+    "allowed_write_paths": [
+      "./__tests__/**",
+      "./lib/evals/**"
+    ],
+    "allowed_read_paths": [
+      "./app/**",
+      "./components/**",
+      "./lib/**"
+    ],
+    "denied_paths": [
+      "./.env",
+      "./.env.*",
+      "./.credentials.json",
+      "./supabase/config.toml",
+      "./node_modules/**",
+      "./.git/**"
+    ]
+  },
+  "network": {
+    "allowed_domains": [
+      "api.anthropic.com"
+    ],
+    "explanation": "Only Anthropic API allowed for test mocks - no production databases or external services"
+  },
+  "commands": {
+    "excluded": ["git", "supabase", "docker"],
+    "auto_approve_in_sandbox": true,
+    "allowed_test_commands": [
+      "pnpm test",
+      "pnpm test:unit",
+      "pnpm test:e2e",
+      "pnpm eval"
+    ]
+  },
+  "agents": {
+    "recommended_for": [
+      "tester",
+      "reviewer"
+    ]
+  },
+  "security_notes": [
+    "Read-only access to source code for test creation",
+    "Write access limited to test directories only",
+    "No access to production databases or APIs",
+    "Ideal for TDD workflows"
+  ]
+}

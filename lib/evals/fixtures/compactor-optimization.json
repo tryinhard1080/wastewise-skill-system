@@ -1,0 +1,158 @@
+{
+  "name": "Compactor Optimization Calculations",
+  "description": "Test cases validating compactor optimization logic per WASTE_FORMULAS_REFERENCE.md v2.0",
+  "testCases": [
+    {
+      "name": "Standard 250-unit property with low utilization",
+      "description": "Typical garden-style property with 5.04 tons/haul (below 6.0 threshold)",
+      "input": {
+        "units": 250,
+        "totalTons": 60.5,
+        "numberOfHauls": 12,
+        "monthlyServiceCost": 2800,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 7
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 3.51,
+        "costPerDoor": 11.20,
+        "avgTonsPerHaul": 5.04,
+        "capacityUtilization": 59.29,
+        "needsOptimization": true
+      }
+    },
+    {
+      "name": "Under-optimized compactor (300 units)",
+      "description": "Low average tons per haul (4.80), should recommend monitors",
+      "input": {
+        "units": 300,
+        "totalTons": 48.0,
+        "numberOfHauls": 10,
+        "monthlyServiceCost": 3200,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 9
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 2.32,
+        "costPerDoor": 10.67,
+        "avgTonsPerHaul": 4.80,
+        "capacityUtilization": 56.47,
+        "needsOptimization": true
+      }
+    },
+    {
+      "name": "Well-optimized compactor (200 units)",
+      "description": "Efficient operation at target capacity (8.50 tons/haul), no optimization needed",
+      "input": {
+        "units": 200,
+        "totalTons": 85.0,
+        "numberOfHauls": 10,
+        "monthlyServiceCost": 2500,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 7
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 6.16,
+        "costPerDoor": 12.50,
+        "avgTonsPerHaul": 8.50,
+        "capacityUtilization": 100.00,
+        "needsOptimization": false
+      }
+    },
+    {
+      "name": "Edge case: exactly 6.0 tons/haul",
+      "description": "Boundary test - exactly at threshold, should NOT recommend (>= 6.0)",
+      "input": {
+        "units": 180,
+        "totalTons": 18.0,
+        "numberOfHauls": 3,
+        "monthlyServiceCost": 1800,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 10
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 1.45,
+        "costPerDoor": 10.00,
+        "avgTonsPerHaul": 6.00,
+        "capacityUtilization": 70.59,
+        "needsOptimization": false
+      }
+    },
+    {
+      "name": "Edge case: 5.99 tons/haul",
+      "description": "Just below threshold (< 6.0), should recommend",
+      "input": {
+        "units": 150,
+        "totalTons": 17.98,
+        "numberOfHauls": 3,
+        "monthlyServiceCost": 1500,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 10
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 1.74,
+        "costPerDoor": 10.00,
+        "avgTonsPerHaul": 5.99,
+        "capacityUtilization": 70.47,
+        "needsOptimization": true
+      }
+    },
+    {
+      "name": "High utilization property",
+      "description": "Excellent performance at 9.0 tons/haul (above target)",
+      "input": {
+        "units": 400,
+        "totalTons": 90.0,
+        "numberOfHauls": 10,
+        "monthlyServiceCost": 4000,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 7
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 3.26,
+        "costPerDoor": 10.00,
+        "avgTonsPerHaul": 9.00,
+        "capacityUtilization": 105.88,
+        "needsOptimization": false
+      }
+    },
+    {
+      "name": "Max days constraint violation",
+      "description": "Low tons (5.5) but max days > 14, should NOT recommend",
+      "input": {
+        "units": 200,
+        "totalTons": 16.5,
+        "numberOfHauls": 3,
+        "monthlyServiceCost": 1800,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 15
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 1.20,
+        "costPerDoor": 9.00,
+        "avgTonsPerHaul": 5.50,
+        "capacityUtilization": 64.71,
+        "needsOptimization": false
+      }
+    },
+    {
+      "name": "Realistic high-rise property",
+      "description": "High-rise with moderate utilization (7.2 tons/haul)",
+      "input": {
+        "units": 350,
+        "totalTons": 86.4,
+        "numberOfHauls": 12,
+        "monthlyServiceCost": 3500,
+        "containerSizeCy": 30,
+        "maxDaysBetween": 7
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 3.58,
+        "costPerDoor": 10.00,
+        "avgTonsPerHaul": 7.20,
+        "capacityUtilization": 84.71,
+        "needsOptimization": false
+      }
+    }
+  ]
+}

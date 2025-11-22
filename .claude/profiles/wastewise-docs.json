@@ -1,0 +1,56 @@
+{
+  "profile_name": "wastewise-docs",
+  "description": "Documentation-only access - for writing guides, API docs, and project documentation",
+  "use_cases": [
+    "Writing documentation",
+    "Updating README files",
+    "Creating guides and tutorials",
+    "Maintaining Claude Code instructions"
+  ],
+  "filesystem": {
+    "allowed_write_paths": [
+      "./docs/**",
+      "./.claude/**",
+      "./README.md",
+      "./*.md"
+    ],
+    "allowed_read_paths": [
+      "./app/**",
+      "./components/**",
+      "./lib/**",
+      "./__tests__/**"
+    ],
+    "denied_paths": [
+      "./.env",
+      "./.env.*",
+      "./.credentials.json",
+      "./supabase/config.toml",
+      "./node_modules/**",
+      "./.git/**"
+    ]
+  },
+  "network": {
+    "allowed_domains": [],
+    "explanation": "No network access needed for documentation work - fully offline"
+  },
+  "commands": {
+    "excluded": ["git"],
+    "auto_approve_in_sandbox": true,
+    "allowed_commands": [
+      "markdownlint",
+      "prettier"
+    ]
+  },
+  "agents": {
+    "recommended_for": [
+      "documentation-agent",
+      "technical-writer"
+    ]
+  },
+  "security_notes": [
+    "Read-only access to source code for documentation accuracy",
+    "Write access limited to documentation directories",
+    "No network access required (offline work)",
+    "Safe for external contributors"
+  ]
+}

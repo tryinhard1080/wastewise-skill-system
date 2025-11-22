@@ -29,7 +29,7 @@ import type {
   CompostingRequirement,
   ComplianceIssue,
 } from '../types'
-import { getExaClient } from '@/lib/api/exa-client'
+import { getSearchManager } from '@/lib/search'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { createServiceClient } from '@/lib/supabase/server'
@@ -41,14 +41,14 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResearchResult>
     'Researches municipal ordinances and assesses waste management compliance for property locations'
 
   private anthropic: Anthropic
-  private exaClient: ReturnType<typeof getExaClient>
+  private searchManager: ReturnType<typeof getSearchManager>
 
   constructor() {
     super()
     this.anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     })
-    this.exaClient = getExaClient()
+    this.searchManager = getSearchManager()
   }
 
   /**
@@ -194,46 +194,50 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResearchResult>
   }
 
   /**
-   * Search for municipal ordinances using Exa
+   * Search for municipal ordinances using SearchManager (with automatic fallbacks)
    */
   private async searchOrdinances(
     city: string,
     state: string
   ): Promise<OrdinanceInfo[]> {
     try {
-      // Search using Exa
-      const searchResults = await this.exaClient.searchOrdinances(
-        city,
-        state,
-        undefined,
-        'waste management trash recycling collection disposal'
-      )
+      // Build search query for ordinances
+      const query = `${city}, ${state} municipal code waste management trash recycling collection disposal ordinances regulations`
 
-      if (searchResults.results.length === 0) {
-        logger.warn('No ordinances found', { city, state })
+      // Search using SearchManager (automatic fallback to Tavily/Brave if Exa fails)
+      const searchResponse = await this.searchManager.search(query, {
+        maxResults: 10,
+        domains: [
+          'municode.com',
+          '.gov',
+          'municipal.codes',
+          'qcode.us',
+          'amlegal.com',
+        ],
+      })
+
+      if (searchResponse.results.length === 0) {
+        logger.warn('No ordinances found', { city, state, provider: searchResponse.provider })
         return []
       }
 
-      // Get full content for top results
-      const contents = await this.exaClient.getContents({
-        ids: searchResults.results.slice(0, 5).map((r) => r.url),
-        text: { maxCharacters: 50000 },
-        highlights: { numSentences: 10, highlightsPerUrl: 5 },
+      logger.info('Ordinances found', {
+        city,
+        state,
+        count: searchResponse.results.length,
+        provider: searchResponse.provider,
+        cached: searchResponse.cached,
       })
 
-      // Convert to OrdinanceInfo format
-      const ordinances: OrdinanceInfo[] = contents.map((content) => {
-        const searchResult = searchResults.results.find((r) => r.url === content.url)
-
-        return {
-          title: content.title,
-          url: content.url,
-          jurisdiction: this.extractJurisdiction(content.title, city, state),
-          summary: searchResult?.text || content.highlights?.slice(0, 3).join(' ') || '',
-          fullText: content.text,
-          relevantExcerpts: content.highlights || [],
-        }
-      })
+      // Convert search results to OrdinanceInfo format
+      const ordinances: OrdinanceInfo[] = searchResponse.results.map((result) => ({
+        title: result.title,
+        url: result.url,
+        jurisdiction: this.extractJurisdiction(result.title, city, state),
+        summary: result.snippet || '',
+        fullText: undefined, // Full text extraction would require additional API call
+        relevantExcerpts: result.snippet ? [result.snippet] : [],
+      }))
 
       return ordinances
     } catch (error) {

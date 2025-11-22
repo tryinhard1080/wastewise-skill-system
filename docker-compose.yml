@@ -1,0 +1,107 @@
+# WasteWise Local Development Docker Compose
+# For testing multi-service deployment locally
+
+version: '3.8'
+
+services:
+  # Next.js Web Service
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wastewise-web
+    ports:
+      - "3000:3000"
+    environment:
+      # Supabase (local)
+      - NEXT_PUBLIC_SUPABASE_URL=http://supabase:54321
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET=project-files
+
+      # AI Services
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # Application
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NODE_ENV=development
+
+      # Monitoring (optional for local)
+      - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN:-}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - wastewise
+    depends_on:
+      - supabase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Background Worker Service
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: wastewise-worker
+    environment:
+      # Supabase (local)
+      - NEXT_PUBLIC_SUPABASE_URL=http://supabase:54321
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET=project-files
+
+      # AI Services
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # Worker Configuration
+      - WORKER_POLL_INTERVAL=2000
+      - WORKER_MAX_CONCURRENT_JOBS=1
+      - NODE_ENV=development
+
+      # Monitoring (optional for local)
+      - SENTRY_DSN=${SENTRY_DSN:-}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - wastewise
+    depends_on:
+      - supabase
+    restart: unless-stopped
+
+  # Supabase Local (PostgreSQL + Auth + Storage)
+  # Note: For production, use Supabase Cloud instead
+  supabase:
+    image: supabase/postgres:15.1.0.117
+    container_name: wastewise-supabase
+    ports:
+      - "54322:5432"
+      - "54321:54321"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=postgres
+    volumes:
+      - supabase-data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - wastewise
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  wastewise:
+    driver: bridge
+
+volumes:
+  supabase-data:
+    driver: local

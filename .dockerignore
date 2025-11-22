@@ -1,0 +1,81 @@
+# WasteWise Docker Ignore
+# Excludes unnecessary files from Docker build context
+
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store
+
+# Testing
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage
+.nyc_output
+playwright-report
+test-results
+test-screenshots
+
+# Next.js
+.next/
+out/
+.swc/
+
+# Production
+build
+dist
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation
+*.md
+!README.md
+docs/
+.claude/
+
+# Logs
+logs
+*.log
+worker.log
+
+# Misc
+.turbo
+*.tsbuildinfo
+.cache
+tmp
+temp
+
+# Development files
+docker-compose.yml
+Dockerfile*
+.dockerignore
+
+# Test data
+waste-skills-complete/
+*.zip
+pr_json.json
+test-output*.txt

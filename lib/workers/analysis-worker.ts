@@ -104,7 +104,7 @@ export class AnalysisWorker {
             // logger.debug('Polling for jobs...')
             console.log('Worker polling for jobs...')
             const { data, error: claimError } = await this.supabase.rpc(
-              'claim_next_analysis_job'
+              'claim_next_analysis_job' as any
             )
 
             if (claimError) {

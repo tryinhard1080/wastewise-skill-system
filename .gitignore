@@ -27,3 +27,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts# Test outputs
 test-output*.txt
+
+# Playwright test outputs
+test-results/
+playwright-report/
+.playwright/

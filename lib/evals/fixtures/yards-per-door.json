@@ -1,0 +1,108 @@
+{
+  "name": "Yards Per Door Calculations",
+  "description": "Test cases validating YPD formulas for compacted and non-compacted service",
+  "testCases": [
+    {
+      "name": "Compactor YPD - High volume property",
+      "description": "400-unit property with 120.5 tons/month",
+      "input": {
+        "equipmentType": "COMPACTOR",
+        "totalTons": 120.5,
+        "units": 400
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 4.37
+      }
+    },
+    {
+      "name": "Compactor YPD - Mid-sized property",
+      "description": "250-unit property with 60.0 tons/month",
+      "input": {
+        "equipmentType": "COMPACTOR",
+        "totalTons": 60.0,
+        "units": 250
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 3.48
+      }
+    },
+    {
+      "name": "Compactor YPD - Small property",
+      "description": "100-unit property with 15.0 tons/month",
+      "input": {
+        "equipmentType": "COMPACTOR",
+        "totalTons": 15.0,
+        "units": 100
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 2.17
+      }
+    },
+    {
+      "name": "Dumpster YPD - 2x8 yard, 2x weekly",
+      "description": "Two 8-yard dumpsters picked up twice per week",
+      "input": {
+        "equipmentType": "DUMPSTER",
+        "qty": 2,
+        "size": 8,
+        "frequency": 2,
+        "units": 150
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 0.92
+      }
+    },
+    {
+      "name": "Dumpster YPD - 1x10 yard, 3x weekly",
+      "description": "Single 10-yard dumpster picked up three times per week",
+      "input": {
+        "equipmentType": "DUMPSTER",
+        "qty": 1,
+        "size": 10,
+        "frequency": 3,
+        "units": 100
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 1.30
+      }
+    },
+    {
+      "name": "Dumpster YPD - 3x6 yard, 1x weekly",
+      "description": "Three 6-yard dumpsters picked up once per week",
+      "input": {
+        "equipmentType": "DUMPSTER",
+        "qty": 3,
+        "size": 6,
+        "frequency": 1,
+        "units": 200
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 0.39
+      }
+    },
+    {
+      "name": "Edge case - Single unit compactor",
+      "description": "Theoretical edge case for single unit with minimal tonnage",
+      "input": {
+        "equipmentType": "COMPACTOR",
+        "totalTons": 0.5,
+        "units": 1
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 7.25
+      }
+    },
+    {
+      "name": "Edge case - Very large property",
+      "description": "Large property with 1000 units and 500 tons/month",
+      "input": {
+        "equipmentType": "COMPACTOR",
+        "totalTons": 500.0,
+        "units": 1000
+      },
+      "expectedOutput": {
+        "yardsPerDoor": 7.25
+      }
+    }
+  ]
+}

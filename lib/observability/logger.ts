@@ -4,9 +4,10 @@
  * Provides consistent, structured logging across the application.
  * Supports different log levels, contexts, and structured data.
  *
- * Phase 1.5: Basic console logging (development)
- * Future: Production logging service integration (e.g., Sentry, LogRocket)
+ * Integrated with Sentry for error tracking in production.
  */
+
+import * as Sentry from '@sentry/nextjs'
 
 export enum LogLevel {
   DEBUG = 'debug',
@@ -105,8 +106,7 @@ class Logger {
   /**
    * Output log entry
    *
-   * Phase 1.5: Console output
-   * Future: Send to logging service
+   * Sends to console and Sentry (for errors in production)
    */
   private output(entry: LogEntry): void {
     if (!this.shouldLog(entry.level)) {
@@ -136,6 +136,38 @@ class Logger {
       case LogLevel.ERROR:
         console.error(fullMessage)
         break
+    }
+
+    // Send errors to Sentry in production
+    if (level === LogLevel.ERROR && error && process.env.NODE_ENV === 'production') {
+      // Reconstruct Error object from serialized error
+      const errorObj = new Error(error.message)
+      errorObj.name = error.message
+      errorObj.stack = error.stack
+
+      Sentry.captureException(errorObj, {
+        level: 'error',
+        contexts: {
+          custom: context || {},
+        },
+        extra: data,
+        tags: {
+          ...(context?.userId && { userId: context.userId }),
+          ...(context?.projectId && { projectId: context.projectId }),
+          ...(context?.jobId && { jobId: context.jobId }),
+          ...(context?.skillName && { skillName: context.skillName }),
+        },
+      })
+    }
+
+    // Send warnings to Sentry in production (as breadcrumbs)
+    if (level === LogLevel.WARN && process.env.NODE_ENV === 'production') {
+      Sentry.addBreadcrumb({
+        category: 'warning',
+        message,
+        level: 'warning',
+        data: { ...context, ...data },
+      })
     }
   }
 
@@ -183,6 +215,24 @@ class Logger {
    */
   child(baseContext: LogContext): ChildLogger {
     return new ChildLogger(this, baseContext)
+  }
+
+  /**
+   * Start a performance timer
+   *
+   * Returns a function that when called, logs the duration.
+   *
+   * @example
+   * const endTimer = logger.startTimer('API call')
+   * // ... do work ...
+   * endTimer() // Logs: "Timer: API call" with duration_ms
+   */
+  startTimer(label: string, context?: LogContext): () => void {
+    const start = performance.now()
+    return () => {
+      const duration = performance.now() - start
+      this.info(`Timer: ${label}`, context, { duration_ms: duration.toFixed(2) })
+    }
   }
 }
 

@@ -1,0 +1,94 @@
+{
+  "name": "Cost Per Door Calculations",
+  "description": "Test cases validating cost per door calculations across property sizes",
+  "testCases": [
+    {
+      "name": "Garden-style 250 units",
+      "description": "Typical garden-style property with $3,500/month service",
+      "input": {
+        "totalMonthlyCost": 3500,
+        "units": 250
+      },
+      "expectedOutput": {
+        "costPerDoor": 14.00
+      }
+    },
+    {
+      "name": "Mid-rise 400 units",
+      "description": "Mid-rise property with $5,200/month service",
+      "input": {
+        "totalMonthlyCost": 5200,
+        "units": 400
+      },
+      "expectedOutput": {
+        "costPerDoor": 13.00
+      }
+    },
+    {
+      "name": "High-rise 600 units",
+      "description": "High-rise with $7,200/month service",
+      "input": {
+        "totalMonthlyCost": 7200,
+        "units": 600
+      },
+      "expectedOutput": {
+        "costPerDoor": 12.00
+      }
+    },
+    {
+      "name": "Small property 100 units",
+      "description": "Small property with $1,800/month service",
+      "input": {
+        "totalMonthlyCost": 1800,
+        "units": 100
+      },
+      "expectedOutput": {
+        "costPerDoor": 18.00
+      }
+    },
+    {
+      "name": "Budget service $10/door",
+      "description": "Low-cost service targeting $10/door for 300 units",
+      "input": {
+        "totalMonthlyCost": 3000,
+        "units": 300
+      },
+      "expectedOutput": {
+        "costPerDoor": 10.00
+      }
+    },
+    {
+      "name": "Premium service $25/door",
+      "description": "High-end service at $25/door for 200 units",
+      "input": {
+        "totalMonthlyCost": 5000,
+        "units": 200
+      },
+      "expectedOutput": {
+        "costPerDoor": 25.00
+      }
+    },
+    {
+      "name": "Edge case - Very small cost",
+      "description": "Minimal service at $500/month for 50 units",
+      "input": {
+        "totalMonthlyCost": 500,
+        "units": 50
+      },
+      "expectedOutput": {
+        "costPerDoor": 10.00
+      }
+    },
+    {
+      "name": "Edge case - Very large property",
+      "description": "Large property with 1000 units at $15,000/month",
+      "input": {
+        "totalMonthlyCost": 15000,
+        "units": 1000
+      },
+      "expectedOutput": {
+        "costPerDoor": 15.00
+      }
+    }
+  ]
+}

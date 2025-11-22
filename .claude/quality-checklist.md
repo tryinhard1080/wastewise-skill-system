@@ -204,10 +204,108 @@ const projects = await supabase.from('projects').eq('user_id', user.id)
 
 ---
 
+## 9. Sandbox Compliance (NEW - Nov 2025)
+
+**Problem**: AI agents accessing sensitive files or making unauthorized API calls
+
+**Checklist**:
+- [ ] Sandbox enabled before launching agents (`/sandbox` command)
+- [ ] No attempts to access .env, credentials, or secrets
+- [ ] All network requests to approved domains only
+- [ ] Boundary violations logged via sandbox-logger.ts
+- [ ] Appropriate sandbox profile selected for task (dev/testing/docs/readonly)
+
+**Commands**:
+```bash
+# Enable sandbox
+/sandbox
+
+# Verify sandbox configuration
+cat .claude/sandbox.json
+
+# Run sandbox compliance tests
+pnpm test __tests__/security/sandbox-compliance.test.ts
+```
+
+**Verification**:
+```typescript
+// Check for violations
+import { getSandboxStats, detectSuspiciousPatterns } from '@/lib/observability/sandbox-logger'
+
+const stats = getSandboxStats()
+const patterns = detectSuspiciousPatterns()
+
+if (patterns.suspicious) {
+  console.error('Suspicious sandbox activity:', patterns.reasons)
+  console.info('Recommendations:', patterns.recommendations)
+}
+```
+
+**When to Use Which Profile**:
+- **wastewise-dev**: Frontend/backend development (default)
+- **wastewise-testing**: Writing tests, running test suites
+- **wastewise-docs**: Documentation updates only
+- **wastewise-readonly**: Code analysis, security audits
+
+---
+
+## 10. Validation Command (RECOMMENDED)
+
+**Problem**: Manually running multiple validation steps is error-prone and inconsistent
+
+**Philosophy**: "If `/validate` passes, WasteWise is production-ready"
+
+**The /validate Command**:
+```bash
+# Run all 5 validation phases (recommended before PR)
+pnpm validate
+
+# Skip E2E tests for faster pre-commit checks
+pnpm validate:skip-e2e
+
+# Run specific phase only
+pnpm validate:phase=1  # Linting only
+pnpm validate:phase=2  # Type checking only
+pnpm validate:phase=3  # Style checking only
+pnpm validate:phase=4  # Unit tests only
+pnpm validate:phase=5  # E2E tests only
+```
+
+**What It Validates (5 Phases)**:
+1. **Linting**: Code quality, common errors (`pnpm lint`)
+2. **Type Checking**: Type safety (`pnpm tsc --noEmit`)
+3. **Style Checking**: Code formatting (`pnpm prettier --check .`)
+4. **Unit Testing**: Business logic, calculations (`pnpm test:unit`)
+5. **E2E Testing**: Complete user workflows (`pnpm test:e2e`)
+
+**When to Use**:
+- ✅ **Before every PR** → Run full `pnpm validate`
+- ✅ **Before every commit** → Run `pnpm validate:skip-e2e` (faster)
+- ✅ **After major changes** → Run full `pnpm validate`
+- ✅ **In CI/CD pipeline** → Run full `pnpm validate`
+
+**When to Use Individual Phases**:
+- Fixing specific issues: `pnpm validate:phase=1` (linting)
+- Quick type check: `pnpm validate:phase=2` (types)
+- Formula changes: `pnpm eval` + `pnpm validate:phase=4` (unit tests)
+
+**Success Criteria**:
+- All 5 phases must pass with 0 errors
+- Calculation evals within 0.01% tolerance
+- Security tests pass
+- No console errors
+
+---
+
 ## Pre-Commit Command
 
-Run this before every commit:
+**Quick Pre-Commit (Recommended)**:
+```bash
+# Fastest validation (skips E2E tests)
+pnpm validate:skip-e2e
+```
 
+**Traditional Approach** (if not using /validate):
 ```bash
 # 1. Type check
 pnpm tsc --noEmit
@@ -235,8 +333,10 @@ pnpm test:unit
 | Hardcoded values | Calculation drift | Import from `formulas.ts` |
 | Missing auth guard | undefined user | Check user before queries |
 | No agent validation | All of the above | **Use agents for everything** |
+| No sandbox | Agent accesses secrets | Enable `/sandbox` command |
+| Manual validation | Inconsistent checks | Run `pnpm validate:skip-e2e` |
 
 ---
 
-**Last Updated**: 2025-11-14
+**Last Updated**: 2025-11-22 (Added /validate command integration)
 **Purpose**: Prevent runtime failures by catching issues at dev time
