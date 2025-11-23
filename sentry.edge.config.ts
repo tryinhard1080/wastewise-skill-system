@@ -1,6 +1,6 @@
-import * as Sentry from "@sentry/nextjs";
+import SentryShim from "./lib/observability/sentry-shim";
 
-Sentry.init({
+SentryShim.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
   tracesSampleRate: 1.0,

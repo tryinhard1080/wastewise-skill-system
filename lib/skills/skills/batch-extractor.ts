@@ -44,7 +44,7 @@ import {
   type InvoiceCharges,
 } from "@/lib/db";
 import ExcelJS from "exceljs";
-import Papa from "papaparse";
+import Papa from "../../utils/csv-parser";
 
 /**
  * Container type validation

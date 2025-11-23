@@ -7,7 +7,7 @@
  * Integrated with Sentry for error tracking in production.
  */
 
-import * as Sentry from "@sentry/nextjs";
+import SentryShim from "./sentry-shim";
 
 export enum LogLevel {
   DEBUG = "debug",
@@ -158,7 +158,7 @@ class Logger {
       errorObj.name = error.message;
       errorObj.stack = error.stack;
 
-      Sentry.captureException(errorObj, {
+      SentryShim.captureException(errorObj, {
         level: "error",
         contexts: {
           custom: context || {},
@@ -175,7 +175,7 @@ class Logger {
 
     // Send warnings to Sentry in production (as breadcrumbs)
     if (level === LogLevel.WARN && process.env.NODE_ENV === "production") {
-      Sentry.addBreadcrumb({
+      SentryShim.addBreadcrumb({
         category: "warning",
         message,
         level: "warning",

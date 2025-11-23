@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import ExcelJS from "exceljs";
-import Papa from "papaparse";
+import Papa from "../../lib/utils/csv-parser";
 
 describe("BatchExtractorSkill - Excel/CSV Parsers", () => {
   const fixturesPath = path.join(process.cwd(), "__tests__", "fixtures");

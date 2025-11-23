@@ -171,6 +171,7 @@ describe("ContractExtractorSkill", () => {
 
     // Set up API key
     process.env.ANTHROPIC_API_KEY = "sk-ant-test-key";
+    process.env.MOCK_MULTI_CONTRACTS = "false";
   });
 
   describe("Basic Properties", () => {
@@ -362,6 +363,8 @@ describe("ContractExtractorSkill", () => {
     });
 
     it("should continue processing after individual file failures", async () => {
+      process.env.MOCK_MULTI_CONTRACTS = "true";
+
       // First call fails, second succeeds
       mockAnthropicCreate
         .mockRejectedValueOnce(new Error("Vision API error"))

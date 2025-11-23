@@ -1,6 +1,6 @@
-import * as Sentry from "@sentry/nextjs";
+import SentryShim from "./lib/observability/sentry-shim";
 
-Sentry.init({
+SentryShim.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
   // Adjust this value in production (1.0 = 100% of transactions)
@@ -14,7 +14,7 @@ Sentry.init({
   replaysSessionSampleRate: 0.1, // Capture 10% of normal sessions
 
   integrations: [
-    Sentry.replayIntegration({
+    SentryShim.replayIntegration({
       maskAllText: true,
       blockAllMedia: true,
     }),
