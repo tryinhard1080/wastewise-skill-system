@@ -7,6 +7,7 @@ This document outlines the performance targets, testing procedures, and optimiza
 ## Performance Targets
 
 ### Page Load Performance
+
 - **Lighthouse Performance Score**: ≥90 on all pages
 - **Page Load Time (p95)**: <2 seconds
 - **First Contentful Paint (FCP)**: <1.5s
@@ -15,11 +16,13 @@ This document outlines the performance targets, testing procedures, and optimiza
 - **Cumulative Layout Shift (CLS)**: <0.1
 
 ### Load Handling
+
 - **Concurrent Users**: Support 100 concurrent users
 - **Error Rate**: <0.1% under load
 - **API Response Time (p95)**: <2000ms
 
 ### Bundle Size
+
 - **Total Bundle Size**: <5MB
 - **Individual Chunks**: <500KB
 - **Initial Page Load**: <200KB (gzipped)
@@ -27,6 +30,7 @@ This document outlines the performance targets, testing procedures, and optimiza
 ## Testing Tools
 
 ### 1. Lighthouse Audits
+
 ```bash
 # Run Lighthouse audit on all key pages
 pnpm perf:lighthouse
@@ -37,6 +41,7 @@ open lighthouse-reports/landing-page.html
 ```
 
 **What it tests:**
+
 - Performance score
 - First Contentful Paint (FCP)
 - Largest Contentful Paint (LCP)
@@ -46,6 +51,7 @@ open lighthouse-reports/landing-page.html
 - Time to Interactive (TTI)
 
 ### 2. Load Testing
+
 ```bash
 # Run load tests with autocannon
 pnpm perf:load
@@ -55,11 +61,13 @@ open load-test-reports/summary.json
 ```
 
 **Test scenarios:**
+
 - Light load (10 concurrent users, 10s)
 - Medium load (50 concurrent users, 20s)
 - Heavy load (100 concurrent users, 30s)
 
 **Metrics tracked:**
+
 - Total requests handled
 - Average latency
 - p95/p99 latency
@@ -67,6 +75,7 @@ open load-test-reports/summary.json
 - Throughput (req/s)
 
 ### 3. Bundle Analysis
+
 ```bash
 # Build application first
 pnpm build
@@ -79,12 +88,14 @@ open bundle-reports/bundle-analysis.json
 ```
 
 **What it analyzes:**
+
 - Total bundle size
 - Individual chunk sizes
 - Largest bundles
 - Code splitting opportunities
 
 ### 4. Complete Performance Suite
+
 ```bash
 # Run all performance tests
 pnpm perf:all
@@ -95,6 +106,7 @@ pnpm perf:all
 ### Frontend Optimizations
 
 #### 1. Code Splitting
+
 ```typescript
 // Use dynamic imports for heavy components
 const HeavyComponent = dynamic(() => import('@/components/HeavyComponent'), {
@@ -107,6 +119,7 @@ const HeavyComponent = dynamic(() => import('@/components/HeavyComponent'), {
 ```
 
 #### 2. Image Optimization
+
 ```typescript
 // Use Next.js Image component
 import Image from 'next/image'
@@ -122,31 +135,35 @@ import Image from 'next/image'
 ```
 
 **Current issue**: `images.unoptimized: true` in next.config.mjs (line 6)
+
 - **Impact**: Missing automatic image optimization, WebP conversion, responsive images
 - **Fix**: Remove or set to `false` and configure image domains
 
 #### 3. Font Optimization
+
 ```typescript
 // Use next/font for automatic font optimization
-import { Inter } from 'next/font/google'
+import { Inter } from "next/font/google";
 
 const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap', // Prevent layout shift
+  subsets: ["latin"],
+  display: "swap", // Prevent layout shift
   preload: true,
-})
+});
 ```
 
 #### 4. Lazy Loading
+
 ```typescript
 // Lazy load components below the fold
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 
-const Footer = dynamic(() => import('@/components/Footer'))
-const Testimonials = dynamic(() => import('@/components/Testimonials'))
+const Footer = dynamic(() => import("@/components/Footer"));
+const Testimonials = dynamic(() => import("@/components/Testimonials"));
 ```
 
 #### 5. Bundle Optimization
+
 ```javascript
 // next.config.mjs
 const nextConfig = {
@@ -155,21 +172,22 @@ const nextConfig = {
 
   // Optimize packages
   modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{member}}',
+    "lucide-react": {
+      transform: "lucide-react/dist/esm/icons/{{member}}",
     },
   },
 
   // Remove unused code
   experimental: {
-    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+    optimizePackageImports: ["@radix-ui/react-icons", "lucide-react"],
   },
-}
+};
 ```
 
 ### Backend Optimizations
 
 #### 1. Database Indexing
+
 ```sql
 -- Add indexes for frequently queried columns
 CREATE INDEX idx_projects_user_id ON projects(user_id);
@@ -179,41 +197,46 @@ CREATE INDEX idx_analysis_jobs_status ON analysis_jobs(status, created_at);
 ```
 
 #### 2. API Response Caching
+
 ```typescript
 // Use Next.js cache helpers
-import { unstable_cache } from 'next/cache'
+import { unstable_cache } from "next/cache";
 
 const getCachedProjectData = unstable_cache(
   async (projectId: string) => {
     return await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', projectId)
-      .single()
+      .from("projects")
+      .select("*")
+      .eq("id", projectId)
+      .single();
   },
-  ['project-data'],
-  { revalidate: 60 } // Cache for 60 seconds
-)
+  ["project-data"],
+  { revalidate: 60 }, // Cache for 60 seconds
+);
 ```
 
 #### 3. Selective Field Queries
+
 ```typescript
 // Only select needed fields
 const { data } = await supabase
-  .from('projects')
-  .select('id, name, property_type') // Not 'select('*')'
-  .eq('user_id', userId)
+  .from("projects")
+  .select("id, name, property_type") // Not 'select('*')'
+  .eq("user_id", userId);
 ```
 
 #### 4. Connection Pooling
+
 Already configured in Supabase client (connection pooling enabled by default)
 
 #### 5. Edge Functions (Future)
+
 Consider moving time-sensitive operations to Supabase Edge Functions for lower latency
 
 ### Caching Strategy
 
 #### 1. Static Generation (ISR)
+
 ```typescript
 // Use ISR for semi-static pages
 export const revalidate = 3600 // Revalidate every hour
@@ -225,41 +248,45 @@ export default async function Page() {
 ```
 
 #### 2. Client-Side Caching (SWR)
+
 ```typescript
-import useSWR from 'swr'
+import useSWR from "swr";
 
 function Dashboard() {
-  const { data, error } = useSWR('/api/projects', fetcher, {
+  const { data, error } = useSWR("/api/projects", fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     dedupingInterval: 30000, // 30 seconds
-  })
+  });
 }
 ```
 
 #### 3. HTTP Cache Headers
+
 ```typescript
 // API routes
 export async function GET(request: Request) {
-  const data = await fetchData()
+  const data = await fetchData();
 
   return Response.json(data, {
     headers: {
-      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
     },
-  })
+  });
 }
 ```
 
 ## Performance Monitoring
 
 ### Development
+
 ```bash
 # Monitor bundle size during development
 pnpm build && pnpm perf:bundle
 ```
 
 ### CI/CD
+
 ```yaml
 # .github/workflows/performance.yml
 name: Performance Tests
@@ -277,7 +304,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -313,6 +340,7 @@ jobs:
 ```
 
 ### Production
+
 - Integrate with Sentry for real-time performance monitoring
 - Use Vercel Analytics (already configured via `@vercel/analytics`)
 - Set up alerts for performance degradation
@@ -320,6 +348,7 @@ jobs:
 ## Performance Budget
 
 ### Enforcement
+
 Create `.lighthouserc.json` to enforce performance budget:
 
 ```json
@@ -342,6 +371,7 @@ Create `.lighthouserc.json` to enforce performance budget:
 ## Optimization Checklist
 
 ### Pre-Deployment
+
 - [ ] Run `pnpm build` successfully
 - [ ] Bundle analysis shows <5MB total
 - [ ] No individual chunks >500KB
@@ -356,6 +386,7 @@ Create `.lighthouserc.json` to enforce performance budget:
 - [ ] Sentry performance monitoring configured
 
 ### Post-Deployment
+
 - [ ] Monitor Core Web Vitals in production
 - [ ] Set up performance alerts
 - [ ] Review real user monitoring (RUM) data
@@ -365,12 +396,15 @@ Create `.lighthouserc.json` to enforce performance budget:
 ## Common Performance Issues
 
 ### Issue: Large Bundle Size
+
 **Symptoms:**
+
 - Total bundle >5MB
 - Individual chunks >500KB
 - Slow initial page load
 
 **Solutions:**
+
 1. Analyze bundle with `pnpm perf:bundle`
 2. Identify large dependencies
 3. Use dynamic imports for heavy components
@@ -378,12 +412,15 @@ Create `.lighthouserc.json` to enforce performance budget:
 5. Remove unused dependencies
 
 ### Issue: Slow API Responses
+
 **Symptoms:**
+
 - API routes taking >2s
 - Timeouts under load
 - Database connection errors
 
 **Solutions:**
+
 1. Add database indexes
 2. Optimize Supabase queries (select only needed fields)
 3. Implement caching
@@ -391,12 +428,15 @@ Create `.lighthouserc.json` to enforce performance budget:
 5. Consider pagination for large datasets
 
 ### Issue: Poor Lighthouse Score
+
 **Symptoms:**
+
 - Performance score <90
 - High LCP or TBT
 - Layout shifts (high CLS)
 
 **Solutions:**
+
 1. Optimize images (use Next.js Image)
 2. Preload critical fonts
 3. Minimize JavaScript execution
@@ -404,12 +444,15 @@ Create `.lighthouserc.json` to enforce performance budget:
 5. Eliminate render-blocking resources
 
 ### Issue: High Error Rate Under Load
+
 **Symptoms:**
+
 - Errors >0.1% at 100 concurrent users
 - Database connection timeouts
 - Memory leaks
 
 **Solutions:**
+
 1. Implement proper error handling
 2. Add retry logic for transient failures
 3. Optimize background worker (reduce memory usage)

@@ -17,6 +17,7 @@ This document describes the enterprise-grade job management features implemented
 **Purpose**: Automatically retry failed jobs with intelligent backoff strategy
 
 **Components**:
+
 - `lib/workers/job-retry-manager.ts` - Retry orchestration class
 - `supabase/migrations/20251122092818_enhance_job_management.sql` - Database schema
 
@@ -30,11 +31,13 @@ This document describes the enterprise-grade job management features implemented
 | Max Backoff | 30 minutes | - |
 
 **Error Classification**:
+
 - **Retryable**: Network errors, timeouts, rate limits (429, 502, 503, 504)
 - **Permanent**: Validation errors, permission errors (401, 403, 404)
 - **Unknown**: Default to retryable (with caution)
 
 **Database Schema**:
+
 ```sql
 ALTER TABLE analysis_jobs ADD COLUMN:
 - retry_after timestamp with time zone  -- When job is eligible for retry
@@ -42,17 +45,18 @@ ALTER TABLE analysis_jobs ADD COLUMN:
 ```
 
 **API**:
+
 ```typescript
-const retryManager = new JobRetryManager(supabaseUrl, supabaseKey)
+const retryManager = new JobRetryManager(supabaseUrl, supabaseKey);
 
 // Check if job should be retried
-const shouldRetry = await retryManager.shouldRetry(job, error)
+const shouldRetry = await retryManager.shouldRetry(job, error);
 
 // Schedule retry with exponential backoff
-await retryManager.scheduleRetry(job, error)
+await retryManager.scheduleRetry(job, error);
 
 // Mark as permanently failed
-await retryManager.markPermanentlyFailed(job, error)
+await retryManager.markPermanentlyFailed(job, error);
 ```
 
 **Testing**: `__tests__/lib/workers/job-retry-manager.test.ts`
@@ -64,6 +68,7 @@ await retryManager.markPermanentlyFailed(job, error)
 **Purpose**: Process high-priority jobs before low-priority ones
 
 **Components**:
+
 - Database function: `get_next_job(worker_identifier)` - Atomic queue claiming
 - Database function: `assign_job_priority(user_id, job_type)` - Smart priority assignment
 
@@ -77,6 +82,7 @@ await retryManager.markPermanentlyFailed(job, error)
 | 9 | Background | Batch operations, cleanup |
 
 **Queue Ordering**:
+
 ```sql
 SELECT * FROM analysis_jobs
 WHERE status = 'pending'
@@ -87,6 +93,7 @@ FOR UPDATE SKIP LOCKED  -- Prevent race conditions
 ```
 
 **Database Schema**:
+
 ```sql
 ALTER TABLE analysis_jobs ADD COLUMN:
 - priority integer DEFAULT 5 CHECK (priority >= 1 AND priority <= 10)
@@ -96,6 +103,7 @@ ALTER TABLE analysis_jobs ADD COLUMN:
 ```
 
 **API Usage**:
+
 ```typescript
 // Client: Create job with custom priority
 POST /api/analyze
@@ -121,6 +129,7 @@ if (jobId) {
 **Purpose**: Notify administrators of job failures, stuck jobs, and system health issues
 
 **Components**:
+
 - `lib/alerts/job-alerts.ts` - Alert manager class
 - `lib/alerts/notification-service.ts` - Multi-channel notification service
 - `supabase/migrations/20251122092818_enhance_job_management.sql` - Alerts table
@@ -134,6 +143,7 @@ if (jobId) {
 | `worker_down` | CRITICAL | Email + Slack | Worker heartbeat timeout |
 
 **Notification Channels**:
+
 1. **Email** (via Resend)
    - HTML-formatted alerts
    - Includes job details and dashboard links
@@ -149,6 +159,7 @@ if (jobId) {
    - Configurable via `PAGERDUTY_KEY`
 
 **Database Schema**:
+
 ```sql
 CREATE TABLE job_alerts (
   id uuid PRIMARY KEY,
@@ -166,26 +177,27 @@ CREATE TABLE job_alerts (
 ```
 
 **API**:
+
 ```typescript
-const alertManager = new JobAlertManager(supabaseUrl, supabaseKey)
+const alertManager = new JobAlertManager(supabaseUrl, supabaseKey);
 
 // Send job failed alert
-await alertManager.sendJobFailedAlert(job, error)
+await alertManager.sendJobFailedAlert(job, error);
 
 // Send stuck job alert
-await alertManager.sendJobStuckAlert(job)
+await alertManager.sendJobStuckAlert(job);
 
 // Check for stuck jobs and alert
-await alertManager.checkStuckJobs()
+await alertManager.checkStuckJobs();
 
 // Check error rate and alert if threshold exceeded
-await alertManager.checkErrorRate('1 hour')
+await alertManager.checkErrorRate("1 hour");
 
 // Get unacknowledged alerts
-const alerts = await alertManager.getUnacknowledgedAlerts()
+const alerts = await alertManager.getUnacknowledgedAlerts();
 
 // Acknowledge alert
-await alertManager.acknowledgeAlert(alertId, userId)
+await alertManager.acknowledgeAlert(alertId, userId);
 ```
 
 **Testing**: `__tests__/lib/alerts/job-alerts.test.ts`
@@ -199,7 +211,9 @@ await alertManager.acknowledgeAlert(alertId, userId)
 **Endpoints**:
 
 #### GET /api/admin/jobs/monitoring
+
 Returns comprehensive queue metrics:
+
 ```json
 {
   "success": true,
@@ -223,7 +237,9 @@ Returns comprehensive queue metrics:
 ```
 
 #### GET /api/admin/workers/health
+
 Returns worker health status:
+
 ```json
 {
   "success": true,
@@ -245,11 +261,13 @@ Returns worker health status:
 ```
 
 **Health Status**:
+
 - `healthy`: Workers active, jobs processing normally
 - `degraded`: Workers active but no jobs processed in 10+ minutes
 - `unhealthy`: No active workers detected
 
 **Implementation**:
+
 - `app/api/admin/jobs/monitoring/route.ts`
 - `app/api/admin/workers/health/route.ts`
 
@@ -343,6 +361,7 @@ pnpm test job-alerts
 ```
 
 **Test Files**:
+
 - `__tests__/lib/workers/job-retry-manager.test.ts` - Retry logic validation
 - `__tests__/lib/alerts/job-alerts.test.ts` - Alert system validation
 
@@ -354,9 +373,11 @@ pnpm test:integration priority-queue
 ```
 
 **Test File**:
+
 - `__tests__/integration/priority-queue.test.ts` - End-to-end queue behavior
 
 **Test Coverage**:
+
 - ✅ Error classification (retryable vs permanent)
 - ✅ Exponential backoff calculation
 - ✅ Priority queue ordering
@@ -372,28 +393,28 @@ pnpm test:integration priority-queue
 ### Worker Implementation
 
 ```typescript
-import { JobProcessor } from '@/lib/workers/job-processor'
+import { JobProcessor } from "@/lib/workers/job-processor";
 
 const processor = new JobProcessor(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  'worker-main-1'
-)
+  "worker-main-1",
+);
 
 // Main worker loop
 while (true) {
-  const jobId = await processor.getNextJob()
+  const jobId = await processor.getNextJob();
 
   if (jobId) {
     try {
-      await processor.processJob(jobId)
+      await processor.processJob(jobId);
     } catch (error) {
       // Error handling with retry logic happens automatically
-      console.error('Job failed:', error)
+      console.error("Job failed:", error);
     }
   } else {
     // No jobs available - sleep briefly
-    await sleep(1000)
+    await sleep(1000);
   }
 }
 ```
@@ -401,37 +422,35 @@ while (true) {
 ### Client: Create High-Priority Job
 
 ```typescript
-const response = await fetch('/api/analyze', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const response = await fetch("/api/analyze", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    projectId: 'uuid',
-    jobType: 'complete_analysis',
-    priority: 1  // Highest priority
-  })
-})
+    projectId: "uuid",
+    jobType: "complete_analysis",
+    priority: 1, // Highest priority
+  }),
+});
 
-const { jobId } = await response.json()
+const { jobId } = await response.json();
 
 // Poll for status
-const job = await fetch(`/api/jobs/${jobId}`).then(r => r.json())
+const job = await fetch(`/api/jobs/${jobId}`).then((r) => r.json());
 ```
 
 ### Admin: Monitor Queue Health
 
 ```typescript
 // Get queue metrics
-const metrics = await fetch('/api/admin/jobs/monitoring')
-  .then(r => r.json())
+const metrics = await fetch("/api/admin/jobs/monitoring").then((r) => r.json());
 
-console.log('Queue health:', metrics.data)
+console.log("Queue health:", metrics.data);
 
 // Get worker health
-const health = await fetch('/api/admin/workers/health')
-  .then(r => r.json())
+const health = await fetch("/api/admin/workers/health").then((r) => r.json());
 
-if (health.data.status !== 'healthy') {
-  console.warn('Worker issues detected:', health.data)
+if (health.data.status !== "healthy") {
+  console.warn("Worker issues detected:", health.data);
 }
 ```
 
@@ -440,21 +459,25 @@ if (health.data.status !== 'healthy') {
 ## 📈 Operational Benefits
 
 ### Reliability
+
 - ✅ Automatic retry with exponential backoff
 - ✅ No lost jobs due to transient failures
 - ✅ Intelligent error classification
 
 ### Observability
+
 - ✅ Real-time queue metrics
 - ✅ Worker health monitoring
 - ✅ Alert history and acknowledgment
 
 ### Performance
+
 - ✅ Priority-based job ordering
 - ✅ First-time user experience optimization
 - ✅ Efficient queue processing with SKIP LOCKED
 
 ### Operational Control
+
 - ✅ Multi-channel alerting (email, Slack, PagerDuty)
 - ✅ Configurable thresholds and retry limits
 - ✅ Admin visibility into job queue state
@@ -464,6 +487,7 @@ if (health.data.status !== 'healthy') {
 ## 🔜 Future Enhancements
 
 ### Planned Features
+
 1. **Worker Registration Table**: Track worker heartbeats, resource usage
 2. **Job Cancellation**: Allow users to cancel pending/processing jobs
 3. **Job Scheduling**: Schedule jobs for future execution (cron-like)
@@ -473,6 +497,7 @@ if (health.data.status !== 'healthy') {
 7. **Bulk Operations**: Batch job creation and management
 
 ### Monitoring Improvements
+
 - Worker CPU and memory usage tracking
 - Distributed tracing for job execution
 - Custom dashboard with real-time updates
@@ -483,25 +508,30 @@ if (health.data.status !== 'healthy') {
 ## 📚 References
 
 **Database Migration**:
+
 - `supabase/migrations/20251122092818_enhance_job_management.sql`
 
 **Core Implementation**:
+
 - `lib/workers/job-retry-manager.ts`
 - `lib/workers/job-processor.ts`
 - `lib/alerts/job-alerts.ts`
 - `lib/alerts/notification-service.ts`
 
 **API Endpoints**:
+
 - `app/api/analyze/route.ts` (priority parameter)
 - `app/api/admin/jobs/monitoring/route.ts`
 - `app/api/admin/workers/health/route.ts`
 
 **Tests**:
+
 - `__tests__/lib/workers/job-retry-manager.test.ts`
 - `__tests__/lib/alerts/job-alerts.test.ts`
 - `__tests__/integration/priority-queue.test.ts`
 
 **Configuration**:
+
 - `.env.template` (updated with new variables)
 
 ---

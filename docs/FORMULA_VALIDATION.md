@@ -11,12 +11,14 @@ WasteWise formula validation ensures that all calculations are accurate, consist
 ## Why Evals Are Critical
 
 ### Business Impact
+
 - **Financial Accuracy**: Incorrect calculations lead to wrong savings estimates
 - **Customer Trust**: Inaccurate reports damage credibility
 - **Legal Compliance**: Billing calculations must be precise
 - **Data Integrity**: Metrics drive business decisions
 
 ### Technical Benefits
+
 - **Prevent Regressions**: Catch calculation changes before production
 - **Enforce Consistency**: All implementations use same formulas
 - **Enable Refactoring**: Confidently restructure code
@@ -32,27 +34,29 @@ All formulas MUST use constants from `lib/constants/formulas.ts`:
 
 ```typescript
 import {
-  COMPACTOR_YPD_CONVERSION,      // 14.49 (cubic yards per ton)
-  DUMPSTER_YPD_CONVERSION,        // 4.33 (weeks per month)
-  COMPACTOR_TARGET_TONS,          // 8.5 (target tons per haul)
+  COMPACTOR_YPD_CONVERSION, // 14.49 (cubic yards per ton)
+  DUMPSTER_YPD_CONVERSION, // 4.33 (weeks per month)
+  COMPACTOR_TARGET_TONS, // 8.5 (target tons per haul)
   COMPACTOR_OPTIMIZATION_THRESHOLD, // 6.0 (tons threshold for monitoring)
-  WEEKS_PER_MONTH,                // 4.33 (industry standard)
-} from '@/lib/constants/formulas'
+  WEEKS_PER_MONTH, // 4.33 (industry standard)
+} from "@/lib/constants/formulas";
 ```
 
 ### NEVER Hardcode Values
 
 ❌ **WRONG**:
+
 ```typescript
 // Hardcoded value - will break validation
-const yardsPerDoor = (totalTons * 14.49) / units
+const yardsPerDoor = (totalTons * 14.49) / units;
 ```
 
 ✅ **CORRECT**:
-```typescript
-import { COMPACTOR_YPD_CONVERSION } from '@/lib/constants/formulas'
 
-const yardsPerDoor = (totalTons * COMPACTOR_YPD_CONVERSION) / units
+```typescript
+import { COMPACTOR_YPD_CONVERSION } from "@/lib/constants/formulas";
+
+const yardsPerDoor = (totalTons * COMPACTOR_YPD_CONVERSION) / units;
 ```
 
 ---
@@ -74,6 +78,7 @@ pnpm eval
 ### In CI/CD
 
 Evals run automatically on:
+
 - Pull requests to `master`
 - Pushes to `master`
 - Changes to calculation files
@@ -159,10 +164,10 @@ grep -r "8.5" lib/skills/ lib/calculations/
 
 ```typescript
 // ❌ WRONG - Missing parentheses
-const ypd = totalTons * COMPACTOR_YPD_CONVERSION / units
+const ypd = (totalTons * COMPACTOR_YPD_CONVERSION) / units;
 
 // ✅ CORRECT - Proper order of operations
-const ypd = (totalTons * COMPACTOR_YPD_CONVERSION) / units
+const ypd = (totalTons * COMPACTOR_YPD_CONVERSION) / units;
 ```
 
 ### 3. Check Rounding
@@ -173,12 +178,14 @@ const ypd = (totalTons * COMPACTOR_YPD_CONVERSION) / units
 
 ```typescript
 // ❌ WRONG - Rounding intermediate values
-const avgTons = Math.round(totalTons / hauls)
-const utilization = (avgTons / COMPACTOR_TARGET_TONS) * 100
+const avgTons = Math.round(totalTons / hauls);
+const utilization = (avgTons / COMPACTOR_TARGET_TONS) * 100;
 
 // ✅ CORRECT - Preserve precision until final output
-const avgTons = totalTons / hauls
-const utilization = Number(((avgTons / COMPACTOR_TARGET_TONS) * 100).toFixed(2))
+const avgTons = totalTons / hauls;
+const utilization = Number(
+  ((avgTons / COMPACTOR_TARGET_TONS) * 100).toFixed(2),
+);
 ```
 
 ### 4. Verify Logic Conditions
@@ -189,11 +196,10 @@ const utilization = Number(((avgTons / COMPACTOR_TARGET_TONS) * 100).toFixed(2))
 
 ```typescript
 // CANONICAL CRITERIA (ALL 3 must be true)
-const recommend = (
-  avgTonsPerHaul < COMPACTOR_OPTIMIZATION_THRESHOLD &&  // < 6.0
-  maxDaysBetween <= COMPACTOR_MAX_DAYS_BETWEEN &&       // <= 14
-  hasCompactor                                          // true
-)
+const recommend =
+  avgTonsPerHaul < COMPACTOR_OPTIMIZATION_THRESHOLD && // < 6.0
+  maxDaysBetween <= COMPACTOR_MAX_DAYS_BETWEEN && // <= 14
+  hasCompactor; // true
 ```
 
 ---
@@ -214,7 +220,7 @@ Add to `lib/evals/fixtures/[skill-name].json`:
     "numberOfHauls": 10
   },
   "expectedOutput": {
-    "avgTonsPerHaul": 5.00,
+    "avgTonsPerHaul": 5.0,
     "needsOptimization": true
   }
 }
@@ -248,20 +254,24 @@ pnpm eval
 ### Step-by-Step Process
 
 1. **Update Documentation**
+
    ```markdown
    # WASTE_FORMULAS_REFERENCE.md
+
    - Document new formula value
    - Explain why change is needed
    - Show derivation/source
    ```
 
 2. **Update Constants**
+
    ```typescript
    // lib/constants/formulas.ts
-   export const NEW_CONSTANT = 10.5 // Updated value with comment
+   export const NEW_CONSTANT = 10.5; // Updated value with comment
    ```
 
 3. **Update Test Fixtures**
+
    ```json
    // Recalculate all expected values
    "expectedOutput": {
@@ -270,6 +280,7 @@ pnpm eval
    ```
 
 4. **Run Validation**
+
    ```bash
    pnpm eval  # Must pass
    pnpm test  # All tests must pass
@@ -305,14 +316,14 @@ Use `FORMULA_CHANGE_CHECKLIST.md` for complete validation steps.
 ### Calculating Tolerance
 
 ```typescript
-const tolerance = 0.0001 // 0.01%
+const tolerance = 0.0001; // 0.01%
 
 // Example: Expected 5.04, Actual 5.05
-const percentDiff = Math.abs((5.05 - 5.04) / 5.04)
+const percentDiff = Math.abs((5.05 - 5.04) / 5.04);
 // 0.001984 = 0.1984% (FAILS - exceeds 0.01%)
 
 // Example: Expected 5.04, Actual 5.040005
-const percentDiff = Math.abs((5.040005 - 5.04) / 5.04)
+const percentDiff = Math.abs((5.040005 - 5.04) / 5.04);
 // 0.000000992 = 0.000992% (PASSES - within 0.01%)
 ```
 
@@ -350,6 +361,7 @@ Developer → Create Branch → Write Code
 ### Required Checks
 
 All PRs MUST pass:
+
 - ✅ TypeScript compilation
 - ✅ ESLint
 - ✅ Unit tests
@@ -413,6 +425,7 @@ pnpm eval
 ### Q: Why are my evals failing with "0.001% difference"?
 
 **A**: Even tiny differences can indicate logic errors. Check:
+
 - Order of operations (parentheses)
 - Intermediate rounding
 - Floating point precision
@@ -429,6 +442,7 @@ pnpm eval
 ### Q: Do evals run on every commit?
 
 **A**: Only when calculation-related files change:
+
 - `lib/calculations/**`
 - `lib/constants/formulas.ts`
 - `lib/skills/**`

@@ -9,6 +9,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## 📋 Pre-Build Preparation
 
 ### Assets Needed
+
 - [ ] 3 Dashboard screenshots (1920x1400px, compressed < 200KB each)
 - [ ] 9 Integration logos (96x96px, SVG or PNG)
 - [ ] 3 Testimonial avatars (128x128px, circle crop)
@@ -17,6 +18,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] All copy written and proofread
 
 ### Account Setup
+
 - [ ] Create Lovable account at lovable.dev
 - [ ] Choose plan (Free: 5 messages/day OR Paid: $20/month for 100 messages)
 - [ ] Explore interface and documentation
@@ -29,6 +31,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ### SESSION 1: Foundation (5 Messages)
 
 **Message 1: Initialize Project**
+
 ```
 ✓ Create React + Vite + Tailwind project
 ✓ Set warm background (#F7F5F3)
@@ -37,6 +40,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 2: Design System**
+
 ```
 ✓ Configure color palette
 ✓ Set typography (serif headings, sans body)
@@ -45,6 +49,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 3: Header**
+
 ```
 ✓ Logo "Brillance" (serif, 20px)
 ✓ Navigation: Products, Pricing, Docs
@@ -53,6 +58,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 4: Hero Section**
+
 ```
 ✓ Heading (80px): "Effortless custom contract billing by Brillance"
 ✓ Subheading (18px, max-width 506px)
@@ -61,6 +67,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 5: Background Pattern**
+
 ```
 ✓ Add SVG pattern behind hero
 ✓ Position absolute, centered
@@ -69,6 +76,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Daily Checkpoint:**
+
 - [ ] Header navigation works
 - [ ] Hero section displays correctly
 - [ ] Background pattern shows behind hero
@@ -80,6 +88,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ### SESSION 2: Dashboard Preview (5 Messages)
 
 **Message 1: Dashboard Container**
+
 ```
 ✓ Container: 960px x 695px, white bg
 ✓ Border radius 9px, subtle shadow
@@ -87,6 +96,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 2: Upload & Display Images**
+
 ```
 ✓ Upload 3 dashboard screenshots
 ✓ Display first image in container
@@ -94,6 +104,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 3: Indicator Cards**
+
 ```
 ✓ 3 cards below preview (horizontal)
 ✓ Cards: "Plan schedules", "Data insights", "Explore templates"
@@ -101,6 +112,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 4: Rotation Logic**
+
 ```
 ✓ useState: activeCard, progress
 ✓ Auto-rotate every 5 seconds
@@ -109,6 +121,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 5: Progress Bar**
+
 ```
 ✓ Linear progress 0-100% over 5s
 ✓ Positioned at bottom of active card
@@ -117,6 +130,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Daily Checkpoint:**
+
 - [ ] All 3 images display correctly
 - [ ] Auto-rotation works smoothly
 - [ ] Manual card click works
@@ -128,6 +142,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ### SESSION 3: Feature Sections (5 Messages)
 
 **Message 1: Smart Simple Brilliant**
+
 ```
 ✓ Title (52px): "Smart, Simple, Brilliant"
 ✓ 3 feature cards (grid layout)
@@ -136,6 +151,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 2: Work in Sync**
+
 ```
 ✓ Title: "Your work, perfectly in sync"
 ✓ 2 alternating image-text blocks
@@ -144,6 +160,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 3: Integration Section**
+
 ```
 ✓ Title: "Effortless Integration"
 ✓ 9 partner logos (3x3 grid)
@@ -152,6 +169,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 4: Statistics**
+
 ```
 ✓ Title: "Numbers that speak"
 ✓ 4 stat cards: Users, Revenue, Uptime, Support
@@ -160,6 +178,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 5: Documentation Preview**
+
 ```
 ✓ 3 doc cards: Getting Started, API, Videos
 ✓ Icons, descriptions, "Read more" links
@@ -167,6 +186,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Daily Checkpoint:**
+
 - [ ] All 5 sections display properly
 - [ ] Grids are responsive
 - [ ] Images load correctly
@@ -178,6 +198,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ### SESSION 4: Social Proof & Forms (5 Messages)
 
 **Message 1: Testimonials**
+
 ```
 ✓ Title: "Loved by teams worldwide"
 ✓ 3 testimonial cards (carousel/scroll)
@@ -186,6 +207,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 2: FAQAccordion**
+
 ```
 ✓ 8 questions with shadcn/ui Accordion
 ✓ Smooth expand/collapse
@@ -194,6 +216,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 3: Pricing Section**
+
 ```
 ✓ 3 plans: Starter ($19), Pro ($49), Enterprise (Custom)
 ✓ "Most popular" badge on Pro
@@ -202,6 +225,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 4: Email Capture (Optional)**
+
 ```
 ✓ Inline form: Email input + Submit button
 ✓ Validation, loading state
@@ -210,6 +234,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 5: Contact Modal (Optional)**
+
 ```
 ✓ Triggered by "Contact sales"
 ✓ Form: Name, Email, Company, Message
@@ -218,6 +243,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Daily Checkpoint:**
+
 - [ ] Testimonials display/scroll
 - [ ] Accordion expands/collapses
 - [ ] Pricing cards aligned properly
@@ -229,6 +255,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ### SESSION 5: Final CTA & Footer (5 Messages)
 
 **Message 1: Final CTA Section**
+
 ```
 ✓ Dark gradient background
 ✓ Heading (64px): "Ready to transform..."
@@ -237,6 +264,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 2: Footer Structure**
+
 ```
 ✓ 5 columns: Logo + 4 nav columns
 ✓ Logo/social, Product, Company, Resources, Legal
@@ -244,6 +272,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 3: Footer Bottom Bar**
+
 ```
 ✓ Copyright notice
 ✓ Optional: Language selector
@@ -252,6 +281,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 4: Back to Top Button (Optional)**
+
 ```
 ✓ Fixed position, bottom right
 ✓ Shows when scrolled past hero
@@ -260,6 +290,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Message 5: Vertical Page Borders**
+
 ```
 ✓ Fixed 1px borders on left and right
 ✓ Full page height
@@ -268,6 +299,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ```
 
 **Daily Checkpoint:**
+
 - [ ] CTA section prominent
 - [ ] Footer all links work
 - [ ] Bottom bar displays correctly
@@ -279,6 +311,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## ✅ Final Quality Checks
 
 ### Visual Testing
+
 - [ ] Chrome browser tested
 - [ ] Safari browser tested
 - [ ] Firefox browser tested
@@ -291,6 +324,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] Dark mode (if implemented)
 
 ### Functional Testing
+
 - [ ] All navigation links work
 - [ ] Forms submit successfully
 - [ ] Email validation works
@@ -301,6 +335,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] Mobile menu toggles
 
 ### Performance
+
 - [ ] Lighthouse score > 90
 - [ ] Images optimized (< 200KB each)
 - [ ] No console errors
@@ -308,6 +343,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] Smooth scrolling
 
 ### Accessibility
+
 - [ ] All images have alt text
 - [ ] Proper heading hierarchy
 - [ ] Keyboard navigation works
@@ -316,6 +352,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] Focus indicators visible
 
 ### Content
+
 - [ ] All copy proofread
 - [ ] Brand name correct
 - [ ] Contact info accurate
@@ -327,6 +364,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## 🚀 Deployment
 
 ### Lovable One-Click Deploy
+
 1. [ ] Click "Publish" in top-right
 2. [ ] Choose deployment name
 3. [ ] Get URL: yourapp.lovable.app
@@ -334,6 +372,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 5. [ ] Share URL for feedback
 
 ### Custom Domain (Optional)
+
 1. [ ] Purchase domain
 2. [ ] Add CNAME record to Lovable
 3. [ ] Configure SSL certificate
@@ -341,6 +380,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 5. [ ] Update environment variables
 
 ### GitHub Integration (Optional)
+
 1. [ ] Connect GitHub account
 2. [ ] Create repository
 3. [ ] Sync code automatically
@@ -352,6 +392,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## 📊 Post-Launch Monitoring
 
 ### Day 1: Initial Check
+
 - [ ] All pages load correctly
 - [ ] Forms submit successfully
 - [ ] Analytics tracking works
@@ -359,6 +400,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] Mobile experience good
 
 ### Week 1: Optimization
+
 - [ ] Review user behavior data
 - [ ] Identify drop-off points
 - [ ] A/B test different CTAs
@@ -367,6 +409,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - [ ] Implement quick wins
 
 ### Month 1: Growth
+
 - [ ] Analyze conversion rates
 - [ ] Optimize underperforming sections
 - [ ] Add new content/features
@@ -378,6 +421,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## 🎯 Success Metrics
 
 ### Technical
+
 ✓ Page Load Time: < 2 seconds  
 ✓ Lighthouse Performance: > 90  
 ✓ Mobile Speed: < 3 seconds  
@@ -385,12 +429,14 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ✓ FCP: < 1.5s
 
 ### Engagement
+
 ✓ Session Duration: > 2 minutes  
 ✓ Bounce Rate: < 50%  
 ✓ Pages per Session: > 1.5  
 ✓ Scroll Depth: > 75%
 
 ### Conversion
+
 ✓ CTA Click Rate: > 5%  
 ✓ Form Submission: > 2%  
 ✓ Trial Signup: > 1%  
@@ -401,6 +447,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## 💡 Quick Tips
 
 **Lovable Prompting:**
+
 1. Be specific with measurements
 2. Include exact color codes
 3. Upload reference images
@@ -408,6 +455,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 5. Use knowledge file for consistency
 
 **Common Issues:**
+
 - **Build Error:** Click "Try to fix it"
 - **Images Not Loading:** Check paths and compress
 - **Mobile Broken:** Test breakpoints and touch targets
@@ -415,6 +463,7 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 - **Animations Choppy:** Use transform/opacity, reduce complexity
 
 **Time Savers:**
+
 - Use Session prompts from main guide
 - Copy/paste exact specifications
 - Test after each major change
@@ -426,12 +475,14 @@ Use this checklist to track your progress while building in Lovable. Refer to th
 ## 📞 Support Resources
 
 **Lovable:**
+
 - Docs: docs.lovable.dev
 - Discord: Community support
 - Email: support@lovable.dev
 - Twitter: @lovable_dev
 
 **This Project:**
+
 - Main Guide: LOVABLE_REBUILD_PLAN.md
 - Detailed Prompts: All 50+ prompts included
 - Troubleshooting: Issue-specific solutions

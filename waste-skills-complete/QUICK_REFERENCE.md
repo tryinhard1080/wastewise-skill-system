@@ -7,31 +7,37 @@
 ## 🚀 Most Common Prompts
 
 ### Invoice Analysis
+
 ```
 "Analyze [Property Name] invoices with regulatory compliance for [City, State]"
 ```
 
 ### Contract Review
+
 ```
 "Extract terms from this [Hauler] contract focusing on rate increases and termination"
 ```
 
 ### Batch Processing
+
 ```
 "Batch process invoices for [#] properties and flag any over $35/unit/month"
 ```
 
 ### Visual Dashboard
+
 ```
 "Create interactive HTML dashboard from this analysis with Chart.js visualizations"
 ```
 
 ### Development Planning
+
 ```
 "Create trash plan for [Property] in [City]: [#] units, [#] buildings, [#] stories"
 ```
 
 ### Compactor Analysis
+
 ```
 "Analyze compactor performance and calculate ROI for monitoring systems"
 ```
@@ -40,30 +46,30 @@
 
 ## 📊 Key Benchmarks (Memorize These)
 
-| Metric | Target | Action Trigger |
-|--------|--------|---------------|
-| **Cost per Door** | $18-35/mo | >$35 = investigate |
-| **Yards per Door** | 2.0-2.5 | >2.5 = optimize |
-| **Tons per Haul** | 8-9 tons | <6 = monitoring |
-| **Contamination** | <3% spend | >3% = reduction |
-| **Bulk Charges** | <$500/mo | >$500 = subscription |
-| **Payback Period** | <24 months | >36 = reconsider |
+| Metric             | Target     | Action Trigger       |
+| ------------------ | ---------- | -------------------- |
+| **Cost per Door**  | $18-35/mo  | >$35 = investigate   |
+| **Yards per Door** | 2.0-2.5    | >2.5 = optimize      |
+| **Tons per Haul**  | 8-9 tons   | <6 = monitoring      |
+| **Contamination**  | <3% spend  | >3% = reduction      |
+| **Bulk Charges**   | <$500/mo   | >$500 = subscription |
+| **Payback Period** | <24 months | >36 = reconsider     |
 
 ---
 
 ## 🎯 Skill Selection Cheat Sheet
 
-| I Need... | Use This Skill |
-|----------|---------------|
-| Fast analysis | wastewise-regulatory-lite |
-| Complete report + compliance | wastewise-regulatory |
-| Maximum validation | wastewise-analytics-validated |
-| Parse contract PDF | waste-contract-extractor |
-| Multiple properties | waste-batch-extractor |
-| Compactor ROI | compactor-optimization |
-| Interactive charts | waste-visual-reporter |
-| Development project | trash-management-planner |
-| Development visuals | waste-dev-report-visualizer |
+| I Need...                    | Use This Skill                |
+| ---------------------------- | ----------------------------- |
+| Fast analysis                | wastewise-regulatory-lite     |
+| Complete report + compliance | wastewise-regulatory          |
+| Maximum validation           | wastewise-analytics-validated |
+| Parse contract PDF           | waste-contract-extractor      |
+| Multiple properties          | waste-batch-extractor         |
+| Compactor ROI                | compactor-optimization        |
+| Interactive charts           | waste-visual-reporter         |
+| Development project          | trash-management-planner      |
+| Development visuals          | waste-dev-report-visualizer   |
 
 ---
 
@@ -83,13 +89,13 @@ Before running any analysis:
 
 ## 🔧 Quick Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Skill not triggering | Use skill name explicitly in prompt |
-| Missing data | Check PDF is searchable, not scanned |
-| Validation failure | Review input completeness |
-| Low confidence | Verify address, check ordinances manually |
-| Wrong output | Upload files before prompting |
+| Problem              | Solution                                  |
+| -------------------- | ----------------------------------------- |
+| Skill not triggering | Use skill name explicitly in prompt       |
+| Missing data         | Check PDF is searchable, not scanned      |
+| Validation failure   | Review input completeness                 |
+| Low confidence       | Verify address, check ordinances manually |
+| Wrong output         | Upload files before prompting             |
 
 ---
 
@@ -113,6 +119,7 @@ my-project/
 ## 🏆 ROI Quick Math
 
 **Monitoring System Example:**
+
 ```
 Current: 2 hauls/week × 6 tons × 4.33 weeks = 52 tons/mo
 Optimized: 1 haul/week × 9 tons × 4.33 weeks = 39 tons/mo
@@ -193,7 +200,7 @@ Before sharing any analysis, verify:
 ---
 
 **Advantage Waste | Skills Ecosystem v2.0**  
-*Keep this card handy for quick reference during analysis*
+_Keep this card handy for quick reference during analysis_
 
-Print Date: _____________  
+Print Date: ******\_******  
 Last Updated: November 14, 2025

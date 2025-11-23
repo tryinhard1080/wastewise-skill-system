@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 export default function CTASection() {
   return (
@@ -45,5 +45,5 @@ export default function CTASection() {
         </div>
       </div>
     </div>
-  )
+  );
 }

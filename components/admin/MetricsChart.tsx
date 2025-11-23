@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Metrics Chart Component
@@ -7,8 +7,8 @@
  * Uses Chart.js for responsive charting
  */
 
-import { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
   Line,
@@ -18,37 +18,37 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts'
+} from "recharts";
 
 interface DataPoint {
-  date: string
-  value: number
+  date: string;
+  value: number;
 }
 
 interface MetricsChartProps {
-  title: string
-  data: DataPoint[]
-  dataKey?: string
-  color?: string
-  valueLabel?: string
+  title: string;
+  data: DataPoint[];
+  dataKey?: string;
+  color?: string;
+  valueLabel?: string;
 }
 
 export function MetricsChart({
   title,
   data,
-  dataKey = 'value',
-  color = '#3b82f6',
-  valueLabel = 'Value',
+  dataKey = "value",
+  color = "#3b82f6",
+  valueLabel = "Value",
 }: MetricsChartProps) {
   const chartData = useMemo(() => {
     return data.map((point) => ({
-      date: new Date(point.date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
+      date: new Date(point.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
       }),
       [dataKey]: point.value,
-    }))
-  }, [data, dataKey])
+    }));
+  }, [data, dataKey]);
 
   return (
     <Card>
@@ -68,9 +68,9 @@ export function MetricsChart({
             <YAxis stroke="#6b7280" fontSize={12} tickLine={false} />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
-                borderRadius: '6px',
+                backgroundColor: "white",
+                border: "1px solid #e5e7eb",
+                borderRadius: "6px",
               }}
             />
             <Legend />
@@ -87,5 +87,5 @@ export function MetricsChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * File Upload Component
@@ -7,12 +7,12 @@
  * Uses react-dropzone for drag-and-drop functionality
  */
 
-import { useCallback, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
-import { createClient } from '@/lib/supabase/client'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { createClient } from "@/lib/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   FileText,
   Upload,
@@ -20,23 +20,23 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface FileUploadProps {
-  projectId: string
-  fileType: 'invoice' | 'contract' | 'haul_log' | 'other'
-  onUploadComplete?: () => void
-  maxFiles?: number
-  acceptedTypes?: string[]
+  projectId: string;
+  fileType: "invoice" | "contract" | "haul_log" | "other";
+  onUploadComplete?: () => void;
+  maxFiles?: number;
+  acceptedTypes?: string[];
 }
 
 interface UploadingFile {
-  file: File
-  progress: number
-  status: 'uploading' | 'success' | 'error'
-  error?: string
+  file: File;
+  progress: number;
+  status: "uploading" | "success" | "error";
+  error?: string;
 }
 
 export function FileUpload({
@@ -45,147 +45,150 @@ export function FileUpload({
   onUploadComplete,
   maxFiles = 10,
   acceptedTypes = [
-    'application/pdf',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'text/csv',
-    'image/png',
-    'image/jpeg',
+    "application/pdf",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/csv",
+    "image/png",
+    "image/jpeg",
   ],
 }: FileUploadProps) {
-  const supabase = createClient()
+  const supabase = createClient();
   const [uploadingFiles, setUploadingFiles] = useState<
     Map<string, UploadingFile>
-  >(new Map())
+  >(new Map());
 
   // Get storage bucket name from environment variable (with fallback)
   const storageBucket =
-    process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'project-files'
+    process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || "project-files";
 
   const uploadFile = async (file: File) => {
-    const fileId = `${file.name}-${Date.now()}`
+    const fileId = `${file.name}-${Date.now()}`;
 
     // Initialize upload status
     setUploadingFiles((prev) => {
-      const next = new Map(prev)
+      const next = new Map(prev);
       next.set(fileId, {
         file,
         progress: 0,
-        status: 'uploading',
-      })
-      return next
-    })
+        status: "uploading",
+      });
+      return next;
+    });
 
     try {
       // Upload to Supabase Storage
-      const storagePath = `projects/${projectId}/${fileType}/${file.name}`
+      const storagePath = `projects/${projectId}/${fileType}/${file.name}`;
 
       const { error: uploadError } = await supabase.storage
         .from(storageBucket)
         .upload(storagePath, file, {
-          cacheControl: '3600',
+          cacheControl: "3600",
           upsert: false,
-        })
+        });
 
       if (uploadError) {
-        throw uploadError
+        throw uploadError;
       }
 
       // Update progress
       setUploadingFiles((prev) => {
-        const next = new Map(prev)
-        const current = next.get(fileId)
+        const next = new Map(prev);
+        const current = next.get(fileId);
         if (current) {
-          next.set(fileId, { ...current, progress: 50 })
+          next.set(fileId, { ...current, progress: 50 });
         }
-        return next
-      })
+        return next;
+      });
 
       // Create database record
-      const { error: dbError } = await supabase.from('project_files').insert({
+      const { error: dbError } = await supabase.from("project_files").insert({
         project_id: projectId,
         file_name: file.name,
         file_type: fileType,
         storage_path: storagePath,
         mime_type: file.type,
         file_size: file.size,
-        processing_status: 'pending',
-      })
+        processing_status: "pending",
+      });
 
       if (dbError) {
-        throw dbError
+        throw dbError;
       }
 
       // Mark as complete
       setUploadingFiles((prev) => {
-        const next = new Map(prev)
-        const current = next.get(fileId)
+        const next = new Map(prev);
+        const current = next.get(fileId);
         if (current) {
-          next.set(fileId, { ...current, progress: 100, status: 'success' })
+          next.set(fileId, { ...current, progress: 100, status: "success" });
         }
-        return next
-      })
+        return next;
+      });
 
       // Auto-remove after 3 seconds
       setTimeout(() => {
         setUploadingFiles((prev) => {
-          const next = new Map(prev)
-          next.delete(fileId)
-          return next
-        })
-      }, 3000)
+          const next = new Map(prev);
+          next.delete(fileId);
+          return next;
+        });
+      }, 3000);
 
-      onUploadComplete?.()
+      onUploadComplete?.();
     } catch (error) {
-      console.error('Upload error:', error)
+      console.error("Upload error:", error);
       setUploadingFiles((prev) => {
-        const next = new Map(prev)
-        const current = next.get(fileId)
+        const next = new Map(prev);
+        const current = next.get(fileId);
         if (current) {
           next.set(fileId, {
             ...current,
-            status: 'error',
+            status: "error",
             error:
-              error instanceof Error ? error.message : 'Failed to upload file',
-          })
+              error instanceof Error ? error.message : "Failed to upload file",
+          });
         }
-        return next
-      })
+        return next;
+      });
     }
-  }
+  };
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       // Check max files limit
       if (uploadingFiles.size + acceptedFiles.length > maxFiles) {
-        toast.error(`Maximum ${maxFiles} files allowed`)
-        return
+        toast.error(`Maximum ${maxFiles} files allowed`);
+        return;
       }
 
       // Upload all files
       for (const file of acceptedFiles) {
-        await uploadFile(file)
+        await uploadFile(file);
       }
     },
-    [uploadingFiles.size, maxFiles]
-  )
+    [uploadingFiles.size, maxFiles],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: acceptedTypes.reduce((acc, type) => {
-      acc[type] = []
-      return acc
-    }, {} as Record<string, string[]>),
+    accept: acceptedTypes.reduce(
+      (acc, type) => {
+        acc[type] = [];
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    ),
     maxFiles,
-  })
+  });
 
   const removeFile = (fileId: string) => {
     setUploadingFiles((prev) => {
-      const next = new Map(prev)
-      next.delete(fileId)
-      return next
-    })
-  }
+      const next = new Map(prev);
+      next.delete(fileId);
+      return next;
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -193,18 +196,18 @@ export function FileUpload({
       <Card
         {...getRootProps()}
         className={cn(
-          'border-2 border-dashed cursor-pointer transition-colors',
+          "border-2 border-dashed cursor-pointer transition-colors",
           isDragActive
-            ? 'border-green-500 bg-green-50'
-            : 'border-gray-300 hover:border-gray-400'
+            ? "border-green-500 bg-green-50"
+            : "border-gray-300 hover:border-gray-400",
         )}
       >
         <div className="p-8 text-center">
           <input {...getInputProps()} />
           <Upload
             className={cn(
-              'mx-auto h-12 w-12 mb-4',
-              isDragActive ? 'text-green-600' : 'text-gray-400'
+              "mx-auto h-12 w-12 mb-4",
+              isDragActive ? "text-green-600" : "text-gray-400",
             )}
           />
           {isDragActive ? (
@@ -232,13 +235,13 @@ export function FileUpload({
               <div className="flex items-start gap-3">
                 {/* Icon */}
                 <div className="flex-shrink-0">
-                  {upload.status === 'uploading' && (
+                  {upload.status === "uploading" && (
                     <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
                   )}
-                  {upload.status === 'success' && (
+                  {upload.status === "success" && (
                     <CheckCircle2 className="h-5 w-5 text-green-600" />
                   )}
-                  {upload.status === 'error' && (
+                  {upload.status === "error" && (
                     <AlertCircle className="h-5 w-5 text-red-600" />
                   )}
                 </div>
@@ -263,17 +266,17 @@ export function FileUpload({
                   </p>
 
                   {/* Progress Bar */}
-                  {upload.status === 'uploading' && (
+                  {upload.status === "uploading" && (
                     <Progress value={upload.progress} className="h-1" />
                   )}
 
                   {/* Error Message */}
-                  {upload.status === 'error' && upload.error && (
+                  {upload.status === "error" && upload.error && (
                     <p className="text-xs text-red-600">{upload.error}</p>
                   )}
 
                   {/* Success Message */}
-                  {upload.status === 'success' && (
+                  {upload.status === "success" && (
                     <p className="text-xs text-green-600">Upload complete</p>
                   )}
                 </div>
@@ -283,5 +286,5 @@ export function FileUpload({
         </div>
       )}
     </div>
-  )
+  );
 }

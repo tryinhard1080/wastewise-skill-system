@@ -1,7 +1,9 @@
 # WasteWise Website Visual Mockups
+
 ## Detailed Layout Specifications
 
 **Design System Colors:**
+
 - Background: `#F7F5F3` (cream/beige)
 - Text: `#37322F` (dark brown)
 - Primary: `#22C55E` (green - savings/success)
@@ -715,6 +717,7 @@
 ## KEY DESIGN ELEMENTS
 
 ### Color Palette
+
 ```
 Background:  #F7F5F3  (Cream/beige - warm, professional)
 Text:        #37322F  (Dark brown - readable, sophisticated)
@@ -724,12 +727,14 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 ```
 
 ### Typography
+
 - **Headings**: Bold, large (56px hero, 32-40px sections)
 - **Body**: 16-18px, readable line height (1.6)
 - **Buttons**: 16px, bold, clear labels
 - **Data/Numbers**: 24-48px for metrics, bold
 
 ### Components
+
 - **Cards**: White background, subtle shadow, 8px radius
 - **Buttons**: Primary (green, white text), Secondary (outlined)
 - **Progress bars**: Green fill, gray background
@@ -737,12 +742,14 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 - **Charts**: Chart.js with green/brown palette
 
 ### Spacing
+
 - Generous whitespace (don't cram)
 - Consistent padding (24px-32px in cards)
 - Clear visual hierarchy
 - Mobile-friendly tap targets (44px minimum)
 
 ### Icons
+
 - Lucide React or similar clean icon set
 - Consistent style throughout
 - Green circles for feature icons
@@ -753,18 +760,21 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 ## RESPONSIVE BEHAVIOR
 
 ### Desktop (1280px+)
+
 - 3-column layouts for cards
 - Sidebar always visible
 - Large hero images
 - Side-by-side forms
 
 ### Tablet (768px - 1279px)
+
 - 2-column layouts
 - Collapsible sidebar
 - Stacked hero on smaller tablets
 - Full-width forms
 
 ### Mobile (< 768px)
+
 - 1-column layouts
 - Hamburger menu
 - Vertical hero stacking
@@ -776,6 +786,7 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 ## ANIMATION & INTERACTION
 
 ### Subtle Animations
+
 - Fade in on scroll (sections)
 - Hover lift on cards (2px translate)
 - Button hover states (darker green)
@@ -783,12 +794,14 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 - Tab switching (fade between content)
 
 ### Loading States
+
 - Skeleton screens (not spinners)
 - Progress bars for uploads
 - Real-time activity log updates
 - Toast notifications for actions
 
 ### Micro-interactions
+
 - Checkbox animations
 - File upload drag-over states
 - Dropdown smooth open/close
@@ -799,6 +812,7 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 ## BRAND PERSONALITY
 
 **WasteWise feels:**
+
 - 🎯 **Professional** - Serious about data and savings
 - 💚 **Optimistic** - Green = growth and sustainability
 - 📊 **Data-driven** - Charts, numbers, facts
@@ -806,6 +820,7 @@ Border:      rgba(55, 50, 47, 0.12)  (Subtle, doesn't compete)
 - ⚡ **Efficient** - Fast, no-nonsense workflows
 
 **WasteWise is NOT:**
+
 - 🚫 Playful or casual
 - 🚫 Overly technical/complex
 - 🚫 Generic corporate blue

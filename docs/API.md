@@ -27,11 +27,13 @@ All API endpoints require authentication via Supabase Auth (JWT token).
 All endpoints require authentication. The Supabase client automatically handles JWT tokens via HTTP-only cookies.
 
 **Unauthorized Response:**
+
 ```json
 {
   "error": "Unauthorized"
 }
 ```
+
 **Status Code:** `401`
 
 ---
@@ -40,26 +42,29 @@ All endpoints require authentication. The Supabase client automatically handles 
 
 Rate limits are enforced per user:
 
-| Endpoint | Limit | Window |
-|----------|-------|--------|
-| `POST /api/analyze` | 10 requests | 1 minute |
-| `GET /api/jobs` | 60 requests | 1 minute |
-| `GET /api/jobs/[id]` | 60 requests | 1 minute |
+| Endpoint               | Limit       | Window   |
+| ---------------------- | ----------- | -------- |
+| `POST /api/analyze`    | 10 requests | 1 minute |
+| `GET /api/jobs`        | 60 requests | 1 minute |
+| `GET /api/jobs/[id]`   | 60 requests | 1 minute |
 | `PATCH /api/jobs/[id]` | 60 requests | 1 minute |
 
 **Rate Limit Headers:**
+
 - `X-RateLimit-Limit` - Maximum requests allowed
 - `X-RateLimit-Remaining` - Requests remaining in current window
 - `X-RateLimit-Reset` - Unix timestamp when the rate limit resets
 - `Retry-After` - Seconds until rate limit resets (when limited)
 
 **Rate Limit Exceeded Response:**
+
 ```json
 {
   "error": "Rate limit exceeded. Please try again later.",
   "retryAfter": 45
 }
 ```
+
 **Status Code:** `429`
 
 ---
@@ -78,14 +83,14 @@ All errors follow this format:
 
 ### Common Error Codes
 
-| Code | Status | Description |
-|------|--------|-------------|
-| `UNAUTHORIZED` | 401 | Missing or invalid authentication |
-| `FORBIDDEN` | 403 | Authenticated but not authorized |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request data |
-| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
-| `INTERNAL_ERROR` | 500 | Server error |
+| Code                  | Status | Description                       |
+| --------------------- | ------ | --------------------------------- |
+| `UNAUTHORIZED`        | 401    | Missing or invalid authentication |
+| `FORBIDDEN`           | 403    | Authenticated but not authorized  |
+| `NOT_FOUND`           | 404    | Resource not found                |
+| `VALIDATION_ERROR`    | 400    | Invalid request data              |
+| `RATE_LIMIT_EXCEEDED` | 429    | Too many requests                 |
+| `INTERNAL_ERROR`      | 500    | Server error                      |
 
 ---
 
@@ -99,13 +104,14 @@ Creates a new complete analysis job for a specific project.
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter   | Type | Description           |
+| ----------- | ---- | --------------------- |
 | `projectId` | UUID | Project ID to analyze |
 
 **Request Body:** None required
 
 **Success Response:**
+
 ```json
 {
   "jobId": "123e4567-e89b-12d3-a456-426614174000",
@@ -113,19 +119,21 @@ Creates a new complete analysis job for a specific project.
   "message": "Analysis started. Use job ID to check progress."
 }
 ```
+
 **Status Code:** `200 OK`
 
 **Error Responses:**
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 400 | `NO_INVOICE_DATA` | Project has no invoice data to analyze |
-| 401 | `UNAUTHORIZED` | Missing or invalid authentication token |
-| 404 | `PROJECT_NOT_FOUND` | Project doesn't exist or user doesn't own it |
-| 409 | `DUPLICATE_JOB` | Job already pending or processing for this project |
-| 500 | `INTERNAL_ERROR` | Server error during job creation |
+| Status Code | Error Code          | Description                                        |
+| ----------- | ------------------- | -------------------------------------------------- |
+| 400         | `NO_INVOICE_DATA`   | Project has no invoice data to analyze             |
+| 401         | `UNAUTHORIZED`      | Missing or invalid authentication token            |
+| 404         | `PROJECT_NOT_FOUND` | Project doesn't exist or user doesn't own it       |
+| 409         | `DUPLICATE_JOB`     | Job already pending or processing for this project |
+| 500         | `INTERNAL_ERROR`    | Server error during job creation                   |
 
 **Example:**
+
 ```bash
 curl -X POST http://localhost:3000/api/projects/550e8400-e29b-41d4-a716-446655440000/analyze \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -133,6 +141,7 @@ curl -X POST http://localhost:3000/api/projects/550e8400-e29b-41d4-a716-44665544
 ```
 
 **Notes:**
+
 - The job type is automatically set to `complete_analysis`
 - Only one analysis job can be pending/processing per project at a time
 - Background worker will pick up the job within 2 seconds
@@ -149,10 +158,11 @@ Get detailed status and results for a specific job.
 **Path Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | UUID | Job ID |
+| --------- | ---- | ----------- |
+| `id`      | UUID | Job ID      |
 
 **Success Response (Processing):**
+
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -182,6 +192,7 @@ Get detailed status and results for a specific job.
 ```
 
 **Success Response (Completed):**
+
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -251,9 +262,11 @@ Get detailed status and results for a specific job.
   }
 }
 ```
+
 **Status Code:** `200 OK`
 
 **Error Object (when status is "failed"):**
+
 ```json
 {
   "error": {
@@ -275,6 +288,7 @@ Get detailed status and results for a specific job.
 - **500 Internal Error** - Server error
 
 **Example:**
+
 ```bash
 curl http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-426614174000
 ```
@@ -284,19 +298,19 @@ curl http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-426614174000
 ```javascript
 async function pollJobStatus(jobId) {
   while (true) {
-    const response = await fetch(`/api/jobs/${jobId}`)
-    const job = await response.json()
+    const response = await fetch(`/api/jobs/${jobId}`);
+    const job = await response.json();
 
-    if (job.status === 'completed') {
-      return job.result
+    if (job.status === "completed") {
+      return job.result;
     }
 
-    if (job.status === 'failed') {
-      throw new Error(job.error.message)
+    if (job.status === "failed") {
+      throw new Error(job.error.message);
     }
 
     // Wait 2 seconds before next poll
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 }
 ```
@@ -311,13 +325,14 @@ Cancel a pending or processing analysis job.
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `jobId` | UUID | Job ID to cancel |
+| Parameter | Type | Description      |
+| --------- | ---- | ---------------- |
+| `jobId`   | UUID | Job ID to cancel |
 
 **Request Body:** None required
 
 **Success Response:**
+
 ```json
 {
   "success": true,
@@ -325,23 +340,26 @@ Cancel a pending or processing analysis job.
   "jobId": "123e4567-e89b-12d3-a456-426614174000"
 }
 ```
+
 **Status Code:** `200 OK`
 
 **Error Responses:**
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 400 | `INVALID_STATUS` | Job is already completed, failed, or cancelled |
-| 401 | `UNAUTHORIZED` | Missing or invalid authentication token |
-| 404 | `JOB_NOT_FOUND` | Job doesn't exist or user doesn't own it |
-| 500 | `INTERNAL_ERROR` | Server error during cancellation |
+| Status Code | Error Code       | Description                                    |
+| ----------- | ---------------- | ---------------------------------------------- |
+| 400         | `INVALID_STATUS` | Job is already completed, failed, or cancelled |
+| 401         | `UNAUTHORIZED`   | Missing or invalid authentication token        |
+| 404         | `JOB_NOT_FOUND`  | Job doesn't exist or user doesn't own it       |
+| 500         | `INTERNAL_ERROR` | Server error during cancellation               |
 
 **Notes:**
+
 - Only jobs with status `pending` or `processing` can be cancelled
 - Cancelling a processing job will stop execution immediately
 - Cancelled jobs retain their partial progress data
 
 **Example:**
+
 ```bash
 curl -X DELETE http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer YOUR_TOKEN"
@@ -354,62 +372,66 @@ curl -X DELETE http://localhost:3000/api/jobs/123e4567-e89b-12d3-a456-4266141740
 ### Complete Analysis Flow
 
 ```javascript
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from "@/lib/supabase/client";
 
 async function analyzeProject(projectId) {
-  const supabase = createClient()
+  const supabase = createClient();
 
   // 1. Get authentication token
-  const { data: { session } } = await supabase.auth.getSession()
-  const token = session?.access_token
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const token = session?.access_token;
 
   // 2. Start analysis job
   const createResponse = await fetch(`/api/projects/${projectId}/analyze`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 
-  const { jobId } = await createResponse.json()
-  console.log('Analysis started:', jobId)
+  const { jobId } = await createResponse.json();
+  console.log("Analysis started:", jobId);
 
   // 3. Poll for completion (every 2 seconds)
-  let status = 'pending'
-  while (status === 'pending' || status === 'processing') {
-    await new Promise(resolve => setTimeout(resolve, 2000))
+  let status = "pending";
+  while (status === "pending" || status === "processing") {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const statusResponse = await fetch(`/api/jobs/${jobId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    const job = await statusResponse.json()
-    status = job.status
+    const job = await statusResponse.json();
+    status = job.status;
 
-    console.log(`Progress: ${job.progress.percent}% - ${job.progress.currentStep}`)
+    console.log(
+      `Progress: ${job.progress.percent}% - ${job.progress.currentStep}`,
+    );
 
-    if (status === 'completed') {
-      console.log('Analysis completed!')
-      console.log('Savings:', job.result.summary.totalSavingsPotential)
-      console.log('Excel:', job.result.reports.excelWorkbook.downloadUrl)
-      console.log('HTML:', job.result.reports.htmlDashboard.downloadUrl)
-      return job.result
+    if (status === "completed") {
+      console.log("Analysis completed!");
+      console.log("Savings:", job.result.summary.totalSavingsPotential);
+      console.log("Excel:", job.result.reports.excelWorkbook.downloadUrl);
+      console.log("HTML:", job.result.reports.htmlDashboard.downloadUrl);
+      return job.result;
     }
 
-    if (status === 'failed') {
-      console.error('Job failed:', job.error.message)
-      throw new Error(job.error.message)
+    if (status === "failed") {
+      console.error("Job failed:", job.error.message);
+      throw new Error(job.error.message);
     }
   }
 }
 
 // Usage
 try {
-  const result = await analyzeProject('your-project-id')
-  console.log('Total recommendations:', result.recommendations.length)
+  const result = await analyzeProject("your-project-id");
+  console.log("Total recommendations:", result.recommendations.length);
 } catch (error) {
-  console.error('Analysis error:', error)
+  console.error("Analysis error:", error);
 }
 ```
 
@@ -442,6 +464,7 @@ For local testing, you can use Supabase's test users or create users via the Sup
 ## Support
 
 For API support or to report issues:
+
 - **GitHub Issues**: Report bugs or feature requests
 - **Documentation**: Full project documentation in `.claude/CLAUDE.md`
 - **Testing**: Use test credentials from `PHASE_7_TEST_RESULTS.md`

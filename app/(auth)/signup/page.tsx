@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Signup Page
@@ -7,14 +7,14 @@
  * Sends confirmation email and shows success message
  */
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,7 +22,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -30,53 +30,55 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, CheckCircle2 } from 'lucide-react'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
-const signupSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  confirmPassword: z.string(),
-  fullName: z.string().min(2, 'Please enter your full name'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-})
+const signupSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirmPassword: z.string(),
+    fullName: z.string().min(2, "Please enter your full name"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-type SignupFormValues = z.infer<typeof signupSchema>
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      fullName: '',
+      email: "",
+      password: "",
+      confirmPassword: "",
+      fullName: "",
     },
-  })
+  });
 
   async function onSubmit(values: SignupFormValues) {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const supabase = createClient()
+      const supabase = createClient();
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
@@ -85,25 +87,25 @@ export default function SignupPage() {
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-      })
+      });
 
       if (error) {
-        setError(error.message)
-        return
+        setError(error.message);
+        return;
       }
 
       // Show success message
-      setSuccess(true)
+      setSuccess(true);
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/login')
-      }, 3000)
+        router.push("/login");
+      }, 3000);
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
-      console.error('Signup error:', err)
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Signup error:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -126,20 +128,15 @@ export default function SignupPage() {
             Please check your email and click the confirmation link to activate
             your account.
           </p>
-          <p className="mt-4">
-            Redirecting to login page...
-          </p>
+          <p className="mt-4">Redirecting to login page...</p>
         </CardContent>
         <CardFooter className="justify-center">
-          <Link
-            href="/login"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href="/login" className="text-sm text-primary hover:underline">
             Go to login now
           </Link>
         </CardFooter>
       </Card>
-    )
+    );
   }
 
   return (
@@ -239,11 +236,7 @@ export default function SignupPage() {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create account
             </Button>
@@ -252,7 +245,7 @@ export default function SignupPage() {
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-muted-foreground text-center">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link
             href="/login"
             className="text-primary font-medium hover:underline"
@@ -261,16 +254,16 @@ export default function SignupPage() {
           </Link>
         </div>
         <div className="text-xs text-center text-muted-foreground">
-          By signing up, you agree to our{' '}
+          By signing up, you agree to our{" "}
           <Link href="/terms" className="underline">
             Terms of Service
-          </Link>{' '}
-          and{' '}
+          </Link>{" "}
+          and{" "}
           <Link href="/privacy" className="underline">
             Privacy Policy
           </Link>
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

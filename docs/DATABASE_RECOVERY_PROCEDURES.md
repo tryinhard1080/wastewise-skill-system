@@ -29,6 +29,7 @@ This document provides detailed recovery procedures for all database disaster sc
 ### Scenario 1: Complete Database Loss
 
 **Symptoms**:
+
 - Database server unreachable
 - Cannot connect to Supabase
 - All tables missing
@@ -43,6 +44,7 @@ This document provides detailed recovery procedures for all database disaster sc
 **Procedure**:
 
 1. **Assess situation**:
+
 ```bash
 # Attempt connection
 psql $DATABASE_URL -c "SELECT 1;"
@@ -54,6 +56,7 @@ curl https://status.supabase.com/
 ```
 
 2. **Notify stakeholders**:
+
 ```bash
 # Post to Slack (use webhook)
 curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
@@ -65,6 +68,7 @@ curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
 ```
 
 3. **Download latest backup from S3**:
+
 ```bash
 # Find latest backup
 LATEST_BACKUP=$(aws s3 ls s3://wastewise-backups/ --recursive | \
@@ -81,6 +85,7 @@ sha256sum -c restore.dump.sha256
 ```
 
 4. **Verify backup integrity**:
+
 ```bash
 # List backup contents
 pg_restore --list restore.dump > backup_contents.txt
@@ -96,6 +101,7 @@ fi
 ```
 
 5. **Restore database**:
+
 ```bash
 # Full restore (will drop and recreate all tables)
 pg_restore restore.dump \
@@ -114,6 +120,7 @@ fi
 ```
 
 6. **Verify restoration**:
+
 ```bash
 # Test connection
 psql $DATABASE_URL -c "SELECT version();"
@@ -132,6 +139,7 @@ curl http://localhost:3000/api/health
 ```
 
 7. **Restore Supabase-specific configurations**:
+
 ```bash
 # Row-level security policies (RLS)
 # These are included in schema backup, but verify:
@@ -146,6 +154,7 @@ psql $DATABASE_URL -c "
 ```
 
 8. **Resume operations**:
+
 ```bash
 # Notify team
 curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
@@ -156,6 +165,7 @@ curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
 ```
 
 9. **Post-recovery validation**:
+
 ```bash
 # Run comprehensive tests
 pnpm test
@@ -177,6 +187,7 @@ psql $DATABASE_URL -c "
 ### Scenario 2: Accidental Table Drop
 
 **Symptoms**:
+
 - Specific table missing (e.g., `DROP TABLE projects`)
 - Application errors referencing missing table
 - Other tables intact
@@ -184,6 +195,7 @@ psql $DATABASE_URL -c "
 **Impact**: Partial data loss, service degraded
 
 **Recovery Method**:
+
 - **Option A**: Point-in-time recovery (Pro tier only, fastest)
 - **Option B**: Restore specific table from backup
 
@@ -197,6 +209,7 @@ psql $DATABASE_URL -c "
 **Procedure**:
 
 1. **Identify restore point**:
+
 ```bash
 # Find timestamp just before table was dropped
 # Check application logs or database audit logs
@@ -204,16 +217,19 @@ RESTORE_TIMESTAMP="2025-01-21 14:30:00 UTC"
 ```
 
 2. **Initiate PITR via Supabase Dashboard**:
+
 - Navigate to: **Supabase Dashboard → Database → Point in Time Recovery**
 - Select restore point: `$RESTORE_TIMESTAMP`
 - Choose: **Create new project** (recommended - non-destructive)
 - Click: **Start Recovery**
 
 3. **Wait for recovery** (5-15 minutes):
+
 - Monitor progress in dashboard
 - New database URL will be provided
 
 4. **Extract missing table from restored database**:
+
 ```bash
 # Set restored database URL
 RESTORED_DB_URL="postgresql://...new-project-url..."
@@ -232,6 +248,7 @@ psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
 ```
 
 5. **Clean up**:
+
 ```bash
 # After confirming data is correct, pause/delete the temporary restored project
 # (via Supabase dashboard to avoid charges)
@@ -247,6 +264,7 @@ psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
 **Procedure**:
 
 1. **Download latest backup**:
+
 ```bash
 LATEST_BACKUP=$(aws s3 ls s3://wastewise-backups/ --recursive | \
   grep "\.dump$" | sort | tail -1 | awk '{print $4}')
@@ -255,6 +273,7 @@ aws s3 cp s3://wastewise-backups/$LATEST_BACKUP ./restore.dump
 ```
 
 2. **Extract table schema and data**:
+
 ```bash
 # Extract table schema
 pg_restore restore.dump \
@@ -270,6 +289,7 @@ pg_restore restore.dump \
 ```
 
 3. **Recreate table**:
+
 ```bash
 # Recreate table structure
 psql $DATABASE_URL -f projects_schema.sql
@@ -282,6 +302,7 @@ psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
 ```
 
 4. **Restore constraints and indexes** (if needed):
+
 ```bash
 # Extract and restore indexes
 pg_restore restore.dump \
@@ -298,6 +319,7 @@ pg_restore restore.dump \
 ### Scenario 3: Data Corruption
 
 **Symptoms**:
+
 - Invalid data in tables (e.g., negative costs, NULL required fields)
 - Application logic errors
 - Calculation discrepancies
@@ -312,6 +334,7 @@ pg_restore restore.dump \
 **Procedure**:
 
 1. **Identify corruption scope**:
+
 ```bash
 # Check for anomalies
 psql $DATABASE_URL -c "
@@ -332,14 +355,17 @@ psql $DATABASE_URL -c "
 2. **Determine restore strategy**:
 
 **If corruption is isolated** (single table, few rows):
+
 - Manual cleanup with UPDATE/DELETE statements
 - Fastest, no downtime
 
 **If corruption is widespread**:
+
 - Full restore from backup before corruption
 - Requires downtime
 
 3. **Option A: Manual cleanup** (if feasible):
+
 ```bash
 # Delete bad records
 psql $DATABASE_URL -c "
@@ -358,6 +384,7 @@ psql $DATABASE_URL -c "
 ```
 
 4. **Option B: Full restore** (if widespread):
+
 - Follow **Scenario 1: Complete Database Loss** procedure
 - Use backup from before corruption timestamp
 - Accept data loss for records created after backup
@@ -370,6 +397,7 @@ psql $DATABASE_URL -c "
 ### Scenario 4: Ransomware Attack
 
 **Symptoms**:
+
 - Encrypted database files
 - Ransom demand message
 - Connection failures
@@ -387,6 +415,7 @@ psql $DATABASE_URL -c "
 **Procedure**:
 
 1. **IMMEDIATELY isolate systems**:
+
 ```bash
 # Disconnect database from internet (Supabase dashboard)
 # Revoke all API keys
@@ -395,6 +424,7 @@ psql $DATABASE_URL -c "
 ```
 
 2. **Preserve evidence**:
+
 ```bash
 # DO NOT DELETE anything
 # Take screenshots of ransom message
@@ -403,6 +433,7 @@ psql $DATABASE_URL -c "
 ```
 
 3. **Security cleanup**:
+
 ```bash
 # Scan local systems for malware
 # Rotate all credentials
@@ -411,6 +442,7 @@ psql $DATABASE_URL -c "
 ```
 
 4. **Create new clean database**:
+
 ```bash
 # Create new Supabase project (fresh instance)
 # DO NOT restore to compromised instance
@@ -419,6 +451,7 @@ NEW_DB_URL="postgresql://...new-clean-project..."
 ```
 
 5. **Restore from S3 backup** (immutable, trusted source):
+
 ```bash
 # Download backup from S3 (encrypted, attacker can't modify)
 aws s3 cp s3://wastewise-backups/$LATEST_BACKUP ./restore.dump
@@ -436,6 +469,7 @@ pg_restore restore.dump \
 ```
 
 6. **Update application configuration**:
+
 ```bash
 # Update DATABASE_URL environment variable
 # Update Supabase API keys
@@ -443,6 +477,7 @@ pg_restore restore.dump \
 ```
 
 7. **Security hardening**:
+
 - Enable MFA for all accounts
 - Review and restrict IP allowlists
 - Enable database audit logging
@@ -450,6 +485,7 @@ pg_restore restore.dump \
 - Schedule security audit
 
 8. **Post-incident**:
+
 - File incident report
 - Notify affected users (if PII exposed)
 - Update security procedures
@@ -464,6 +500,7 @@ pg_restore restore.dump \
 ### Scenario 5: Failed Migration/Deployment
 
 **Symptoms**:
+
 - Schema mismatch errors after deployment
 - Application crashes referencing missing columns
 - Database in inconsistent state
@@ -478,12 +515,14 @@ pg_restore restore.dump \
 **Procedure**:
 
 1. **Stop deployment**:
+
 ```bash
 # Cancel in-progress deployment
 # Revert application to previous version
 ```
 
 2. **Identify pre-deployment backup**:
+
 ```bash
 # List recent backups
 aws s3 ls s3://wastewise-backups/pre-deploy/ | tail -5
@@ -493,12 +532,14 @@ PRE_DEPLOY_BACKUP="wastewise_backup_20250121_140000_pre-deploy.dump"
 ```
 
 3. **Download and verify**:
+
 ```bash
 aws s3 cp s3://wastewise-backups/pre-deploy/$PRE_DEPLOY_BACKUP ./rollback.dump
 sha256sum -c rollback.dump.sha256
 ```
 
 4. **Restore database**:
+
 ```bash
 pg_restore rollback.dump \
   --dbname=$DATABASE_URL \
@@ -512,6 +553,7 @@ curl http://localhost:3000/api/health
 ```
 
 5. **Root cause analysis**:
+
 ```bash
 # Review failed migration
 cat supabase/migrations/FAILED_MIGRATION.sql
@@ -528,6 +570,7 @@ cat supabase/migrations/FAILED_MIGRATION.sql
 ### Scenario 6: Partial Data Loss (Specific Records)
 
 **Symptoms**:
+
 - User reports missing project
 - Specific records deleted accidentally
 - Audit log shows DELETE operation
@@ -542,6 +585,7 @@ cat supabase/migrations/FAILED_MIGRATION.sql
 **Procedure**:
 
 1. **Identify missing record**:
+
 ```bash
 # Get record ID from user report
 MISSING_PROJECT_ID="d82e2314-7ccf-404e-a133-0caebb154c7e"
@@ -553,6 +597,7 @@ psql $DATABASE_URL -c "
 ```
 
 2. **Download latest backup**:
+
 ```bash
 LATEST_BACKUP=$(aws s3 ls s3://wastewise-backups/ --recursive | \
   grep "\.dump$" | sort | tail -1 | awk '{print $4}')
@@ -561,6 +606,7 @@ aws s3 cp s3://wastewise-backups/$LATEST_BACKUP ./restore.dump
 ```
 
 3. **Extract specific record**:
+
 ```bash
 # Restore to temporary database
 createdb temp_restore
@@ -577,6 +623,7 @@ cat missing_project.csv
 ```
 
 4. **Re-insert into production**:
+
 ```bash
 # Import record
 psql $DATABASE_URL -c "
@@ -590,6 +637,7 @@ psql $DATABASE_URL -c "
 ```
 
 5. **Clean up**:
+
 ```bash
 # Drop temporary database
 dropdb temp_restore
@@ -665,17 +713,17 @@ psql $DATABASE_URL -c "
 
 ## Recovery Decision Matrix
 
-| Scenario | PITR Available? | Scope | Recommended Method | RTO | RPO |
-|----------|----------------|-------|-------------------|-----|-----|
-| Complete database loss | N/A | Total | Full restore from S3 | 1h | 24h |
-| Accidental table drop | Yes | Partial | PITR + table extract | 15m | minutes |
-| Accidental table drop | No | Partial | Table restore from backup | 30m | 24h |
-| Data corruption (isolated) | N/A | Limited | Manual UPDATE/DELETE | 10m | 0 |
-| Data corruption (widespread) | Yes | Major | PITR to before corruption | 30m | varies |
-| Data corruption (widespread) | No | Major | Full restore from backup | 1h | 24h |
-| Ransomware | N/A | Total | New DB + S3 restore | 2h | 24h |
-| Failed migration | N/A | Schema | Pre-deploy snapshot | 15m | 0 |
-| Specific record loss | N/A | Single record | Extract from backup | 10m | 24h |
+| Scenario                     | PITR Available? | Scope         | Recommended Method        | RTO | RPO     |
+| ---------------------------- | --------------- | ------------- | ------------------------- | --- | ------- |
+| Complete database loss       | N/A             | Total         | Full restore from S3      | 1h  | 24h     |
+| Accidental table drop        | Yes             | Partial       | PITR + table extract      | 15m | minutes |
+| Accidental table drop        | No              | Partial       | Table restore from backup | 30m | 24h     |
+| Data corruption (isolated)   | N/A             | Limited       | Manual UPDATE/DELETE      | 10m | 0       |
+| Data corruption (widespread) | Yes             | Major         | PITR to before corruption | 30m | varies  |
+| Data corruption (widespread) | No              | Major         | Full restore from backup  | 1h  | 24h     |
+| Ransomware                   | N/A             | Total         | New DB + S3 restore       | 2h  | 24h     |
+| Failed migration             | N/A             | Schema        | Pre-deploy snapshot       | 15m | 0       |
+| Specific record loss         | N/A             | Single record | Extract from backup       | 10m | 24h     |
 
 ---
 
@@ -702,14 +750,17 @@ psql $DATABASE_URL -c "
 ## Emergency Contacts
 
 **Database Issues**:
+
 - Primary: devops@wastewise.com
 - On-call: +1-555-0100 (PagerDuty)
 
 **Supabase Support**:
+
 - Email: support@supabase.io
 - Emergency: Dashboard → Support → Priority ticket
 
 **Security Incidents**:
+
 - CISO: security@wastewise.com
 - Law Enforcement: FBI IC3 (https://www.ic3.gov/)
 

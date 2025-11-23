@@ -39,6 +39,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ### 1. Strategy & Planning
 
 #### [DATABASE_BACKUP_STRATEGY.md](./DATABASE_BACKUP_STRATEGY.md)
+
 - **Purpose**: High-level backup strategy and objectives
 - **Audience**: Leadership, infrastructure team, auditors
 - **Key Content**:
@@ -48,6 +49,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Data prioritization (P0, P1, P2 tables)
 
 **When to read**:
+
 - Designing backup infrastructure
 - Reviewing compliance requirements
 - Planning disaster recovery strategy
@@ -57,6 +59,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ### 2. Operational Procedures
 
 #### [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md)
+
 - **Purpose**: Step-by-step backup creation procedures
 - **Audience**: DevOps engineers, infrastructure team
 - **Key Content**:
@@ -66,6 +69,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Cloud upload procedures (S3/R2)
 
 **When to read**:
+
 - Setting up automated backups
 - Creating manual backups
 - Troubleshooting backup failures
@@ -73,6 +77,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ---
 
 #### [DATABASE_RECOVERY_PROCEDURES.md](./DATABASE_RECOVERY_PROCEDURES.md)
+
 - **Purpose**: Step-by-step recovery procedures
 - **Audience**: DevOps engineers, on-call engineers
 - **Key Content**:
@@ -83,6 +88,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Rollback procedures
 
 **When to read**:
+
 - Data loss incident
 - Accidental deletion
 - Database corruption
@@ -93,6 +99,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ### 3. Testing & Validation
 
 #### [DATABASE_BACKUP_TESTING.md](./DATABASE_BACKUP_TESTING.md)
+
 - **Purpose**: Quarterly backup testing procedures
 - **Audience**: Infrastructure team, QA team
 - **Key Content**:
@@ -102,6 +109,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Performance benchmarking
 
 **When to read**:
+
 - Quarterly backup testing (required)
 - Validating new backup procedures
 - Benchmarking recovery performance
@@ -112,6 +120,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ### 4. Incident Response
 
 #### [DATABASE_INCIDENT_RESPONSE.md](./DATABASE_INCIDENT_RESPONSE.md)
+
 - **Purpose**: Emergency response plan for data loss incidents
 - **Audience**: On-call engineers, incident commanders
 - **Key Content**:
@@ -122,6 +131,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Escalation procedures
 
 **When to read**:
+
 - **IMMEDIATELY** during data loss incident
 - Training new on-call engineers
 - Incident response drills
@@ -131,6 +141,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ### 5. Monitoring & Alerting
 
 #### [DATABASE_BACKUP_MONITORING.md](./DATABASE_BACKUP_MONITORING.md)
+
 - **Purpose**: Monitoring setup and alert configuration
 - **Audience**: DevOps engineers, SRE team
 - **Key Content**:
@@ -140,6 +151,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Health checks
 
 **When to read**:
+
 - Setting up monitoring infrastructure
 - Configuring alerts
 - Creating dashboards
@@ -150,6 +162,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ### 6. Compliance & Legal
 
 #### [DATABASE_BACKUP_COMPLIANCE.md](./DATABASE_BACKUP_COMPLIANCE.md)
+
 - **Purpose**: Compliance requirements and legal obligations
 - **Audience**: Legal team, compliance officers, auditors
 - **Key Content**:
@@ -161,6 +174,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
   - Legal holds and eDiscovery
 
 **When to read**:
+
 - Compliance audits (SOC 2, ISO 27001)
 - Legal hold requests
 - User deletion requests
@@ -178,6 +192,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 **Purpose**: Automated database backup with encryption and cloud storage
 
 **Usage**:
+
 ```bash
 # Daily backup (default)
 ./scripts/backup-database.sh
@@ -196,6 +211,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 ```
 
 **Features**:
+
 - ✅ Automated pg_dump with compression
 - ✅ GPG encryption (AES-256)
 - ✅ Cloud upload to S3/R2
@@ -205,6 +221,7 @@ This index provides a comprehensive guide to WasteWise's database backup and dis
 - ✅ Logging and notifications
 
 **Environment Variables Required**:
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL
 SUPABASE_SERVICE_KEY
@@ -221,6 +238,7 @@ BACKUP_GPG_RECIPIENT
 **Purpose**: Database restoration from backups with verification and rollback
 
 **Usage**:
+
 ```bash
 # Restore from local backup
 ./scripts/restore-database.sh local /path/to/backup.sql.gpg
@@ -239,6 +257,7 @@ BACKUP_GPG_RECIPIENT
 ```
 
 **Features**:
+
 - ✅ Pre-restore safety backup (automatic)
 - ✅ User confirmation (prevent accidents)
 - ✅ Decryption (GPG)
@@ -249,6 +268,7 @@ BACKUP_GPG_RECIPIENT
 - ✅ Rollback capability
 
 **Safety Mechanisms**:
+
 1. Requires typing "RESTORE" to confirm
 2. Creates pre-restore backup automatically
 3. Restores to temporary database first
@@ -264,6 +284,7 @@ BACKUP_GPG_RECIPIENT
 **Purpose**: Quarterly backup testing and validation
 
 **Usage**:
+
 ```bash
 # Quick test (no restore, validates files only)
 ./scripts/test-backup.sh
@@ -279,6 +300,7 @@ BACKUP_GPG_RECIPIENT
 ```
 
 **Tests Performed**:
+
 1. ✅ Backup file exists and size is reasonable
 2. ✅ Backup file is readable by pg_restore
 3. ✅ Checksum validation (if available)
@@ -289,6 +311,7 @@ BACKUP_GPG_RECIPIENT
 8. ✅ **[Full test only]** Performance validation (RTO compliance)
 
 **Output**:
+
 - **Log file**: `backup-tests/logs/test-TIMESTAMP.log`
 - **Results JSON**: `backup-tests/results/test-TIMESTAMP.json`
 - **Pass rate**: Must be ≥80% to pass
@@ -300,21 +323,25 @@ BACKUP_GPG_RECIPIENT
 ### Cron Jobs (Linux/Mac)
 
 **Daily Backup** (2 AM UTC):
+
 ```bash
 0 2 * * * /path/to/wastewise/scripts/backup-database.sh daily >> /var/log/wastewise/backup.log 2>&1
 ```
 
 **Weekly Backup** (Sunday 3 AM UTC):
+
 ```bash
 0 3 * * 0 /path/to/wastewise/scripts/backup-database.sh weekly >> /var/log/wastewise/backup.log 2>&1
 ```
 
 **Monthly Backup** (1st day of month, 4 AM UTC):
+
 ```bash
 0 4 1 * * /path/to/wastewise/scripts/backup-database.sh monthly >> /var/log/wastewise/backup.log 2>&1
 ```
 
 **Quarterly Testing** (1st day of quarter, 5 AM UTC):
+
 ```bash
 0 5 1 */3 * /path/to/wastewise/scripts/test-backup.sh --full-test >> /var/log/wastewise/test.log 2>&1
 ```
@@ -332,6 +359,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 **Goal**: Set up backup infrastructure for new Supabase instance
 
 1. **Configure environment variables** (.env.local):
+
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
    SUPABASE_SERVICE_KEY=eyJxxx...
@@ -340,6 +368,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
    ```
 
 2. **Set up GPG encryption**:
+
    ```bash
    # Generate key
    gpg --gen-key
@@ -354,11 +383,13 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
    - Configure IAM policy (see COMPLIANCE.md)
 
 4. **Test manual backup**:
+
    ```bash
    ./scripts/backup-database.sh daily
    ```
 
 5. **Verify backup in S3**:
+
    ```bash
    aws s3 ls s3://wastewise-backups-prod/
    ```
@@ -377,17 +408,20 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 **Goal**: Create safety backup before major deployment
 
 1. **Create pre-deployment backup**:
+
    ```bash
    ./scripts/backup-database.sh pre-deploy
    ```
 
 2. **Wait for confirmation**:
+
    ```
    [SUCCESS] Backup created successfully
    [INFO] URL: s3://wastewise-backups/pre-deploy/2025-11-22/...
    ```
 
 3. **Verify backup**:
+
    ```bash
    ./scripts/test-backup.sh /path/to/backup.sql.gpg
    ```
@@ -408,6 +442,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 **Phase 1: Immediate Actions (0-15 min)**
 
 1. **Stop application** (prevent further damage):
+
    ```bash
    # Stop production app
    vercel --prod --pause
@@ -435,12 +470,14 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
    - If old (> 24 hours): Use weekly/monthly backup
 
 5. **Download and verify backup**:
+
    ```bash
    ./scripts/restore-database.sh s3
    # Select appropriate backup from list
    ```
 
 6. **Restore database**:
+
    ```bash
    # Confirmation required (type "RESTORE")
    # Pre-restore backup created automatically
@@ -483,11 +520,13 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 1. **Schedule testing window** (low-traffic period)
 
 2. **Run full backup test**:
+
    ```bash
    ./scripts/test-backup.sh --full-test
    ```
 
 3. **Review test results**:
+
    ```bash
    cat backup-tests/results/test-TIMESTAMP.json
    ```
@@ -502,6 +541,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
    - ✅ Performance acceptable (< 1 hour)
 
 5. **Document results** in compliance register:
+
    ```
    Date: 2025-11-22
    Test Type: Quarterly Backup Test
@@ -523,6 +563,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 ### GDPR Compliance
 
 **Key Requirements**:
+
 1. ✅ User deletion requests processed within 30 days
 2. ✅ Data purged from backups within 90 days (retention policy)
 3. ✅ Encryption at rest (AES-256)
@@ -531,6 +572,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 6. ✅ Privacy policy disclosure (backup practices)
 
 **Actions Required**:
+
 - User deletes account → soft delete (30 days) → hard delete (production) → purge from backups (up to 90 days)
 - Document all backup access in audit log
 - Annual review of backup procedures with legal team
@@ -538,6 +580,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 ### SOC 2 Type II Compliance
 
 **Key Requirements**:
+
 1. ✅ Documented backup procedures (this documentation)
 2. ✅ Quarterly backup testing (test-backup.sh)
 3. ✅ RTO/RPO targets met (1 hour / 24 hours)
@@ -546,6 +589,7 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 6. ✅ Incident response plan (INCIDENT_RESPONSE.md)
 
 **Actions Required**:
+
 - Quarterly testing documentation for auditors
 - Annual security audit of backup infrastructure
 - Access control review (quarterly)
@@ -560,12 +604,14 @@ See [DATABASE_BACKUP_PROCEDURES.md](./DATABASE_BACKUP_PROCEDURES.md) - Section "
 **Symptoms**: Script exits with error during pg_dump
 
 **Common Causes**:
+
 1. Database connection failure (check credentials)
 2. Insufficient disk space
 3. Database locked (active connections)
 4. Network timeout
 
 **Resolution**:
+
 ```bash
 # Check database connection
 psql "$DATABASE_URL" -c "SELECT 1;"
@@ -587,11 +633,13 @@ psql "$DATABASE_URL" -c "SELECT count(*) FROM pg_stat_activity;"
 **Symptoms**: pg_restore appears frozen
 
 **Common Causes**:
+
 1. Large database size (> 10GB)
 2. Active connections preventing restore
 3. Slow network (if restoring from S3)
 
 **Resolution**:
+
 ```bash
 # Terminate active connections
 psql "$DATABASE_URL" -c "
@@ -615,12 +663,14 @@ aws s3 cp s3://bucket/backup.sql.gpg ./
 **Symptoms**: test-backup.sh reports failures
 
 **Common Causes**:
+
 1. Backup file corrupted (checksum mismatch)
 2. Encryption key missing/incorrect
 3. Test database creation failed
 4. Performance degradation (RTO exceeded)
 
 **Resolution**:
+
 ```bash
 # Check which tests failed
 cat backup-tests/results/test-TIMESTAMP.json | jq '.tests'
@@ -643,15 +693,18 @@ psql "$DATABASE_URL" -c "SELECT pg_size_pretty(pg_database_size('postgres'));"
 ### Primary Contacts
 
 **Infrastructure Team**:
+
 - Email: infrastructure@wastewise.com
 - Slack: #infrastructure
 - On-call: PagerDuty rotation
 
 **Security Team**:
+
 - Email: security@wastewise.com
 - Incident hotline: [TBD]
 
 **Compliance Officer**:
+
 - Email: compliance@wastewise.com
 
 ### Escalation Path
@@ -674,6 +727,7 @@ psql "$DATABASE_URL" -c "SELECT pg_size_pretty(pg_database_size('postgres'));"
 ### Version Control
 
 All documentation and scripts are version controlled in git:
+
 ```bash
 git log -- docs/DATABASE_*.md
 git log -- scripts/*backup*.sh

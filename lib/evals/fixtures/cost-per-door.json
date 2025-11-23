@@ -10,7 +10,7 @@
         "units": 250
       },
       "expectedOutput": {
-        "costPerDoor": 14.00
+        "costPerDoor": 14.0
       }
     },
     {
@@ -21,7 +21,7 @@
         "units": 400
       },
       "expectedOutput": {
-        "costPerDoor": 13.00
+        "costPerDoor": 13.0
       }
     },
     {
@@ -32,7 +32,7 @@
         "units": 600
       },
       "expectedOutput": {
-        "costPerDoor": 12.00
+        "costPerDoor": 12.0
       }
     },
     {
@@ -43,7 +43,7 @@
         "units": 100
       },
       "expectedOutput": {
-        "costPerDoor": 18.00
+        "costPerDoor": 18.0
       }
     },
     {
@@ -54,7 +54,7 @@
         "units": 300
       },
       "expectedOutput": {
-        "costPerDoor": 10.00
+        "costPerDoor": 10.0
       }
     },
     {
@@ -65,7 +65,7 @@
         "units": 200
       },
       "expectedOutput": {
-        "costPerDoor": 25.00
+        "costPerDoor": 25.0
       }
     },
     {
@@ -76,7 +76,7 @@
         "units": 50
       },
       "expectedOutput": {
-        "costPerDoor": 10.00
+        "costPerDoor": 10.0
       }
     },
     {
@@ -87,7 +87,7 @@
         "units": 1000
       },
       "expectedOutput": {
-        "costPerDoor": 15.00
+        "costPerDoor": 15.0
       }
     }
   ]

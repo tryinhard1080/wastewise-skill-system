@@ -36,16 +36,10 @@
   "commands": {
     "excluded": ["git"],
     "auto_approve_in_sandbox": true,
-    "allowed_commands": [
-      "markdownlint",
-      "prettier"
-    ]
+    "allowed_commands": ["markdownlint", "prettier"]
   },
   "agents": {
-    "recommended_for": [
-      "documentation-agent",
-      "technical-writer"
-    ]
+    "recommended_for": ["documentation-agent", "technical-writer"]
   },
   "security_notes": [
     "Read-only access to source code for documentation accuracy",

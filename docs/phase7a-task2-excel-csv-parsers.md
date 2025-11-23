@@ -4,6 +4,7 @@
 **Date**: 2025-11-21
 **Agent**: Backend Development
 **Related Files**:
+
 - `lib/skills/skills/batch-extractor.ts` (implementation)
 - `__tests__/skills/batch-extractor-parsers.test.ts` (tests)
 - `__tests__/fixtures/` (test data)
@@ -18,15 +19,16 @@ Successfully implemented Excel (.xlsx/.xls) and CSV file parsing capabilities fo
 
 ```json
 {
-  "exceljs": "^4.4.0",           // Already installed
-  "papaparse": "^5.5.3",          // CSV parsing
-  "@types/papaparse": "^5.5.0"   // TypeScript types
+  "exceljs": "^4.4.0", // Already installed
+  "papaparse": "^5.5.3", // CSV parsing
+  "@types/papaparse": "^5.5.0" // TypeScript types
 }
 ```
 
 ### 2. Core Features
 
 #### Excel Parser (`processExcelFile`)
+
 - **File Types**: .xlsx (OpenXML), .xls (legacy Excel)
 - **Max File Size**: 10MB (prevents memory exhaustion)
 - **Max Rows**: 100 (controls token usage for LLM)
@@ -35,6 +37,7 @@ Successfully implemented Excel (.xlsx/.xls) and CSV file parsing capabilities fo
 - **Error Handling**: Graceful failures with detailed error messages
 
 **Key Implementation**:
+
 ```typescript
 private async processExcelFile(
   file: any,
@@ -48,6 +51,7 @@ private async processExcelFile(
 ```
 
 #### CSV Parser (`processCSVFile`)
+
 - **File Type**: .csv (text/csv MIME type)
 - **Max File Size**: 10MB
 - **Max Rows**: 100 (controls token usage)
@@ -56,6 +60,7 @@ private async processExcelFile(
 - **Edge Cases**: Handles quoted fields, escaped characters
 
 **Key Implementation**:
+
 ```typescript
 private async processCSVFile(
   file: any,
@@ -69,10 +74,12 @@ private async processCSVFile(
 ```
 
 #### Table Formatter (`formatTableDataForLLM`)
+
 - Converts spreadsheet data to concise text format for Claude
 - Minimizes token usage while preserving structure
 - Format: `Header | Data rows with column separators`
 - Example output:
+
   ```
   Spreadsheet: invoice.xlsx
   Table with 4 data rows and 8 columns
@@ -85,6 +92,7 @@ private async processCSVFile(
   ```
 
 #### Claude Extraction (`extractStructuredDataWithClaude`)
+
 - Uses Claude Sonnet 3.5 to extract structured data from formatted tables
 - Document type detection (invoice vs haul-log) based on filename
 - Prompts Claude to return valid JSON matching WasteWise schemas
@@ -94,24 +102,29 @@ private async processCSVFile(
 ### 3. Security Measures
 
 **File Size Validation**:
+
 ```typescript
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 if (fileBuffer.length > MAX_FILE_SIZE) {
-  throw new Error(`File too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`)
+  throw new Error(
+    `File too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`,
+  );
 }
 ```
 
 **Formula Sanitization** (Excel):
+
 ```typescript
 // Sanitize cell values (remove formulas for security)
 if (cell.type === ExcelJS.ValueType.Formula) {
-  rowValues.push(cell.result?.toString() || '')  // Extract result, not formula
+  rowValues.push(cell.result?.toString() || ""); // Extract result, not formula
 } else {
-  rowValues.push(cell.value?.toString() || '')
+  rowValues.push(cell.value?.toString() || "");
 }
 ```
 
 **Token Usage Control**:
+
 - Limits to first 100 rows (prevents excessive API costs)
 - Logs warning when files are truncated
 - Provides row count metadata for transparency
@@ -119,14 +132,17 @@ if (cell.type === ExcelJS.ValueType.Formula) {
 ### 4. Test Fixtures Created
 
 **Invoice Files**:
+
 - `sample-invoice.csv` (4 line items, realistic waste invoice)
 - `sample-invoice.xlsx` (same data in Excel format)
 
 **Haul Log Files**:
+
 - `sample-haullog.csv` (8 haul entries, compactor data)
 - `sample-haullog.xlsx` (same data in Excel format)
 
 **Generator Script**:
+
 - `scripts/create-test-fixtures.ts` (generates Excel files from data)
 - Run with: `pnpm tsx scripts/create-test-fixtures.ts`
 
@@ -135,6 +151,7 @@ if (cell.type === ExcelJS.ValueType.Formula) {
 **Test Coverage**: 18 tests, all passing ✅
 
 **Test Categories**:
+
 1. **Excel Parser Tests** (7 tests)
    - Parse invoice Excel file
    - Parse haul log Excel file
@@ -160,6 +177,7 @@ if (cell.type === ExcelJS.ValueType.Formula) {
    - Extract formula results, not formulas
 
 **Test Execution**:
+
 ```bash
 pnpm vitest run __tests__/skills/batch-extractor-parsers.test.ts
 
@@ -169,20 +187,25 @@ pnpm vitest run __tests__/skills/batch-extractor-parsers.test.ts
 ## Validation Results
 
 ### TypeScript Compilation
+
 ```bash
 pnpm tsc --noEmit
 ```
+
 **Result**: ✅ No errors in `batch-extractor.ts`
 
 (Existing errors in `regulatory-research.test.ts` and `analysis-worker.ts` are unrelated to this task)
 
 ### Test Suite
+
 ```bash
 pnpm vitest run __tests__/skills/batch-extractor-parsers.test.ts
 ```
+
 **Result**: ✅ 18/18 tests passing
 
 ### File Structure
+
 ```
 __tests__/
 ├── fixtures/
@@ -203,23 +226,25 @@ scripts/
 ## Usage Example
 
 ### Before (throws error):
+
 ```typescript
 // User uploads invoice.xlsx
-const result = await batchExtractor.execute(context)
+const result = await batchExtractor.execute(context);
 // Error: "Excel file processing not yet implemented"
 ```
 
 ### After (works):
+
 ```typescript
 // User uploads invoice.xlsx
-const result = await batchExtractor.execute(context)
+const result = await batchExtractor.execute(context);
 // Result: {
 //   invoices: [{ invoiceNumber: 'INV-2025-001', total: 1392.50, ... }],
 //   aiUsage: { totalRequests: 1, totalTokensInput: 450, ... }
 // }
 
 // User uploads invoice.csv
-const result2 = await batchExtractor.execute(context)
+const result2 = await batchExtractor.execute(context);
 // Same result structure, parses CSV correctly
 ```
 
@@ -244,15 +269,18 @@ const result2 = await batchExtractor.execute(context)
 ## Performance Considerations
 
 **Token Usage**:
+
 - Excel/CSV parsing uses ~400-800 tokens per file (vs 2000-5000 for Vision API)
 - 100-row limit prevents excessive costs
 - Structured prompts minimize response tokens
 
 **Memory**:
+
 - 10MB file size limit prevents memory exhaustion
 - Streaming not implemented (files are small enough)
 
 **Execution Time**:
+
 - Excel parsing: ~200-500ms
 - CSV parsing: ~50-100ms
 - Claude extraction: ~2-4 seconds
@@ -271,6 +299,7 @@ const result2 = await batchExtractor.execute(context)
 The Excel/CSV parser implementation is **production-ready** and fully tested. Users can now upload waste management invoices and haul logs in spreadsheet formats, expanding the flexibility of the WasteWise platform.
 
 **Validation Status**: ✅ All checks passing
+
 - Dependencies installed: ✅
 - Implementation complete: ✅
 - TypeScript compilation: ✅

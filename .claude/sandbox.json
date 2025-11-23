@@ -54,11 +54,7 @@
     }
   },
   "commands": {
-    "excluded": [
-      "git",
-      "supabase",
-      "docker"
-    ],
+    "excluded": ["git", "supabase", "docker"],
     "auto_approve_in_sandbox": true,
     "explanation": {
       "git": "Git operations require flexible filesystem access for branch management",

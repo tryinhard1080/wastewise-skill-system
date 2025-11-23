@@ -4,31 +4,26 @@
  * Advanced analytics and reporting for admins
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MetricsChart } from '@/components/admin/MetricsChart'
-import { StatsCard } from '@/components/admin/StatsCard'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MetricsChart } from "@/components/admin/MetricsChart";
+import { StatsCard } from "@/components/admin/StatsCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useSystemMetrics } from '@/lib/hooks/useAdminData'
-import {
-  TrendingUp,
-  DollarSign,
-  Users,
-  FileText,
-} from 'lucide-react'
+} from "@/components/ui/select";
+import { useSystemMetrics } from "@/lib/hooks/useAdminData";
+import { TrendingUp, DollarSign, Users, FileText } from "lucide-react";
 
 export default function AnalyticsPage() {
-  const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d')
-  const { data: metrics, isLoading } = useSystemMetrics(period)
+  const [period, setPeriod] = useState<"24h" | "7d" | "30d">("7d");
+  const { data: metrics, isLoading } = useSystemMetrics(period);
 
   return (
     <div className="space-y-6">
@@ -36,9 +31,7 @@ export default function AnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-500 mt-2">
-            Advanced insights and reporting
-          </p>
+          <p className="text-gray-500 mt-2">Advanced insights and reporting</p>
         </div>
         <Select value={period} onValueChange={(v) => setPeriod(v as any)}>
           <SelectTrigger className="w-[150px]">
@@ -71,7 +64,8 @@ export default function AnalyticsPage() {
               change={{
                 value: metrics?.revenue?.change || 0,
                 isPositive: (metrics?.revenue?.change || 0) > 0,
-                period: period === '24h' ? 'vs yesterday' : 'vs previous period',
+                period:
+                  period === "24h" ? "vs yesterday" : "vs previous period",
               }}
             />
             <StatsCard
@@ -82,7 +76,8 @@ export default function AnalyticsPage() {
               change={{
                 value: metrics?.users_change || 0,
                 isPositive: (metrics?.users_change || 0) > 0,
-                period: period === '24h' ? 'vs yesterday' : 'vs previous period',
+                period:
+                  period === "24h" ? "vs yesterday" : "vs previous period",
               }}
             />
             <StatsCard
@@ -154,7 +149,9 @@ export default function AnalyticsPage() {
                 <div key={i} className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">{skill.name}</div>
-                    <div className="text-sm text-gray-500">{skill.count} executions</div>
+                    <div className="text-sm text-gray-500">
+                      {skill.count} executions
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="font-medium">${skill.cost.toFixed(2)}</div>
@@ -164,7 +161,8 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               ))}
-              {(!metrics?.usage_by_skill || metrics.usage_by_skill.length === 0) && (
+              {(!metrics?.usage_by_skill ||
+                metrics.usage_by_skill.length === 0) && (
                 <p className="text-sm text-gray-500 text-center py-8">
                   No usage data available
                 </p>
@@ -174,5 +172,5 @@ export default function AnalyticsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

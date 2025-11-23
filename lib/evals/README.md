@@ -49,26 +49,26 @@ Individual eval files for each skill. See `compactor-optimization-eval.ts` for r
 Extract expected values from the Python reference implementation:
 
 ```typescript
-import type { TestCase } from './types'
+import type { TestCase } from "./types";
 
 interface MySkillInput {
   // Define input structure matching Python function
-  propertyUnits: number
-  containerSize: number
+  propertyUnits: number;
+  containerSize: number;
   // ... other inputs
 }
 
 interface MySkillExpectedOutput {
   // Define expected outputs from Python
-  calculatedMetric: number
-  recommendation: boolean
+  calculatedMetric: number;
+  recommendation: boolean;
   // ... other outputs
 }
 
 const TEST_CASES: TestCase<MySkillInput, MySkillExpectedOutput>[] = [
   {
-    id: 'test-01-basic',
-    description: 'Basic calculation with standard inputs',
+    id: "test-01-basic",
+    description: "Basic calculation with standard inputs",
     input: {
       propertyUnits: 200,
       containerSize: 30,
@@ -81,23 +81,23 @@ const TEST_CASES: TestCase<MySkillInput, MySkillExpectedOutput>[] = [
     },
   },
   // ... more test cases
-]
+];
 ```
 
 ### Step 2: Implement Test Runner
 
 ```typescript
-import { MySkill } from '@/lib/skills/skills/my-skill'
-import { compareMetrics, generateEvalSummary } from './eval-utils'
-import type { EvalResult, EvalSummary } from './types'
+import { MySkill } from "@/lib/skills/skills/my-skill";
+import { compareMetrics, generateEvalSummary } from "./eval-utils";
+import type { EvalResult, EvalSummary } from "./types";
 
 export async function runMySkillEval(): Promise<EvalSummary> {
-  const results: EvalResult[] = []
+  const results: EvalResult[] = [];
 
   for (const testCase of TEST_CASES) {
     try {
-      const result = await runSingleTest(testCase)
-      results.push(result)
+      const result = await runSingleTest(testCase);
+      results.push(result);
     } catch (error) {
       results.push({
         testCaseId: testCase.id,
@@ -105,23 +105,23 @@ export async function runMySkillEval(): Promise<EvalSummary> {
         pass: false,
         comparisons: [],
         error: error instanceof Error ? error.message : String(error),
-      })
+      });
     }
   }
 
-  return generateEvalSummary(results)
+  return generateEvalSummary(results);
 }
 
 async function runSingleTest(
-  testCase: TestCase<MySkillInput, MySkillExpectedOutput>
+  testCase: TestCase<MySkillInput, MySkillExpectedOutput>,
 ): Promise<EvalResult> {
-  const skill = new MySkill()
+  const skill = new MySkill();
 
   // Build SkillContext from test input
-  const context = buildSkillContext(testCase.input)
+  const context = buildSkillContext(testCase.input);
 
   // Execute skill
-  const skillResult = await skill.execute(context)
+  const skillResult = await skill.execute(context);
 
   if (!skillResult.success || !skillResult.data) {
     return {
@@ -129,8 +129,8 @@ async function runSingleTest(
       description: testCase.description,
       pass: false,
       comparisons: [],
-      error: skillResult.error?.message || 'Skill execution failed',
-    }
+      error: skillResult.error?.message || "Skill execution failed",
+    };
   }
 
   // Compare outputs
@@ -140,16 +140,16 @@ async function runSingleTest(
       testCase.expected.calculatedMetric,
     ],
     // ... other metrics
-  })
+  });
 
-  const pass = comparisons.every(c => c.pass)
+  const pass = comparisons.every((c) => c.pass);
 
   return {
     testCaseId: testCase.id,
     description: testCase.description,
     pass,
     comparisons,
-  }
+  };
 }
 ```
 
@@ -174,18 +174,23 @@ console.log(formatEvalReport(summary))
 **CRITICAL**: All calculations must match Python reference within **0.01% tolerance** (0.0001 as a decimal).
 
 ```typescript
-import { DEFAULT_TOLERANCE } from './eval-utils'
+import { DEFAULT_TOLERANCE } from "./eval-utils";
 
 // DEFAULT_TOLERANCE = 0.0001 (0.01%)
 
-const comparison = compareValues('myMetric', tsValue, pythonValue, DEFAULT_TOLERANCE)
+const comparison = compareValues(
+  "myMetric",
+  tsValue,
+  pythonValue,
+  DEFAULT_TOLERANCE,
+);
 
 if (!comparison.pass) {
-  console.error(`Calculation exceeds tolerance!`)
-  console.error(`Expected: ${pythonValue}`)
-  console.error(`Actual: ${tsValue}`)
-  console.error(`Difference: ${comparison.difference}`)
-  console.error(`% Diff: ${comparison.percentDiff * 100}%`)
+  console.error(`Calculation exceeds tolerance!`);
+  console.error(`Expected: ${pythonValue}`);
+  console.error(`Actual: ${tsValue}`);
+  console.error(`Difference: ${comparison.difference}`);
+  console.error(`% Diff: ${comparison.percentDiff * 100}%`);
 }
 ```
 
@@ -257,7 +262,7 @@ import {
   COMPACTOR_TARGET_TONS,
   DSQ_MONITOR_INSTALL,
   DSQ_MONITOR_MONTHLY,
-} from '@/lib/constants/formulas'
+} from "@/lib/constants/formulas";
 
 // Verify these match Python constants
 // Python: OPTIMIZATION_THRESHOLD = 6.0

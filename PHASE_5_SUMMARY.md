@@ -14,15 +14,18 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 ## Objectives Completed
 
 ### ✅ Task 1: Database Persistence Layer
+
 **Goal**: Create type-safe repository pattern for saving extracted data to PostgreSQL
 
 **Deliverables**:
+
 - 4 repository classes with dependency injection
 - Batch insert optimization (1,000-row chunks)
 - Graceful error handling with detailed logging
 - Integration into batch-extractor and contract-extractor skills
 
 **Files Created** (1,470 lines):
+
 - `lib/db/invoice-repository.ts` (390 lines)
 - `lib/db/haul-log-repository.ts` (350 lines)
 - `lib/db/contract-repository.ts` (320 lines)
@@ -30,10 +33,12 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 - `lib/db/index.ts` (30 lines)
 
 **Files Modified** (+270 lines):
+
 - `lib/skills/skills/batch-extractor.ts` (+168 lines)
 - `lib/skills/skills/contract-extractor.ts` (+102 lines)
 
 **Key Features**:
+
 - Constructor injection for testability
 - Intelligent data extraction from unstructured line items
 - Automatic calendar reminder generation (90/30/7 day warnings)
@@ -43,15 +48,18 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 ---
 
 ### ✅ Task 2: Excel Report Generation
+
 **Goal**: Create professional Excel workbooks with WasteWise branding and industry-standard formatting
 
 **Deliverables**:
+
 - 5-tab workbook generator with conditional tabs
 - Comprehensive styling library with reusable utilities
 - Professional color scheme (Teal primary, Amber accent)
 - Auto-sizing columns and conditional formatting
 
 **Files Created** (2,485 lines):
+
 - `lib/reports/formatters.ts` (450 lines) - Reusable styling utilities
 - `lib/reports/excel-generator.ts` (195 lines) - Main orchestrator
 - `lib/reports/excel-tabs/executive-summary.ts` (410 lines)
@@ -62,6 +70,7 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 - `lib/reports/index.ts` (20 lines)
 
 **Tab Structure**:
+
 1. **Executive Summary** - Property info, key metrics, benchmarks, top 3 recommendations, savings summary
 2. **Expense Analysis** - Invoice summary table, charges breakdown, category analysis
 3. **Haul Log** (compactor only) - Haul history, utilization analysis, monitor recommendations
@@ -69,6 +78,7 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 5. **Contract Terms** - Service details, pricing, key terms, calendar reminders
 
 **Color Palette**:
+
 - Primary: Teal #0F766E
 - Accent: Amber #F59E0B
 - Success: Green #10B981
@@ -78,9 +88,11 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 ---
 
 ### ✅ Task 3: HTML Dashboard Generation
+
 **Goal**: Create interactive single-file HTML dashboards with embedded visualizations
 
 **Deliverables**:
+
 - Self-contained HTML with embedded CSS (600+ lines) and JavaScript (200+ lines)
 - Chart.js 4.4.0 integration for data visualizations
 - 5 tabbed sections matching Excel report structure
@@ -88,9 +100,11 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 - Print-friendly styling
 
 **Files Created** (1,216 lines):
+
 - `lib/reports/html-generator.ts` (955 lines code + 261 lines embedded CSS/JS)
 
 **Features**:
+
 - **Dashboard Tab**: Property overview, savings summary pie chart, key metrics cards, benchmark comparison
 - **Expense Analysis Tab**: Monthly trend line chart, category breakdown bar chart, detailed invoice table
 - **Haul Log Tab** (compactor only): Utilization scatter plot, tonnage trend, detailed haul history
@@ -98,6 +112,7 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 - **Contract Terms Tab**: Service details, pricing structure, calendar reminders
 
 **Chart Types**:
+
 - Pie chart: Savings breakdown by recommendation
 - Line chart: Monthly expense trends
 - Bar chart: Category spending comparison
@@ -106,26 +121,32 @@ Phase 5 focused on building the **complete data persistence and reporting infras
 ---
 
 ### ✅ Task 4: Report Storage Integration
+
 **Goal**: Upload generated reports to Supabase Storage and generate signed download URLs
 
 **Deliverables**:
+
 - Upload utility for Excel and HTML reports
 - Signed URL generation (365-day expiry)
 - Automatic cleanup (keep 5 most recent reports)
 - Organized storage paths (reports/{projectId}/{filename})
 
 **Files Created** (217 lines):
+
 - `lib/reports/storage.ts` (195 lines)
 
 **Files Modified** (+22 lines):
+
 - `lib/reports/index.ts` - Added storage exports
 
 **Functions**:
+
 - `uploadReport()` - Single file upload with signed URL
 - `uploadReports()` - Batch upload Excel + HTML
 - `deleteOldReports()` - Cleanup old files
 
 **Storage Structure**:
+
 ```
 project-files/
 └── reports/
@@ -139,15 +160,18 @@ project-files/
 ## Design Decisions
 
 ### Repository Pattern for Database Operations
+
 **Decision**: Use repository classes with constructor injection instead of direct Supabase calls in skills
 
 **Rationale**:
+
 - **Testability**: Can mock repositories in unit tests
 - **Reusability**: Shared logic (batch insert, error handling) in one place
 - **Type Safety**: Enforces correct types at repository boundary
 - **Separation of Concerns**: Skills focus on business logic, repositories handle persistence
 
 **Implementation**:
+
 ```typescript
 export class InvoiceRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -158,36 +182,40 @@ export class InvoiceRepository {
 }
 
 // Usage in skill
-const repo = new InvoiceRepository(supabase)
-await repo.batchInsert(invoiceRecords)
+const repo = new InvoiceRepository(supabase);
+await repo.batchInsert(invoiceRecords);
 ```
 
 ---
 
 ### Intelligent Data Categorization
+
 **Decision**: Extract structured charges from unstructured invoice line items using keyword analysis
 
 **Rationale**:
+
 - Invoice data comes from Claude Vision extraction (unstructured line items)
 - Database schema expects categorized charges (disposal, pickup, rental, etc.)
 - Manual categorization would require human review
 - Keyword-based categorization provides 90%+ accuracy
 
 **Implementation**:
+
 ```typescript
 inv.lineItems.forEach((item) => {
-  const desc = item.description.toLowerCase()
+  const desc = item.description.toLowerCase();
 
-  if (desc.includes('disposal') || desc.includes('landfill')) {
-    charges.disposal += item.totalPrice
-  } else if (desc.includes('pickup') || desc.includes('haul')) {
-    charges.pickup_fees += item.totalPrice
+  if (desc.includes("disposal") || desc.includes("landfill")) {
+    charges.disposal += item.totalPrice;
+  } else if (desc.includes("pickup") || desc.includes("haul")) {
+    charges.pickup_fees += item.totalPrice;
   }
   // ... more categories
-})
+});
 ```
 
 **Keywords Used**:
+
 - **Disposal**: "disposal", "landfill", "tipping"
 - **Pickup**: "pickup", "haul", "collection"
 - **Rental**: "rental", "container", "dumpster"
@@ -197,9 +225,11 @@ inv.lineItems.forEach((item) => {
 ---
 
 ### Self-Contained HTML Dashboards
+
 **Decision**: Embed all CSS and JavaScript directly in HTML file instead of separate files
 
 **Rationale**:
+
 - **Portability**: Single .html file can be emailed, downloaded, or stored
 - **No Build Step**: No bundling required for deployment
 - **Offline Capable**: Works without internet (except Chart.js CDN)
@@ -212,23 +242,26 @@ inv.lineItems.forEach((item) => {
 ---
 
 ### Conditional Tab Generation
+
 **Decision**: Only generate Excel/HTML tabs when relevant data is available
 
 **Rationale**:
+
 - **Haul Log**: Only for compactor projects (dumpster projects don't track individual hauls)
 - **Contract Terms**: Only when contract data has been extracted
 - **Optimization**: Only when recommendations exist
 
 **Implementation**:
-```typescript
-const tabsIncluded: string[] = ['Dashboard', 'Expense Analysis']
 
-if (project.equipment_type === 'COMPACTOR' && haulLogs.length > 0) {
-  tabsIncluded.push('Haul Log')
+```typescript
+const tabsIncluded: string[] = ["Dashboard", "Expense Analysis"];
+
+if (project.equipment_type === "COMPACTOR" && haulLogs.length > 0) {
+  tabsIncluded.push("Haul Log");
 }
 
 if (result.contractTerms) {
-  tabsIncluded.push('Contract Terms')
+  tabsIncluded.push("Contract Terms");
 }
 ```
 
@@ -237,14 +270,17 @@ if (result.contractTerms) {
 ---
 
 ### Calendar Reminder Auto-Generation
+
 **Decision**: Automatically generate contract expiration reminders (90/30/7 days) instead of manual entry
 
 **Rationale**:
+
 - **Compliance**: Properties often miss contract renewal deadlines
 - **Automation**: Reduces manual work for property managers
 - **Standardization**: Consistent reminder schedule across all properties
 
 **Implementation**:
+
 ```typescript
 generateCalendarReminders(contract: ContractRecord): CalendarReminder[] {
   const endDate = new Date(contract.contract_end_date)
@@ -270,7 +306,9 @@ generateCalendarReminders(contract: ContractRecord): CalendarReminder[] {
 ## Integration Points
 
 ### Skill Integration
+
 **batch-extractor skill** (`lib/skills/skills/batch-extractor.ts`):
+
 - Added `saveToDatabase()` private method
 - Creates InvoiceRepository and HaulLogRepository instances
 - Extracts charges from line items with keyword categorization
@@ -278,6 +316,7 @@ generateCalendarReminders(contract: ContractRecord): CalendarReminder[] {
 - Graceful error handling (logs but doesn't throw)
 
 **contract-extractor skill** (`lib/skills/skills/contract-extractor.ts`):
+
 - Added `saveToDatabase()` private method
 - Creates ContractRepository instance
 - Categorizes clauses by type (Term & Renewal, Termination, Pricing, etc.)
@@ -287,6 +326,7 @@ generateCalendarReminders(contract: ContractRecord): CalendarReminder[] {
 ---
 
 ### Report Generation Workflow
+
 ```
 Analytics Skill
     ↓
@@ -304,7 +344,9 @@ Returns signed URLs (365-day expiry)
 ---
 
 ### API Integration (Future)
+
 Phase 5 creates the foundation for API routes:
+
 - `POST /api/projects/[id]/analyze` - Trigger analysis, save results to DB
 - `GET /api/projects/[id]/reports` - List available reports
 - `POST /api/projects/[id]/reports/generate` - Generate new reports
@@ -315,6 +357,7 @@ Phase 5 creates the foundation for API routes:
 ## Code Quality
 
 ### TypeScript Errors Fixed
+
 **Total Errors Fixed**: 8 categories
 
 1. **Import Path Errors** (4 files): Changed `@/lib/types/supabase` → `@/types/database.types`
@@ -331,11 +374,13 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Test Coverage
+
 **Unit Tests**: Deferred to Task 6
 **Integration Tests**: Deferred to Task 6
 **Manual Testing**: All code compiles successfully
 
 **Recommended Test Cases** (for Task 6):
+
 - Repository batch insert with chunking
 - Charge extraction from various line item formats
 - Calendar reminder generation edge cases
@@ -346,6 +391,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Performance Optimizations
+
 1. **Batch Insert Chunking**: 1,000-row max per query (prevents timeouts)
 2. **Auto-sized Columns**: Iterates cells once, caches max length
 3. **Conditional Tab Generation**: Skips unused tabs (reduces workbook size)
@@ -357,31 +403,33 @@ Phase 5 creates the foundation for API routes:
 ## File Statistics
 
 ### New Files Created: 14
-| File | Lines | Purpose |
-|------|-------|---------|
-| `lib/db/invoice-repository.ts` | 390 | Invoice data persistence |
-| `lib/db/haul-log-repository.ts` | 350 | Haul log persistence |
-| `lib/db/contract-repository.ts` | 320 | Contract terms persistence |
-| `lib/db/optimization-repository.ts` | 380 | Optimization recommendations persistence |
-| `lib/db/index.ts` | 30 | Repository exports |
-| `lib/reports/formatters.ts` | 450 | Excel styling utilities |
-| `lib/reports/excel-generator.ts` | 195 | Excel orchestrator |
-| `lib/reports/excel-tabs/executive-summary.ts` | 410 | Executive summary tab |
-| `lib/reports/excel-tabs/expense-analysis.ts` | 380 | Expense analysis tab |
-| `lib/reports/excel-tabs/haul-log.ts` | 380 | Haul log tab |
-| `lib/reports/excel-tabs/optimization.ts` | 320 | Optimization tab |
-| `lib/reports/excel-tabs/contract-terms.ts` | 330 | Contract terms tab |
-| `lib/reports/html-generator.ts` | 1216 | HTML dashboard generator |
-| `lib/reports/storage.ts` | 195 | Supabase Storage utility |
-| **TOTAL** | **5,346** | |
+
+| File                                          | Lines     | Purpose                                  |
+| --------------------------------------------- | --------- | ---------------------------------------- |
+| `lib/db/invoice-repository.ts`                | 390       | Invoice data persistence                 |
+| `lib/db/haul-log-repository.ts`               | 350       | Haul log persistence                     |
+| `lib/db/contract-repository.ts`               | 320       | Contract terms persistence               |
+| `lib/db/optimization-repository.ts`           | 380       | Optimization recommendations persistence |
+| `lib/db/index.ts`                             | 30        | Repository exports                       |
+| `lib/reports/formatters.ts`                   | 450       | Excel styling utilities                  |
+| `lib/reports/excel-generator.ts`              | 195       | Excel orchestrator                       |
+| `lib/reports/excel-tabs/executive-summary.ts` | 410       | Executive summary tab                    |
+| `lib/reports/excel-tabs/expense-analysis.ts`  | 380       | Expense analysis tab                     |
+| `lib/reports/excel-tabs/haul-log.ts`          | 380       | Haul log tab                             |
+| `lib/reports/excel-tabs/optimization.ts`      | 320       | Optimization tab                         |
+| `lib/reports/excel-tabs/contract-terms.ts`    | 330       | Contract terms tab                       |
+| `lib/reports/html-generator.ts`               | 1216      | HTML dashboard generator                 |
+| `lib/reports/storage.ts`                      | 195       | Supabase Storage utility                 |
+| **TOTAL**                                     | **5,346** |                                          |
 
 ### Files Modified: 3
-| File | Lines Added | Purpose |
-|------|-------------|---------|
-| `lib/skills/skills/batch-extractor.ts` | +168 | Database persistence integration |
-| `lib/skills/skills/contract-extractor.ts` | +102 | Database persistence integration |
-| `lib/reports/index.ts` | +22 | Storage exports |
-| **TOTAL** | **+292** | |
+
+| File                                      | Lines Added | Purpose                          |
+| ----------------------------------------- | ----------- | -------------------------------- |
+| `lib/skills/skills/batch-extractor.ts`    | +168        | Database persistence integration |
+| `lib/skills/skills/contract-extractor.ts` | +102        | Database persistence integration |
+| `lib/reports/index.ts`                    | +22         | Storage exports                  |
+| **TOTAL**                                 | **+292**    |                                  |
 
 ### Grand Total: 5,638 lines of production code
 
@@ -390,6 +438,7 @@ Phase 5 creates the foundation for API routes:
 ## Commits Made
 
 ### Commit 1: Database Persistence Layer
+
 **SHA**: `476cf63`
 **Files**: 5 new + 2 modified (1,740 lines)
 **Message**: "feat(db): add repository layer for invoice, haul log, contract, and optimization data with batch insert optimization and skill integration"
@@ -397,6 +446,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Commit 2: Excel Report Generation
+
 **SHA**: `476cf63`
 **Files**: 8 new (2,485 lines)
 **Message**: "feat(reports): add Excel report generation with 5 professional tabs, comprehensive styling, and WasteWise branding"
@@ -404,6 +454,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Commit 3: HTML Dashboard Generation
+
 **SHA**: `101394b`
 **Files**: 1 new (1,216 lines)
 **Message**: "feat(reports): add interactive HTML dashboard with Chart.js visualizations and responsive design"
@@ -411,6 +462,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Commit 4: Report Storage Integration
+
 **SHA**: `ca81b15`
 **Files**: 1 new + 1 modified (217 lines)
 **Message**: "feat(reports): add Supabase Storage integration for uploading Excel and HTML reports with signed URLs"
@@ -420,12 +472,14 @@ Phase 5 creates the foundation for API routes:
 ## Deferred Tasks
 
 ### Task 5: Regulatory Research Skill
+
 **Reason**: Requires external API integration (Exa search, web scraping)
 **Complexity**: Medium-High
 **Dependencies**: API keys, rate limiting, web scraping infrastructure
 **Recommendation**: Implement in dedicated Phase 6 task
 
 **Scope**:
+
 - Exa AI search integration for ordinance discovery
 - Web scraping for municipal websites
 - PDF extraction for ordinance documents
@@ -435,12 +489,14 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Task 6: Testing & Quality Assurance
+
 **Reason**: Can add incrementally without blocking development
 **Complexity**: Medium
 **Dependencies**: Test data fixtures, mock Supabase client
 **Recommendation**: Add tests as features stabilize
 
 **Scope**:
+
 - Unit tests for repositories (batch insert, error handling)
 - Unit tests for Excel formatters (styling, calculations)
 - Unit tests for HTML generator (escaping, chart data)
@@ -452,6 +508,7 @@ Phase 5 creates the foundation for API routes:
 ## Next Steps (Phase 6)
 
 ### Immediate Priorities
+
 1. **Complete Analytics Skill Integration**
    - Integrate Excel and HTML generation into wastewise-analytics skill
    - Add report upload to analysis workflow
@@ -470,6 +527,7 @@ Phase 5 creates the foundation for API routes:
    - Show processing progress during analysis
 
 ### Medium-Term Goals
+
 4. **Testing Suite**
    - Add unit tests for repositories
    - Add integration tests for skills
@@ -490,6 +548,7 @@ Phase 5 creates the foundation for API routes:
 ## Lessons Learned
 
 ### Type Safety Wins
+
 **Lesson**: Early type errors caught schema mismatches before runtime
 
 **Example**: `property_address` field didn't exist in ProjectRow schema - caught at compile time, not in production
@@ -499,6 +558,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Repository Pattern Payoff
+
 **Lesson**: Separation of concerns makes testing and debugging easier
 
 **Example**: When invoice mapping broke, only had to fix InvoiceRepository, not every skill using it
@@ -508,6 +568,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Keyword Categorization Limitations
+
 **Lesson**: 90% accuracy is good enough for initial release, but edge cases exist
 
 **Example**: Line item "MSW Container Rental 8yd" could be rental OR pickup fee depending on context
@@ -517,6 +578,7 @@ Phase 5 creates the foundation for API routes:
 ---
 
 ### Self-Contained HTML Advantages
+
 **Lesson**: Portability > file size for business reports
 
 **Example**: Property managers prefer single .html file they can email to regional directors
@@ -535,12 +597,14 @@ Phase 5 successfully built the complete data persistence and reporting infrastru
 ✅ **Cloud storage integration** with signed URLs
 
 **Quality Metrics**:
+
 - Zero TypeScript errors in new code
 - Comprehensive error handling throughout
 - Consistent code style and documentation
 - Production-ready architecture
 
 **Foundation for Phase 6**:
+
 - Complete analytics skill integration
 - API route implementation
 - Frontend results page

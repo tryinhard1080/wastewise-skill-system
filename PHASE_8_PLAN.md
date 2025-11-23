@@ -9,6 +9,7 @@
 ## 🎯 Objective
 
 Complete the end-to-end user workflow by implementing the missing frontend pages that allow users to:
+
 1. Monitor analysis job progress in real-time
 2. View completed analysis results
 3. Download generated reports (Excel + HTML)
@@ -17,12 +18,12 @@ Complete the end-to-end user workflow by implementing the missing frontend pages
 
 ## 📋 Tasks Overview
 
-| Task | File | Priority | Estimate |
-|------|------|----------|----------|
-| 1. Processing Page | `app/projects/[id]/processing/page.tsx` | P0 - Critical | 45 min |
-| 2. Results Page | `app/projects/[id]/results/page.tsx` | P0 - Critical | 30 min |
-| 3. Fix Navigation | `components/project/start-analysis-button.tsx` | P0 - Critical | 5 min |
-| 4. E2E Test Validation | Run `pnpm test:ui` | P0 - Critical | 10 min |
+| Task                   | File                                           | Priority      | Estimate |
+| ---------------------- | ---------------------------------------------- | ------------- | -------- |
+| 1. Processing Page     | `app/projects/[id]/processing/page.tsx`        | P0 - Critical | 45 min   |
+| 2. Results Page        | `app/projects/[id]/results/page.tsx`           | P0 - Critical | 30 min   |
+| 3. Fix Navigation      | `components/project/start-analysis-button.tsx` | P0 - Critical | 5 min    |
+| 4. E2E Test Validation | Run `pnpm test:ui`                             | P0 - Critical | 10 min   |
 
 **Total Estimated Time**: 90 minutes
 
@@ -33,9 +34,11 @@ Complete the end-to-end user workflow by implementing the missing frontend pages
 ### File: `app/projects/[id]/processing/page.tsx`
 
 ### Purpose
+
 Real-time monitoring page that polls job status and displays progress to the user.
 
 ### User Experience Flow
+
 1. User clicks "Start Analysis" button
 2. → Navigates to `/projects/{id}/processing`
 3. → See loading spinner and progress bar
@@ -46,33 +49,38 @@ Real-time monitoring page that polls job status and displays progress to the use
 ### Technical Requirements
 
 #### Polling Strategy
+
 - Poll `/api/jobs/[id]` every 2 seconds
 - Stop polling when status is 'completed' or 'failed'
 - Use `setInterval` with cleanup in `useEffect`
 
 #### State Management
+
 ```typescript
-const [jobStatus, setJobStatus] = useState<string>('pending')
-const [progress, setProgress] = useState<number>(0)
-const [currentStep, setCurrentStep] = useState<string>('')
-const [error, setError] = useState<string | null>(null)
+const [jobStatus, setJobStatus] = useState<string>("pending");
+const [progress, setProgress] = useState<number>(0);
+const [currentStep, setCurrentStep] = useState<string>("");
+const [error, setError] = useState<string | null>(null);
 ```
 
 #### Job Status Handling
+
 - **pending**: Show "Queued for processing..."
 - **processing**: Show progress bar with percentage
 - **completed**: Show success message → redirect to results
 - **failed**: Show error message with retry option
 
 #### Critical Data Attributes (for E2E testing)
+
 ```html
-<div data-job-status={jobStatus}>
-  <Progress value={progress} data-progress={progress} />
-  <p data-current-step={currentStep}>{currentStep}</p>
+<div data-job-status="{jobStatus}">
+  <progress value="{progress}" data-progress="{progress}" />
+  <p data-current-step="{currentStep}">{currentStep}</p>
 </div>
 ```
 
 ### API Response Format
+
 ```typescript
 // GET /api/jobs/[id] returns:
 {
@@ -95,11 +103,13 @@ const [error, setError] = useState<string | null>(null)
 ```
 
 ### UI Components Needed
+
 - `Progress` (shadcn/ui) - Already installed
 - `Card`, `CardHeader`, `CardTitle`, `CardContent` - Already installed
 - Icons: `Loader2`, `CheckCircle2`, `XCircle` from `lucide-react`
 
 ### Edge Cases to Handle
+
 1. **No job found**: User navigates directly to processing page without creating job
    - Solution: Fetch latest job for this project, or redirect to project page
 2. **Job already completed**: User refreshes processing page after job completes
@@ -116,9 +126,11 @@ const [error, setError] = useState<string | null>(null)
 ### File: `app/projects/[id]/results/page.tsx`
 
 ### Purpose
+
 Display completed analysis results, recommendations, and download links for generated reports.
 
 ### User Experience Flow
+
 1. Auto-redirected from processing page when job completes
 2. → See analysis summary (savings, recommendations)
 3. → Download Excel report (comprehensive workbook)
@@ -128,6 +140,7 @@ Display completed analysis results, recommendations, and download links for gene
 ### Technical Requirements
 
 #### Data Fetching
+
 - Server-side rendering (async Server Component)
 - Query `analysis_jobs` table for latest completed job
 - Extract `result_data` JSON field containing:
@@ -137,23 +150,24 @@ Display completed analysis results, recommendations, and download links for gene
   - `htmlUrl`: string (signed URL)
 
 #### Result Data Structure
+
 ```typescript
 // result_data from analysis_jobs table:
 {
-  totalSavings: number
+  totalSavings: number;
   recommendations: Array<{
-    title: string
-    description: string
-    savings?: number
-    priority: 'high' | 'medium' | 'low'
-  }>
-  excelUrl: string  // Supabase Storage signed URL
-  htmlUrl: string   // Supabase Storage signed URL
+    title: string;
+    description: string;
+    savings?: number;
+    priority: "high" | "medium" | "low";
+  }>;
+  excelUrl: string; // Supabase Storage signed URL
+  htmlUrl: string; // Supabase Storage signed URL
   analysisMetadata: {
-    propertyName: string
-    units: number
-    equipmentType: string
-    analysisDate: string
+    propertyName: string;
+    units: number;
+    equipmentType: string;
+    analysisDate: string;
   }
 }
 ```
@@ -161,6 +175,7 @@ Display completed analysis results, recommendations, and download links for gene
 #### UI Sections
 
 **1. Download Reports Section**
+
 ```typescript
 <Card>
   <CardHeader>
@@ -184,6 +199,7 @@ Display completed analysis results, recommendations, and download links for gene
 ```
 
 **2. Executive Summary Section**
+
 ```typescript
 <Card>
   <CardHeader>
@@ -209,6 +225,7 @@ Display completed analysis results, recommendations, and download links for gene
 ```
 
 **3. Recommendations List**
+
 ```typescript
 <Card>
   <CardHeader>
@@ -234,6 +251,7 @@ Display completed analysis results, recommendations, and download links for gene
 ```
 
 #### Edge Cases to Handle
+
 1. **No completed job found**: User navigates directly to results page
    - Solution: Show message "No analysis available", link to project page
 2. **Missing result_data**: Job completed but result is null (error during processing)
@@ -252,32 +270,36 @@ Display completed analysis results, recommendations, and download links for gene
 ### Line 71: Change Navigation Logic
 
 **Current Code**:
+
 ```typescript
 // Close dialog and refresh
-setOpen(false)
-router.refresh()
+setOpen(false);
+router.refresh();
 
 // Optional: Navigate to job monitoring page
 // router.push(`/jobs/${data.jobId}`)
 ```
 
 **Change To**:
+
 ```typescript
 // Close dialog
-setOpen(false)
+setOpen(false);
 
 // Show success message
-toast.success('Analysis started!')
+toast.success("Analysis started!");
 
 // Navigate to processing page
-router.push(`/projects/${projectId}/processing`)
+router.push(`/projects/${projectId}/processing`);
 ```
 
 ### Why This Change Matters
+
 - **Current behavior**: Dialog closes, page refreshes, user stays on project page → no feedback
 - **New behavior**: Dialog closes, toast notification appears, user navigates to processing page → sees real-time progress
 
 ### Side Effects to Test
+
 1. Toast notification appears before navigation
 2. Dialog closes cleanly (no animation glitches)
 3. Processing page loads with job data
@@ -287,11 +309,13 @@ router.push(`/projects/${projectId}/processing`)
 ## 📝 Task 4: E2E Test Validation
 
 ### Command
+
 ```bash
 pnpm test:ui
 ```
 
 ### Expected Output
+
 ```
 ✅ Test 1: Landing Page Branding (4260ms)
 ✅ Test 2: Login Flow (8642ms)
@@ -304,7 +328,9 @@ pnpm test:ui
 ```
 
 ### Test 5 Verification Steps
+
 The E2E test will:
+
 1. Click "Start Analysis" button
 2. Wait for navigation to `/projects/{id}/processing`
 3. Poll for progress updates by checking DOM elements:
@@ -317,18 +343,22 @@ The E2E test will:
 ### What to Do If Test Fails
 
 **Failure: Navigation timeout**
+
 - Check: Did `start-analysis-button.tsx` navigation line get updated?
 - Check: Does processing page exist at correct path?
 
 **Failure: Progress elements not found**
+
 - Check: Are `data-job-status`, `data-progress`, `data-current-step` attributes present?
 - Check: Is polling interval running (console log inside useEffect)?
 
 **Failure: Results page not found**
+
 - Check: Does results page exist at correct path?
 - Check: Is redirect logic in processing page working?
 
 **Failure: Download links missing**
+
 - Check: Does `result_data` in database contain `excelUrl` and `htmlUrl`?
 - Check: Are signed URLs valid (not expired)?
 
@@ -337,6 +367,7 @@ The E2E test will:
 ## 🎨 UI/UX Considerations
 
 ### Processing Page Design
+
 - **Visual feedback**: Large, prominent progress bar
 - **Informative**: Current step description updates in real-time
 - **Professional**: No janky animations, smooth transitions
@@ -344,6 +375,7 @@ The E2E test will:
 - **Error handling**: Clear error messages if something goes wrong
 
 ### Results Page Design
+
 - **Action-oriented**: Download buttons above the fold
 - **Scannable**: Use cards to separate sections
 - **Highlight savings**: Use large, bold text for potential savings
@@ -351,6 +383,7 @@ The E2E test will:
 - **Navigable**: Clear "Back to Project" button
 
 ### Responsive Design
+
 - Both pages should work on mobile (375px) to desktop (1440px)
 - Progress bar should be full-width on mobile
 - Download buttons should stack vertically on mobile
@@ -363,6 +396,7 @@ The E2E test will:
 After implementing all 3 tasks, manually test:
 
 ### Happy Path
+
 - [ ] Click "Start Analysis" on project page
 - [ ] Navigate to processing page
 - [ ] See progress bar animating
@@ -374,6 +408,7 @@ After implementing all 3 tasks, manually test:
 - [ ] Click "Back to Project" → returns to project page
 
 ### Error Handling
+
 - [ ] Navigate directly to `/projects/{id}/processing` (no job)
 - [ ] Navigate directly to `/projects/{id}/results` (no completed job)
 - [ ] Kill worker during processing → see timeout warning
@@ -381,6 +416,7 @@ After implementing all 3 tasks, manually test:
 - [ ] Refresh results page → still shows results
 
 ### Edge Cases
+
 - [ ] Start multiple analyses back-to-back
 - [ ] Navigate away from processing page mid-job
 - [ ] Return to results page after 1 day (signed URLs should still work)
@@ -405,12 +441,14 @@ Phase 8 is complete when:
 ## 🚀 Implementation Order
 
 **Recommended sequence**:
+
 1. Start with Processing Page (most critical, unblocks testing)
 2. Fix Navigation (quick win, enables flow)
 3. Create Results Page (completes workflow)
 4. Run E2E tests and iterate
 
 **Why this order?**
+
 - Processing page is the bottleneck - without it, nothing works
 - Navigation fix is quick and lets you manually test the flow
 - Results page can be refined after basic flow works
@@ -421,10 +459,12 @@ Phase 8 is complete when:
 ## 📚 Reference Files
 
 ### API Contracts
+
 - `app/api/jobs/[id]/route.ts` - Job status API
 - `app/api/analyze/route.ts` - Create job API
 
 ### Database Schema
+
 ```sql
 -- analysis_jobs table
 create table analysis_jobs (
@@ -443,6 +483,7 @@ create table analysis_jobs (
 ```
 
 ### Storage Structure
+
 ```
 Supabase Storage
 └── project-files (bucket)

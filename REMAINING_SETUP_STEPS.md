@@ -9,11 +9,14 @@
 ## Step 1: Update API Keys in .env.local (5 minutes) 🔴 **REQUIRED**
 
 ### Current Issue
+
 `.env.local` still has placeholder values:
+
 - Line 18: `ANTHROPIC_API_KEY=sk-ant-your-actual-key-here` (27 chars ❌)
 - Line 29: `EXA_API_KEY=your-exa-key-here` (17 chars ❌)
 
 ### Action Required
+
 Open `.env.local` in your editor and replace:
 
 ```bash
@@ -35,12 +38,14 @@ EXA_API_KEY=[paste-your-full-key-here]
 ### How to Get Keys
 
 **Anthropic** (for invoice extraction, regulatory research):
+
 1. Go to: https://console.anthropic.com/settings/keys
 2. Click "Create Key"
 3. Copy the key (starts with `sk-ant-api03-`)
 4. Paste into `.env.local` line 18
 
 **Exa** (for semantic search of ordinances):
+
 1. Go to: https://dashboard.exa.ai/api-keys
 2. Sign up if needed (free tier available)
 3. Create new API key
@@ -70,12 +75,15 @@ pnpm test:integration
 ## Step 2: Enable Branch Protection on GitHub (5 minutes) 🟡 **RECOMMENDED**
 
 ### Why This Matters
+
 Without branch protection:
+
 - ❌ Anyone can push directly to master (bypassing tests)
 - ❌ PRs can be merged without passing checks
 - ❌ Quality gates are optional, not enforced
 
 With branch protection:
+
 - ✅ All changes MUST go through PR workflow
 - ✅ Tests MUST pass before merge
 - ✅ Formula validation is enforced
@@ -116,7 +124,9 @@ With branch protection:
 ## Step 3: Add GitHub Secrets for CI/CD (5 minutes) 🟡 **RECOMMENDED**
 
 ### Why This Matters
+
 Integration tests need API access in GitHub Actions:
+
 - ❌ Without secrets: Integration tests are skipped
 - ✅ With secrets: Full test suite runs on every PR
 
@@ -152,7 +162,9 @@ Integration tests need API access in GitHub Actions:
 ## Step 4: Create Test PR to Verify Workflow (5 minutes) 🟢 **OPTIONAL**
 
 ### Why This Matters
+
 Validates that GitHub Actions workflow runs correctly:
+
 - ✅ All 9 jobs execute
 - ✅ Auto-commenting works
 - ✅ Status checks appear on PR
@@ -193,6 +205,7 @@ git push origin --delete test/verify-github-actions
 ```
 
 **Expected Results**:
+
 - ✅ All jobs show green checkmarks
 - ✅ Auto-comment appears: "All quality checks passed!"
 - ✅ Status checks appear at bottom of PR
@@ -224,6 +237,7 @@ node -e "require('dotenv').config({ path: '.env.local' }); console.log('API Keys
 ```
 
 **Current Output**:
+
 ```
 API Keys Status:
 Anthropic: 27 chars ❌ (placeholder)
@@ -238,17 +252,18 @@ Exa: 40-50 chars
 
 ## Summary
 
-| Step | Priority | Time | Status |
-|------|----------|------|--------|
-| 1. Update .env.local with real API keys | 🔴 Required | 5 min | ⏸️ **Pending** |
-| 2. Enable branch protection | 🟡 Recommended | 5 min | ⏸️ **Pending** |
-| 3. Add GitHub Secrets | 🟡 Recommended | 5 min | ⏸️ **Pending** |
-| 4. Test PR workflow | 🟢 Optional | 5 min | ⏸️ **Pending** |
-| 5. Verify unit tests | 🟢 Good Practice | 2 min | ✅ **Complete** |
+| Step                                    | Priority         | Time  | Status          |
+| --------------------------------------- | ---------------- | ----- | --------------- |
+| 1. Update .env.local with real API keys | 🔴 Required      | 5 min | ⏸️ **Pending**  |
+| 2. Enable branch protection             | 🟡 Recommended   | 5 min | ⏸️ **Pending**  |
+| 3. Add GitHub Secrets                   | 🟡 Recommended   | 5 min | ⏸️ **Pending**  |
+| 4. Test PR workflow                     | 🟢 Optional      | 5 min | ⏸️ **Pending**  |
+| 5. Verify unit tests                    | 🟢 Good Practice | 2 min | ✅ **Complete** |
 
 **Total Time**: 15-20 minutes
 
 **Blockers**:
+
 1. Real API keys needed in `.env.local` (Step 1)
 2. Branch protection and GitHub Secrets are manual GitHub settings (Steps 2-3)
 
@@ -259,6 +274,7 @@ Exa: 40-50 chars
 Once all steps are complete:
 
 ### For Every PR Created:
+
 1. GitHub Actions automatically runs 9 jobs (2-5 minutes)
 2. TypeScript, lint, tests, formula validation, security scan, build
 3. Auto-comments on failures with fix instructions
@@ -266,10 +282,12 @@ Once all steps are complete:
 5. Merge button enabled only if checks pass (with branch protection)
 
 ### For Every Commit to Master:
+
 1. Same checks run to verify master stays healthy
 2. Deployment pipeline can be added later (Phase 3)
 
 ### For Local Development:
+
 1. Run `pnpm test:unit` before committing (fast, 2-5 seconds)
 2. Run `pnpm test:integration` before PR (slow, 60-120 seconds, needs API keys)
 3. Use `pnpm test:watch` during development (auto-reruns on file changes)

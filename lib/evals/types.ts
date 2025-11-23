@@ -9,19 +9,19 @@
  */
 export interface EvalComparison {
   /** Name of the metric being compared */
-  metric: string
+  metric: string;
   /** TypeScript implementation value */
-  tsValue: number
+  tsValue: number;
   /** Python reference value */
-  pythonValue: number
+  pythonValue: number;
   /** Absolute difference (tsValue - pythonValue) */
-  difference: number
+  difference: number;
   /** Percentage difference relative to Python value */
-  percentDiff: number
+  percentDiff: number;
   /** Whether difference is within tolerance */
-  pass: boolean
+  pass: boolean;
   /** Tolerance threshold used */
-  tolerance: number
+  tolerance: number;
 }
 
 /**
@@ -29,15 +29,15 @@ export interface EvalComparison {
  */
 export interface EvalResult {
   /** Test case identifier */
-  testCaseId: string
+  testCaseId: string;
   /** Human-readable description */
-  description: string
+  description: string;
   /** Whether all comparisons passed */
-  pass: boolean
+  pass: boolean;
   /** Individual metric comparisons */
-  comparisons: EvalComparison[]
+  comparisons: EvalComparison[];
   /** Any errors encountered during execution */
-  error?: string
+  error?: string;
 }
 
 /**
@@ -45,17 +45,17 @@ export interface EvalResult {
  */
 export interface EvalSummary {
   /** Total number of test cases */
-  totalTests: number
+  totalTests: number;
   /** Number of passing tests */
-  passing: number
+  passing: number;
   /** Number of failing tests */
-  failing: number
+  failing: number;
   /** Overall pass rate (0-100) */
-  passRate: number
+  passRate: number;
   /** Individual test results */
-  results: EvalResult[]
+  results: EvalResult[];
   /** Timestamp of eval execution */
-  executedAt: Date
+  executedAt: Date;
 }
 
 /**
@@ -63,11 +63,11 @@ export interface EvalSummary {
  */
 export interface TestCase<TInput, TExpected> {
   /** Unique identifier */
-  id: string
+  id: string;
   /** Human-readable description */
-  description: string
+  description: string;
   /** Input data for the test */
-  input: TInput
+  input: TInput;
   /** Expected output values from Python reference */
-  expected: TExpected
+  expected: TExpected;
 }

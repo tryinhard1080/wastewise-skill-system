@@ -10,6 +10,7 @@ description: WasteWise Complete Analysis with automated regulatory compliance re
 Enhanced version of WasteWise Complete Analysis with:
 
 ### Core Validation Framework
+
 - ✅ Contract tabs are generated when contracts are provided
 - ✅ Contract clauses are properly extracted and categorized
 - ✅ Optimization recommendations meet strict criteria
@@ -19,6 +20,7 @@ Enhanced version of WasteWise Complete Analysis with:
 - ✅ Cross-sheet data consistency
 
 ### NEW: Regulatory Compliance Research
+
 - ✅ Automated research of local waste/recycling/organics ordinances
 - ✅ Extraction of mandatory requirements and thresholds
 - ✅ Documentation of penalties and enforcement
@@ -33,9 +35,10 @@ Enhanced version of WasteWise Complete Analysis with:
 Before generating the final workbook, this skill runs a **mandatory validation suite**:
 
 ### 1. Contract Validation
+
 ```
 ☐ If contract file detected → CONTRACT_TERMS sheet MUST be created
-☐ Extract 7 clause types: Term & Renewal, Rate Increases, Termination, Liability, 
+☐ Extract 7 clause types: Term & Renewal, Rate Increases, Termination, Liability,
    Service Level, Force Majeure, Indemnification
 ☐ Calendar reminders calculated for critical dates
 ☐ Verbatim clause text extracted (not paraphrased)
@@ -43,6 +46,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ```
 
 ### 2. Optimization Validation
+
 ```
 ☐ Compactor optimization: Only if avg < 6 tons/haul AND 14-day max interval
 ☐ Contamination reduction: Only if charges > 3-5% of spend
@@ -53,6 +57,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ```
 
 ### 3. Formula Validation
+
 ```
 ☐ Yards per door: Correct formula for equipment type
    - Compactors: (Total Tons × 14.49) / Units
@@ -63,6 +68,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ```
 
 ### 4. Sheet Structure Validation
+
 ```
 ☐ SUMMARY_FULL: 2026 savings one-liner at top
 ☐ EXPENSE_ANALYSIS: Month-by-month COLUMN format
@@ -75,6 +81,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ```
 
 ### 5. Data Completeness Validation
+
 ```
 ☐ Property name extracted
 ☐ Unit count specified
@@ -87,6 +94,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ```
 
 ### 6. Cross-Validation
+
 ```
 ☐ SUMMARY totals match EXPENSE_ANALYSIS
 ☐ HAUL_LOG tonnage matches OPTIMIZATION calculations
@@ -96,6 +104,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ```
 
 ### 7. NEW: Regulatory Compliance Validation
+
 ```
 ☐ Location data successfully extracted from property documents
 ☐ Minimum 3 official government sources (.gov) consulted
@@ -116,6 +125,7 @@ Before generating the final workbook, this skill runs a **mandatory validation s
 ### Phase 1: Extract Location Data
 
 From uploaded documentation, identify:
+
 - City name
 - County (if available)
 - State
@@ -126,6 +136,7 @@ From uploaded documentation, identify:
 ### Phase 2: Conduct Regulatory Research
 
 **Search Pattern Sequence:**
+
 1. `"[City Name] [State]" waste recycling ordinance`
 2. `"[City Name]" universal recycling ordinance`
 3. `"[City Name]" mandatory composting multifamily`
@@ -134,6 +145,7 @@ From uploaded documentation, identify:
 6. `"[State]" recycling law commercial properties`
 
 **Priority Sources:**
+
 - Municipal solid waste/sanitation department websites (.gov)
 - City/county ordinance databases (Municode, American Legal)
 - State environmental agency waste division pages
@@ -144,6 +156,7 @@ From uploaded documentation, identify:
 For each waste stream (Trash, Recycling, Composting/Organics), document:
 
 #### TRASH/WASTE COLLECTION
+
 - Municipal service availability for property size
 - Private licensed hauler requirement (mandatory/optional)
 - Minimum service frequency requirements
@@ -152,6 +165,7 @@ For each waste stream (Trash, Recycling, Composting/Organics), document:
 - Licensed hauler directory URL
 
 #### RECYCLING REQUIREMENTS
+
 - Mandatory vs voluntary status
 - Property size threshold for mandate
 - Minimum capacity requirement (% of waste, gallons per unit, or total volume)
@@ -163,6 +177,7 @@ For each waste stream (Trash, Recycling, Composting/Organics), document:
 - Co-location rules
 
 #### COMPOSTING/ORGANICS REQUIREMENTS
+
 - Mandatory vs voluntary status
 - Effective date (especially 2023-2025 mandates)
 - Property size threshold
@@ -175,6 +190,7 @@ For each waste stream (Trash, Recycling, Composting/Organics), document:
 ### Phase 4: Document Penalties & Enforcement
 
 Extract:
+
 - Violation classification (misdemeanor, civil, criminal)
 - Fine structure (per offense, per day, maximum)
 - Enforcement agency name and contact
@@ -184,6 +200,7 @@ Extract:
 ### Phase 5: Identify Licensed Haulers
 
 Compile minimum 3-5 haulers with:
+
 - Company name
 - Phone number
 - Website URL
@@ -193,6 +210,7 @@ Compile minimum 3-5 haulers with:
 ### Phase 6: Generate Compliance Checklist
 
 Create property-specific checklist showing:
+
 - ✅ Requirements currently met
 - ⚠️ Requirements needing attention
 - ❌ Requirements not met
@@ -203,6 +221,7 @@ Create property-specific checklist showing:
 After completing regulatory research, assign confidence level:
 
 ### HIGH CONFIDENCE
+
 - All waste streams documented with official ordinance citations
 - Penalty amounts and enforcement agency confirmed
 - Licensed hauler directory found and verified
@@ -212,6 +231,7 @@ After completing regulatory research, assign confidence level:
 - Recent regulatory changes confirmed
 
 ### MEDIUM CONFIDENCE
+
 - Core requirements found but some details missing
 - Ordinance cited but specific sections unclear
 - Hauler list incomplete (fewer than 3 haulers)
@@ -219,6 +239,7 @@ After completing regulatory research, assign confidence level:
 - Mixed specificity in requirements
 
 ### LOW CONFIDENCE - FLAG FOR HUMAN REVIEW
+
 - Limited official information available
 - Conflicting sources found
 - Recent changes not confirmed
@@ -234,7 +255,7 @@ After completing regulatory research, assign confidence level:
 ```python
 class RegulatoryComplianceValidator:
     """Validates regulatory compliance research quality"""
-    
+
     def __init__(self):
         self.validation_results = {
             'location_extraction': {},
@@ -246,73 +267,73 @@ class RegulatoryComplianceValidator:
         self.errors = []
         self.warnings = []
         self.confidence_score = None
-        
-    def validate_regulatory_research(self, regulatory_data: Dict, 
+
+    def validate_regulatory_research(self, regulatory_data: Dict,
                                     property_info: Dict) -> Tuple[bool, str]:
         """
         Validate regulatory compliance research quality
         Returns: (passed: bool, confidence_level: str)
         """
-        
+
         # 1. Validate location extraction
         location_valid = self.validate_location_data(
             regulatory_data.get('location', {}),
             property_info
         )
-        
+
         # 2. Validate source quality
         sources_valid = self.validate_sources(
             regulatory_data.get('sources', [])
         )
-        
+
         # 3. Validate requirement specificity
         specificity_valid = self.validate_requirement_specificity(
             regulatory_data.get('requirements', {})
         )
-        
+
         # 4. Validate completeness
         completeness_valid = self.validate_completeness(
             regulatory_data
         )
-        
+
         # 5. Assess confidence level
         confidence_level = self.assess_confidence(
             location_valid, sources_valid, specificity_valid, completeness_valid
         )
-        
+
         # Determine if research passed minimum standards
         passed = confidence_level in ['HIGH', 'MEDIUM']
-        
+
         if confidence_level == 'LOW':
             self.errors.append(
                 "❌ REGULATORY RESEARCH CONFIDENCE TOO LOW: "
                 "Research quality insufficient for automated compliance assessment. "
                 "HUMAN REVIEW REQUIRED."
             )
-        
+
         return passed, confidence_level
-    
+
     def validate_location_data(self, location: Dict, property_info: Dict) -> bool:
         """Validate location extraction quality"""
-        
+
         required_fields = ['city', 'state']
         optional_fields = ['county', 'zip_code']
-        
+
         missing_required = [f for f in required_fields if not location.get(f)]
-        
+
         if missing_required:
             self.errors.append(
                 f"❌ LOCATION DATA INCOMPLETE: Missing required fields: "
                 f"{', '.join(missing_required)}"
             )
             return False
-        
+
         # Check for property size data
         if not property_info.get('unit_count'):
             self.warnings.append(
                 "⚠️  Unit count not specified - may affect threshold applicability"
             )
-        
+
         self.validation_results['location_extraction'] = {
             'status': 'PASSED',
             'city': location.get('city'),
@@ -320,94 +341,94 @@ class RegulatoryComplianceValidator:
             'county': location.get('county'),
             'unit_count': property_info.get('unit_count')
         }
-        
+
         return True
-    
+
     def validate_sources(self, sources: List[Dict]) -> bool:
         """Validate research source quality"""
-        
+
         if len(sources) < 3:
             self.errors.append(
                 f"❌ INSUFFICIENT SOURCES: Only {len(sources)} sources consulted. "
                 f"Minimum 3 required."
             )
             return False
-        
+
         # Check for .gov sources
         gov_sources = [s for s in sources if '.gov' in s.get('url', '')]
-        
+
         if len(gov_sources) == 0:
             self.warnings.append(
                 "⚠️  No official .gov sources found - relying on secondary sources"
             )
-        
+
         self.validation_results['source_quality'] = {
             'status': 'PASSED' if len(gov_sources) >= 1 else 'WARNING',
             'total_sources': len(sources),
             'gov_sources': len(gov_sources),
             'source_list': [s.get('name', 'Unknown') for s in sources]
         }
-        
+
         return True
-    
+
     def validate_requirement_specificity(self, requirements: Dict) -> bool:
         """Validate that requirements are specific and measurable"""
-        
+
         vague_terms = ['adequate', 'sufficient', 'appropriate', 'regular', 'as needed']
         specificity_issues = []
-        
+
         # Check recycling requirements
         recycling = requirements.get('recycling', {})
         capacity = recycling.get('capacity_requirement', '')
-        
+
         if any(term in str(capacity).lower() for term in vague_terms):
             specificity_issues.append("Recycling capacity uses vague terms")
-        
+
         if recycling.get('service_frequency', '') in ['regular', 'as needed', '']:
             specificity_issues.append("Recycling frequency not specific")
-        
+
         # Check composting requirements
         composting = requirements.get('composting', {})
         if composting.get('mandatory'):
             comp_capacity = composting.get('capacity_requirement', '')
             if any(term in str(comp_capacity).lower() for term in vague_terms):
                 specificity_issues.append("Composting capacity uses vague terms")
-        
+
         # Check penalties
         penalties = requirements.get('penalties', {})
         if not penalties.get('fine_per_offense') or '$' not in str(penalties.get('fine_per_offense')):
             specificity_issues.append("Penalty amounts not specified with $ values")
-        
+
         if specificity_issues:
             for issue in specificity_issues:
                 self.warnings.append(f"⚠️  SPECIFICITY: {issue}")
-        
+
         self.validation_results['requirement_specificity'] = {
             'status': 'PASSED' if len(specificity_issues) == 0 else 'WARNING',
             'issues_found': len(specificity_issues),
             'issues': specificity_issues
         }
-        
+
         return len(specificity_issues) == 0
-    
+
     def validate_completeness(self, regulatory_data: Dict) -> bool:
         """Validate completeness of regulatory research"""
-        
+
         requirements = regulatory_data.get('requirements', {})
-        
+
         # Check all three waste streams are addressed
         waste_streams = ['waste', 'recycling', 'composting']
         missing_streams = []
-        
+
         for stream in waste_streams:
             if stream not in requirements or not requirements[stream]:
                 missing_streams.append(stream)
-        
+
         if missing_streams:
             self.warnings.append(
                 f"⚠️  INCOMPLETE RESEARCH: Missing waste streams: {', '.join(missing_streams)}"
             )
-        
+
         # Check for licensed haulers
         haulers = regulatory_data.get('licensed_haulers', [])
         if len(haulers) < 3:
@@ -415,7 +436,7 @@ class RegulatoryComplianceValidator:
                 f"⚠️  INSUFFICIENT HAULERS: Only {len(haulers)} licensed haulers found. "
                 f"Minimum 3 recommended."
             )
-        
+
         # Check for ordinance citations
         ordinances = regulatory_data.get('ordinances', [])
         if len(ordinances) == 0:
@@ -423,23 +444,23 @@ class RegulatoryComplianceValidator:
                 "❌ NO ORDINANCE CITATIONS: No ordinances referenced in research"
             )
             return False
-        
+
         self.validation_results['completeness'] = {
             'status': 'PASSED' if len(missing_streams) == 0 else 'WARNING',
             'waste_streams_covered': len(waste_streams) - len(missing_streams),
             'haulers_found': len(haulers),
             'ordinances_cited': len(ordinances)
         }
-        
+
         return len(missing_streams) <= 1  # Allow 1 missing stream
-    
+
     def assess_confidence(self, location_valid: bool, sources_valid: bool,
                          specificity_valid: bool, completeness_valid: bool) -> str:
         """
         Assess overall confidence level for regulatory research
         Returns: 'HIGH', 'MEDIUM', or 'LOW'
         """
-        
+
         # Count validations passed
         validations_passed = sum([
             location_valid,
@@ -447,35 +468,35 @@ class RegulatoryComplianceValidator:
             specificity_valid,
             completeness_valid
         ])
-        
+
         # Get detailed metrics
         source_quality = self.validation_results.get('source_quality', {})
         requirement_specificity = self.validation_results.get('requirement_specificity', {})
         completeness = self.validation_results.get('completeness', {})
-        
+
         gov_sources = source_quality.get('gov_sources', 0)
         specificity_issues = requirement_specificity.get('issues_found', 0)
         haulers_found = completeness.get('haulers_found', 0)
-        
+
         # HIGH CONFIDENCE criteria
-        if (validations_passed == 4 and 
-            gov_sources >= 2 and 
-            specificity_issues == 0 and 
+        if (validations_passed == 4 and
+            gov_sources >= 2 and
+            specificity_issues == 0 and
             haulers_found >= 3):
             confidence = 'HIGH'
-        
+
         # MEDIUM CONFIDENCE criteria
-        elif (validations_passed >= 3 and 
-              gov_sources >= 1 and 
+        elif (validations_passed >= 3 and
+              gov_sources >= 1 and
               specificity_issues <= 2):
             confidence = 'MEDIUM'
-        
+
         # LOW CONFIDENCE
         else:
             confidence = 'LOW'
-        
+
         self.confidence_score = confidence
-        
+
         self.validation_results['confidence_assessment'] = {
             'level': confidence,
             'validations_passed': f"{validations_passed}/4",
@@ -483,7 +504,7 @@ class RegulatoryComplianceValidator:
             'specificity_issues': specificity_issues,
             'haulers_found': haulers_found
         }
-        
+
         return confidence
 ```
 
@@ -492,7 +513,7 @@ class RegulatoryComplianceValidator:
 ```python
 class WasteWiseValidator:
     """Comprehensive validation framework for WasteWise Analysis"""
-    
+
     def __init__(self):
         self.validation_results = {
             'contract_validation': {},
@@ -506,15 +527,15 @@ class WasteWiseValidator:
         self.errors = []
         self.warnings = []
         self.regulatory_validator = RegulatoryComplianceValidator()  # NEW
-        
-    def validate_all(self, invoice_data: List[Dict], contract_data: Dict, 
+
+    def validate_all(self, invoice_data: List[Dict], contract_data: Dict,
                      property_info: Dict, optimization_results: Dict,
                      regulatory_data: Dict) -> Tuple[bool, Dict]:  # NEW parameter
         """
         Run all validation checks including regulatory compliance
         Returns: (passed: bool, validation_report: dict)
         """
-        
+
         # 1-6. Original validations (contract, optimization, formula, etc.)
         contract_valid = self.validate_contract(contract_data, invoice_data)
         optimization_valid = self.validate_optimizations(optimization_results, invoice_data)
@@ -528,23 +549,23 @@ class WasteWiseValidator:
         cross_valid = self.validate_cross_references(
             invoice_data, optimization_results, contract_data
         )
-        
+
         # 7. NEW: Regulatory compliance validation
         regulatory_valid, confidence_level = self.regulatory_validator.validate_regulatory_research(
             regulatory_data, property_info
         )
-        
+
         # Store regulatory validation results
         self.validation_results['regulatory_compliance_validation'] = {
             'status': 'PASSED' if regulatory_valid else 'FAILED',
             'confidence_level': confidence_level,
             'details': self.regulatory_validator.validation_results
         }
-        
+
         # Merge errors and warnings from regulatory validator
         self.errors.extend(self.regulatory_validator.errors)
         self.warnings.extend(self.regulatory_validator.warnings)
-        
+
         all_passed = all([
             contract_valid,
             optimization_valid,
@@ -554,13 +575,14 @@ class WasteWiseValidator:
             cross_valid,
             regulatory_valid  # NEW
         ])
-        
+
         return all_passed, self.generate_validation_report()
 ```
 
 ## REGULATORY_COMPLIANCE Sheet Structure
 
 ### Section 1: Jurisdiction Overview
+
 ```
 SECTION 1: REGULATORY COMPLIANCE - [City, State]
 
@@ -574,6 +596,7 @@ Regulatory Summary: [1-2 sentences on key mandates]
 ```
 
 ### Section 2: Waste Collection Requirements
+
 ```
 Municipal Service: Available / Not Available
 Private Hauler Requirement: ✅ MANDATORY / ⚠️ OPTIONAL
@@ -588,6 +611,7 @@ Licensed Hauler Directory: [URL]
 ```
 
 ### Section 3: Recycling Requirements
+
 ```
 MANDATORY STATUS: ✅ MANDATORY / ⚠️ VOLUNTARY
 
@@ -616,6 +640,7 @@ Compliance Checklist:
 ```
 
 ### Section 4: Composting/Organics Requirements
+
 ```
 ⚠️ IMPORTANT: [Note if recent requirement]
 
@@ -650,6 +675,7 @@ Compliance Checklist:
 ```
 
 ### Section 5: Penalties & Enforcement
+
 ```
 Violation Type: [Classification]
 
@@ -667,6 +693,7 @@ Example Violations:
 ```
 
 ### Section 6: Licensed Haulers
+
 ```
 FULL-SERVICE PROVIDERS:
 
@@ -686,6 +713,7 @@ Official Hauler Directory: [URL]
 ```
 
 ### Section 7: Regulatory Contacts
+
 ```
 PRIMARY AGENCY:
 Agency: [Full name]
@@ -700,6 +728,7 @@ Email: [Address]
 ```
 
 ### Section 8: Research Confidence Assessment
+
 ```
 RESEARCH QUALITY ASSESSMENT
 
@@ -722,12 +751,14 @@ This research requires manual verification due to:
 ## Complete Workflow with Regulatory Compliance
 
 ### Step 1: Initial Data Processing
+
 1. Process uploaded invoices
 2. Extract contract (if provided)
 3. **NEW:** Extract location data from property documents
 4. Identify property characteristics (units, type, building height)
 
 ### Step 2: Regulatory Research Phase
+
 1. Execute search pattern sequence
 2. Consult minimum 3 official sources
 3. Extract waste, recycling, and organics requirements
@@ -736,6 +767,7 @@ This research requires manual verification due to:
 6. Assign confidence score
 
 ### Step 3: Comprehensive Validation
+
 1. Run contract validation
 2. Run optimization validation
 3. Run formula validation
@@ -746,10 +778,12 @@ This research requires manual verification due to:
 8. Assess overall confidence level
 
 ### Step 4: Validation Gate
+
 - **HIGH/MEDIUM Confidence:** Proceed to output
 - **LOW Confidence:** HALT and flag for human review
 
 ### Step 5: Generate Output
+
 1. Create all standard sheets (SUMMARY, EXPENSE_ANALYSIS, OPTIMIZATION, etc.)
 2. **NEW:** Create REGULATORY_COMPLIANCE sheet
 3. Create QUALITY_CHECK sheet with regulatory confidence score
@@ -776,7 +810,7 @@ This research requires manual verification due to:
    Ordinances Cited: 3
    Licensed Haulers Found: 6
    Confidence Level: HIGH
-   
+
    Key Findings:
    ✅ Universal Recycling Ordinance applies (8+ units)
    ✅ Mandatory composting effective January 2024
@@ -820,7 +854,7 @@ VALIDATION SUMMARY:
    Ordinances Cited: 0
    Licensed Haulers Found: 1
    Confidence Level: LOW
-   
+
    Issues Identified:
    ❌ No official .gov sources found
    ❌ No ordinance citations located
@@ -830,7 +864,7 @@ VALIDATION SUMMARY:
 
 🚨 HUMAN REVIEW REQUIRED 🚨
 
-The regulatory compliance research did not meet minimum quality 
+The regulatory compliance research did not meet minimum quality
 standards for automated assessment. Manual verification needed for:
 
 1. Composting mandate status (conflicting sources)
@@ -870,6 +904,7 @@ Please complete manual regulatory verification before proceeding.
 **User prompt**: "I uploaded 6 months of invoices, the waste service contract, and property documents for The Club at Millenia (560 units, Austin TX). Run the validated analysis with regulatory compliance research."
 
 **Claude will**:
+
 1. ✅ Process all invoices and extract contract
 2. ✅ Extract location data (Austin, Travis County, Texas)
 3. ✅ Research Austin waste/recycling/composting ordinances
@@ -888,6 +923,7 @@ Please complete manual regulatory verification before proceeding.
 16. ✅ Generate validated Excel workbook with quality report
 
 **Output files**:
+
 - `TheClubAtMillenia_WasteAnalysis_Validated.xlsx` - Complete workbook with all sheets including regulatory compliance
 - Executive summary with validation status and regulatory confidence level
 

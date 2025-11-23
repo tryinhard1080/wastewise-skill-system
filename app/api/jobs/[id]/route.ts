@@ -10,9 +10,9 @@
  * Jobs are protected by RLS - users can only access their own jobs
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { logger } from '@/lib/observability/logger'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/observability/logger";
 
 /**
  * GET /api/jobs/[id]
@@ -21,37 +21,37 @@ import { logger } from '@/lib/observability/logger'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  const jobId = params.id
+  const jobId = params.id;
 
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Get authenticated user
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get job (RLS ensures user can only see their own jobs)
     const { data: job, error: jobError } = await supabase
-      .from('analysis_jobs')
-      .select('*')
-      .eq('id', jobId)
-      .single()
+      .from("analysis_jobs")
+      .select("*")
+      .eq("id", jobId)
+      .single();
 
     if (jobError || !job) {
-      logger.warn('Job not found or access denied', {
+      logger.warn("Job not found or access denied", {
         jobId,
         userId: user.id,
         error: jobError?.message,
-      })
-      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+      });
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
     // Return structured job status
@@ -92,15 +92,15 @@ export async function GET(
         maxRetries: job.max_retries,
       },
       updatedAt: job.updated_at,
-    }
+    };
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
   } catch (error) {
-    logger.error('Job status endpoint error', error as Error, { jobId })
+    logger.error("Job status endpoint error", error as Error, { jobId });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -114,91 +114,91 @@ export async function GET(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  const jobId = params.id
+  const jobId = params.id;
 
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Get authenticated user
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get current job status first
     const { data: job, error: fetchError } = await supabase
-      .from('analysis_jobs')
-      .select('id, status, job_type, project_id')
-      .eq('id', jobId)
-      .single()
+      .from("analysis_jobs")
+      .select("id, status, job_type, project_id")
+      .eq("id", jobId)
+      .single();
 
     if (fetchError || !job) {
-      logger.warn('Job not found for cancellation', {
+      logger.warn("Job not found for cancellation", {
         jobId,
         userId: user.id,
         error: fetchError?.message,
-      })
-      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+      });
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
     // Check if job can be cancelled
-    if (!['pending', 'processing'].includes(job.status)) {
-      logger.warn('Cannot cancel job in current status', {
+    if (!["pending", "processing"].includes(job.status)) {
+      logger.warn("Cannot cancel job in current status", {
         jobId,
         status: job.status,
         userId: user.id,
-      })
+      });
       return NextResponse.json(
         {
           error: `Cannot cancel job with status '${job.status}'. Only pending or processing jobs can be cancelled.`,
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Cancel job
     const { error: updateError } = await supabase
-      .from('analysis_jobs')
+      .from("analysis_jobs")
       .update({
-        status: 'cancelled',
+        status: "cancelled",
         completed_at: new Date().toISOString(),
       })
-      .eq('id', jobId)
-      .in('status', ['pending', 'processing'])
+      .eq("id", jobId)
+      .in("status", ["pending", "processing"]);
 
     if (updateError) {
-      logger.error('Failed to cancel job', updateError as Error, {
+      logger.error("Failed to cancel job", updateError as Error, {
         jobId,
         userId: user.id,
-      })
+      });
       return NextResponse.json(
-        { error: 'Failed to cancel job' },
-        { status: 500 }
-      )
+        { error: "Failed to cancel job" },
+        { status: 500 },
+      );
     }
 
-    logger.info('Job cancelled', {
+    logger.info("Job cancelled", {
       jobId,
       jobType: job.job_type,
       projectId: job.project_id,
       userId: user.id,
-    })
+    });
 
     return NextResponse.json({
-      message: 'Job cancelled successfully',
+      message: "Job cancelled successfully",
       jobId,
-    })
+    });
   } catch (error) {
-    logger.error('Job cancellation error', error as Error, { jobId })
+    logger.error("Job cancellation error", error as Error, { jobId });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

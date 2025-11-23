@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -12,15 +12,15 @@ Sentry.init({
 
   beforeSend(event) {
     // Filter out development errors
-    if (process.env.NODE_ENV === 'development') {
-      return null
+    if (process.env.NODE_ENV === "development") {
+      return null;
     }
 
     // Filter out expected errors (like rate limiting)
-    if (event.exception?.values?.[0]?.type === 'RateLimitError') {
-      return null
+    if (event.exception?.values?.[0]?.type === "RateLimitError") {
+      return null;
     }
 
-    return event
+    return event;
   },
-})
+});

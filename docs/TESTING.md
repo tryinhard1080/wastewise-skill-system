@@ -48,14 +48,14 @@ pnpm test:ui
 
 The E2E test suite (`scripts/test-e2e-ui.ts`) covers the complete WasteWise workflow:
 
-| Test # | Name | Duration | Description |
-|--------|------|----------|-------------|
-| 1 | Landing Page Branding | ~5s | Verifies WasteWise branding (no "Brillance") |
-| 2 | Login Flow | ~10s | Authentication with test credentials |
-| 3 | Project Navigation | ~5s | Navigate to test project page |
-| 4 | Start Analysis | ~5s | Click "Start Analysis" button, verify job creation |
-| 5 | Monitor Progress | 2-5min | Poll for job completion, track progress |
-| 6 | Results Validation | ~10s | Verify savings, recommendations, download buttons |
+| Test # | Name                  | Duration | Description                                        |
+| ------ | --------------------- | -------- | -------------------------------------------------- |
+| 1      | Landing Page Branding | ~5s      | Verifies WasteWise branding (no "Brillance")       |
+| 2      | Login Flow            | ~10s     | Authentication with test credentials               |
+| 3      | Project Navigation    | ~5s      | Navigate to test project page                      |
+| 4      | Start Analysis        | ~5s      | Click "Start Analysis" button, verify job creation |
+| 5      | Monitor Progress      | 2-5min   | Poll for job completion, track progress            |
+| 6      | Results Validation    | ~10s     | Verify savings, recommendations, download buttons  |
 
 **Total Duration**: ~3-6 minutes (depends on analysis completion time)
 
@@ -74,6 +74,7 @@ TEST_PROJECT_ID=d82e2314-7ccf-404e-a133-0caebb154c7e  # From pnpm seed output
 ### Test Output
 
 **Screenshots**: Saved to `test-screenshots/` directory
+
 - `01-landing-page.png` - Initial page load
 - `02-login-form.png` - Login form filled
 - `02-login-success.png` - After login redirect
@@ -84,6 +85,7 @@ TEST_PROJECT_ID=d82e2314-7ccf-404e-a133-0caebb154c7e  # From pnpm seed output
 - `06-results-page.png` - Final results page
 
 **Console Output**:
+
 ```
 🚀 Starting WasteWise E2E UI Test Suite
 
@@ -126,6 +128,7 @@ Pass Rate: 100.0%
 ### Customization
 
 **Run with custom config**:
+
 ```bash
 DEV_SERVER_URL=http://localhost:4000 pnpm test:ui
 ```
@@ -133,25 +136,27 @@ DEV_SERVER_URL=http://localhost:4000 pnpm test:ui
 **Run in headed mode** (for debugging):
 
 Edit `scripts/test-e2e-ui.ts` line 619:
+
 ```typescript
 browser = await puppeteer.launch({
-  headless: false,  // Changed from true
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
-})
+  headless: false, // Changed from true
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+});
 ```
 
 **Adjust timeouts**:
 
 Edit `CONFIG` object in `scripts/test-e2e-ui.ts`:
+
 ```typescript
 const CONFIG = {
   // ...
   timeout: {
-    navigation: 30000,      // Page load timeout
-    analysis: 300000,       // 5 minutes for analysis
-    element: 10000,         // Element wait timeout
+    navigation: 30000, // Page load timeout
+    analysis: 300000, // 5 minutes for analysis
+    element: 10000, // Element wait timeout
   },
-}
+};
 ```
 
 ---
@@ -161,6 +166,7 @@ const CONFIG = {
 ### Overview
 
 After Puppeteer tests pass, use **Chrome DevTools MCP** for advanced performance validation:
+
 - **Lighthouse audits** - Overall performance score
 - **Console error monitoring** - Runtime errors
 - **Network timing** - API request durations
@@ -173,6 +179,7 @@ Chrome DevTools MCP is AI-assisted, meaning **I (Claude) execute the validation 
 #### Step 1: Ask Claude to Run Performance Validation
 
 **Example request**:
+
 ```
 "Can you run a Lighthouse audit on the WasteWise results page and check for console errors?"
 ```
@@ -180,6 +187,7 @@ Chrome DevTools MCP is AI-assisted, meaning **I (Claude) execute the validation 
 #### Step 2: Claude Uses MCP Tools
 
 I will use the following MCP tools (configured in `.claude/mcp-servers.json`):
+
 - `mcp__puppeteer__puppeteer_navigate` - Navigate to page
 - `mcp__puppeteer__puppeteer_evaluate` - Execute JavaScript to check performance
 - `mcp__puppeteer__puppeteer_screenshot` - Capture visual evidence
@@ -187,6 +195,7 @@ I will use the following MCP tools (configured in `.claude/mcp-servers.json`):
 #### Step 3: Review Results
 
 I will provide a report with:
+
 - Lighthouse scores (Performance, Accessibility, Best Practices, SEO)
 - Console errors found (if any)
 - Network request timings
@@ -195,9 +204,11 @@ I will provide a report with:
 ### Example Performance Validation Session
 
 **You**:
+
 > "Run performance validation on the WasteWise results page after the E2E tests complete."
 
 **Claude (me)**:
+
 1. Navigate to `http://localhost:3000/projects/[id]/results`
 2. Run Lighthouse audit
 3. Check for console errors
@@ -234,9 +245,11 @@ Overall: PASS ✅ All metrics meet Phase 7 requirements
 #### Check 1: Lighthouse Score >90
 
 **Request**:
+
 > "Run a Lighthouse audit on the landing page and ensure the performance score is above 90."
 
 **What I'll do**:
+
 - Navigate to landing page
 - Run Lighthouse audit using Chrome DevTools
 - Report all scores
@@ -244,9 +257,11 @@ Overall: PASS ✅ All metrics meet Phase 7 requirements
 #### Check 2: Console Error Detection
 
 **Request**:
+
 > "Check for console errors during the complete workflow (login → analysis → results)."
 
 **What I'll do**:
+
 - Navigate through workflow
 - Monitor console for errors, warnings
 - Report any issues found
@@ -254,9 +269,11 @@ Overall: PASS ✅ All metrics meet Phase 7 requirements
 #### Check 3: Network Request Analysis
 
 **Request**:
+
 > "Analyze network requests during analysis job polling. Are we polling too frequently?"
 
 **What I'll do**:
+
 - Monitor network tab during polling
 - Count requests
 - Measure timing
@@ -265,9 +282,11 @@ Overall: PASS ✅ All metrics meet Phase 7 requirements
 #### Check 4: Responsive Design Validation
 
 **Request**:
+
 > "Test the results page at mobile (375px), tablet (768px), and desktop (1440px) viewports."
 
 **What I'll do**:
+
 - Resize viewport to each breakpoint
 - Take screenshots
 - Verify layout adapts correctly
@@ -281,6 +300,7 @@ Overall: PASS ✅ All metrics meet Phase 7 requirements
 **Script**: `scripts/seed-test-data.ts`
 
 **What it creates**:
+
 - ✅ Test user: `test@wastewise.local` / `TestPassword123!`
 - ✅ Test project: "Riverside Gardens Apartments"
   - 250 units
@@ -291,11 +311,13 @@ Overall: PASS ✅ All metrics meet Phase 7 requirements
 - ✅ 1 contract terms record
 
 **Run seed script**:
+
 ```bash
 pnpm seed
 ```
 
 **Output**:
+
 ```
 ✅ Seed completed successfully!
 
@@ -317,6 +339,7 @@ pnpm seed
 ```
 
 **Important**: Copy the `Project ID` and add it to `.env.local`:
+
 ```bash
 TEST_PROJECT_ID=d82e2314-7ccf-404e-a133-0caebb154c7e
 ```
@@ -369,7 +392,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -452,6 +475,7 @@ pnpm test:unit || exit 1
 **Error**: "WasteWise branding not found"
 
 **Solution**:
+
 - Check dev server is running (`pnpm dev`)
 - Verify `DEV_SERVER_URL` is correct
 - Check landing page content in browser manually
@@ -461,6 +485,7 @@ pnpm test:unit || exit 1
 **Error**: "Expected redirect to dashboard, got: /login"
 
 **Solutions**:
+
 - Verify test user exists (`test@wastewise.local`)
 - Check password is correct (`TestPassword123!`)
 - Manually login in browser to verify credentials
@@ -471,6 +496,7 @@ pnpm test:unit || exit 1
 **Error**: "Project details not found on page"
 
 **Solutions**:
+
 - Verify test data is seeded (`pnpm seed`)
 - Check `TEST_PROJECT_ID` in `.env.local` is correct
 - Navigate to project page manually in browser
@@ -480,6 +506,7 @@ pnpm test:unit || exit 1
 **Error**: "Could not find Start Analysis button"
 
 **Solutions**:
+
 - Check project page has "Start Analysis" button
 - Verify no existing jobs are running
 - Check for console errors on project page
@@ -489,6 +516,7 @@ pnpm test:unit || exit 1
 **Error**: "Analysis did not complete within 5 minutes"
 
 **Solutions**:
+
 - Verify worker is running (`pnpm worker`)
 - Check worker logs for errors
 - Manually check job status in database:
@@ -505,6 +533,7 @@ pnpm test:unit || exit 1
 **Error**: "Could not verify savings/recommendations data"
 
 **Solutions**:
+
 - Check job completed successfully (status='completed')
 - Verify `result_data` is not null in database
 - Check for errors in results page console
@@ -515,12 +544,14 @@ pnpm test:unit || exit 1
 **Error**: "Failed to launch browser"
 
 **Windows Solution**:
+
 ```bash
 # Install browser dependencies
 pnpm puppeteer browsers install chrome
 ```
 
 **Linux Solution**:
+
 ```bash
 # Install Chrome dependencies
 sudo apt-get install -y \
@@ -549,6 +580,7 @@ sudo apt-get install -y \
 **Issue**: Claude DevTools MCP not working
 
 **Solution**:
+
 - Verify MCP server is configured: check `.claude/mcp-servers.json`
 - Ensure `chrome-devtools-mcp` is installed:
   ```bash
@@ -568,15 +600,15 @@ Edit `scripts/test-e2e-ui.ts` to add viewport tests:
 
 ```typescript
 const viewports = [
-  { width: 375, height: 667, name: 'Mobile' },
-  { width: 768, height: 1024, name: 'Tablet' },
-  { width: 1024, height: 768, name: 'Desktop' },
-  { width: 1440, height: 900, name: 'Large Desktop' },
-]
+  { width: 375, height: 667, name: "Mobile" },
+  { width: 768, height: 1024, name: "Tablet" },
+  { width: 1024, height: 768, name: "Desktop" },
+  { width: 1440, height: 900, name: "Large Desktop" },
+];
 
 for (const viewport of viewports) {
-  await page.setViewport(viewport)
-  await takeScreenshot(`results-${viewport.name}`)
+  await page.setViewport(viewport);
+  await takeScreenshot(`results-${viewport.name}`);
 }
 ```
 
@@ -586,9 +618,9 @@ for (const viewport of viewports) {
 
 ```typescript
 // Click dark mode toggle
-await page.click('[data-theme-toggle]')
-await sleep(500)
-await takeScreenshot('results-dark-mode')
+await page.click("[data-theme-toggle]");
+await sleep(500);
+await takeScreenshot("results-dark-mode");
 ```
 
 ### Download Validation
@@ -597,21 +629,21 @@ await takeScreenshot('results-dark-mode')
 
 ```typescript
 // Set download path
-const client = await page.target().createCDPSession()
-await client.send('Page.setDownloadBehavior', {
-  behavior: 'allow',
-  downloadPath: './test-downloads',
-})
+const client = await page.target().createCDPSession();
+await client.send("Page.setDownloadBehavior", {
+  behavior: "allow",
+  downloadPath: "./test-downloads",
+});
 
 // Click download button
-await page.click('button:has-text("Download Excel")')
+await page.click('button:has-text("Download Excel")');
 
 // Wait for download
-await sleep(2000)
+await sleep(2000);
 
 // Verify file exists
-const files = fs.readdirSync('./test-downloads')
-console.log('Downloaded files:', files)
+const files = fs.readdirSync("./test-downloads");
+console.log("Downloaded files:", files);
 ```
 
 ---
@@ -619,18 +651,21 @@ console.log('Downloaded files:', files)
 ## Summary
 
 **Automated Testing** (Puppeteer):
+
 - ✅ Runs independently without AI assistance
 - ✅ CI/CD integration ready
 - ✅ Full workflow coverage
 - ✅ Screenshot evidence at each step
 
 **Performance Validation** (Chrome DevTools MCP):
+
 - ✅ AI-assisted advanced validation
 - ✅ Lighthouse audits
 - ✅ Console error detection
 - ✅ Network timing analysis
 
 **Combined Approach**:
+
 - ✅ Best of both worlds
 - ✅ Comprehensive test coverage
 - ✅ Production-ready quality assurance

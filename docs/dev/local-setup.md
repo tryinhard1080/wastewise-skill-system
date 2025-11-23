@@ -12,21 +12,21 @@ Ensure you have the following installed before proceeding:
 
 ### Required Software
 
-| Tool | Version | Installation |
-|------|---------|--------------|
-| **Node.js** | 18+ (20+ recommended) | [Download](https://nodejs.org/) |
-| **pnpm** | 8+ | `npm install -g pnpm` |
-| **Git** | Latest | [Download](https://git-scm.com/) |
-| **Supabase CLI** | Latest | `npm install -g supabase` |
-| **Docker Desktop** | Latest | [Download](https://www.docker.com/products/docker-desktop) (for Supabase local) |
+| Tool               | Version               | Installation                                                                    |
+| ------------------ | --------------------- | ------------------------------------------------------------------------------- |
+| **Node.js**        | 18+ (20+ recommended) | [Download](https://nodejs.org/)                                                 |
+| **pnpm**           | 8+                    | `npm install -g pnpm`                                                           |
+| **Git**            | Latest                | [Download](https://git-scm.com/)                                                |
+| **Supabase CLI**   | Latest                | `npm install -g supabase`                                                       |
+| **Docker Desktop** | Latest                | [Download](https://www.docker.com/products/docker-desktop) (for Supabase local) |
 
 ### Optional But Recommended
 
-| Tool | Purpose | Installation |
-|------|---------|--------------|
-| **VS Code** | Code editor | [Download](https://code.visualstudio.com/) |
-| **TablePlus** | Database GUI | [Download](https://tableplus.com/) |
-| **Postman** | API testing | [Download](https://www.postman.com/) |
+| Tool          | Purpose      | Installation                               |
+| ------------- | ------------ | ------------------------------------------ |
+| **VS Code**   | Code editor  | [Download](https://code.visualstudio.com/) |
+| **TablePlus** | Database GUI | [Download](https://tableplus.com/)         |
+| **Postman**   | API testing  | [Download](https://www.postman.com/)       |
 
 ### Verify Installation
 
@@ -79,6 +79,7 @@ pnpm install
 ```
 
 **Expected Output**:
+
 ```
 Progress: resolved XXX, reused XXX, downloaded XXX
 Packages: +XXX
@@ -155,6 +156,7 @@ WORKER_CONCURRENCY=1
 ```
 
 **Important Notes**:
+
 - **Supabase keys**: Will be automatically generated in Step 4
 - **ANTHROPIC_API_KEY**: **Required** for invoice extraction and analysis
   - Sign up at https://console.anthropic.com/
@@ -187,6 +189,7 @@ npx supabase start
 ```
 
 **Expected Output** (after initialization):
+
 ```
 Started supabase local development setup.
 
@@ -240,6 +243,7 @@ npx supabase db reset
 ```
 
 **Expected Output**:
+
 ```
 Resetting local database...
 Applying migration 20240101000000_initial_schema.sql...
@@ -306,6 +310,7 @@ pnpm dev
 ### Common Issues
 
 **Port 3000 already in use**:
+
 ```bash
 # Kill existing process
 # Windows:
@@ -320,6 +325,7 @@ pnpm dev -- -p 3001
 ```
 
 **TypeScript errors**:
+
 ```bash
 # Run type check
 npx tsc --noEmit
@@ -328,6 +334,7 @@ npx tsc --noEmit
 ```
 
 **Supabase connection error**:
+
 ```bash
 # Verify Supabase is running
 npx supabase status
@@ -364,6 +371,7 @@ pnpm worker
 ### What the Worker Does
 
 The worker:
+
 1. Polls the `analysis_jobs` table every 5 seconds
 2. Picks up jobs with status = 'pending'
 3. Executes the appropriate skill (compactor-optimization, complete-analysis, etc.)
@@ -374,6 +382,7 @@ The worker:
 ### Worker Logs
 
 You'll see logs like:
+
 ```
 [YYYY-MM-DD HH:MM:SS] Polling for jobs... (0 pending)
 [YYYY-MM-DD HH:MM:SS] Found job: abc-123-def (complete_analysis)
@@ -421,6 +430,7 @@ npx tsx scripts/seed-test-data.ts
 ### Expected Results
 
 After ~2-3 minutes, you should see:
+
 - **Status**: Complete ✅
 - **Excel Report**: Ready for download
 - **HTML Dashboard**: Ready for download
@@ -432,6 +442,7 @@ After ~2-3 minutes, you should see:
 ### Verify Logs
 
 Check both terminals:
+
 - **Dev Server**: API requests logged
 - **Worker**: Job processing logged
 
@@ -500,6 +511,7 @@ pnpm test && npx tsc --noEmit && pnpm lint
 ### Code Quality
 
 Before committing:
+
 ```bash
 # 1. Run all tests
 pnpm test
@@ -525,6 +537,7 @@ pnpm format
 **Error**: `Cannot start Supabase`
 
 **Solution**:
+
 ```bash
 # Check Docker is running
 docker ps
@@ -542,6 +555,7 @@ npx supabase start
 **Solutions**:
 
 1. **Check environment variables**:
+
    ```bash
    # Verify SUPABASE_SERVICE_ROLE_KEY is set
    echo $SUPABASE_SERVICE_ROLE_KEY  # Mac/Linux
@@ -549,6 +563,7 @@ npx supabase start
    ```
 
 2. **Check API key**:
+
    ```bash
    # Verify ANTHROPIC_API_KEY is set
    echo $ANTHROPIC_API_KEY
@@ -573,6 +588,7 @@ npx supabase start
 **Solutions**:
 
 1. **Regenerate database types**:
+
    ```bash
    npx supabase gen types typescript --local > types/database.types.ts
    ```
@@ -592,6 +608,7 @@ npx supabase start
 **Error**: `Migration failed`
 
 **Solution**:
+
 ```bash
 # Check migration syntax
 cat supabase/migrations/XXXXXX_migration_name.sql
@@ -610,6 +627,7 @@ npx supabase db reset
 **Solutions**:
 
 1. **Kill the process**:
+
    ```bash
    # Windows
    netstat -ano | findstr :3000
@@ -635,6 +653,7 @@ npx supabase db reset
    - Compare with output from `npx supabase status`
 
 2. **Reset test user**:
+
    ```bash
    npx tsx scripts/seed-test-data.ts
    ```
@@ -670,6 +689,7 @@ Congratulations! Your local development environment is fully set up.
 ### Agent-Based Development
 
 **IMPORTANT**: This project uses agent-based development:
+
 - **Frontend changes** → Use `frontend-dev` agent
 - **Backend changes** → Use `backend-dev` agent
 - **Skills changes** → Use `skills-dev` agent

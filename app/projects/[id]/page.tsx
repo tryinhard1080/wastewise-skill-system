@@ -5,18 +5,18 @@
  * Allows file uploads and job creation
  */
 
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Building2,
   MapPin,
@@ -25,16 +25,16 @@ import {
   FileText,
   PlayCircle,
   ChevronLeft,
-} from 'lucide-react'
-import Link from 'next/link'
-import { FileUploadSection } from '@/components/project/file-upload-section'
-import { JobsList } from '@/components/project/jobs-list'
-import { StartAnalysisButton } from '@/components/project/start-analysis-button'
+} from "lucide-react";
+import Link from "next/link";
+import { FileUploadSection } from "@/components/project/file-upload-section";
+import { JobsList } from "@/components/project/jobs-list";
+import { StartAnalysisButton } from "@/components/project/start-analysis-button";
 
 interface ProjectDetailPageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 // Transform database jobs to API format
@@ -56,45 +56,45 @@ function transformJobsForDisplay(jobs: any[]) {
     },
     hasError: !!job.error_message,
     hasResult: !!job.result_data,
-  }))
+  }));
 }
 
 export default async function ProjectDetailPage({
   params,
 }: ProjectDetailPageProps) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // Fetch project with files and jobs
   const { data: project, error } = await supabase
-    .from('projects')
+    .from("projects")
     .select(
       `
       *,
       project_files(*),
       analysis_jobs(*)
-    `
+    `,
     )
-    .eq('id', params.id)
-    .eq('user_id', user.id)
-    .single()
+    .eq("id", params.id)
+    .eq("user_id", user.id)
+    .single();
 
   if (error || !project) {
-    redirect('/projects')
+    redirect("/projects");
   }
 
-  const totalFiles = project.project_files?.length || 0
-  const totalJobs = project.analysis_jobs?.length || 0
+  const totalFiles = project.project_files?.length || 0;
+  const totalJobs = project.analysis_jobs?.length || 0;
   const completedJobs =
-    project.analysis_jobs?.filter((job: any) => job.status === 'completed')
-      .length || 0
+    project.analysis_jobs?.filter((job: any) => job.status === "completed")
+      .length || 0;
 
   return (
     <div className="space-y-6">
@@ -149,7 +149,7 @@ export default async function ProjectDetailPage({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold capitalize">
-              {project.equipment_type || 'N/A'}
+              {project.equipment_type || "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">Equipment type</p>
           </CardContent>
@@ -171,10 +171,13 @@ export default async function ProjectDetailPage({
       <Tabs defaultValue="files" className="space-y-4">
         <TabsList>
           <TabsTrigger value="files">
-            Files <Badge variant="secondary" className="ml-2">{totalFiles}</Badge>
+            Files{" "}
+            <Badge variant="secondary" className="ml-2">
+              {totalFiles}
+            </Badge>
           </TabsTrigger>
           <TabsTrigger value="jobs">
-            Analysis Jobs{' '}
+            Analysis Jobs{" "}
             <Badge variant="secondary" className="ml-2">
               {completedJobs}/{totalJobs}
             </Badge>
@@ -222,7 +225,7 @@ export default async function ProjectDetailPage({
                     Property Type
                   </p>
                   <p className="text-base font-medium capitalize">
-                    {project.property_type || 'Not specified'}
+                    {project.property_type || "Not specified"}
                   </p>
                 </div>
                 <div>
@@ -248,7 +251,7 @@ export default async function ProjectDetailPage({
                     Equipment Type
                   </p>
                   <p className="text-base font-medium capitalize">
-                    {project.equipment_type || 'Not specified'}
+                    {project.equipment_type || "Not specified"}
                   </p>
                 </div>
                 <div>
@@ -258,7 +261,7 @@ export default async function ProjectDetailPage({
                   <p className="text-base font-medium">
                     {project.analysis_period_months
                       ? `${project.analysis_period_months} months`
-                      : 'Not specified'}
+                      : "Not specified"}
                   </p>
                 </div>
                 <div>
@@ -266,7 +269,7 @@ export default async function ProjectDetailPage({
                     Status
                   </p>
                   <Badge variant="secondary" className="capitalize">
-                    {project.status || 'Active'}
+                    {project.status || "Active"}
                   </Badge>
                 </div>
               </div>
@@ -275,5 +278,5 @@ export default async function ProjectDetailPage({
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

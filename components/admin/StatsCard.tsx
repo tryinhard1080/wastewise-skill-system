@@ -5,21 +5,21 @@
  * Color-coded: green=good, red=bad, gray=neutral
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatsCardProps {
-  title: string
-  value: string | number
-  icon: LucideIcon
-  description?: string
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  description?: string;
   change?: {
-    value: number
-    isPositive: boolean
-    period?: string
-  }
-  variant?: 'default' | 'success' | 'danger' | 'warning'
+    value: number;
+    isPositive: boolean;
+    period?: string;
+  };
+  variant?: "default" | "success" | "danger" | "warning";
 }
 
 export function StatsCard({
@@ -28,14 +28,14 @@ export function StatsCard({
   icon: Icon,
   description,
   change,
-  variant = 'default',
+  variant = "default",
 }: StatsCardProps) {
   const variantStyles = {
-    default: 'bg-gray-100 text-gray-600',
-    success: 'bg-green-100 text-green-600',
-    danger: 'bg-red-100 text-red-600',
-    warning: 'bg-yellow-100 text-yellow-600',
-  }
+    default: "bg-gray-100 text-gray-600",
+    success: "bg-green-100 text-green-600",
+    danger: "bg-red-100 text-red-600",
+    warning: "bg-yellow-100 text-yellow-600",
+  };
 
   return (
     <Card>
@@ -43,7 +43,7 @@ export function StatsCard({
         <CardTitle className="text-sm font-medium text-gray-600">
           {title}
         </CardTitle>
-        <div className={cn('p-2 rounded-lg', variantStyles[variant])}>
+        <div className={cn("p-2 rounded-lg", variantStyles[variant])}>
           <Icon className="h-4 w-4" />
         </div>
       </CardHeader>
@@ -61,11 +61,11 @@ export function StatsCard({
             )}
             <span
               className={cn(
-                'text-xs font-medium',
-                change.isPositive ? 'text-green-600' : 'text-red-600'
+                "text-xs font-medium",
+                change.isPositive ? "text-green-600" : "text-red-600",
               )}
             >
-              {change.value > 0 ? '+' : ''}
+              {change.value > 0 ? "+" : ""}
               {change.value}%
             </span>
             {change.period && (
@@ -75,5 +75,5 @@ export function StatsCard({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

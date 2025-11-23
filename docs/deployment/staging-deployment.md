@@ -13,6 +13,7 @@ This runbook guides you through deploying WasteWise to a staging environment for
 ### Staging Environment Purpose
 
 The staging environment serves as a production-like environment for:
+
 - Final integration testing with real AI services
 - Performance validation under realistic load
 - Security testing (auth, RLS, input validation)
@@ -23,6 +24,7 @@ The staging environment serves as a production-like environment for:
 ### Architecture
 
 **Staging Stack**:
+
 - **Frontend + API**: Vercel (serverless)
 - **Database**: Supabase Cloud (managed PostgreSQL)
 - **Background Worker**: Vercel Serverless Function (long-running)
@@ -31,6 +33,7 @@ The staging environment serves as a production-like environment for:
 - **Search**: Exa API (optional, for regulatory research)
 
 **Differences from Production**:
+
 - Lower resource limits (to save costs)
 - Smaller database instance
 - Test user accounts allowed
@@ -44,24 +47,28 @@ The staging environment serves as a production-like environment for:
 ### Code Quality
 
 - [ ] **All tests passing**
+
   ```bash
   pnpm test
   # Expected: 0 failures, all suites pass
   ```
 
 - [ ] **TypeScript compiles with 0 errors**
+
   ```bash
   npx tsc --noEmit
   # Expected: no errors
   ```
 
 - [ ] **Linting passes**
+
   ```bash
   pnpm lint
   # Expected: 0 errors, 0 warnings (or acceptable warnings only)
   ```
 
 - [ ] **Calculation evals pass** (if implemented)
+
   ```bash
   pnpm eval
   # Expected: All calculations within 0.01% of reference
@@ -76,18 +83,21 @@ The staging environment serves as a production-like environment for:
 ### Database
 
 - [ ] **All migrations applied**
+
   ```bash
   npx supabase db reset  # Local verification
   ls supabase/migrations/  # Check migration files
   ```
 
 - [ ] **Database types generated**
+
   ```bash
   npx supabase gen types typescript --local > types/database.types.ts
   # Verify file is up-to-date
   ```
 
 - [ ] **Seed data script works**
+
   ```bash
   npx tsx scripts/seed-test-data.ts
   # Should create test user and sample project
@@ -146,6 +156,7 @@ The staging environment serves as a production-like environment for:
   - Ensure sensitive data not logged (PII, API keys)
 
 - [ ] **Health check endpoint exists**
+
   ```bash
   curl http://localhost:3000/api/health
   # Should return 200 OK
@@ -183,6 +194,7 @@ The staging environment serves as a production-like environment for:
      - `service_role` key (keep secret!)
 
 2. **Run Migrations**:
+
    ```bash
    # Link to remote project
    npx supabase link --project-ref xxxxx
@@ -281,6 +293,7 @@ WORKER_CONCURRENCY=1
 ```
 
 **Important**:
+
 - Mark `SUPABASE_SERVICE_ROLE_KEY` and `ANTHROPIC_API_KEY` as **sensitive** (not shown in logs)
 - Select **"All Environments"** or just **"Production"** (Vercel's "production" = our staging)
 
@@ -298,25 +311,29 @@ The worker needs to run as a long-running process, not a serverless function.
 **Option A: Vercel Cron Job** (Recommended for Staging)
 
 1. Create `vercel.json`:
+
    ```json
    {
-     "crons": [{
-       "path": "/api/worker",
-       "schedule": "*/5 * * * *"
-     }]
+     "crons": [
+       {
+         "path": "/api/worker",
+         "schedule": "*/5 * * * *"
+       }
+     ]
    }
    ```
 
 2. Create `app/api/worker/route.ts`:
-   ```typescript
-   import { NextResponse } from 'next/server'
-   import { processAnalysisJobs } from '@/scripts/worker'
 
-   export const maxDuration = 300 // 5 minutes
+   ```typescript
+   import { NextResponse } from "next/server";
+   import { processAnalysisJobs } from "@/scripts/worker";
+
+   export const maxDuration = 300; // 5 minutes
 
    export async function GET() {
-     await processAnalysisJobs()
-     return NextResponse.json({ status: 'ok' })
+     await processAnalysisJobs();
+     return NextResponse.json({ status: "ok" });
    }
    ```
 
@@ -355,6 +372,7 @@ In Supabase dashboard:
 Run through these checks:
 
 1. **Health Check**:
+
    ```bash
    curl https://wastewise-staging.vercel.app/api/health
    # Expected: {"status":"ok"}
@@ -591,6 +609,7 @@ For subsequent staging deployments:
 Once staging is stable:
 
 1. **Tag release**:
+
    ```bash
    git tag -a v1.0.0 -m "Production release 1.0.0"
    git push origin v1.0.0
@@ -612,23 +631,23 @@ Once staging is stable:
 
 ### Required Variables
 
-| Variable | Example | Description |
-|----------|---------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://xxx.supabase.co` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGc...` | Public anon key (safe to expose) |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJhbGc...` | Service role key (SECRET) |
-| `ANTHROPIC_API_KEY` | `sk-ant-...` | Anthropic API key (SECRET) |
-| `NEXT_PUBLIC_APP_URL` | `https://staging.wastewise.com` | Application URL |
-| `NODE_ENV` | `production` | Node environment |
+| Variable                        | Example                         | Description                      |
+| ------------------------------- | ------------------------------- | -------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | `https://xxx.supabase.co`       | Supabase project URL             |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGc...`                    | Public anon key (safe to expose) |
+| `SUPABASE_SERVICE_ROLE_KEY`     | `eyJhbGc...`                    | Service role key (SECRET)        |
+| `ANTHROPIC_API_KEY`             | `sk-ant-...`                    | Anthropic API key (SECRET)       |
+| `NEXT_PUBLIC_APP_URL`           | `https://staging.wastewise.com` | Application URL                  |
+| `NODE_ENV`                      | `production`                    | Node environment                 |
 
 ### Optional Variables
 
-| Variable | Example | Description |
-|----------|---------|-------------|
-| `EXA_API_KEY` | `exa_...` | Exa search API key (for regulatory) |
-| `WORKER_POLL_INTERVAL_MS` | `5000` | Worker polling interval |
-| `WORKER_CONCURRENCY` | `1` | Max concurrent jobs |
-| `SENTRY_DSN` | `https://...@sentry.io/...` | Error tracking (if using Sentry) |
+| Variable                  | Example                     | Description                         |
+| ------------------------- | --------------------------- | ----------------------------------- |
+| `EXA_API_KEY`             | `exa_...`                   | Exa search API key (for regulatory) |
+| `WORKER_POLL_INTERVAL_MS` | `5000`                      | Worker polling interval             |
+| `WORKER_CONCURRENCY`      | `1`                         | Max concurrent jobs                 |
+| `SENTRY_DSN`              | `https://...@sentry.io/...` | Error tracking (if using Sentry)    |
 
 ---
 
@@ -639,6 +658,7 @@ Once staging is stable:
 **Error**: Build fails on Vercel
 
 **Solutions**:
+
 1. Check build logs for specific error
 2. Verify `pnpm build` works locally
 3. Check all dependencies in `package.json`
@@ -649,6 +669,7 @@ Once staging is stable:
 **Error**: Jobs stuck in 'pending' status
 
 **Solutions**:
+
 1. Check worker logs in Vercel dashboard
 2. Verify `ANTHROPIC_API_KEY` is set and valid
 3. Check `SUPABASE_SERVICE_ROLE_KEY` is correct
@@ -659,6 +680,7 @@ Once staging is stable:
 **Error**: "Could not connect to database"
 
 **Solutions**:
+
 1. Verify Supabase project is running
 2. Check connection string format
 3. Verify service role key is correct
@@ -669,6 +691,7 @@ Once staging is stable:
 **Error**: "CORS policy: No 'Access-Control-Allow-Origin' header"
 
 **Solutions**:
+
 1. Add staging domain to Supabase CORS settings
 2. Verify `NEXT_PUBLIC_APP_URL` matches actual URL
 3. Check `next.config.js` headers configuration

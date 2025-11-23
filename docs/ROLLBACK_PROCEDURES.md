@@ -7,6 +7,7 @@ Detailed procedures for rolling back deployments when issues occur.
 ## When to Rollback
 
 Immediate rollback required if:
+
 - ✗ Health checks failing (>50% failure rate)
 - ✗ Error rate >5% of requests
 - ✗ Critical functionality completely broken
@@ -14,6 +15,7 @@ Immediate rollback required if:
 - ✗ Security vulnerability exploited
 
 Consider rollback if:
+
 - ⚠ Error rate >1% of requests
 - ⚠ Response time >2 seconds (p95)
 - ⚠ User reports of broken functionality
@@ -37,11 +39,13 @@ pnpm rollback --auto
 ```
 
 **Pros**:
+
 - Fast (< 2 minutes)
 - Includes verification steps
 - Creates documentation
 
 **Cons**:
+
 - Limited to Railway deployments
 - May not work for all scenarios
 
@@ -56,11 +60,13 @@ pnpm rollback --auto
 7. Verify health checks pass
 
 **Pros**:
+
 - Visual interface
 - Can select specific deployment
 - Works even if CLI unavailable
 
 **Cons**:
+
 - Slower (manual process)
 - Easy to select wrong deployment
 
@@ -80,11 +86,13 @@ git push origin master
 ```
 
 **Pros**:
+
 - Creates permanent record in git history
 - Works with any platform
 - Easy to understand what was rolled back
 
 **Cons**:
+
 - Slower (requires new deployment)
 - May have merge conflicts
 - Doesn't rollback database changes
@@ -121,6 +129,7 @@ curl https://wastewise.com/api/health
 ### 4. Monitor for 15 Minutes
 
 Watch for:
+
 - Error spikes in Sentry
 - Memory/CPU usage in Railway
 - Database connection pool usage
@@ -250,14 +259,15 @@ We apologize for any inconvenience.
 
 ## Rollback Decision Matrix
 
-| Severity | Error Rate | Response Time | Action |
-|----------|-----------|---------------|--------|
-| Critical | >10% | N/A | **Rollback immediately** |
-| High | 5-10% | >5s | **Rollback within 15 min** |
-| Medium | 1-5% | 2-5s | Investigate, rollback if not resolved in 30 min |
-| Low | <1% | <2s | Monitor, fix in next deployment |
+| Severity | Error Rate | Response Time | Action                                          |
+| -------- | ---------- | ------------- | ----------------------------------------------- |
+| Critical | >10%       | N/A           | **Rollback immediately**                        |
+| High     | 5-10%      | >5s           | **Rollback within 15 min**                      |
+| Medium   | 1-5%       | 2-5s          | Investigate, rollback if not resolved in 30 min |
+| Low      | <1%        | <2s           | Monitor, fix in next deployment                 |
 
 **Critical Scenarios** (always rollback):
+
 - Complete service outage
 - Data loss or corruption
 - Security vulnerability being exploited
@@ -268,12 +278,14 @@ We apologize for any inconvenience.
 ## Rollback Limitations
 
 What rollback **CANNOT** fix:
+
 - Database schema changes (need separate migration rollback)
 - Data that was deleted or corrupted
 - External API changes
 - Third-party service outages
 
 What rollback **CAN** fix:
+
 - Code bugs introduced in deployment
 - Configuration errors
 - Performance regressions

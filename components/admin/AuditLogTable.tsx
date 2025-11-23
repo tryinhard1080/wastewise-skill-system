@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Audit Log Table Component
@@ -7,7 +7,7 @@
  * Supports export to CSV
  */
 
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,74 +15,70 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Search, Download, Eye } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+} from "@/components/ui/dialog";
+import { Search, Download, Eye } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface AuditLog {
-  id: string
-  admin_email: string
-  action: string
-  target_type: string
-  target_id: string
-  changes?: Record<string, any>
-  ip_address?: string
-  created_at: string
+  id: string;
+  admin_email: string;
+  action: string;
+  target_type: string;
+  target_id: string;
+  changes?: Record<string, any>;
+  ip_address?: string;
+  created_at: string;
 }
 
 interface AuditLogTableProps {
-  logs: AuditLog[]
-  onExport?: () => void
+  logs: AuditLog[];
+  onExport?: () => void;
 }
 
 export function AuditLogTable({ logs, onExport }: AuditLogTableProps) {
-  const [search, setSearch] = useState('')
-  const [actionFilter, setActionFilter] = useState<string>('all')
-  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
+  const [search, setSearch] = useState("");
+  const [actionFilter, setActionFilter] = useState<string>("all");
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
       log.admin_email.toLowerCase().includes(search.toLowerCase()) ||
-      log.target_id.toLowerCase().includes(search.toLowerCase())
-    const matchesAction = actionFilter === 'all' || log.action === actionFilter
+      log.target_id.toLowerCase().includes(search.toLowerCase());
+    const matchesAction = actionFilter === "all" || log.action === actionFilter;
 
-    return matchesSearch && matchesAction
-  })
+    return matchesSearch && matchesAction;
+  });
 
-  const actionTypes = Array.from(new Set(logs.map((log) => log.action)))
+  const actionTypes = Array.from(new Set(logs.map((log) => log.action)));
 
   const getActionBadge = (action: string) => {
-    const variants: Record<string, 'default' | 'destructive' | 'outline'> = {
-      create: 'default',
-      update: 'outline',
-      delete: 'destructive',
-      disable: 'destructive',
-      enable: 'default',
-    }
+    const variants: Record<string, "default" | "destructive" | "outline"> = {
+      create: "default",
+      update: "outline",
+      delete: "destructive",
+      disable: "destructive",
+      enable: "default",
+    };
 
-    return (
-      <Badge variant={variants[action] || 'outline'}>
-        {action}
-      </Badge>
-    )
-  }
+    return <Badge variant={variants[action] || "outline"}>{action}</Badge>;
+  };
 
   return (
     <div className="space-y-4">
@@ -132,7 +128,10 @@ export function AuditLogTable({ logs, onExport }: AuditLogTableProps) {
           <TableBody>
             {filteredLogs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-gray-500"
+                >
                   No audit logs found
                 </TableCell>
               </TableRow>
@@ -144,18 +143,22 @@ export function AuditLogTable({ logs, onExport }: AuditLogTableProps) {
                       addSuffix: true,
                     })}
                   </TableCell>
-                  <TableCell className="font-medium">{log.admin_email}</TableCell>
+                  <TableCell className="font-medium">
+                    {log.admin_email}
+                  </TableCell>
                   <TableCell>{getActionBadge(log.action)}</TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div className="text-sm font-medium">{log.target_type}</div>
+                      <div className="text-sm font-medium">
+                        {log.target_type}
+                      </div>
                       <div className="text-xs text-gray-500 font-mono">
                         {log.target_id.slice(0, 8)}...
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-gray-500">
-                    {log.ip_address || '-'}
+                    {log.ip_address || "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     <Dialog>
@@ -196,7 +199,9 @@ export function AuditLogTable({ logs, onExport }: AuditLogTableProps) {
                               <div className="text-sm font-medium text-gray-500">
                                 Target ID
                               </div>
-                              <div className="text-sm font-mono">{log.target_id}</div>
+                              <div className="text-sm font-mono">
+                                {log.target_id}
+                              </div>
                             </div>
                           </div>
                           {log.changes && (
@@ -225,5 +230,5 @@ export function AuditLogTable({ logs, onExport }: AuditLogTableProps) {
         Showing {filteredLogs.length} of {logs.length} audit logs
       </div>
     </div>
-  )
+  );
 }

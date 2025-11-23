@@ -1,14 +1,14 @@
-import type React from "react"
+import type React from "react";
 
 interface NumbersThatSpeakProps {
   /** Fixed width from Figma: 482px */
-  width?: number | string
+  width?: number | string;
   /** Fixed height from Figma: 300px */
-  height?: number | string
+  height?: number | string;
   /** Optional className to pass to root */
-  className?: string
+  className?: string;
   /** Theme palette */
-  theme?: "light" | "dark"
+  theme?: "light" | "dark";
 }
 
 /**
@@ -40,13 +40,13 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
           "--nts-text-muted": "rgba(55,50,47,0.7)",
           "--nts-border": "rgba(47,48,55,0.12)",
           "--nts-shadow": "rgba(47,48,55,0.06)",
-        } as React.CSSProperties)
+        } as React.CSSProperties);
 
   // Figma-exported assets
-  const imgSchedule = "/placeholder.svg?height=271&width=431"
-  const imgYAxisLine = "/placeholder.svg?height=17&width=295"
-  const imgYAxisLine1 = "/placeholder.svg?height=13&width=295"
-  const imgYAxisLine2 = "/placeholder.svg?height=13&width=295"
+  const imgSchedule = "/placeholder.svg?height=271&width=431";
+  const imgYAxisLine = "/placeholder.svg?height=17&width=295";
+  const imgYAxisLine1 = "/placeholder.svg?height=13&width=295";
+  const imgYAxisLine2 = "/placeholder.svg?height=13&width=295";
 
   return (
     <div
@@ -341,38 +341,40 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                                     boxSizing: "border-box",
                                   }}
                                 >
-                                  {["500k", "300k", "200k", "100k", "0"].map((label, index) => (
-                                    <div
-                                      key={index}
-                                      style={{
-                                        display: "flex",
-                                        gap: "6.261px",
-                                        height: "17.217px",
-                                        alignItems: "center",
-                                        justifyContent: "flex-end",
-                                        paddingLeft: 0,
-                                        paddingRight: 0,
-                                        paddingTop: "8.609px",
-                                        paddingBottom: "8.609px",
-                                        width: "100%",
-                                        boxSizing: "border-box",
-                                      }}
-                                    >
+                                  {["500k", "300k", "200k", "100k", "0"].map(
+                                    (label, index) => (
                                       <div
+                                        key={index}
                                         style={{
-                                          fontFamily: "'Inter', sans-serif",
-                                          fontWeight: 500,
-                                          fontSize: "7.826px",
-                                          lineHeight: "14.087px",
-                                          color: "var(--nts-text-muted)",
-                                          textAlign: "right",
-                                          whiteSpace: "pre",
+                                          display: "flex",
+                                          gap: "6.261px",
+                                          height: "17.217px",
+                                          alignItems: "center",
+                                          justifyContent: "flex-end",
+                                          paddingLeft: 0,
+                                          paddingRight: 0,
+                                          paddingTop: "8.609px",
+                                          paddingBottom: "8.609px",
+                                          width: "100%",
+                                          boxSizing: "border-box",
                                         }}
                                       >
-                                        {label}
+                                        <div
+                                          style={{
+                                            fontFamily: "'Inter', sans-serif",
+                                            fontWeight: 500,
+                                            fontSize: "7.826px",
+                                            lineHeight: "14.087px",
+                                            color: "var(--nts-text-muted)",
+                                            textAlign: "right",
+                                            whiteSpace: "pre",
+                                          }}
+                                        >
+                                          {label}
+                                        </div>
                                       </div>
-                                    </div>
-                                  ))}
+                                    ),
+                                  )}
                                 </div>
                               </div>
 
@@ -399,45 +401,99 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                                   }}
                                 >
                                   <div
-                                    style={{ height: "17.217px", width: "100%", display: "flex", alignItems: "center" }}
+                                    style={{
+                                      height: "17.217px",
+                                      width: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
                                   >
                                     <div
-                                      style={{ width: "100%", height: "1px", backgroundColor: "rgba(0,0,0,0.05)" }}
+                                      style={{
+                                        width: "100%",
+                                        height: "1px",
+                                        backgroundColor: "rgba(0,0,0,0.05)",
+                                      }}
                                     />
                                   </div>
                                   <div
-                                    style={{ height: "13.304px", width: "100%", display: "flex", alignItems: "center" }}
+                                    style={{
+                                      height: "13.304px",
+                                      width: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
                                   >
                                     <div
-                                      style={{ width: "100%", height: "1px", backgroundColor: "rgba(0,0,0,0.05)" }}
+                                      style={{
+                                        width: "100%",
+                                        height: "1px",
+                                        backgroundColor: "rgba(0,0,0,0.05)",
+                                      }}
                                     />
                                   </div>
                                   <div
-                                    style={{ height: "13.304px", width: "100%", display: "flex", alignItems: "center" }}
+                                    style={{
+                                      height: "13.304px",
+                                      width: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
                                   >
                                     <div
-                                      style={{ width: "100%", height: "1px", backgroundColor: "rgba(0,0,0,0.05)" }}
+                                      style={{
+                                        width: "100%",
+                                        height: "1px",
+                                        backgroundColor: "rgba(0,0,0,0.05)",
+                                      }}
                                     />
                                   </div>
                                   <div
-                                    style={{ height: "13.304px", width: "100%", display: "flex", alignItems: "center" }}
+                                    style={{
+                                      height: "13.304px",
+                                      width: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
                                   >
                                     <div
-                                      style={{ width: "100%", height: "1px", backgroundColor: "rgba(0,0,0,0.05)" }}
+                                      style={{
+                                        width: "100%",
+                                        height: "1px",
+                                        backgroundColor: "rgba(0,0,0,0.05)",
+                                      }}
                                     />
                                   </div>
                                   <div
-                                    style={{ height: "13.304px", width: "100%", display: "flex", alignItems: "center" }}
+                                    style={{
+                                      height: "13.304px",
+                                      width: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
                                   >
                                     <div
-                                      style={{ width: "100%", height: "1px", backgroundColor: "rgba(0,0,0,0.05)" }}
+                                      style={{
+                                        width: "100%",
+                                        height: "1px",
+                                        backgroundColor: "rgba(0,0,0,0.05)",
+                                      }}
                                     />
                                   </div>
                                   <div
-                                    style={{ height: "13.304px", width: "100%", display: "flex", alignItems: "center" }}
+                                    style={{
+                                      height: "13.304px",
+                                      width: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
                                   >
                                     <div
-                                      style={{ width: "100%", height: "1px", backgroundColor: "rgba(0,0,0,0.05)" }}
+                                      style={{
+                                        width: "100%",
+                                        height: "1px",
+                                        backgroundColor: "rgba(0,0,0,0.05)",
+                                      }}
                                     />
                                   </div>
                                 </div>
@@ -462,8 +518,12 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                                     width: "100%",
                                   }}
                                 >
-                                  <div style={{ whiteSpace: "pre" }}>Aug 2023</div>
-                                  <div style={{ whiteSpace: "pre" }}>Aug 2024</div>
+                                  <div style={{ whiteSpace: "pre" }}>
+                                    Aug 2023
+                                  </div>
+                                  <div style={{ whiteSpace: "pre" }}>
+                                    Aug 2024
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -534,7 +594,7 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NumbersThatSpeak
+export default NumbersThatSpeak;

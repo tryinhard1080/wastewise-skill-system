@@ -25,15 +25,15 @@
  * ```
  */
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { Database } from '@/types/database.types'
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { Database } from "@/types/database.types";
 
 export async function createClient() {
-  let cookieStore: any
+  let cookieStore: any;
 
   try {
-    cookieStore = await cookies()
+    cookieStore = await cookies();
   } catch (error) {
     // Called outside request context (e.g. worker)
     // Return client without cookie handling
@@ -43,10 +43,10 @@ export async function createClient() {
       {
         cookies: {
           getAll: () => [],
-          setAll: () => { },
+          setAll: () => {},
         },
-      }
-    )
+      },
+    );
   }
 
   return createServerClient<Database>(
@@ -55,13 +55,13 @@ export async function createClient() {
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options)
-            })
+              cookieStore.set(name, value, options);
+            });
           } catch (error) {
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
@@ -69,8 +69,8 @@ export async function createClient() {
           }
         },
       },
-    }
-  )
+    },
+  );
 }
 
 /**
@@ -95,8 +95,8 @@ export function createServiceClient() {
     {
       cookies: {
         getAll: () => [],
-        setAll: () => { },
+        setAll: () => {},
       },
-    }
-  )
+    },
+  );
 }

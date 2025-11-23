@@ -20,15 +20,15 @@ Successfully validated the TypeScript `compactor-optimization` skill implementat
 
 Created a complete, reusable evaluation framework:
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `types.ts` | Type definitions for eval results | 75 |
-| `eval-utils.ts` | Comparison utilities and report formatting | 180 |
-| `compactor-optimization-eval.ts` | Compactor skill validation tests | 350 |
-| `formula-validator.ts` | Runtime constant validation | 280 |
-| `README.md` | Framework documentation and patterns | 450 |
-| `VALIDATION_REPORT.md` | Detailed findings and analysis | 450 |
-| `TASK-2-SUMMARY.md` | This summary document | - |
+| File                             | Purpose                                    | Lines |
+| -------------------------------- | ------------------------------------------ | ----- |
+| `types.ts`                       | Type definitions for eval results          | 75    |
+| `eval-utils.ts`                  | Comparison utilities and report formatting | 180   |
+| `compactor-optimization-eval.ts` | Compactor skill validation tests           | 350   |
+| `formula-validator.ts`           | Runtime constant validation                | 280   |
+| `README.md`                      | Framework documentation and patterns       | 450   |
+| `VALIDATION_REPORT.md`           | Detailed findings and analysis             | 450   |
+| `TASK-2-SUMMARY.md`              | This summary document                      | -     |
 
 **Total**: 1,785+ lines of production-ready eval infrastructure
 
@@ -39,11 +39,13 @@ Created a complete, reusable evaluation framework:
 The Python reference (`compactor_calculator.py`) and TypeScript implementation use **different optimization methodologies**:
 
 **Python Approach** (Older):
+
 - Uses container-specific max capacity: `(container_CY * 580 lbs/CY) / 2000 = max_tons`
 - Recommends when: `(avg_tons / max_tons) * 100 < 60%`
 - Example: 30 CY container → 8.7 ton max capacity
 
 **TypeScript Approach** (Canonical v2.0):
+
 - Uses industry-standard target: `8.5 tons` (midpoint of 8-9 ton standard)
 - Recommends when: `avg_tons < 6.0` (direct threshold)
 - Plus: `max_days_between <= 14` and `has_compactor == true`
@@ -54,11 +56,12 @@ The Python reference (`compactor_calculator.py`) and TypeScript implementation u
 
 #### Finding 2: Conversion Rate Discrepancy ⚠️
 
-| Conversion | Python | TypeScript (v2.0) | Derivation |
-|------------|--------|-------------------|------------|
-| Tons to Yards | 3.448 | 14.49 | 2000 lbs/ton ÷ 138 lbs/CY |
+| Conversion    | Python | TypeScript (v2.0) | Derivation                |
+| ------------- | ------ | ----------------- | ------------------------- |
+| Tons to Yards | 3.448  | 14.49             | 2000 lbs/ton ÷ 138 lbs/CY |
 
 **Analysis**:
+
 - Python's 3.448 appears to be for compacted density (undocumented)
 - Canonical 14.49 is EPA standard for mixed MSW (documented)
 - **4.2x difference** - used for different purposes
@@ -67,15 +70,15 @@ The Python reference (`compactor_calculator.py`) and TypeScript implementation u
 
 All TypeScript constants match WASTE_FORMULAS_REFERENCE.md v2.0:
 
-| Constant | Value | Source Line | Match |
-|----------|-------|-------------|-------|
-| COMPACTOR_OPTIMIZATION_THRESHOLD | 6.0 | 204-209 | ✓ |
-| COMPACTOR_TARGET_TONS | 8.5 | 103 | ✓ |
-| COMPACTOR_MAX_DAYS_BETWEEN | 14 | 92 | ✓ |
-| DSQ_MONITOR_INSTALL | 300 | 332 | ✓ |
-| DSQ_MONITOR_MONTHLY | 200 | 333 | ✓ |
-| TONS_TO_YARDS | 14.49 | 140 | ✓ |
-| WEEKS_PER_MONTH | 4.33 | 150 | ✓ |
+| Constant                         | Value | Source Line | Match |
+| -------------------------------- | ----- | ----------- | ----- |
+| COMPACTOR_OPTIMIZATION_THRESHOLD | 6.0   | 204-209     | ✓     |
+| COMPACTOR_TARGET_TONS            | 8.5   | 103         | ✓     |
+| COMPACTOR_MAX_DAYS_BETWEEN       | 14    | 92          | ✓     |
+| DSQ_MONITOR_INSTALL              | 300   | 332         | ✓     |
+| DSQ_MONITOR_MONTHLY              | 200   | 333         | ✓     |
+| TONS_TO_YARDS                    | 14.49 | 140         | ✓     |
+| WEEKS_PER_MONTH                  | 4.33  | 150         | ✓     |
 
 **Validation**: All constants verified by `formula-validator.ts`
 
@@ -86,6 +89,7 @@ All TypeScript constants match WASTE_FORMULAS_REFERENCE.md v2.0:
 **Status**: VALIDATED - Correctly implements canonical v2.0 formulas
 
 **Tested Components**:
+
 - ✓ Average tons per haul calculation
 - ✓ Recommendation criteria (3-part AND logic)
 - ✓ Threshold boundary conditions (5.8, 6.0, 6.1 tons)
@@ -95,6 +99,7 @@ All TypeScript constants match WASTE_FORMULAS_REFERENCE.md v2.0:
 - ✓ Error handling (no haul log, wrong equipment type)
 
 **Test Coverage**:
+
 - 6 test cases in eval suite
 - Edge cases: boundary values, constraint violations
 - Integration with BaseSkill framework
@@ -105,6 +110,7 @@ All TypeScript constants match WASTE_FORMULAS_REFERENCE.md v2.0:
 **Status**: NEEDS UPDATE - Uses pre-v2.0 methodology
 
 **Recommended Updates**:
+
 1. Change optimization threshold from `utilization < 60%` to `avg_tons < 6.0`
 2. Change target capacity from container-based to `8.5 tons` constant
 3. Update tons-to-yards conversion to `14.49` with documented derivation
@@ -125,17 +131,20 @@ All TypeScript constants match WASTE_FORMULAS_REFERENCE.md v2.0:
 ### Example Usage
 
 ```typescript
-import { runCompactorOptimizationEval, formatEvalReport } from '@/lib/evals/compactor-optimization-eval'
+import {
+  runCompactorOptimizationEval,
+  formatEvalReport,
+} from "@/lib/evals/compactor-optimization-eval";
 
 // Run eval suite
-const summary = await runCompactorOptimizationEval()
+const summary = await runCompactorOptimizationEval();
 
 // Print report
-console.log(formatEvalReport(summary))
+console.log(formatEvalReport(summary));
 
 // Check results
 if (summary.failing > 0) {
-  throw new Error(`${summary.failing} test(s) failed`)
+  throw new Error(`${summary.failing} test(s) failed`);
 }
 ```
 
@@ -144,8 +153,8 @@ if (summary.failing > 0) {
 ```typescript
 const TEST_CASES: TestCase<MyInput, MyExpected>[] = [
   {
-    id: 'test-01-description',
-    description: 'Human-readable explanation',
+    id: "test-01-description",
+    description: "Human-readable explanation",
     input: {
       // Test data matching skill input structure
     },
@@ -153,7 +162,7 @@ const TEST_CASES: TestCase<MyInput, MyExpected>[] = [
       // Expected outputs from canonical formulas
     },
   },
-]
+];
 ```
 
 ### For Future Skills
@@ -176,10 +185,10 @@ To create a new eval for another skill:
 ### Phase 1: Formula Constant Verification ✓
 
 ```typescript
-import { validateFormulaConstants } from '@/lib/evals/formula-validator'
+import { validateFormulaConstants } from "@/lib/evals/formula-validator";
 
 // Verify all constants match canonical reference
-validateFormulaConstants() // Throws error if mismatch
+validateFormulaConstants(); // Throws error if mismatch
 ```
 
 **Result**: All 11 formula constants match v2.0 exactly
@@ -187,6 +196,7 @@ validateFormulaConstants() // Throws error if mismatch
 ### Phase 2: Implementation Logic Review ✓
 
 Manual code review comparing TypeScript vs canonical formulas:
+
 - ✓ Imports constants from `@/lib/constants/formulas` (not hardcoded)
 - ✓ Uses `shouldRecommendMonitoring()` helper function
 - ✓ Implements 3-part AND criteria correctly
@@ -195,6 +205,7 @@ Manual code review comparing TypeScript vs canonical formulas:
 ### Phase 3: Test Case Execution ⏳
 
 Automated test suite execution:
+
 - 6 test cases covering edge cases and constraints
 - Validates calculation accuracy
 - Tests error handling paths
@@ -205,6 +216,7 @@ Automated test suite execution:
 ### Phase 4: Documentation Validation ✓
 
 Cross-referenced implementation against:
+
 - ✓ WASTE_FORMULAS_REFERENCE.md v2.0 (canonical source)
 - ✓ Skill documentation comments
 - ✓ Type definitions in `lib/skills/types.ts`
@@ -238,14 +250,16 @@ Cross-referenced implementation against:
 ### Immediate (Priority 1)
 
 1. **Run formula validator** in app initialization:
+
    ```typescript
    // app/layout.tsx or lib/app-init.ts
-   import { assertFormulaConstants } from '@/lib/evals/formula-validator'
+   import { assertFormulaConstants } from "@/lib/evals/formula-validator";
 
-   assertFormulaConstants() // Throws error if mismatch
+   assertFormulaConstants(); // Throws error if mismatch
    ```
 
 2. **Add eval to CI/CD pipeline**:
+
    ```yaml
    # .github/workflows/validate-merge.yml
    - name: Validate formula constants
@@ -288,6 +302,7 @@ Cross-referenced implementation against:
 ### 1. Importance of Canonical Documentation
 
 Having WASTE_FORMULAS_REFERENCE.md v2.0 as single source of truth was critical for:
+
 - Resolving conflicts between Python and TypeScript
 - Validating implementation correctness
 - Documenting derivations and industry standards
@@ -309,6 +324,7 @@ Initially attempted to extract test data from Python output, which failed due to
 ### 4. Eval Framework Design
 
 Generic, reusable framework pays dividends:
+
 - 1-2 hours to build framework core
 - 30 minutes per new skill eval (copying pattern)
 - Same utilities work for all calculation validations
@@ -319,16 +335,16 @@ Generic, reusable framework pays dividends:
 
 ## Metrics
 
-| Metric | Value |
-|--------|-------|
-| Time spent | ~4 hours |
-| Files created | 7 |
-| Lines of code | 1,785+ |
-| Test cases | 6 |
-| Formula constants validated | 11 |
-| Discrepancies found | 2 (methodology, conversion rate) |
-| Code changes needed | 0 (TypeScript is correct) |
-| Documentation pages | 3 |
+| Metric                      | Value                            |
+| --------------------------- | -------------------------------- |
+| Time spent                  | ~4 hours                         |
+| Files created               | 7                                |
+| Lines of code               | 1,785+                           |
+| Test cases                  | 6                                |
+| Formula constants validated | 11                               |
+| Discrepancies found         | 2 (methodology, conversion rate) |
+| Code changes needed         | 0 (TypeScript is correct)        |
+| Documentation pages         | 3                                |
 
 ---
 

@@ -8,6 +8,7 @@ description: Generate professional interactive dashboards and comprehensive spec
 ## What This Skill Does
 
 Transforms raw development project data into professional, interactive waste management analysis reports including:
+
 - **Interactive HTML Dashboard** with 6+ dynamic charts, building selector, and cost comparisons
 - **Comprehensive Spec Sheet** with detailed calculations, equipment specs, regulatory compliance, and implementation plans
 - Automated volume calculations using EPA/industry standards (0.16 CY/unit/week waste, 4:1 compaction ratios)
@@ -20,6 +21,7 @@ Perfect for presenting to executives, property managers, developers, or contract
 ## When to Use
 
 Invoke this skill when the user:
+
 - Uploads development project data with building information (units, square footage)
 - Mentions "trash management plan", "waste analysis", "compactor study"
 - Asks for "dashboard", "spec sheet", or "professional report" for waste services
@@ -71,16 +73,16 @@ def calculate_volumes(row):
     """Calculate weekly waste volumes for a building"""
     units = row['units']
     commercial_sf = row.get('commercial_sf', 0)
-    
+
     # Residential volumes
     loose_waste = units * WASTE_PER_UNIT
     compacted_waste = loose_waste / COMPACTION_RATIO
-    
+
     loose_recycling = units * RECYCLING_PER_UNIT
     compacted_recycling = loose_recycling / COMPACTION_RATIO
-    
+
     compost = units * COMPOST_PER_UNIT
-    
+
     # Commercial volumes (if applicable)
     if commercial_sf > 0:
         com_waste_lbs = commercial_sf * RESTAURANT_WASTE
@@ -88,7 +90,7 @@ def calculate_volumes(row):
         loose_waste += com_waste_cy * (1 - RESTAURANT_RECYCLING - RESTAURANT_COMPOST)
         loose_recycling += com_waste_cy * RESTAURANT_RECYCLING
         compost += com_waste_cy * RESTAURANT_COMPOST
-    
+
     return {
         'loose_waste_cy': loose_waste,
         'compacted_waste_cy': compacted_waste,
@@ -121,42 +123,42 @@ TIME_PER_BIN = 0.15  # hours to rake/rotate each bin
 
 def calculate_costs(row):
     """Calculate monthly service and labor costs"""
-    
+
     # Scenario 1: Loose service
     loose_waste_bins = row['loose_waste_cy'] / BIN_SIZE
     loose_recycle_bins = row['loose_recycling_cy'] / BIN_SIZE
     compost_toters = row['compost_cy'] / 0.5  # 96-gal toters
-    
+
     loose_pickups_week = loose_waste_bins + loose_recycle_bins + compost_toters
     loose_pickups_month = loose_pickups_week * WEEKS_PER_MONTH
-    
-    loose_waste_cost = (loose_waste_bins * WEEKS_PER_MONTH * 
+
+    loose_waste_cost = (loose_waste_bins * WEEKS_PER_MONTH *
                         FRONT_LOAD_RATE * BIN_SIZE)
-    loose_recycle_cost = (loose_recycle_bins * WEEKS_PER_MONTH * 
+    loose_recycle_cost = (loose_recycle_bins * WEEKS_PER_MONTH *
                           FRONT_LOAD_RATE * BIN_SIZE * 0.65)  # 35% discount
     compost_cost = compost_toters * WEEKS_PER_MONTH * 97.00  # Fixed toter rate
-    
+
     loose_total = loose_waste_cost + loose_recycle_cost + compost_cost
-    
+
     # Scenario 2: Compacted waste only
     comp_waste_bins = row['compacted_waste_cy'] / BIN_SIZE
     comp_pickups_week = comp_waste_bins + loose_recycle_bins + compost_toters
-    
+
     comp_waste_cost = comp_waste_bins * WEEKS_PER_MONTH * FRONT_LOAD_RATE * BIN_SIZE
     comp_total = comp_waste_cost + loose_recycle_cost + compost_cost
-    
+
     # Scenario 3: Both compacted
     comp_recycle_bins = row['compacted_recycling_cy'] / BIN_SIZE
     both_pickups_week = comp_waste_bins + comp_recycle_bins + compost_toters
-    
+
     comp_recycle_cost = comp_recycle_bins * WEEKS_PER_MONTH * FRONT_LOAD_RATE * BIN_SIZE * 0.65
     both_total = comp_waste_cost + comp_recycle_cost + compost_cost
-    
+
     # Labor costs
     loose_labor = ((TIME_TO_MOVE_BINS * 1) + (TIME_PER_BIN * loose_pickups_week)) * WEEKS_PER_MONTH * LABOR_RATE
     comp_labor = ((TIME_TO_MOVE_BINS * 1) + (TIME_PER_BIN * comp_pickups_week)) * WEEKS_PER_MONTH * LABOR_RATE
     both_labor = ((TIME_TO_MOVE_BINS * 1) + (TIME_PER_BIN * both_pickups_week)) * WEEKS_PER_MONTH * LABOR_RATE
-    
+
     return {
         'loose_service': loose_total,
         'loose_labor': loose_labor,
@@ -188,24 +190,24 @@ PALLET_JACK = 7907.00
 def calculate_payback(row):
     """Calculate payback periods for equipment investment"""
     units = row['units']
-    
+
     # Savings calculations
     comp_waste_savings = row['loose_total'] - row['comp_total']
     both_savings = row['loose_total'] - row['both_total']
-    
+
     # Equipment costs
     single_compactor_cost = COMPACTOR_COST
     dual_compactor_cost = COMPACTOR_COST * 2
-    
+
     # Payback in months
     comp_payback = (single_compactor_cost / comp_waste_savings) if comp_waste_savings > 0 else 999
     both_payback = (dual_compactor_cost / both_savings) if both_savings > 0 else 999
-    
+
     # Per unit costs
     loose_per_unit = row['loose_total'] / units
     comp_per_unit = row['comp_total'] / units
     both_per_unit = row['both_total'] / units
-    
+
     return {
         'comp_monthly_savings': comp_waste_savings,
         'both_monthly_savings': both_savings,
@@ -218,7 +220,7 @@ def calculate_payback(row):
         'loose_cost_per_unit': loose_per_unit,
         'comp_cost_per_unit': comp_per_unit,
         'both_cost_per_unit': both_per_unit,
-        'container_reduction_pct': ((row['loose_containers'] - row['both_containers']) / 
+        'container_reduction_pct': ((row['loose_containers'] - row['both_containers']) /
                                      row['loose_containers'] * 100)
     }
 
@@ -247,17 +249,17 @@ BENCHMARKS = {
 def calculate_yards_per_door(row):
     """
     Calculate yards of service per door per month for benchmarking
-    
+
     For dumpster service:
     Yards/Door = (Container_Size × Containers × Pickups/Week × 4.33) / Units
-    
+
     For compactor service:
     Yards/Door = ((Tons × 2000) / 138) / Units
     Where 138 lbs/yd³ is EPA standard density for loose MSW
     """
     units = row['units']
     building_type = row.get('building_type', 'mid-rise').lower()
-    
+
     # Get appropriate benchmark
     if 'garden' in building_type:
         benchmark = BENCHMARKS['garden-style']
@@ -265,29 +267,29 @@ def calculate_yards_per_door(row):
         benchmark = BENCHMARKS['high-rise']
     else:
         benchmark = BENCHMARKS['mid-rise']
-    
+
     # Calculate yards/door for loose service (dumpster formula)
     loose_waste_containers = row['loose_waste_cy'] / BIN_SIZE
     loose_pickups_week = loose_waste_containers + (row['loose_recycling_cy'] / BIN_SIZE)
     loose_yards_per_door = (BIN_SIZE * loose_pickups_week * WEEKS_PER_MONTH) / units
-    
+
     # Calculate yards/door for compacted service
     # Estimate tonnage: (CY × 138 lbs/yd³) / 2000 lbs/ton
     comp_waste_tons_month = (row['compacted_waste_cy'] * WEEKS_PER_MONTH * 138) / 2000
     comp_yards_per_door = ((comp_waste_tons_month * 2000) / 138) / units
-    
+
     # Calculate yards/door for both compacted
     both_waste_tons_month = (row['compacted_waste_cy'] * WEEKS_PER_MONTH * 138) / 2000
     both_recycle_tons_month = (row['compacted_recycling_cy'] * WEEKS_PER_MONTH * 138) / 2000
     total_tons = both_waste_tons_month + both_recycle_tons_month
     both_yards_per_door = ((total_tons * 2000) / 138) / units
-    
+
     # Compare to benchmarks
-    loose_vs_benchmark = ((loose_yards_per_door - benchmark['optimal']) / 
+    loose_vs_benchmark = ((loose_yards_per_door - benchmark['optimal']) /
                           benchmark['optimal'] * 100)
-    both_vs_benchmark = ((both_yards_per_door - benchmark['optimal']) / 
+    both_vs_benchmark = ((both_yards_per_door - benchmark['optimal']) /
                          benchmark['optimal'] * 100)
-    
+
     return {
         'loose_yards_per_door': loose_yards_per_door,
         'comp_yards_per_door': comp_yards_per_door,
@@ -297,7 +299,7 @@ def calculate_yards_per_door(row):
         'benchmark_optimal': benchmark['optimal'],
         'loose_vs_benchmark_pct': loose_vs_benchmark,
         'both_vs_benchmark_pct': both_vs_benchmark,
-        'within_benchmark': (both_yards_per_door >= benchmark['min'] and 
+        'within_benchmark': (both_yards_per_door >= benchmark['min'] and
                             both_yards_per_door <= benchmark['max'])
     }
 
@@ -318,7 +320,7 @@ for idx, row in df.iterrows():
 ```python
 def generate_dashboard(df, project_name):
     """Create interactive HTML dashboard with Chart.js"""
-    
+
     html = f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -460,17 +462,17 @@ def generate_dashboard(df, project_name):
             <p>Comprehensive Waste Management Analysis & Optimization Report</p>
             <p style="margin-top: 10px; font-weight: 600;">Generated: {datetime.now().strftime("%B %d, %Y at %I:%M %p")}</p>
         </div>
-        
+
         <div class="metrics">
 '''
-    
+
     # Calculate total metrics
     total_units = df['units'].sum()
     total_savings = df['both_monthly_savings'].sum()
     avg_payback = df['both_payback_months'].mean()
-    container_reduction = ((df['loose_containers'].sum() - df['both_containers'].sum()) / 
+    container_reduction = ((df['loose_containers'].sum() - df['both_containers'].sum()) /
                            df['loose_containers'].sum() * 100)
-    
+
     html += f'''
             <div class="metric-card">
                 <div class="metric-label">Total Units</div>
@@ -492,19 +494,19 @@ def generate_dashboard(df, project_name):
             </div>
         </div>
 '''
-    
+
     # Add charts section with Chart.js
     html += '''
         <div class="building-selector" id="buildingSelector">
             <button class="building-btn active" onclick="selectBuilding('all')">All Buildings</button>
     '''
-    
+
     for idx, row in df.iterrows():
         html += f'<button class="building-btn" onclick="selectBuilding({idx})">{row["building_name"]}</button>'
-    
+
     html += '''
         </div>
-        
+
         <div class="charts">
             <div class="chart-card">
                 <div class="chart-title">📊 Cost Comparison by Scenario</div>
@@ -532,10 +534,10 @@ def generate_dashboard(df, project_name):
             </div>
         </div>
 '''
-    
+
     # Add recommendation section
     best_building = df.loc[df['both_payback_months'].idxmin()]
-    
+
     html += f'''
         <div class="recommendation">
             <h2>✅ Recommendation: Full Compaction System</h2>
@@ -561,37 +563,37 @@ def generate_dashboard(df, project_name):
                 </div>
             </div>
             <p style="margin-top: 20px; font-size: 16px;">
-                🏆 <strong>Best Performer:</strong> {best_building['building_name']} shows fastest payback 
+                🏆 <strong>Best Performer:</strong> {best_building['building_name']} shows fastest payback
                 at {best_building['both_payback_months']:.0f} months with ${best_building['both_monthly_savings']:,.0f}/month savings.
             </p>
         </div>
     </div>
-    
+
     <script>
         // Data from Python
         const buildingData = {json.dumps(df.to_dict('records'))};
-        
+
         // Chart instances
         let charts = {{}};
-        
+
         function selectBuilding(index) {{
             // Update button states
             document.querySelectorAll('.building-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Update charts
             updateCharts(index);
         }}
-        
+
         function updateCharts(index) {{
             const data = index === 'all' ? buildingData : [buildingData[index]];
-            
+
             // Cost Comparison Chart
             const costLabels = data.map(b => b.building_name);
             const looseData = data.map(b => b.loose_total);
             const compData = data.map(b => b.comp_total);
             const bothData = data.map(b => b.both_total);
-            
+
             if (charts.cost) charts.cost.destroy();
             charts.cost = new Chart(document.getElementById('costChart'), {{
                 type: 'bar',
@@ -609,12 +611,12 @@ def generate_dashboard(df, project_name):
                     scales: {{ y: {{ beginAtZero: true, title: {{ display: true, text: 'Monthly Cost ($)' }} }} }}
                 }}
             }});
-            
+
             // Container Requirements Chart
             const looseContainers = data.map(b => b.loose_containers);
             const compContainers = data.map(b => b.comp_containers);
             const bothContainers = data.map(b => b.both_containers);
-            
+
             if (charts.containers) charts.containers.destroy();
             charts.containers = new Chart(document.getElementById('containerChart'), {{
                 type: 'bar',
@@ -632,12 +634,12 @@ def generate_dashboard(df, project_name):
                     scales: {{ y: {{ beginAtZero: true, title: {{ display: true, text: 'Containers/Week' }} }} }}
                 }}
             }});
-            
+
             // Continue with other charts...
             // Savings Chart
             const compSavings = data.map(b => b.comp_monthly_savings);
             const bothSavings = data.map(b => b.both_monthly_savings);
-            
+
             if (charts.savings) charts.savings.destroy();
             charts.savings = new Chart(document.getElementById('savingsChart'), {{
                 type: 'bar',
@@ -654,11 +656,11 @@ def generate_dashboard(df, project_name):
                     scales: {{ y: {{ beginAtZero: true, title: {{ display: true, text: 'Monthly Savings ($)' }} }} }}
                 }}
             }});
-            
+
             // Payback Chart
             const compPayback = data.map(b => b.comp_payback_months);
             const bothPayback = data.map(b => b.both_payback_months);
-            
+
             if (charts.payback) charts.payback.destroy();
             charts.payback = new Chart(document.getElementById('paybackChart'), {{
                 type: 'bar',
@@ -675,12 +677,12 @@ def generate_dashboard(df, project_name):
                     scales: {{ y: {{ beginAtZero: true, title: {{ display: true, text: 'Months to Payback' }} }} }}
                 }}
             }});
-            
+
             // Per Unit Cost Chart
             const looseCPU = data.map(b => b.loose_cost_per_unit);
             const compCPU = data.map(b => b.comp_cost_per_unit);
             const bothCPU = data.map(b => b.both_cost_per_unit);
-            
+
             if (charts.perUnit) charts.perUnit.destroy();
             charts.perUnit = new Chart(document.getElementById('perUnitChart'), {{
                 type: 'bar',
@@ -698,10 +700,10 @@ def generate_dashboard(df, project_name):
                     scales: {{ y: {{ beginAtZero: true, title: {{ display: true, text: 'Cost Per Unit ($/month)' }} }} }}
                 }}
             }});
-            
+
             // ROI Chart
             const annualROI = data.map(b => b.both_annual_savings);
-            
+
             if (charts.roi) charts.roi.destroy();
             charts.roi = new Chart(document.getElementById('roiChart'), {{
                 type: 'bar',
@@ -718,13 +720,13 @@ def generate_dashboard(df, project_name):
                 }}
             }});
         }}
-        
+
         // Initialize with all buildings
         updateCharts('all');
     </script>
 </body>
 </html>'''
-    
+
     return html
 
 # Generate dashboard
@@ -742,7 +744,7 @@ print("✓ Dashboard generated: waste_management_dashboard.html")
 ```python
 def generate_spec_sheet(df, project_name, equipment):
     """Create detailed technical specification document"""
-    
+
     html = f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -906,26 +908,26 @@ def generate_spec_sheet(df, project_name, equipment):
                 Date: {datetime.now().strftime("%B %d, %Y")}
             </div>
         </div>
-        
+
         <div class="btn-group no-print">
             <button class="btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
             <button class="btn" onclick="downloadHTML()">💾 Download HTML</button>
         </div>
 '''
-    
+
     # Executive Summary
     total_units = df['units'].sum()
     total_savings_monthly = df['both_monthly_savings'].sum()
     total_savings_annual = total_savings_monthly * 12
     avg_payback = df['both_payback_months'].mean()
     total_investment = df['both_equipment_cost'].sum()
-    
+
     html += f'''
         <div class="executive-summary">
             <h2>Executive Summary</h2>
             <p style="font-size: 16px; margin-bottom: 20px;">
-                This comprehensive waste management plan analyzes three development scenarios for {total_units:,.0f} 
-                total residential units with commercial space. Our analysis recommends implementing full compaction 
+                This comprehensive waste management plan analyzes three development scenarios for {total_units:,.0f}
+                total residential units with commercial space. Our analysis recommends implementing full compaction
                 systems (waste + recycling) across all buildings for optimal cost savings and operational efficiency.
             </p>
             <div>
@@ -947,7 +949,7 @@ def generate_spec_sheet(df, project_name, equipment):
                 </div>
             </div>
         </div>
-        
+
         <h2>1. Building Summary</h2>
         <table>
             <thead>
@@ -963,7 +965,7 @@ def generate_spec_sheet(df, project_name, equipment):
             </thead>
             <tbody>
 '''
-    
+
     for idx, row in df.iterrows():
         html += f'''
                 <tr>
@@ -976,7 +978,7 @@ def generate_spec_sheet(df, project_name, equipment):
                     <td>{row['both_payback_months']:.0f} mo</td>
                 </tr>
 '''
-    
+
     html += f'''
             </tbody>
             <tfoot>
@@ -991,14 +993,14 @@ def generate_spec_sheet(df, project_name, equipment):
                 </tr>
             </tfoot>
         </table>
-        
+
         <h2>2. Calculation Methodology</h2>
-        
+
         <h3>2.1 Base Generation Rates (Per Unit/Week)</h3>
         <div class="formula">
 Residential:
 • Waste: 0.16 CY (32 gallons) per unit/week
-• Recycling: 0.16 CY (32 gallons) per unit/week  
+• Recycling: 0.16 CY (32 gallons) per unit/week
 • Compost: 0.012 CY (2.4 gallons) per unit/week
 • Cardboard: 3.5 boxes per unit/week
 
@@ -1007,7 +1009,7 @@ Commercial (Restaurant):
 • Recycling: 40% diversion rate
 • Compost: 25% diversion rate
         </div>
-        
+
         <h3>2.2 Compaction Ratios</h3>
         <div class="formula">
 Waste Compaction: 4:1 ratio
@@ -1015,7 +1017,7 @@ Recycling Compaction: 4:1 ratio
 
 Example: 31.2 CY loose waste ÷ 4 = 7.8 CY compacted
         </div>
-        
+
         <h3>2.3 Cost Calculations</h3>
         <div class="formula">
 Athens Services 2023 Rate Schedule:
@@ -1031,7 +1033,7 @@ Monthly Service Cost Formula:
 Labor Cost Formula:
 = [(0.5 hrs base) + (0.15 hrs × containers)] × 4.33 weeks × $21/hr
         </div>
-        
+
         <h3>2.4 Payback Period Calculation</h3>
         <div class="formula">
 Payback (months) = Equipment Cost ÷ Monthly Savings
@@ -1040,13 +1042,13 @@ Monthly Savings = (Loose Total Cost) - (Compacted Total Cost)
 
 Where Total Cost = Service Cost + Labor Cost
         </div>
-        
+
         <div class="page-break"></div>
-        
+
         <h2>3. Equipment Specifications</h2>
-        
+
         <h3>3.1 Container Specifications</h3>
-        
+
         <table>
             <thead>
                 <tr>
@@ -1081,18 +1083,18 @@ Where Total Cost = Service Cost + Labor Cost
                 </tr>
             </tbody>
         </table>
-        
+
         <div class="note">
             <strong>📦 Container Notes:</strong>
             <ul style="margin: 10px 0 0 20px;">
-                <li><strong>Compacted Bins:</strong> Reinforced steel (10-12 gauge) vs standard (12-14 gauge). 
+                <li><strong>Compacted Bins:</strong> Reinforced steel (10-12 gauge) vs standard (12-14 gauge).
                 150-300 lbs heavier to withstand compaction forces.</li>
                 <li><strong>Clearance Required:</strong> Minimum 14' overhead for front-load truck arms.</li>
                 <li><strong>Side Clearances:</strong> 3-4 feet on service side, 2 feet on non-service sides.</li>
                 <li><strong>Max Fill Weights:</strong> Include container + waste. Exceeding limits may result in overage charges.</li>
             </ul>
         </div>
-        
+
         <h3>3.2 Compactor Systems</h3>
         <table>
             <tr>
@@ -1121,10 +1123,10 @@ Where Total Cost = Service Cost + Labor Cost
                 <td>${PALLET_JACK:,.2f}</td>
             </tr>
         </table>
-        
+
         <h3>3.3 Container Requirements by Scenario</h3>
 '''
-    
+
     for idx, row in df.iterrows():
         html += f'''
         <p><strong>{row['building_name']} ({row['units']} units)</strong></p>
@@ -1163,16 +1165,16 @@ Where Total Cost = Service Cost + Labor Cost
             </tr>
         </table>
 '''
-    
+
     # Add yards per door benchmarks section
     html += '''
         <div class="page-break"></div>
-        
+
         <h2>4. Industry Benchmarks & Performance Metrics</h2>
-        
+
         <h3>4.1 Yards Per Door Analysis</h3>
         <p>Industry standard metric for measuring waste service consumption. Enables apples-to-apples comparison across properties and service types.</p>
-        
+
         <table>
             <thead>
                 <tr>
@@ -1186,11 +1188,11 @@ Where Total Cost = Service Cost + Labor Cost
             </thead>
             <tbody>
 '''
-    
+
     for idx, row in df.iterrows():
         status_class = "highlight" if row['within_benchmark'] else "warning"
         status_text = "✓ Within Range" if row['within_benchmark'] else "⚠ Outside Range"
-        
+
         html += f'''
                 <tr>
                     <td><strong>{row['building_name']}</strong></td>
@@ -1201,11 +1203,11 @@ Where Total Cost = Service Cost + Labor Cost
                     <td>{status_text}</td>
                 </tr>
 '''
-    
+
     html += '''
             </tbody>
         </table>
-        
+
         <div class="formula">
 <strong>Calculation Methods:</strong>
 
@@ -1217,7 +1219,7 @@ Yards/Door = ((Total_Monthly_Tons × 2000) / 138) / Units
 
 Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
         </div>
-        
+
         <h3>4.2 Cost Per Door Benchmarks</h3>
         <table>
             <thead>
@@ -1231,7 +1233,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             </thead>
             <tbody>
 '''
-    
+
     # Add cost per door comparison
     for idx, row in df.iterrows():
         building_type = row.get('building_type', 'mid-rise').lower()
@@ -1241,9 +1243,9 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             optimal_range = "$12-18"
         else:
             optimal_range = "$15-20"
-        
+
         performance = "✓ Excellent" if row['both_cost_per_unit'] < 22 else "○ Good" if row['both_cost_per_unit'] < 28 else "⚠ High"
-        
+
         html += f'''
                 <tr>
                     <td><strong>{row['building_name']}</strong></td>
@@ -1253,11 +1255,11 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
                     <td>{performance}</td>
                 </tr>
 '''
-    
+
     html += '''
             </tbody>
         </table>
-        
+
         <div class="note">
             <strong>📊 Benchmark Interpretation:</strong>
             <ul>
@@ -1269,38 +1271,38 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             </ul>
         </div>
     '''
-    
+
     html += f'''
         <div class="page-break"></div>
-        
+
         <h2>5. Regulatory Compliance</h2>
-        
+
         <h3>5.1 California State Requirements</h3>
         <ul>
-            <li><strong>AB 341 (Recycling):</strong> Mandatory commercial recycling for businesses and multifamily 
+            <li><strong>AB 341 (Recycling):</strong> Mandatory commercial recycling for businesses and multifamily
             properties with 5+ units</li>
-            <li><strong>AB 1826 (Organics):</strong> Mandatory organic waste recycling for commercial/multifamily 
+            <li><strong>AB 1826 (Organics):</strong> Mandatory organic waste recycling for commercial/multifamily
             generators</li>
             <li><strong>AB 1383 (SLCP):</strong> Reduce organic waste disposal 75% by 2025, recover 20% edible food</li>
             <li><strong>SB 1383 Compliance:</strong> Requires monitoring, education, contamination prevention programs</li>
         </ul>
-        
+
         <h3>5.2 LA City Requirements</h3>
         <ul>
             <li><strong>Recycling Room Size:</strong> Minimum 100 SF for buildings with ≥51 units (8 ft ceiling height)</li>
             <li><strong>Container Access:</strong> Bins must be accessible within 150 ft of collection point</li>
-            <li><strong>Fire Code (NFPA 82):</strong> Compactor rooms require proper ventilation, sprinklers, fire-rated 
+            <li><strong>Fire Code (NFPA 82):</strong> Compactor rooms require proper ventilation, sprinklers, fire-rated
             construction</li>
             <li><strong>ADA Compliance:</strong> Accessible routes to recycling areas, appropriate signage</li>
         </ul>
-        
+
         <div class="note">
-            <strong>⚠️ Note:</strong> All buildings in this project meet or exceed regulatory requirements for 
+            <strong>⚠️ Note:</strong> All buildings in this project meet or exceed regulatory requirements for
             recycling room sizing and equipment accessibility.
         </div>
-        
+
         <h2>6. Recommended Service Schedules</h2>
-        
+
         <table>
             <thead>
                 <tr>
@@ -1313,13 +1315,13 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             </thead>
             <tbody>
 '''
-    
+
     for idx, row in df.iterrows():
         waste_pickups = int(row['compacted_waste_cy'] / BIN_SIZE)
         recycle_pickups = int(row['compacted_recycling_cy'] / BIN_SIZE)
         compost_pickups = int(row['compost_cy'] / 0.5)
         cardboard_daily = int(row['cardboard_boxes_week'] / 7)
-        
+
         html += f'''
                 <tr>
                     <td><strong>{row['building_name']}</strong></td>
@@ -1329,13 +1331,13 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
                     <td>~{cardboard_daily} boxes/day</td>
                 </tr>
 '''
-    
+
     html += '''
             </tbody>
         </table>
-        
+
         <h2>7. Maintenance Requirements</h2>
-        
+
         <h3>7.1 Daily Maintenance</h3>
         <ul>
             <li>Visual inspection of compactor operation</li>
@@ -1343,7 +1345,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Ensure chutes are clear and clean</li>
             <li>Monitor fill levels on all containers</li>
         </ul>
-        
+
         <h3>7.2 Weekly Maintenance</h3>
         <ul>
             <li>Deep clean compactor chutes and hoppers</li>
@@ -1351,7 +1353,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Check hydraulic fluid levels</li>
             <li>Clean container staging areas</li>
         </ul>
-        
+
         <h3>7.3 Quarterly Maintenance</h3>
         <ul>
             <li>Professional compactor servicing by certified technician</li>
@@ -1359,7 +1361,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Electrical system check</li>
             <li>Replace worn parts as needed</li>
         </ul>
-        
+
         <h3>7.4 Annual Maintenance</h3>
         <ul>
             <li>Comprehensive equipment audit</li>
@@ -1367,11 +1369,11 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Pest control inspection and treatment</li>
             <li>Service contract renewal and rate review</li>
         </ul>
-        
+
         <div class="page-break"></div>
-        
+
         <h2>8. Implementation Plan</h2>
-        
+
         <h3>Phase 1: Planning & Design (Weeks 1-2)</h3>
         <ul>
             <li>Finalize compactor room designs with architect</li>
@@ -1379,7 +1381,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Order compactor equipment (12-16 week lead time)</li>
             <li>Coordinate with Athens Services for container delivery</li>
         </ul>
-        
+
         <h3>Phase 2: Construction & Installation (Weeks 3-20)</h3>
         <ul>
             <li>Complete compactor room construction</li>
@@ -1387,7 +1389,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Deliver and install compactor equipment</li>
             <li>Final inspections and permitting sign-offs</li>
         </ul>
-        
+
         <h3>Phase 3: Service Setup (Weeks 21-22)</h3>
         <ul>
             <li>Coordinate service schedules with Athens Services</li>
@@ -1395,7 +1397,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Set up billing and service agreements</li>
             <li>Train property management staff on operations</li>
         </ul>
-        
+
         <h3>Phase 4: Resident Education (Weeks 23-24)</h3>
         <ul>
             <li>Create resident education materials (flyers, signage)</li>
@@ -1403,7 +1405,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Install clear, multilingual signage in common areas</li>
             <li>Set up contamination monitoring program</li>
         </ul>
-        
+
         <h3>Phase 5: Monitoring & Optimization (Ongoing)</h3>
         <ul>
             <li>Track monthly waste volumes and costs</li>
@@ -1411,9 +1413,9 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
             <li>Quarterly service reviews with Athens Services</li>
             <li>Annual cost benchmarking and optimization</li>
         </ul>
-        
+
         <h2>9. Key Contacts</h2>
-        
+
         <table>
             <tr>
                 <th>Organization</th>
@@ -1441,28 +1443,28 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
                 <td>On-site Operations Management</td>
             </tr>
         </table>
-        
+
         <h2>10. Appendices</h2>
-        
+
         <h3>Appendix A: Rate Schedule</h3>
         <p>Complete Athens Services 2023 rate schedule available upon request.</p>
-        
+
         <h3>Appendix B: Equipment Specifications</h3>
         <p>Detailed compactor technical specifications and CAD drawings available upon request.</p>
-        
+
         <h3>Appendix C: Regulatory Documents</h3>
         <p>Full text of AB 341, AB 1826, AB 1383, and LA City ordinances available upon request.</p>
-        
+
         <h3>Appendix D: Resident Education Materials</h3>
         <p>Sample flyers, posters, and signage templates available upon request.</p>
-        
+
         <div style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #e2e8f0; text-align: center; color: #718096;">
             <p><strong>Advantage Waste | Greystar Real Estate Partners</strong></p>
             <p>Simplifying waste management for multifamily communities nationwide</p>
             <p style="margin-top: 10px;">Generated: {datetime.now().strftime("%B %d, %Y at %I:%M %p")}</p>
         </div>
     </div>
-    
+
     <script>
         function downloadHTML() {{
             const html = document.documentElement.outerHTML;
@@ -1476,7 +1478,7 @@ Where 138 lbs/yd³ is EPA/ENERGY STAR standard density for loose MSW
     </script>
 </body>
 </html>'''
-    
+
     return html
 
 # Generate spec sheet
@@ -1500,6 +1502,7 @@ print("✓ Spec sheet generated: waste_management_spec_sheet.html")
 **User prompt**: "I have data for a 3-building development project with 620 total units. Can you create a waste management dashboard and spec sheet?"
 
 **Claude will**:
+
 1. Load your CSV with building data (units, commercial SF, building names)
 2. Calculate all waste volumes using EPA standards (0.16 CY/unit/week)
 3. Compare three scenarios: loose, compacted waste only, both compacted
@@ -1510,6 +1513,7 @@ print("✓ Spec sheet generated: waste_management_spec_sheet.html")
 8. Provide both files ready for download/sharing
 
 **Output files**:
+
 - `waste_management_dashboard.html` - Interactive dashboard with Chart.js visualizations
 - `waste_management_spec_sheet.html` - 20+ page technical document ready to print/PDF
 

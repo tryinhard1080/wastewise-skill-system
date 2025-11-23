@@ -1,4 +1,5 @@
 # Waste Management Formulas - Universal Reference
+
 **Version 2.0 - Canonical Source of Truth**
 **Last Updated: November 14, 2025**
 
@@ -13,6 +14,7 @@ This document defines ALL calculations used across the waste management skills e
 ## 📊 Core Metrics Calculations
 
 ### 1. Cost Per Door
+
 ```python
 # CANONICAL FORMULA - Use everywhere
 cost_per_door = total_monthly_cost / unit_count
@@ -28,6 +30,7 @@ cost_per_door = total_monthly_cost / unit_count
 ```
 
 ### 2. Yards Per Door (NON-COMPACTED Service)
+
 ```python
 # CANONICAL FORMULA - Open tops / loose service ONLY
 yards_per_door = (container_qty × container_size × frequency × 4.33) / unit_count
@@ -46,6 +49,7 @@ yards_per_door = (container_qty × container_size × frequency × 4.33) / unit_c
 ```
 
 ### 3. Yards Per Door (COMPACTED Service)
+
 ```python
 # CANONICAL FORMULA - Compactors ONLY
 yards_per_door = (total_tons × 14.49) / unit_count
@@ -65,6 +69,7 @@ yards_per_door = (total_tons × 14.49) / unit_count
 ```
 
 ### 4. Tons Per Haul (Compactors Only)
+
 ```python
 # CANONICAL FORMULA
 tons_per_haul = total_tons / total_hauls
@@ -80,6 +85,7 @@ tons_per_haul = total_tons / total_hauls
 ```
 
 ### 5. Days Between Pickups
+
 ```python
 # CANONICAL FORMULA
 days_between = 30 / hauls_per_month
@@ -94,6 +100,7 @@ days_between = (pickup_date_n - pickup_date_n-1).days
 ```
 
 ### 6. Capacity Utilization
+
 ```python
 # CANONICAL FORMULA - Compactors
 utilization = (tons_per_haul / target_tons) × 100
@@ -186,7 +193,7 @@ TIME_PER_BIN = 0.15  # hours to rake/rotate each bin
 TIME_CARDBOARD_BREAKDOWN = 0.25  # hours per pickup
 
 # Monthly labor cost
-monthly_labor = ((TIME_TO_MOVE_BINS + (bins × TIME_PER_BIN)) × 
+monthly_labor = ((TIME_TO_MOVE_BINS + (bins × TIME_PER_BIN)) ×
                  pickups_per_week × 4.33 × LABOR_RATE)
 
 # Compactor labor (minimal)
@@ -409,6 +416,7 @@ Every skill should include in its SKILL.md:
 All calculations use the formulas defined in WASTE_FORMULAS_REFERENCE.md v2.0.
 
 Critical formulas:
+
 - Cost per door: total_cost / units
 - Yards per door (loose): (qty × size × freq × 4.33) / units
 - Yards per door (compacted): (tons × 14.49) / units
@@ -441,11 +449,13 @@ assert TONS_TO_YARDS == 2000 / EPA_DENSITY  # Should be True
 **Next Review:** Q1 2026
 
 **Change History:**
+
 - v2.0 (Nov 2025): Comprehensive formula standardization
 - v1.5 (Oct 2025): Added contamination criteria
 - v1.0 (Sep 2025): Initial unified formulas
 
 **When formulas change:**
+
 1. Update this document FIRST
 2. Update ALL skills to reference new version
 3. Document changes in CHANGELOG
@@ -456,6 +466,7 @@ assert TONS_TO_YARDS == 2000 / EPA_DENSITY  # Should be True
 ## 📞 Questions About Formulas?
 
 If any formula is unclear or needs adjustment:
+
 - Contact: Richard Bates, Advantage Waste
 - All changes must be documented here
 - Skills must be updated consistently

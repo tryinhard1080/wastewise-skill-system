@@ -1,9 +1,9 @@
 # Staging Deployment Checklist
 
-**Date**: _______________
-**Deployer**: _______________
+**Date**: ******\_\_\_******
+**Deployer**: ******\_\_\_******
 **Deployment Type**: [ ] Initial [ ] Update [ ] Hotfix
-**Git Commit**: _______________
+**Git Commit**: ******\_\_\_******
 
 ---
 
@@ -28,6 +28,7 @@
 - [ ] Test coverage adequate (>80% for calculations)
 
 **Commands**:
+
 ```bash
 pnpm test:unit --run
 pnpm test:integration --run
@@ -43,6 +44,7 @@ pnpm eval
 - [ ] Database backup procedures documented
 
 **Verification**:
+
 ```bash
 npx supabase db reset
 # Test with: test@wastewise.local / TestPassword123!
@@ -57,6 +59,7 @@ npx supabase db reset
 - [ ] Staging environment variables prepared (see Section 3)
 
 **Environment Variables Required**:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_KEY`
@@ -77,6 +80,7 @@ npx supabase db reset
 - [ ] Auth flow tested (signup, login, logout, forgot password)
 
 **Security Audit Command**:
+
 ```bash
 grep -r "sk-ant-" . --exclude-dir=node_modules --exclude-dir=.next
 grep -r "eyJ" . --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=__tests__
@@ -90,6 +94,7 @@ grep -r "eyJ" . --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=__t
 - [ ] Production build succeeds (`pnpm build`)
 
 **Commands**:
+
 ```bash
 pnpm audit --audit-level high
 pnpm build
@@ -110,7 +115,7 @@ pnpm build
 ### 2.1 Create Staging Project
 
 - [ ] Create new Supabase project for staging
-- [ ] Note project reference ID: _______________
+- [ ] Note project reference ID: ******\_\_\_******
 - [ ] Configure project settings (region, database password)
 - [ ] Enable required extensions (uuid-ossp, etc.)
 
@@ -137,6 +142,7 @@ npx supabase db push
 - [ ] Verified schema in Supabase Studio
 
 **Verify Tables Created**:
+
 - [ ] `profiles`
 - [ ] `projects`
 - [ ] `project_files`
@@ -222,7 +228,7 @@ vercel --prod
 
 - [ ] Deployment initiated
 - [ ] Build logs show no errors
-- [ ] Deployment URL: _______________
+- [ ] Deployment URL: ******\_\_\_******
 - [ ] Custom domain configured (if applicable)
 
 ### 3.4 Verify Frontend Deployment
@@ -234,6 +240,7 @@ vercel --prod
 - [ ] Health check returns 200 (`/api/health`)
 
 **Test URLs**:
+
 - [ ] `https://staging.wastewise.io`
 - [ ] `https://staging.wastewise.io/api/health`
 - [ ] `https://staging.wastewise.io/login`
@@ -350,6 +357,7 @@ STAGING_URL=https://staging.wastewise.io pnpm run smoke-tests
 ### 5.2 Manual End-to-End Test
 
 **Test Account**:
+
 - Email: `test@wastewise.local`
 - Password: `TestPassword123!`
 
@@ -471,6 +479,7 @@ pnpm load-test https://staging.wastewise.io
 - [ ] Worker CPU/memory monitored
 
 **Alert Thresholds**:
+
 - Job failure rate >10% → Send alert
 - Worker down >5 minutes → Send alert
 - Database connections >80% → Send alert
@@ -487,6 +496,7 @@ pnpm load-test https://staging.wastewise.io
 - [ ] Share staging URL with team
 
 **Deployment Log Entry**:
+
 ```
 Date: 2025-11-22
 Deployer: [Name]
@@ -505,6 +515,7 @@ Notes: First staging deployment
 - [ ] Schedule user acceptance testing
 
 **Notification Template**:
+
 ```
 ✅ Staging Deployment Complete
 
@@ -529,6 +540,7 @@ Report any issues in #staging-feedback
 - [ ] Schedule feedback session
 
 **Beta Tester Checklist**:
+
 - [ ] User 1: [Name/Email]
 - [ ] User 2: [Name/Email]
 - [ ] User 3: [Name/Email]
@@ -542,9 +554,9 @@ Report any issues in #staging-feedback
 - [ ] Review error logs daily for first week
 - [ ] Check job success rate daily
 
-**Issues Found**: _______________________________________________
+**Issues Found**: **********************\_\_\_**********************
 
-**Resolution**: _______________________________________________
+**Resolution**: **********************\_\_\_**********************
 
 ---
 
@@ -557,7 +569,7 @@ Rollback if any of the following occur:
 - [ ] Critical functionality broken (can't create projects, analysis fails)
 - [ ] Database corruption or data loss
 - [ ] Security vulnerability discovered
-- [ ] >50% job failure rate
+- [ ] > 50% job failure rate
 - [ ] Worker constantly crashing
 
 ### 8.2 Rollback Frontend
@@ -628,15 +640,16 @@ sudo systemctl restart wastewise-worker
 
 **Overall Status**: [ ] Success [ ] Success with Issues [ ] Failed
 
-**Signed**: _______________
-**Date**: _______________
-**Next Steps**: _______________________________________________
+**Signed**: ******\_\_\_******
+**Date**: ******\_\_\_******
+**Next Steps**: **********************\_\_\_**********************
 
 ---
 
 ## Appendix: Useful Commands
 
 ### Quick Health Checks
+
 ```bash
 # Frontend health
 curl https://staging.wastewise.io/api/health
@@ -649,6 +662,7 @@ npx supabase db ping
 ```
 
 ### Log Viewing
+
 ```bash
 # Vercel logs
 vercel logs
@@ -661,6 +675,7 @@ docker logs wastewise-worker -f
 ```
 
 ### Database Operations
+
 ```bash
 # View schema
 npx supabase db dump --schema-only
@@ -673,9 +688,10 @@ npx supabase db reset
 ```
 
 ### Emergency Contacts
-- **Technical Lead**: _______________
-- **DevOps**: _______________
-- **On-Call Engineer**: _______________
+
+- **Technical Lead**: ******\_\_\_******
+- **DevOps**: ******\_\_\_******
+- **On-Call Engineer**: ******\_\_\_******
 
 ---
 

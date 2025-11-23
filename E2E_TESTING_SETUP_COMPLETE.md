@@ -28,6 +28,7 @@ A comprehensive E2E testing infrastructure has been set up for WasteWise using *
 **File**: `__tests__/e2e/utils/test-helpers.ts`
 
 Comprehensive helper functions:
+
 - **User Management**: `createTestUser`, `deleteTestUser`, `loginUser`, `logoutUser`
 - **Project Management**: `createTestProject`, `deleteTestProject`
 - **Job Monitoring**: `waitForJobCompletion`, `getCurrentJobProgress`, `waitForProgress`
@@ -44,17 +45,20 @@ Comprehensive helper functions:
 Reusable test contexts with automatic setup/cleanup:
 
 #### `authenticatedPage`
+
 - Creates test user
 - Logs in automatically
 - Provides authenticated page
 - Auto-cleanup after test
 
 #### `testProject`
+
 - Creates test user and project
 - Provides page + project ID
 - Auto-cleanup after test
 
 #### `seededProject`
+
 - Creates project with 6 months of invoice data
 - Includes 22 haul log entries
 - Ready for immediate analysis
@@ -65,6 +69,7 @@ Reusable test contexts with automatic setup/cleanup:
 **Location**: `__tests__/e2e/seeds/test-files/`
 
 Test files copied from fixtures:
+
 - `sample-invoice.csv`
 - `sample-invoice.xlsx`
 - `sample-haullog.csv`
@@ -107,6 +112,7 @@ Test files copied from fixtures:
 **Two Jobs**:
 
 #### Main E2E Tests
+
 - Runs on PR and push to `master`
 - Sets up Supabase, Next.js, Worker
 - Executes Playwright tests
@@ -114,6 +120,7 @@ Test files copied from fixtures:
 - Comments PR with results
 
 #### Scheduled Tests (Optional)
+
 - Nightly full suite (all browsers)
 - Extended timeout (45 minutes)
 - Slack notifications on failure
@@ -154,6 +161,7 @@ pnpm test:e2e:report   # Open HTML report
 ### 9. Git Configuration ✅
 
 Updated `.gitignore`:
+
 - `test-results/` - Playwright test results
 - `playwright-report/` - HTML reports
 - `.playwright/` - Browser binaries and cache
@@ -163,6 +171,7 @@ Updated `.gitignore`:
 ## Validation Results
 
 ### TypeScript Validation ✅
+
 ```bash
 ✓ playwright.config.ts - No errors
 ✓ __tests__/e2e/utils/test-helpers.ts - No errors
@@ -171,6 +180,7 @@ Updated `.gitignore`:
 ```
 
 ### Test Discovery ✅
+
 ```bash
 $ pnpm exec playwright test --list
 
@@ -190,6 +200,7 @@ Total: 5 tests in 1 file
 ### Prerequisites
 
 1. **Environment Variables** (`.env.local`):
+
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=your-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -198,17 +209,20 @@ Total: 5 tests in 1 file
    ```
 
 2. **Supabase Running**:
+
    ```bash
    pnpm supabase start
    pnpm supabase db push
    ```
 
 3. **Background Worker**:
+
    ```bash
    pnpm worker  # In separate terminal
    ```
 
 4. **Playwright Browsers** (One-time):
+
    ```bash
    pnpm exec playwright install chromium
    ```
@@ -254,6 +268,7 @@ pnpm test:e2e:report
 ### Lazy Initialization Pattern
 
 Test helpers use lazy initialization of Supabase client, allowing:
+
 - ✅ Tests can be listed without environment variables
 - ✅ Clear error messages if env vars missing during execution
 - ✅ No premature initialization errors
@@ -261,6 +276,7 @@ Test helpers use lazy initialization of Supabase client, allowing:
 ### Fixture-Based Testing
 
 Fixtures provide:
+
 - ✅ Automatic setup before test
 - ✅ Automatic cleanup after test
 - ✅ Reusable test contexts
@@ -269,6 +285,7 @@ Fixtures provide:
 ### Seeded Data Fixture
 
 The `seededProject` fixture is optimized for speed:
+
 - ✅ No file uploads needed
 - ✅ Data pre-loaded in database
 - ✅ Realistic 6-month dataset
@@ -277,6 +294,7 @@ The `seededProject` fixture is optimized for speed:
 ### Async Job Testing
 
 Utilities handle WasteWise's async architecture:
+
 - ✅ Poll job status every 2 seconds
 - ✅ Configurable timeouts
 - ✅ Progress milestone tracking
@@ -289,6 +307,7 @@ Utilities handle WasteWise's async architecture:
 ### Automated Checks
 
 Every PR triggers:
+
 1. Supabase setup
 2. Database migrations
 3. Test data seeding
@@ -301,6 +320,7 @@ Every PR triggers:
 ### Merge Requirements
 
 To merge, PR must pass:
+
 - ✅ All E2E tests
 - ✅ TypeScript compilation
 - ✅ Linting
@@ -314,6 +334,7 @@ To merge, PR must pass:
 ### Immediate (Ready to Use)
 
 1. **Run Locally**:
+
    ```bash
    # Ensure services running
    pnpm supabase start
@@ -393,6 +414,7 @@ To merge, PR must pass:
 **Problem**: `winldd.exe` error when installing Chromium on Windows
 
 **Workaround**:
+
 - Tests work fine in CI/CD (Linux)
 - Can use Puppeteer (already installed)
 - Or skip browser install and use system Chrome
@@ -404,6 +426,7 @@ To merge, PR must pass:
 **Problem**: Complete analysis test takes 5-10 minutes due to real AI processing
 
 **Mitigation**:
+
 - Use `seededProject` fixture for faster tests
 - Set appropriate timeouts (15 minutes)
 - Run in CI/CD overnight
@@ -415,12 +438,14 @@ To merge, PR must pass:
 ## Success Metrics
 
 ### Code Quality ✅
+
 - ✅ 100% TypeScript strict mode
 - ✅ No compilation errors
 - ✅ Comprehensive documentation
 - ✅ Reusable test patterns
 
 ### Test Coverage ✅
+
 - ✅ Complete user workflow
 - ✅ Error handling
 - ✅ Progress monitoring
@@ -428,12 +453,14 @@ To merge, PR must pass:
 - ✅ Multiple scenarios
 
 ### CI/CD Ready ✅
+
 - ✅ Automated workflow configured
 - ✅ Artifact collection
 - ✅ PR integration
 - ✅ Failure notifications
 
 ### Developer Experience ✅
+
 - ✅ Simple npm scripts
 - ✅ Interactive UI mode
 - ✅ Debug capabilities
@@ -474,6 +501,7 @@ If issues arise:
 ✅ **E2E testing infrastructure is production-ready**
 
 The WasteWise application now has:
+
 - Comprehensive E2E test coverage
 - Automated CI/CD testing
 - Developer-friendly test utilities

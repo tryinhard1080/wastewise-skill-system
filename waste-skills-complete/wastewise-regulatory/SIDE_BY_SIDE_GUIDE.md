@@ -5,12 +5,14 @@
 You can now run both skills simultaneously without any conflicts:
 
 ### Skill 1: wastewise-analytics-validated (Your Current Skill)
+
 **Name:** `wastewise-analytics-validated`
 **Location:** `/mnt/skills/user/wastewise-analytics-validated/`
 **What it does:** Standard WasteWise analysis with validation
 **Sheets generated:** 6-7 sheets (no regulatory compliance)
 
 ### Skill 2: wastewise-regulatory (New Skill with Compliance)
+
 **Name:** `wastewise-regulatory`
 **Location:** Install to `/mnt/skills/user/wastewise-regulatory/`
 **What it does:** Everything from Skill 1 PLUS automated regulatory research
@@ -23,6 +25,7 @@ You can now run both skills simultaneously without any conflicts:
 ### When to Use wastewise-analytics-validated (Old)
 
 **Use for:**
+
 - Quick analysis without regulatory research
 - Properties where you already know the compliance requirements
 - Rapid portfolio screening
@@ -30,6 +33,7 @@ You can now run both skills simultaneously without any conflicts:
 - When you just need cost analysis and optimization
 
 **Example prompts:**
+
 ```
 "Analyze invoices for Orion Prosper Lakes using wastewise-analytics-validated"
 
@@ -45,6 +49,7 @@ You can now run both skills simultaneously without any conflicts:
 ### When to Use wastewise-regulatory (New)
 
 **Use for:**
+
 - New properties entering portfolio
 - Compliance audits
 - Due diligence for acquisitions
@@ -54,6 +59,7 @@ You can now run both skills simultaneously without any conflicts:
 - When stakeholders need regulatory documentation
 
 **Example prompts:**
+
 ```
 "Analyze invoices for Orion Prosper Lakes using wastewise-regulatory"
 
@@ -70,21 +76,21 @@ You can now run both skills simultaneously without any conflicts:
 
 ## Side-by-Side Comparison
 
-| Feature | wastewise-analytics-validated | wastewise-regulatory |
-|---------|------------------------------|---------------------|
-| Invoice analysis | ✅ Yes | ✅ Yes |
-| Contract extraction | ✅ Yes | ✅ Yes |
-| Optimization opportunities | ✅ Yes | ✅ Yes |
-| Haul log (compactor) | ✅ Yes | ✅ Yes |
-| Formula validation | ✅ Yes | ✅ Yes |
-| Quality check report | ✅ Yes | ✅ Enhanced with judge |
-| **Regulatory research** | ❌ No | ✅ **Yes** |
-| **LLM Judge evaluation** | ❌ No | ✅ **Yes** |
-| **REGULATORY_COMPLIANCE sheet** | ❌ No | ✅ **Yes** |
-| **Licensed haulers list** | ❌ No | ✅ **Yes** |
-| **Compliance checklist** | ❌ No | ✅ **Yes** |
-| Processing time | 1-2 min | 2-3 min |
-| Sheets generated | 6-7 | 7-8 |
+| Feature                         | wastewise-analytics-validated | wastewise-regulatory   |
+| ------------------------------- | ----------------------------- | ---------------------- |
+| Invoice analysis                | ✅ Yes                        | ✅ Yes                 |
+| Contract extraction             | ✅ Yes                        | ✅ Yes                 |
+| Optimization opportunities      | ✅ Yes                        | ✅ Yes                 |
+| Haul log (compactor)            | ✅ Yes                        | ✅ Yes                 |
+| Formula validation              | ✅ Yes                        | ✅ Yes                 |
+| Quality check report            | ✅ Yes                        | ✅ Enhanced with judge |
+| **Regulatory research**         | ❌ No                         | ✅ **Yes**             |
+| **LLM Judge evaluation**        | ❌ No                         | ✅ **Yes**             |
+| **REGULATORY_COMPLIANCE sheet** | ❌ No                         | ✅ **Yes**             |
+| **Licensed haulers list**       | ❌ No                         | ✅ **Yes**             |
+| **Compliance checklist**        | ❌ No                         | ✅ **Yes**             |
+| Processing time                 | 1-2 min                       | 2-3 min                |
+| Sheets generated                | 6-7                           | 7-8                    |
 
 ---
 
@@ -93,6 +99,7 @@ You can now run both skills simultaneously without any conflicts:
 ### Step 1: Keep Your Current Skill (Don't Touch It!)
 
 Your current skill stays exactly where it is:
+
 ```
 /mnt/skills/user/wastewise-analytics-validated/
 ```
@@ -106,6 +113,7 @@ Your current skill stays exactly where it is:
 2. Extract the zip file
 
 3. Copy the extracted folder to your skills directory:
+
    ```
    /mnt/skills/user/wastewise-regulatory/
    ```
@@ -120,11 +128,13 @@ Your current skill stays exactly where it is:
 ### Step 3: Test Both Work
 
 **Test the old skill:**
+
 ```
 "Using wastewise-analytics-validated, analyze these invoices for [property]"
 ```
 
 **Test the new skill:**
+
 ```
 "Using wastewise-regulatory, analyze these invoices for [property] in [city, state]"
 ```
@@ -142,6 +152,7 @@ Use `wastewise-analytics-validated` (your proven, trusted version)
 
 **For Testing/Pilots:**
 Use `wastewise-regulatory` on 5-10 properties to:
+
 - Verify regulatory research accuracy
 - Check judge decisions
 - Compare outputs side-by-side
@@ -149,11 +160,13 @@ Use `wastewise-regulatory` on 5-10 properties to:
 ### Phase 2: Selective Use (1-3 months)
 
 **Use wastewise-analytics-validated for:**
+
 - Quick monthly reviews
 - Properties you know well
 - Speed-critical situations
 
 **Use wastewise-regulatory for:**
+
 - New acquisitions
 - Compliance audits
 - Development projects
@@ -164,11 +177,13 @@ Use `wastewise-regulatory` on 5-10 properties to:
 Once confident in wastewise-regulatory:
 
 **Option A: Keep Both**
+
 - Use old for speed
 - Use new for compliance work
 - Maximum flexibility
 
 **Option B: Replace with New**
+
 - Remove wastewise-analytics-validated
 - Rename wastewise-regulatory to wastewise-analytics-validated
 - Single unified solution
@@ -180,11 +195,13 @@ Once confident in wastewise-regulatory:
 ### To Explicitly Choose a Skill:
 
 **Be specific:**
+
 ```
 "Use wastewise-regulatory to analyze..."
 ```
 
 **Or mention what you want:**
+
 ```
 "Analyze WITH regulatory compliance research"  → Uses wastewise-regulatory
 "Quick analysis without ordinances"            → Uses wastewise-analytics-validated
@@ -195,6 +212,7 @@ Once confident in wastewise-regulatory:
 Claude will automatically select the right skill based on your request:
 
 **Triggers for wastewise-regulatory:**
+
 - "regulatory compliance"
 - "local ordinances"
 - "research requirements"
@@ -203,6 +221,7 @@ Claude will automatically select the right skill based on your request:
 - "compliance audit"
 
 **Triggers for wastewise-analytics-validated:**
+
 - "quick analysis"
 - "standard review"
 - "no compliance needed"
@@ -215,6 +234,7 @@ Claude will automatically select the right skill based on your request:
 ### Problem: Both skills trying to run
 
 **Solution:** Be explicit in your prompt
+
 ```
 ❌ "Analyze these invoices"  (ambiguous)
 ✅ "Use wastewise-regulatory to analyze..."  (clear)
@@ -223,17 +243,20 @@ Claude will automatically select the right skill based on your request:
 ### Problem: Can't find wastewise-regulatory
 
 **Check installation:**
+
 ```bash
 ls /mnt/skills/user/
 ```
 
 Should see both:
+
 - wastewise-analytics-validated
 - wastewise-regulatory
 
 ### Problem: Old skill suddenly doing regulatory research
 
 **This shouldn't happen** - they're completely separate skills. If it does:
+
 - Check the skill name in the folder
 - Verify SKILL.md has correct name
 - Restart Claude or reload skills
@@ -244,14 +267,14 @@ Should see both:
 
 **Save this for easy reference:**
 
-| I Want... | Use This Skill | Example Prompt |
-|-----------|---------------|----------------|
-| Quick cost analysis | wastewise-analytics-validated | "Quick analysis without compliance" |
-| Full compliance audit | wastewise-regulatory | "Analyze WITH regulatory research" |
-| New property evaluation | wastewise-regulatory | "Full analysis for [property] in [city]" |
-| Monthly review | wastewise-analytics-validated | "Standard monthly review" |
-| Due diligence | wastewise-regulatory | "Research ordinances for [property]" |
-| Speed is critical | wastewise-analytics-validated | "Fast analysis, no regulatory" |
+| I Want...               | Use This Skill                | Example Prompt                           |
+| ----------------------- | ----------------------------- | ---------------------------------------- |
+| Quick cost analysis     | wastewise-analytics-validated | "Quick analysis without compliance"      |
+| Full compliance audit   | wastewise-regulatory          | "Analyze WITH regulatory research"       |
+| New property evaluation | wastewise-regulatory          | "Full analysis for [property] in [city]" |
+| Monthly review          | wastewise-analytics-validated | "Standard monthly review"                |
+| Due diligence           | wastewise-regulatory          | "Research ordinances for [property]"     |
+| Speed is critical       | wastewise-analytics-validated | "Fast analysis, no regulatory"           |
 
 ---
 
@@ -269,6 +292,7 @@ Should see both:
 ## When to Consolidate (Eventually)
 
 Consolidate to single skill when:
+
 - ✅ Tested wastewise-regulatory on 20+ properties
 - ✅ Judge decisions consistently accurate (>95%)
 - ✅ Team comfortable with new workflow
@@ -282,11 +306,13 @@ Consolidate to single skill when:
 ## Support
 
 **Questions about which skill to use?**
+
 - Use `wastewise-analytics-validated` for familiar situations
 - Use `wastewise-regulatory` when you need compliance info
 - When in doubt, use `wastewise-regulatory` (it does everything)
 
 **Having issues?**
+
 - Check skill is properly installed
 - Verify SKILL.md has correct name in frontmatter
 - Be explicit in prompts about which skill to use

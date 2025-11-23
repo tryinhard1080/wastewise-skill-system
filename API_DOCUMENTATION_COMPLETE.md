@@ -32,9 +32,11 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
 ### Configuration & Core Files (3 files)
 
 #### 1. `lib/api-docs/openapi-config.ts` (658 lines)
+
 **Purpose**: Base OpenAPI 3.0 specification and reusable components
 
 **Contents**:
+
 - API metadata (title, version, description)
 - Server configurations (dev/prod)
 - 8 tags for endpoint categorization
@@ -62,17 +64,21 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
   - `JobIdParam` - Job UUID
 
 #### 2. `lib/api-docs/swagger-config.ts` (21 lines)
+
 **Purpose**: swagger-jsdoc configuration
 
 **Contents**:
+
 - Configures JSDoc scanning paths
 - Combines annotations with base spec
 - Exports unified specification
 
 #### 3. `lib/api-docs/examples/all-routes.ts` (1,035 lines)
+
 **Purpose**: Complete JSDoc annotations for all API routes
 
 **Contents**:
+
 - 19 fully documented endpoints
 - Request body schemas with examples
 - Response schemas for all status codes
@@ -84,18 +90,22 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
 **Documented Endpoints**:
 
 **Health (2 endpoints)**:
+
 - `GET /api/health` - API health check
 - `GET /api/health/worker` - Worker health check
 
 **Jobs (2 endpoints)**:
+
 - `GET /api/jobs` - List user's jobs
 - `GET /api/jobs/{id}` - Get job status
 
 **Analysis (2 endpoints)**:
+
 - `POST /api/analyze` - Create analysis job
 - `POST /api/projects/{id}/analyze` - Analyze specific project
 
 **Admin (13 endpoints)**:
+
 - `GET /api/admin/jobs` - List all jobs
 - `GET /api/admin/jobs/{id}` - Get job details
 - `POST /api/admin/jobs/{id}/retry` - Retry failed job
@@ -113,11 +123,13 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
 ### API Routes (2 files)
 
 #### 4. `app/api/analyze/route.ts` (Updated)
+
 **Purpose**: Example of fully documented endpoint
 
 **Added**: 138 lines of JSDoc annotations
 
 **Includes**:
+
 - Complete OpenAPI spec for POST endpoint
 - Request schema with 2 examples
 - 5 response schemas (201, 400, 401, 404, 429, 500)
@@ -125,9 +137,11 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
 - Async job pattern explanation
 
 #### 5. `app/api/openapi.json/route.ts` (39 lines)
+
 **Purpose**: Serve dynamically generated OpenAPI spec
 
 **Features**:
+
 - Generates spec on-the-fly from JSDoc
 - Returns JSON specification
 - CORS headers for testing tools
@@ -136,9 +150,11 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
 ### UI Components (1 file)
 
 #### 6. `app/api-docs/page.tsx` (166 lines)
+
 **Purpose**: Interactive Swagger UI page
 
 **Features**:
+
 - Dynamic spec loading with error handling
 - Professional WasteWise branding
 - Quick Start guide with 3 sections:
@@ -154,6 +170,7 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
   - Response validation
 
 **Design**:
+
 - Blue gradient header
 - Gray quick-start section
 - Clean, professional layout
@@ -163,9 +180,11 @@ Complete OpenAPI 3.0/Swagger documentation has been successfully implemented for
 ### Scripts (2 files)
 
 #### 7. `scripts/export-openapi.ts` (118 lines)
+
 **Purpose**: Export OpenAPI spec to JSON and YAML
 
 **Usage**:
+
 ```bash
 pnpm export:openapi           # Both formats
 pnpm export:openapi:json      # JSON only
@@ -173,6 +192,7 @@ pnpm export:openapi:yaml      # YAML only
 ```
 
 **Features**:
+
 - Automatic directory creation
 - File size reporting
 - Statistics summary:
@@ -184,18 +204,22 @@ pnpm export:openapi:yaml      # YAML only
 - Validation warnings
 
 **Output**:
+
 - `docs/api/openapi.json` (68 KB)
 - `docs/api/openapi.yaml` (47.74 KB)
 
 #### 8. `scripts/validate-openapi.ts` (247 lines)
+
 **Purpose**: Comprehensive spec validation
 
 **Usage**:
+
 ```bash
 pnpm validate:openapi
 ```
 
 **Validation Checks**:
+
 - OpenAPI 3.0 compliance
 - Required fields (info, servers, paths)
 - Schema consistency
@@ -209,6 +233,7 @@ pnpm validate:openapi
 - Component definitions
 
 **Output**:
+
 - Categorized errors (exit code 1)
 - Categorized warnings (exit code 0)
 - Statistics summary
@@ -217,9 +242,11 @@ pnpm validate:openapi
 ### Documentation (4 files)
 
 #### 9. `docs/api/README.md` (436 lines)
+
 **Purpose**: Comprehensive API usage guide
 
 **Sections**:
+
 1. **Overview** - Features and capabilities
 2. **Authentication** - Complete JWT flow
 3. **Async Job Pattern** - Detailed workflow
@@ -239,15 +266,18 @@ pnpm validate:openapi
     - Version updates
 
 **Code Examples**:
+
 - cURL commands for all flows
 - JavaScript fetch examples
 - Response samples
 - Error examples
 
 #### 10. `docs/api/API_DOCUMENTATION_SUMMARY.md` (308 lines)
+
 **Purpose**: Implementation summary and reference
 
 **Contents**:
+
 - File manifest with line counts
 - Statistics and coverage metrics
 - Example JSDoc annotation
@@ -257,9 +287,11 @@ pnpm validate:openapi
 - Maintenance guidelines
 
 #### 11. `docs/api/SWAGGER_UI_GUIDE.md` (380 lines)
+
 **Purpose**: Visual guide to using Swagger UI
 
 **Contents**:
+
 - ASCII art page layout diagrams
 - Step-by-step authentication
 - Endpoint exploration walkthrough
@@ -274,9 +306,11 @@ pnpm validate:openapi
 - Troubleshooting guide
 
 #### 12. `docs/api/openapi.json` (Auto-generated, 68 KB)
+
 **Purpose**: Complete OpenAPI spec in JSON
 
 **Contents**:
+
 - 19 documented paths
 - 20 operations
 - 8 schemas
@@ -286,6 +320,7 @@ pnpm validate:openapi
 - 8 tags
 
 #### 13. `docs/api/openapi.yaml` (Auto-generated, 47.74 KB)
+
 **Purpose**: Complete OpenAPI spec in YAML (human-readable)
 
 **Contents**: Same as JSON, formatted as YAML
@@ -293,9 +328,11 @@ pnpm validate:openapi
 ### Package Configuration (1 file)
 
 #### 14. `package.json` (Updated)
+
 **Purpose**: Add API documentation scripts
 
 **Added Scripts**:
+
 ```json
 {
   "export:openapi": "tsx scripts/export-openapi.ts",
@@ -307,6 +344,7 @@ pnpm validate:openapi
 ```
 
 **Added Dependencies**:
+
 ```json
 {
   "devDependencies": {
@@ -389,23 +427,27 @@ pnpm validate:openapi
 ### For Developers
 
 #### 1. View Interactive Documentation
+
 ```bash
 pnpm dev
 # Navigate to: http://localhost:3000/api-docs
 ```
 
 #### 2. Validate Specification
+
 ```bash
 pnpm validate:openapi
 ```
 
 #### 3. Export Specification
+
 ```bash
 pnpm export:openapi
 # Outputs to: docs/api/openapi.json and docs/api/openapi.yaml
 ```
 
 #### 4. Full Workflow (Validate + Export)
+
 ```bash
 pnpm docs:api
 ```
@@ -413,12 +455,14 @@ pnpm docs:api
 ### For API Consumers
 
 #### 1. Import into Postman
+
 1. Open Postman
 2. File → Import → Link
 3. URL: `http://localhost:3000/api/openapi.json`
 4. Configure Bearer token authentication
 
 #### 2. Import into Insomnia
+
 1. Open Insomnia
 2. Application → Preferences → Data → Import Data
 3. URL: `http://localhost:3000/api/openapi.json`
@@ -427,6 +471,7 @@ pnpm docs:api
 #### 3. Generate Client SDK
 
 **TypeScript/JavaScript**:
+
 ```bash
 npx openapi-generator-cli generate \
   -i docs/api/openapi.json \
@@ -435,6 +480,7 @@ npx openapi-generator-cli generate \
 ```
 
 **Python**:
+
 ```bash
 openapi-generator-cli generate \
   -i docs/api/openapi.json \
@@ -443,6 +489,7 @@ openapi-generator-cli generate \
 ```
 
 **Go**:
+
 ```bash
 openapi-generator-cli generate \
   -i docs/api/openapi.json \
@@ -459,6 +506,7 @@ openapi-generator-cli generate \
 **Solution**: Background job queue with polling
 
 **Documentation**:
+
 - Complete workflow in multiple examples
 - Polling interval recommendations (2 seconds)
 - Progress tracking fields
@@ -466,6 +514,7 @@ openapi-generator-cli generate \
 - Result retrieval when completed
 
 **Example Flow**:
+
 ```
 1. POST /api/analyze → { jobId: "..." }
 2. GET /api/jobs/{jobId} (every 2s)
@@ -478,6 +527,7 @@ openapi-generator-cli generate \
 **Method**: Supabase JWT Bearer tokens
 
 **Documentation**:
+
 - Login endpoint
 - Token format: `Authorization: Bearer <token>`
 - Token expiration (1 hour)
@@ -485,6 +535,7 @@ openapi-generator-cli generate \
 - Common auth errors
 
 **Security**:
+
 - All endpoints require auth except `/api/health`
 - Admin endpoints require `role: admin`
 - JWT tokens validated by Supabase
@@ -492,16 +543,19 @@ openapi-generator-cli generate \
 ### 3. Rate Limiting
 
 **Limits**:
+
 - Users: 100 requests/minute
 - Admins: 500 requests/minute
 
 **Documentation**:
+
 - Rate limit headers in all responses
 - 429 error response format
 - `retryAfter` field
 - Reset timestamp
 
 **Headers**:
+
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -511,15 +565,19 @@ X-RateLimit-Reset: 1736942400
 ### 4. Error Handling
 
 **Standard Format**:
+
 ```json
 {
   "error": "Human-readable message",
   "code": "MACHINE_READABLE_CODE",
-  "details": { /* Additional context */ }
+  "details": {
+    /* Additional context */
+  }
 }
 ```
 
 **Documentation**:
+
 - All error codes documented
 - HTTP status mapping
 - Validation error details
@@ -528,10 +586,12 @@ X-RateLimit-Reset: 1736942400
 ### 5. Pagination
 
 **Parameters**:
+
 - `page` (default: 1)
 - `limit` (default: 20, max: 100)
 
 **Response Format**:
+
 ```json
 {
   "data": [...],
@@ -619,9 +679,11 @@ Complete example from `app/api/analyze/route.ts`:
 ## Access Points
 
 ### 1. Interactive Swagger UI
+
 **URL**: http://localhost:3000/api-docs
 
 **Features**:
+
 - Browse all endpoints
 - Try API calls directly
 - View request/response examples
@@ -630,18 +692,22 @@ Complete example from `app/api/analyze/route.ts`:
 - Filter endpoints
 
 ### 2. OpenAPI Spec Endpoint
+
 **URL**: http://localhost:3000/api/openapi.json
 
 **Features**:
+
 - Machine-readable API definition
 - Auto-generated from JSDoc
 - Cached for 5 minutes
 - CORS enabled
 
 ### 3. Exported Files
+
 **Location**: `docs/api/`
 
 **Files**:
+
 - `openapi.json` - JSON specification (68 KB)
 - `openapi.yaml` - YAML specification (47.74 KB)
 - `README.md` - Usage guide (436 lines)
@@ -651,6 +717,7 @@ Complete example from `app/api/analyze/route.ts`:
 ## Testing & Quality
 
 ### Validation Status
+
 ✅ **OpenAPI 3.0 Compliant**
 ✅ **All Required Fields Present**
 ✅ **Schema Consistency Verified**
@@ -659,6 +726,7 @@ Complete example from `app/api/analyze/route.ts`:
 ✅ **No Errors or Warnings**
 
 ### Test Commands
+
 ```bash
 # Validate spec
 pnpm validate:openapi
@@ -671,6 +739,7 @@ pnpm docs:api
 ```
 
 ### Coverage
+
 - **API Routes**: 20 total, 19 documented (95%)
 - **Operations**: 20 total, 20 documented (100%)
 - **Schemas**: 8 defined and used
@@ -749,12 +818,14 @@ pnpm docs:api
 ## Support & Resources
 
 ### Documentation Links
+
 - **Interactive Docs**: http://localhost:3000/api-docs
 - **API Spec**: http://localhost:3000/api/openapi.json
 - **Usage Guide**: `docs/api/README.md`
 - **Swagger Guide**: `docs/api/SWAGGER_UI_GUIDE.md`
 
 ### Scripts Reference
+
 ```bash
 # Validate specification
 pnpm validate:openapi
@@ -773,6 +844,7 @@ pnpm docs:api
 ```
 
 ### Related Documentation
+
 - OpenAPI 3.0 Spec: https://swagger.io/specification/
 - swagger-jsdoc: https://github.com/Surnet/swagger-jsdoc
 - Swagger UI: https://swagger.io/tools/swagger-ui/

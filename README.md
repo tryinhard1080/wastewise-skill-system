@@ -3,7 +3,7 @@
 [![PR Checks](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
-[![Phase](https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg)](#current-phase)
+[![Phase](<https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg>)](#current-phase)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > AI-powered waste management optimization platform for multifamily properties
@@ -15,6 +15,7 @@
 WasteWise is a skills-based SaaS platform that analyzes waste service invoices, hauler logs, and contracts to identify cost savings opportunities and ensure regulatory compliance for multifamily property portfolios. Built for property managers who want to reduce waste costs by 15-30% through data-driven optimization.
 
 **Key Value Propositions**:
+
 - 📊 Identify over-servicing and reduce waste costs by 15-30%
 - 🔍 Validate compliance with local waste ordinances
 - 📈 Benchmark performance against industry standards
@@ -24,31 +25,40 @@ WasteWise is a skills-based SaaS platform that analyzes waste service invoices, 
 ## ✨ Features
 
 ### 1. Complete Waste Analytics
+
 Full analysis combining compactor optimization, cost benchmarking, contamination tracking, bulk item analysis, and regulatory compliance research.
 
 ### 2. Compactor Optimization
+
 Specialized analysis for compacted waste services:
+
 - Calculate capacity utilization (target: 8.5 tons/haul)
 - Identify over-servicing (threshold: <6.0 tons/haul)
 - Recommend DSQ monitors when appropriate
 - Validate sanitary minimums (1-2x weekly)
 
 ### 3. Contract Intelligence
+
 Extract critical data from waste service agreements:
+
 - Service specifications and pricing structures
 - Contract terms and renewal dates
 - Vendor commitments and SLA details
 - Rate escalation clauses
 
 ### 4. Regulatory Compliance
+
 Automated research of local waste ordinances:
+
 - Recycling and composting requirements
 - Container placement regulations
 - Reporting obligations
 - Compliance checklists with citations
 
 ### 5. Batch Processing
+
 Process multiple properties simultaneously:
+
 - Bulk invoice extraction with Claude Vision
 - Location-specific Excel tabs
 - Validation reports and accuracy metrics
@@ -84,31 +94,32 @@ pnpm worker
 Visit http://localhost:3000 to see the application.
 
 **Test Credentials** (local development):
+
 - Email: `test@wastewise.local`
 - Password: `TestPassword123!`
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| **Frontend** | Next.js | 14.x |
-| | React | 19.x |
-| | TypeScript | 5.x |
-| | Tailwind CSS | 3.x |
-| | shadcn/ui | Latest |
-| **Backend** | Supabase | Latest |
-| | PostgreSQL | 15.x |
-| | Edge Functions | Deno |
-| **AI Services** | Anthropic Claude | Latest |
-| | Claude Vision | Invoice extraction |
-| | Claude Sonnet | Regulatory research |
-| **Reports** | ExcelJS | 4.x |
-| | Custom HTML | Chart.js |
-| **Testing** | Vitest | 1.x |
-| | Playwright | 1.x |
-| | Custom Evals | TypeScript |
-| **Deployment** | Vercel | Latest |
-| | Supabase Cloud | Production |
+| Layer           | Technology       | Version             |
+| --------------- | ---------------- | ------------------- |
+| **Frontend**    | Next.js          | 14.x                |
+|                 | React            | 19.x                |
+|                 | TypeScript       | 5.x                 |
+|                 | Tailwind CSS     | 3.x                 |
+|                 | shadcn/ui        | Latest              |
+| **Backend**     | Supabase         | Latest              |
+|                 | PostgreSQL       | 15.x                |
+|                 | Edge Functions   | Deno                |
+| **AI Services** | Anthropic Claude | Latest              |
+|                 | Claude Vision    | Invoice extraction  |
+|                 | Claude Sonnet    | Regulatory research |
+| **Reports**     | ExcelJS          | 4.x                 |
+|                 | Custom HTML      | Chart.js            |
+| **Testing**     | Vitest           | 1.x                 |
+|                 | Playwright       | 1.x                 |
+|                 | Custom Evals     | TypeScript          |
+| **Deployment**  | Vercel           | Latest              |
+|                 | Supabase Cloud   | Production          |
 
 ## 🏗️ Architecture
 
@@ -147,6 +158,7 @@ Visit http://localhost:3000 to see the application.
 ```
 
 **Key Design Principles**:
+
 - **Dynamic module loading**: Skills load on-demand at runtime
 - **Single responsibility**: Each skill handles one domain
 - **Admin-only modifications**: Skills are fixed for all users
@@ -191,6 +203,7 @@ Visit http://localhost:3000 to see the application.
 ```
 
 **Benefits**:
+
 - ✅ No timeout issues (jobs can run for hours)
 - ✅ Real-time progress tracking
 - ✅ Automatic retry on failure
@@ -200,6 +213,7 @@ Visit http://localhost:3000 to see the application.
 ### Database Schema
 
 **8 Core Tables**:
+
 - `projects` - Property and analysis metadata
 - `project_files` - Uploaded invoices, contracts, haul logs
 - `invoice_data` - Extracted line items
@@ -210,6 +224,7 @@ Visit http://localhost:3000 to see the application.
 - `ordinance_database` - Cached compliance requirements
 
 **Critical Table**: `skills_config`
+
 - Stores validated formula constants (conversion rates, thresholds)
 - Synced with `lib/constants/formulas.ts` on startup
 - Ensures calculation consistency across system
@@ -217,23 +232,27 @@ Visit http://localhost:3000 to see the application.
 ## 📚 Documentation
 
 ### For Users
+
 - **[Getting Started Guide](./docs/user/getting-started.md)** - Signup to first analysis in 7 steps
-- **[User Manual](./docs/user/user-manual.md)** - Complete feature reference *(coming soon)*
-- **[FAQ](./docs/user/faq.md)** - Common questions and troubleshooting *(coming soon)*
+- **[User Manual](./docs/user/user-manual.md)** - Complete feature reference _(coming soon)_
+- **[FAQ](./docs/user/faq.md)** - Common questions and troubleshooting _(coming soon)_
 
 ### For Developers
+
 - **[Local Setup](./docs/dev/local-setup.md)** - 15-minute development environment setup
 - **[API Documentation](./docs/api/API_DOCUMENTATION_COMPLETE.md)** - Complete API reference
-- **[Skills Development](./docs/dev/skills-guide.md)** - Creating new analysis skills *(coming soon)*
-- **[Testing Guide](./docs/dev/testing-guide.md)** - Unit tests, E2E, and evals *(coming soon)*
+- **[Skills Development](./docs/dev/skills-guide.md)** - Creating new analysis skills _(coming soon)_
+- **[Testing Guide](./docs/dev/testing-guide.md)** - Unit tests, E2E, and evals _(coming soon)_
 - **[Formula Reference](./WASTE_FORMULAS_REFERENCE.md)** - Canonical calculation formulas
 
 ### For DevOps
+
 - **[Staging Deployment](./docs/deployment/staging-deployment.md)** - Deployment runbook with checklists
-- **[Production Deployment](./docs/deployment/production-deployment.md)** - Production release process *(coming soon)*
-- **[Monitoring Guide](./docs/deployment/monitoring.md)** - Health checks and observability *(coming soon)*
+- **[Production Deployment](./docs/deployment/production-deployment.md)** - Production release process _(coming soon)_
+- **[Monitoring Guide](./docs/deployment/monitoring.md)** - Health checks and observability _(coming soon)_
 
 ### Architecture Guides
+
 - **[Quality Checklist](./.claude/quality-checklist.md)** - Pre-development validation steps
 - **[Git Workflow](./docs/git/GIT_QUICK_REFERENCE.md)** - Branch strategy and merge protocol
 - **[Agent Coordination](./.claude/agents/)** - Specialized agent documentation
@@ -241,6 +260,7 @@ Visit http://localhost:3000 to see the application.
 ## 🧪 Testing & Validation
 
 ### Test Coverage Requirements
+
 - **Unit tests**: 100% coverage for calculations
 - **Integration tests**: All API routes
 - **E2E tests**: Complete user workflows
@@ -268,6 +288,7 @@ pnpm test && pnpm tsc --noEmit && pnpm lint
 ### Quality Gates
 
 **Pre-merge requirements** (enforced by CI/CD):
+
 - ✅ All tests passing
 - ✅ TypeScript compiles with 0 errors
 - ✅ Linting passes
@@ -282,6 +303,7 @@ pnpm test && pnpm tsc --noEmit && pnpm lint
 **CRITICAL**: All development uses specialized agents coordinated by an orchestrator. Never make changes directly.
 
 **Agent Selection**:
+
 - **Frontend changes** → Use `frontend-dev` agent
 - **Backend changes** → Use `backend-dev` agent
 - **Skills changes** → Use `skills-dev` agent
@@ -321,21 +343,25 @@ See [Git Quick Reference](./docs/git/GIT_QUICK_REFERENCE.md) for detailed workfl
 ### Code Quality Standards
 
 **Modularity**:
+
 - Max 500 lines per file
 - Single responsibility per function
 - Clear, descriptive names (no abbreviations)
 
 **Testing**:
+
 - TDD approach (write tests first)
 - Evals for all calculations
 - E2E for complete workflows
 
 **Documentation**:
+
 - Comment complex logic (explain "why" not "what")
 - Use `file:line` references in discussions
 - Keep README updated
 
 **Error Handling**:
+
 - Meaningful error messages for users
 - Graceful failures (never crash silently)
 - Retry logic for API calls (max 3 attempts)
@@ -362,6 +388,7 @@ See [Quality Checklist](./.claude/quality-checklist.md) for complete validation 
 ### Formula Reference Protocol
 
 **Single Source of Truth**:
+
 - **Documentation**: `WASTE_FORMULAS_REFERENCE.md` (version controlled)
 - **Code**: `lib/constants/formulas.ts` (exported constants)
 - **Database**: `skills_config` table (validated on startup)
@@ -386,6 +413,7 @@ See [Formula Reference](./WASTE_FORMULAS_REFERENCE.md) for complete documentatio
 **Started**: 2025-11-17
 
 ### Completed Phases (0-6)
+
 - ✅ **Phase 0**: Foundation (Next.js, Supabase, Auth)
 - ✅ **Phase 1**: Core Infrastructure (Error handling, logging, database schema)
 - ✅ **Phase 2.1**: Compactor Optimization Vertical Slice
@@ -394,27 +422,32 @@ See [Formula Reference](./WASTE_FORMULAS_REFERENCE.md) for complete documentatio
 - ✅ **Phase 6**: Complete Analytics Integration (Excel/HTML reports, frontend results page)
 
 ### Phase 7 Progress
+
 **Goal**: Validate entire system through integration testing and prepare for production deployment
 
 **Completed**:
+
 - ✅ Worker startup validation (environment checks)
 - ✅ Test data seed script (test user, 250-unit property, 6 invoices, 22 haul logs)
 - ✅ All systems running (Supabase, dev server, worker)
 - ✅ Automated test framework setup
 
 **In Progress**:
+
 - 🔄 Manual E2E workflow testing (login → analyze → results → download)
 - ⏳ API endpoint integration tests
 - ⏳ Frontend responsiveness validation
 - ⏳ Performance & load testing
 
 **Remaining**:
+
 - Security validation (auth, RLS, input validation)
 - Production deployment configuration
 - Monitoring & health checks setup
 - Documentation (API docs, deployment guide)
 
 ### Production Readiness: 85%
+
 - ✅ Complete end-to-end workflow implemented
 - ✅ Real Excel and HTML report generation
 - ✅ Async job processing with background workers
@@ -433,16 +466,19 @@ MIT License - see [LICENSE](./LICENSE) for details.
 ## 💬 Support
 
 ### For Users
+
 - **Email**: support@thetrashub.com
 - **Documentation**: [User Manual](./docs/user/user-manual.md)
 - **FAQ**: [Common Questions](./docs/user/faq.md)
 
 ### For Developers
+
 - **Issues**: [GitHub Issues](https://github.com/your-org/wastewise-saas/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-org/wastewise-saas/discussions)
 - **API Docs**: [Complete API Reference](./docs/api/API_DOCUMENTATION_COMPLETE.md)
 
 ### For Enterprise
+
 - **Sales**: sales@thetrashub.com
 - **Custom Solutions**: Contact us for portfolio-level integrations
 

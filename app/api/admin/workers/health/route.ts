@@ -17,23 +17,23 @@
  * Phase 7: Production monitoring and alerting
  */
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { logger } from '@/lib/observability/logger'
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/observability/logger";
 
 export async function GET(request: Request) {
   try {
-    logger.info('Fetching worker health metrics')
+    logger.info("Fetching worker health metrics");
 
-    const supabase = createClient()
+    const supabase = await createClient();
 
     // Check if user is authenticated and has admin role
     const {
       data: { user },
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // TODO: Add admin role check
@@ -41,59 +41,62 @@ export async function GET(request: Request) {
 
     // Get last processed job timestamp and active worker count
     const { data: recentJobs, error: jobsError } = await supabase
-      .from('analysis_jobs')
-      .select('completed_at, worker_id, status')
-      .in('status', ['processing', 'completed'])
-      .order('completed_at', { ascending: false })
-      .limit(100)
+      .from("analysis_jobs")
+      .select("completed_at, worker_id, status")
+      .in("status", ["processing", "completed"])
+      .order("completed_at", { ascending: false })
+      .limit(100);
 
     if (jobsError) {
-      logger.error('Failed to fetch recent jobs', jobsError as Error)
+      logger.error("Failed to fetch recent jobs", jobsError as Error);
       return NextResponse.json(
-        { error: 'Failed to fetch worker health', details: jobsError.message },
-        { status: 500 }
-      )
+        { error: "Failed to fetch worker health", details: jobsError.message },
+        { status: 500 },
+      );
     }
 
     // Calculate metrics
-    const now = new Date()
-    const lastHour = new Date(now.getTime() - 60 * 60 * 1000)
-    const lastDay = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    const now = new Date();
+    const lastHour = new Date(now.getTime() - 60 * 60 * 1000);
+    const lastDay = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const activeWorkerIds = new Set(
       recentJobs
-        ?.filter((job) => job.status === 'processing' && job.worker_id)
-        .map((job) => job.worker_id) || []
-    )
+        ?.filter((job) => job.status === "processing" && job.worker_id)
+        .map((job) => job.worker_id) || [],
+    );
 
-    const recentCompletedJobs = recentJobs?.filter(
-      (job) => job.status === 'completed' && job.completed_at
-    ) || []
+    const recentCompletedJobs =
+      recentJobs?.filter(
+        (job) => job.status === "completed" && job.completed_at,
+      ) || [];
 
-    const lastJobProcessed = recentCompletedJobs[0]?.completed_at || null
-    const lastJobTimestamp = lastJobProcessed ? new Date(lastJobProcessed) : null
+    const lastJobProcessed = recentCompletedJobs[0]?.completed_at || null;
+    const lastJobTimestamp = lastJobProcessed
+      ? new Date(lastJobProcessed)
+      : null;
 
     const jobsLastHour = recentCompletedJobs.filter(
-      (job) => new Date(job.completed_at!) >= lastHour
-    ).length
+      (job) => new Date(job.completed_at!) >= lastHour,
+    ).length;
 
     const jobsLastDay = recentCompletedJobs.filter(
-      (job) => new Date(job.completed_at!) >= lastDay
-    ).length
+      (job) => new Date(job.completed_at!) >= lastDay,
+    ).length;
 
     // Calculate time since last job
     const minutesSinceLastJob = lastJobTimestamp
       ? Math.floor((now.getTime() - lastJobTimestamp.getTime()) / 1000 / 60)
-      : null
+      : null;
 
     // Determine health status
-    let healthStatus: 'healthy' | 'degraded' | 'unhealthy'
+    let healthStatus: "healthy" | "degraded" | "unhealthy";
     if (activeWorkerIds.size === 0) {
-      healthStatus = 'unhealthy' // No active workers
+      healthStatus = "unhealthy"; // No active workers
     } else if (minutesSinceLastJob !== null && minutesSinceLastJob > 10) {
-      healthStatus = 'degraded' // No jobs processed in last 10 minutes
+      healthStatus = "degraded"; // No jobs processed in last 10 minutes
     } else {
-      healthStatus = 'healthy'
+      healthStatus = "healthy";
     }
 
     const metrics = {
@@ -108,24 +111,24 @@ export async function GET(request: Request) {
         perHour: jobsLastHour,
         perDay: jobsLastDay,
       },
-    }
+    };
 
-    logger.info('Worker health metrics calculated', {
+    logger.info("Worker health metrics calculated", {
       status: healthStatus,
       activeWorkers: activeWorkerIds.size,
       minutesSinceLastJob,
-    })
+    });
 
     return NextResponse.json({
       success: true,
       data: metrics,
       timestamp: new Date().toISOString(),
-    })
+    });
   } catch (error) {
-    logger.error('Error in worker health endpoint', error as Error)
+    logger.error("Error in worker health endpoint", error as Error);
     return NextResponse.json(
-      { error: 'Internal server error', details: (error as Error).message },
-      { status: 500 }
-    )
+      { error: "Internal server error", details: (error as Error).message },
+      { status: 500 },
+    );
   }
 }

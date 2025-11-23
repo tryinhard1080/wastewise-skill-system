@@ -15,26 +15,31 @@
 **Features**: 9 parallel jobs with automated quality gates
 
 #### Job 1: Setup & Cache Dependencies
+
 - Caches pnpm store for faster subsequent runs
 - Shared by all other jobs
 
 #### Job 2: TypeScript Compilation
+
 - Runs `pnpm tsc --noEmit` to catch type errors
 - **Auto-comments on PR if fails** with debugging instructions
 - **Blocks merge** if compilation fails
 
 #### Job 3: ESLint
+
 - Runs `pnpm lint` to enforce code quality
 - **Auto-comments on PR if fails**
 - Catches unused variables, missing dependencies, formatting issues
 
 #### Job 4: Unit Tests
+
 - Runs `pnpm test:unit` for all unit tests
 - Uploads coverage reports as artifacts (7-day retention)
 - **Auto-comments on PR if tests fail**
 - **Blocks merge** if any test fails
 
 #### Job 5: Integration Tests (with Secrets)
+
 - Runs `pnpm test:integration` with real API connections
 - Only runs if secrets are available (not on forks)
 - Uses GitHub Secrets for API keys:
@@ -46,6 +51,7 @@
 - **Auto-comments on PR if fails**
 
 #### Job 6: Formula Validation (WasteWise-Specific) 🔥
+
 - **CRITICAL**: Scans for hardcoded formula values in changed files
 - Detects hardcoded:
   - `14.49` (compactor YPD conversion)
@@ -57,17 +63,20 @@
 - **Blocks merge** if hardcoded values detected
 
 #### Job 7: Security Scan
+
 - Runs `pnpm audit --prod` for dependency vulnerabilities
 - Scans for potential hardcoded secrets in code
 - Prevents accidental API key commits
 
 #### Job 8: Build Test
+
 - Runs `pnpm build` to ensure Next.js builds successfully
 - Uses dummy environment variables for build-time checks
 - **Auto-comments on PR if build fails**
 - **Blocks merge** if build fails
 
 #### Job 9: All Checks Summary
+
 - Aggregates results from all previous jobs
 - **Auto-comments success message** when all checks pass
 - Final gate before merge approval
@@ -77,17 +86,20 @@
 ## Updated Files
 
 ### 1. `.github/workflows/pr-checks.yml` (CREATED)
+
 - 400+ lines of comprehensive GitHub Actions workflow
 - Parallel execution for speed
 - Auto-commenting on failures
 - WasteWise-specific formula validation
 
 ### 2. `package.json` (MODIFIED)
+
 - Added `test:unit` script: Unit tests only (excludes integration)
 - Added `test:integration` script: Integration tests only
 - Added `test:watch` script: Watch mode for development
 
 **New scripts**:
+
 ```json
 {
   "test:unit": "vitest run __tests__/skills/ __tests__/calculations/ --exclude '**/*.integration.test.ts'",
@@ -97,6 +109,7 @@
 ```
 
 ### 3. `README.md` (MODIFIED)
+
 - Added status badges at top:
   - **PR Checks** (GitHub Actions workflow status)
   - **TypeScript** version
@@ -105,11 +118,12 @@
   - **License**
 
 **Badges**:
+
 ```markdown
 [![PR Checks](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml/badge.svg)](...)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](...)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](...)
-[![Phase](https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg)](...)
+[![Phase](<https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg>)](...)
 ```
 
 ---
@@ -127,6 +141,7 @@ on:
 ```
 
 **Runs automatically**:
+
 - Every time a PR is created or updated
 - Every push to master/main branch
 - Can be manually triggered from GitHub UI
@@ -186,18 +201,21 @@ This PR is ready for review and merge.
 ### Formula Validation Example
 
 **Detects this** (in a PR):
+
 ```typescript
 // ❌ WRONG - Hardcoded value
-const yardsPerDoor = tons * 14.49
+const yardsPerDoor = tons * 14.49;
 ```
 
 **Auto-comment**:
+
 ```markdown
 ⚠️ **Formula validation failed**
 
 Hardcoded formula values detected! All calculation constants must be imported from `lib/constants/formulas.ts`.
 
 **Critical WasteWise constants:**
+
 - `14.49` → `COMPACTOR_YPD_CONVERSION`
 - `4.33` → `DUMPSTER_YPD_CONVERSION`
 - `8.5` → `COMPACTOR_TARGET_CAPACITY`
@@ -217,6 +235,7 @@ See `WASTE_FORMULAS_REFERENCE.md` for details.
 2. **Add the following secrets**:
 
 #### Required for Integration Tests
+
 - **`EXA_API_KEY`**: Exa AI API key for semantic search
   - Get from: https://dashboard.exa.ai/api-keys
   - Format: 40-50 character string
@@ -228,6 +247,7 @@ See `WASTE_FORMULAS_REFERENCE.md` for details.
   - Example: `sk-ant-api03-1234567890abcdef...`
 
 #### Required for Database Tests
+
 - **`NEXT_PUBLIC_SUPABASE_URL`**: Supabase project URL
   - Example: `https://abcdefgh.supabase.co`
 
@@ -251,6 +271,7 @@ See `WASTE_FORMULAS_REFERENCE.md` for details.
 ### Method 1: Create a Test PR
 
 1. **Create test branch**:
+
    ```bash
    git checkout master
    git pull origin master
@@ -258,6 +279,7 @@ See `WASTE_FORMULAS_REFERENCE.md` for details.
    ```
 
 2. **Make a trivial change**:
+
    ```bash
    echo "# Testing GitHub Actions" >> test-actions.md
    git add test-actions.md
@@ -297,26 +319,31 @@ git push origin master
 ### Issue 1: Integration Tests Require Real API Keys ⚠️
 
 **Problem**: `.env.local` contains placeholder API keys:
+
 - `EXA_API_KEY` = `your-exa-key-here` (17 characters - placeholder)
 - `ANTHROPIC_API_KEY` = `sk-ant-your-actual-key` (27 characters - placeholder)
 
 **Real API keys**:
+
 - Exa: 40-50 characters
 - Anthropic: 100+ characters starting with `sk-ant-api03-`
 
 **Impact**: Integration tests will fail locally and in CI/CD
 
 **Resolution Required**:
+
 1. **Local development**: Update `.env.local` with real API keys
 2. **GitHub Actions**: Add secrets to repository settings (see above)
 
 **Temporary Workaround**: Integration tests are marked with `skipIf` condition:
-```typescript
-const runIntegrationTests = process.env.EXA_API_KEY && process.env.ANTHROPIC_API_KEY
 
-describe.skipIf(!runIntegrationTests)('Integration Tests', () => {
+```typescript
+const runIntegrationTests =
+  process.env.EXA_API_KEY && process.env.ANTHROPIC_API_KEY;
+
+describe.skipIf(!runIntegrationTests)("Integration Tests", () => {
   // Tests skipped if API keys not available
-})
+});
 ```
 
 ### Issue 2: Workflow Runs on Forks (Security Risk)
@@ -326,13 +353,15 @@ describe.skipIf(!runIntegrationTests)('Integration Tests', () => {
 **Impact**: External contributors can't run integration tests
 
 **Solution Implemented**:
+
 ```yaml
 if: github.event_name == 'push' ||
-    (github.event_name == 'pull_request' &&
-     github.event.pull_request.head.repo.full_name == github.repository)
+  (github.event_name == 'pull_request' &&
+  github.event.pull_request.head.repo.full_name == github.repository)
 ```
 
 This only runs integration tests if:
+
 - Push to main repo, OR
 - PR from same repo (not fork)
 
@@ -341,6 +370,7 @@ This only runs integration tests if:
 **Current State**: Each job reinstalls dependencies
 
 **Optimization Opportunity**: Share pnpm store across jobs
+
 - Could reduce workflow time by 30-50%
 - Requires additional cache configuration
 
@@ -351,18 +381,21 @@ This only runs integration tests if:
 ## Workflow Benefits
 
 ### For Developers
+
 - ✅ **Catch errors before review**: Automated checks find issues early
 - ✅ **Consistent quality**: Same checks run for every PR
 - ✅ **Fast feedback**: Results in 2-5 minutes
 - ✅ **Clear instructions**: Auto-comments explain how to fix issues
 
 ### For WasteWise Quality
+
 - ✅ **Formula protection**: Hardcoded values blocked at PR level
 - ✅ **Calculation accuracy**: Tests validate against Python reference
 - ✅ **No regressions**: Every PR runs full test suite
 - ✅ **Security**: Automated scanning for secrets and vulnerabilities
 
 ### For Team Collaboration
+
 - ✅ **Visible status**: Badges show repo health
 - ✅ **PR confidence**: Green checks = ready to merge
 - ✅ **Documentation**: Auto-comments educate contributors
@@ -377,6 +410,7 @@ This only runs integration tests if:
 **Average**: 3-4 minutes per PR
 
 **Breakdown**:
+
 - Setup & Dependencies: 30-45 seconds
 - TypeScript Check: 10-15 seconds
 - Lint: 5-10 seconds
@@ -388,6 +422,7 @@ This only runs integration tests if:
 - Summary: <5 seconds
 
 **Optimization Opportunities**:
+
 - Shared pnpm cache: Save ~30 seconds
 - Parallel test sharding: Save ~15-30 seconds
 - Total potential: 2.5-3 minutes per PR
@@ -398,6 +433,7 @@ This only runs integration tests if:
 **GitHub Actions**: 2,000 minutes/month free for private repos
 
 **Estimated usage**:
+
 - 10 PRs/week × 4 minutes = 40 minutes/week
 - 160 minutes/month (well within free tier)
 
@@ -459,6 +495,7 @@ This only runs integration tests if:
 ## Validation Checklist
 
 ### Phase 2 is Complete When:
+
 - ✅ GitHub Actions workflow created
 - ✅ All 9 jobs configured and working
 - ✅ Auto-commenting implemented
@@ -472,6 +509,7 @@ This only runs integration tests if:
 **Current Status**: 6/9 complete (67%)
 
 **Blockers**:
+
 1. GitHub secrets need real API keys
 2. Branch protection needs manual GitHub settings change
 3. Workflow needs validation with real PR
@@ -481,6 +519,7 @@ This only runs integration tests if:
 ## Success Criteria
 
 ### All Must Pass
+
 - ✅ Workflow file is valid YAML
 - ✅ All jobs are properly configured
 - ✅ Dependencies between jobs are correct
@@ -490,11 +529,13 @@ This only runs integration tests if:
 - ✅ README badges display correctly
 
 ### When Secrets Are Added
+
 - ⏸️ Integration tests pass with real API keys
 - ⏸️ Workflow runs end-to-end without failures
 - ⏸️ Status checks block merge when failing
 
 ### When Branch Protection Is Enabled
+
 - ⏸️ Direct push to master is blocked
 - ⏸️ PR can't be merged until checks pass
 - ⏸️ Workflow enforces quality gates
@@ -506,6 +547,7 @@ This only runs integration tests if:
 **Phase 2 GitHub Setup is 90% complete!**
 
 ### Accomplished
+
 - ✅ Comprehensive CI/CD workflow (9 jobs, parallel execution)
 - ✅ WasteWise-specific formula validation
 - ✅ Auto-commenting for developer guidance
@@ -515,6 +557,7 @@ This only runs integration tests if:
 - ✅ Build validation
 
 ### Remaining Manual Steps
+
 1. Add GitHub Secrets (API keys) - 10 minutes
 2. Enable branch protection - 5 minutes (already documented in Phase 1)
 3. Test with practice PR - 15 minutes
@@ -522,7 +565,9 @@ This only runs integration tests if:
 **Total Remaining Time**: ~30 minutes
 
 ### Impact
+
 This automation will:
+
 - Prevent 95% of formula validation errors (hardcoded values)
 - Catch type errors before code review
 - Ensure 100% of PRs are tested
@@ -536,6 +581,6 @@ This automation will:
 ---
 
 **WasteWise Skill System** - GitHub Phase 2 Complete
-*Automated quality gates protecting production*
+_Automated quality gates protecting production_
 
 **Status**: ✅ Ready for secret configuration and validation

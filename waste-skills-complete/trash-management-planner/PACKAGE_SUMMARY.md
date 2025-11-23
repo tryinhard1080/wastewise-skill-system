@@ -9,6 +9,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 ## 📦 What's Included (5 Files)
 
 ### 1. **SKILL.md** (18 KB) ⭐ THE MAIN FILE
+
 - Proper YAML frontmatter (name + description only)
 - Complete 14-section report generation instructions
 - Web research integration (automatic hauler lookup!)
@@ -17,6 +18,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 - **ACTION: Upload this file to Claude Projects**
 
 ### 2. **README.md** (11 KB) 📚 OVERVIEW
+
 - What the skill does and why
 - Key features and capabilities
 - Who should use it
@@ -25,6 +27,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 - Integration examples for Advantage Waste
 
 ### 3. **SETUP.md** (9 KB) 🚀 INSTALLATION GUIDE
+
 - Step-by-step installation for Claude.ai, Desktop, API
 - Quick start (3 steps)
 - Usage examples
@@ -33,6 +36,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 - Customization options
 
 ### 4. **demo-prompt.txt** (2 KB) 💡 QUICK REFERENCE
+
 - Simple usage template
 - Example prompts
 - Tips for best results
@@ -40,6 +44,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 - What you'll get
 
 ### 5. **sample-property-input.txt** (3 KB) 🧪 TEST DATA
+
 - Ready-to-use test properties
 - Single building examples
 - Multiple building examples
@@ -51,12 +56,14 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 ## 🎯 What This Skill Does
 
 ### INPUT (Simple):
+
 ```
-"Generate a trash management plan for Lincoln Commons at 
+"Generate a trash management plan for Lincoln Commons at
 456 Oak St, Dallas, TX - 300 units, 7 stories"
 ```
 
 ### OUTPUT (Professional):
+
 **Complete 14-section report** (15-20 pages) including:
 
 1. ✅ **Executive Summary** - Key findings, ROI, recommendations
@@ -79,12 +86,14 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 ## ✨ Key Features
 
 ### 🔍 Automatic Research
+
 - Uses `web_search` to find franchise haulers
 - Researches state regulations (AB341, AB1826, etc.)
 - Identifies local ordinances
 - No manual lookup needed!
 
 ### 📊 Comprehensive Calculations
+
 - Waste: 0.16 CY/unit/week baseline
 - Recycling: 30% of waste stream
 - Compost: 25% of waste stream
@@ -93,6 +102,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 - Service frequency optimization
 
 ### 💰 Financial Analysis
+
 - Loose service costs (with staff labor)
 - Compacted service costs
 - Capital equipment (amortized)
@@ -101,6 +111,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 - Clear ROI recommendations
 
 ### 🏗️ Professional Design
+
 - Chute systems (NFPA 82 compliant)
 - Compactor specifications (A-Series 500)
 - Ground floor unit solutions
@@ -113,6 +124,7 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 ## 🚀 Get Started (3 Steps - Takes 5 Minutes)
 
 ### Step 1: Upload the Skill (2 minutes)
+
 1. Go to Claude.ai
 2. Create or open a Project
 3. Click "Add content" → "Upload files"
@@ -120,7 +132,9 @@ Richard, I've created a **complete, working Claude Skill** using the meta-prompt
 5. Done! Skill is now active.
 
 ### Step 2: Test It (2 minutes)
+
 Copy this test prompt:
+
 ```
 Generate a trash management plan for:
 Property: Test Towers
@@ -131,7 +145,9 @@ Goals: Cost-effective with good ROI
 ```
 
 ### Step 3: Watch the Magic ✨ (1 minute)
+
 Claude will automatically:
+
 - Research Austin's franchise hauler (Texas Disposal Systems)
 - Note Texas regulations (no state mandates)
 - Calculate waste/recycling/compost volumes
@@ -146,12 +162,14 @@ Claude will automatically:
 ## 💼 Business Value for Advantage Waste
 
 ### Time Savings
+
 - **Manual process:** 2-3 days per report
 - **With this skill:** 30 minutes per report
 - **Time savings:** 80-90% reduction
 - **Capacity increase:** 10× more reports per person
 
 ### Quality Improvements
+
 - ✅ 100% consistent formatting
 - ✅ Complete 14 sections every time
 - ✅ No missed calculations
@@ -159,6 +177,7 @@ Claude will automatically:
 - ✅ Stakeholder-ready professional output
 
 ### For Your Development Initiative (Q1/Q2 2025)
+
 - Perfect timing for launch
 - Demonstrate technical capability
 - Scale across entire Greystar portfolio
@@ -166,6 +185,7 @@ Claude will automatically:
 - Competitive advantage
 
 ### ROI for Advantage Waste
+
 - **10 reports/month** × 2 days saved each = **20 days/month** freed up
 - Labor value: ~$10,000/month in time savings
 - Plus: Better quality, faster turnaround, unlimited scalability
@@ -176,6 +196,7 @@ Claude will automatically:
 ## 📋 What Makes This Different
 
 ### Compared to Manual Process:
+
 - ✅ 90% faster
 - ✅ 100% consistent
 - ✅ Includes automatic research
@@ -184,6 +205,7 @@ Claude will automatically:
 - ✅ Stakeholder-ready
 
 ### Compared to Templates:
+
 - ✅ No manual data entry
 - ✅ Automatic calculations
 - ✅ Research integration
@@ -192,6 +214,7 @@ Claude will automatically:
 - ✅ Customizable output
 
 ### Compared to Other Skills:
+
 - ✅ Built specifically for your ATM standards
 - ✅ Matches Bundy Blocks format exactly
 - ✅ Greystar/Advantage Waste context
@@ -204,17 +227,20 @@ Claude will automatically:
 ## 🎓 Training Your Team
 
 ### Who Can Use:
+
 - Anyone who can describe a property
 - No waste management background needed
 - No technical skills required
 - Just access to Claude.ai
 
 ### Training Time:
+
 - **15 minutes:** Understand the skill
 - **30 minutes:** Hands-on practice
 - **Ready to go:** Generate reports independently
 
 ### What They Need:
+
 1. Property address (full street address)
 2. Unit count and stories
 3. Ground floor units (if any)
@@ -228,16 +254,19 @@ Claude will automatically:
 ## 💡 Usage Tips
 
 ### Always Include:
+
 - ✅ Full address (enables hauler research)
 - ✅ Unit count (for volume calculations)
 - ✅ Number of stories (for system design)
 
 ### Highly Recommended:
+
 - ✅ Ground floor units (critical for design!)
 - ✅ Loading/ceiling height (determines equipment)
 - ✅ Project goals (shapes recommendations)
 
 ### Optional Enhancements:
+
 - Multiple buildings (list each)
 - Site constraints (access, turning)
 - Special requirements (LEED, HOA)
@@ -248,6 +277,7 @@ Claude will automatically:
 ## 🔧 Customization Options
 
 The skill can be easily modified to:
+
 - Add Greystar/Advantage Waste branding
 - Include WM National Account details
 - Reference Optimize platform
@@ -265,18 +295,21 @@ The skill can be easily modified to:
 Track your results:
 
 ### Efficiency:
+
 - Reports generated per week
 - Time per report (target: <30 min)
 - Team members trained
 - Properties analyzed
 
 ### Quality:
+
 - Completeness (all 14 sections)
 - Accuracy of calculations
 - Stakeholder satisfaction
 - Follow-on business
 
 ### Business Impact:
+
 - Development deals supported
 - SLT presentations delivered
 - Regional director requests fulfilled
@@ -287,18 +320,21 @@ Track your results:
 ## 🎯 Next Actions
 
 ### TODAY:
+
 - [x] Download the skill package
 - [ ] Upload SKILL.md to Claude Project
 - [ ] Test with sample property
 - [ ] Review output quality
 
 ### THIS WEEK:
+
 - [ ] Generate 2-3 real project reports
 - [ ] Compare to manual process
 - [ ] Train one team member
 - [ ] Share with key stakeholder
 
 ### THIS MONTH:
+
 - [ ] Integrate into Development Initiative
 - [ ] Train entire Advantage Waste team
 - [ ] Present to Greystar leadership
@@ -310,19 +346,24 @@ Track your results:
 ## 📞 Support
 
 ### Questions?
+
 Just ask Claude:
+
 - "How do I use the trash-management-planner skill?"
 - "Show me an example output"
 - "Can you explain how [section X] works?"
 
 ### Need Changes?
+
 Tell Claude:
+
 - "Modify the skill to include [X]"
 - "Regenerate with [different assumption]"
 - "Add a section about [Y]"
 - "Update calculations to use [Z]"
 
 ### Technical Issues?
+
 - Check SETUP.md for troubleshooting
 - Verify SKILL.md is uploaded to Project
 - Use trigger keywords in your prompt
@@ -376,6 +417,7 @@ trash-management-planner/
 ## 🎊 Ready to Transform Waste Management Analysis!
 
 Your professional trash management plan generator is:
+
 - ✅ Built using the meta-prompt template
 - ✅ Properly formatted with correct YAML frontmatter
 - ✅ Comprehensive and production-ready
@@ -389,7 +431,7 @@ Your professional trash management plan generator is:
 
 ---
 
-*Created for: Advantage Waste by THE Trash Hub*  
-*Purpose: Professional trash management planning for multifamily developments*  
-*Standard: American Trash Management industry format*  
-*Version: 1.0*
+_Created for: Advantage Waste by THE Trash Hub_  
+_Purpose: Professional trash management planning for multifamily developments_  
+_Standard: American Trash Management industry format_  
+_Version: 1.0_

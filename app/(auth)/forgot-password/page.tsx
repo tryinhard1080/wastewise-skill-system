@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Forgot Password Page
@@ -7,13 +7,13 @@
  * Sends reset link to user's email
  */
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -29,54 +29,54 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-})
+  email: z.string().email("Please enter a valid email address"),
+});
 
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
-      email: '',
+      email: "",
     },
-  })
+  });
 
   async function onSubmit(values: ForgotPasswordFormValues) {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const supabase = createClient()
+      const supabase = createClient();
 
       const { error } = await supabase.auth.resetPasswordForEmail(
         values.email,
         {
           redirectTo: `${window.location.origin}/auth/reset-password`,
-        }
-      )
+        },
+      );
 
       if (error) {
-        setError(error.message)
-        return
+        setError(error.message);
+        return;
       }
 
-      setSuccess(true)
+      setSuccess(true);
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
-      console.error('Password reset error:', err)
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Password reset error:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -96,8 +96,8 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent className="text-center text-sm text-muted-foreground space-y-4">
           <p>
-            If an account exists with <strong>{form.getValues('email')}</strong>,
-            you will receive a password reset link shortly.
+            If an account exists with <strong>{form.getValues("email")}</strong>
+            , you will receive a password reset link shortly.
           </p>
           <p>
             Please check your email and click the link to reset your password.
@@ -117,8 +117,8 @@ export default function ForgotPasswordPage() {
           <Button
             variant="outline"
             onClick={() => {
-              setSuccess(false)
-              form.reset()
+              setSuccess(false);
+              form.reset();
             }}
             className="w-full"
           >
@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
           </Button>
         </CardFooter>
       </Card>
-    )
+    );
   }
 
   return (
@@ -184,5 +184,5 @@ export default function ForgotPasswordPage() {
         </Link>
       </CardFooter>
     </Card>
-  )
+  );
 }

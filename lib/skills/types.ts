@@ -5,13 +5,15 @@
  * All skills must conform to these interfaces to ensure consistency.
  */
 
-import { Database } from '@/types/database.types'
+import { Database } from "@/types/database.types";
 
 // Database type aliases
-export type SkillConfigRow = Database['public']['Tables']['skills_config']['Row']
-export type ProjectRow = Database['public']['Tables']['projects']['Row']
-export type InvoiceDataRow = Database['public']['Tables']['invoice_data']['Row']
-export type HaulLogRow = Database['public']['Tables']['haul_log']['Row']
+export type SkillConfigRow =
+  Database["public"]["Tables"]["skills_config"]["Row"];
+export type ProjectRow = Database["public"]["Tables"]["projects"]["Row"];
+export type InvoiceDataRow =
+  Database["public"]["Tables"]["invoice_data"]["Row"];
+export type HaulLogRow = Database["public"]["Tables"]["haul_log"]["Row"];
 
 /**
  * Skill execution result
@@ -21,40 +23,40 @@ export type HaulLogRow = Database['public']['Tables']['haul_log']['Row']
  */
 export interface SkillResult<TData = any> {
   /** Indicates if skill execution was successful */
-  success: boolean
+  success: boolean;
 
   /** Skill-specific result data */
-  data: TData | null
+  data: TData | null;
 
   /** Error information if execution failed */
   error?: {
-    message: string
-    code: string
-    details?: any
-  }
+    message: string;
+    code: string;
+    details?: any;
+  };
 
   /** Execution metadata */
   metadata: {
     /** Skill name that produced this result */
-    skillName: string
+    skillName: string;
 
     /** Skill version */
-    skillVersion: string
+    skillVersion: string;
 
     /** Execution duration in milliseconds */
-    durationMs: number
+    durationMs: number;
 
     /** Timestamp when execution started */
-    executedAt: string
+    executedAt: string;
 
     /** AI API usage for this execution */
     aiUsage?: {
-      requests: number
-      tokensInput: number
-      tokensOutput: number
-      costUsd: number
-    }
-  }
+      requests: number;
+      tokensInput: number;
+      tokensOutput: number;
+      costUsd: number;
+    };
+  };
 }
 
 /**
@@ -65,28 +67,28 @@ export interface SkillResult<TData = any> {
  */
 export interface SkillContext {
   /** Project ID being analyzed */
-  projectId: string
+  projectId: string;
 
   /** User ID executing the skill */
-  userId: string
+  userId: string;
 
   /** Project data from database */
-  project: ProjectRow
+  project: ProjectRow;
 
   /** Invoice data for the project */
-  invoices: InvoiceDataRow[]
+  invoices: InvoiceDataRow[];
 
   /** Haul log data (for compactor projects) */
-  haulLog?: HaulLogRow[]
+  haulLog?: HaulLogRow[];
 
   /** Skill configuration from skills_config table */
-  config: SkillConfig
+  config: SkillConfig;
 
   /** Optional progress callback for long-running operations */
-  onProgress?: (progress: SkillProgress) => Promise<void>
+  onProgress?: (progress: SkillProgress) => Promise<void>;
 
   /** Optional cancellation signal */
-  signal?: AbortSignal
+  signal?: AbortSignal;
 }
 
 /**
@@ -94,16 +96,16 @@ export interface SkillContext {
  */
 export interface SkillProgress {
   /** Progress percentage (0-100) */
-  percent: number
+  percent: number;
 
   /** Human-readable description of current step */
-  step: string
+  step: string;
 
   /** Optional step number (if known) */
-  stepNumber?: number
+  stepNumber?: number;
 
   /** Optional total steps (if known) */
-  totalSteps?: number
+  totalSteps?: number;
 }
 
 /**
@@ -116,29 +118,29 @@ export interface SkillConfig {
   /** Conversion rates (must match formulas.ts) */
   conversionRates: {
     /** Compactor YPD conversion: 14.49 */
-    compactorYpd: number
+    compactorYpd: number;
 
     /** Dumpster YPD conversion: 4.33 */
-    dumpsterYpd: number
+    dumpsterYpd: number;
 
     /** Target compactor capacity: 8.5 tons */
-    targetCapacity: number
-  }
+    targetCapacity: number;
+  };
 
   /** Optimization thresholds (must match formulas.ts) */
   thresholds: {
     /** Compactor optimization threshold: 6.0 tons */
-    compactorTons: number
+    compactorTons: number;
 
     /** Contamination threshold: 3.0% */
-    contaminationPct: number
+    contaminationPct: number;
 
     /** Bulk subscription threshold: $500 */
-    bulkMonthly: number
+    bulkMonthly: number;
 
     /** Lease-up variance threshold: -40% */
-    leaseupVariance: number
-  }
+    leaseupVariance: number;
+  };
 }
 
 /**
@@ -152,13 +154,13 @@ export interface SkillConfig {
  */
 export interface Skill<TResult = any> {
   /** Unique skill identifier (matches skills_config.skill_name) */
-  name: string
+  name: string;
 
   /** Skill version (semantic versioning) */
-  version: string
+  version: string;
 
   /** Human-readable description */
-  description: string
+  description: string;
 
   /**
    * Execute the skill
@@ -168,7 +170,7 @@ export interface Skill<TResult = any> {
    *
    * @throws {SkillExecutionError} If execution fails
    */
-  execute(context: SkillContext): Promise<SkillResult<TResult>>
+  execute(context: SkillContext): Promise<SkillResult<TResult>>;
 
   /**
    * Validate input before execution (optional)
@@ -179,7 +181,7 @@ export interface Skill<TResult = any> {
    * @param context - Execution context to validate
    * @returns Validation result with error details if invalid
    */
-  validate?(context: SkillContext): Promise<ValidationResult>
+  validate?(context: SkillContext): Promise<ValidationResult>;
 }
 
 /**
@@ -187,14 +189,14 @@ export interface Skill<TResult = any> {
  */
 export interface ValidationResult {
   /** Is the context valid for execution? */
-  valid: boolean
+  valid: boolean;
 
   /** Validation errors (if any) */
   errors?: Array<{
-    field: string
-    message: string
-    code: string
-  }>
+    field: string;
+    message: string;
+    code: string;
+  }>;
 }
 
 /**
@@ -202,16 +204,16 @@ export interface ValidationResult {
  */
 export interface RegisteredSkill {
   /** Skill instance */
-  skill: Skill
+  skill: Skill;
 
   /** Is this skill enabled? */
-  enabled: boolean
+  enabled: boolean;
 
   /** When was this skill last validated against formulas.ts? */
-  lastValidated?: Date
+  lastValidated?: Date;
 
   /** Skill configuration from database */
-  config: SkillConfig
+  config: SkillConfig;
 }
 
 /**
@@ -220,11 +222,11 @@ export interface RegisteredSkill {
  * Matches job_type in analysis_jobs table
  */
 export enum SkillType {
-  WASTEWISE_ANALYTICS = 'wastewise-analytics',
-  COMPACTOR_OPTIMIZATION = 'compactor-optimization',
-  CONTRACT_EXTRACTOR = 'contract-extractor',
-  REGULATORY_RESEARCH = 'regulatory-research',
-  BATCH_EXTRACTOR = 'batch-extractor',
+  WASTEWISE_ANALYTICS = "wastewise-analytics",
+  COMPACTOR_OPTIMIZATION = "compactor-optimization",
+  CONTRACT_EXTRACTOR = "contract-extractor",
+  REGULATORY_RESEARCH = "regulatory-research",
+  BATCH_EXTRACTOR = "batch-extractor",
 }
 
 /**
@@ -234,16 +236,16 @@ export enum SkillType {
  */
 export interface AnalysisRequest {
   /** User's original request/question */
-  query: string
+  query: string;
 
   /** Detected intent/skill type */
-  skillType: SkillType
+  skillType: SkillType;
 
   /** Confidence score (0-1) */
-  confidence: number
+  confidence: number;
 
   /** Extracted parameters for skill execution */
-  parameters?: Record<string, any>
+  parameters?: Record<string, any>;
 }
 
 /**
@@ -251,205 +253,205 @@ export interface AnalysisRequest {
  */
 
 export interface CompactorOptimizationResult {
-  recommend: boolean
-  avgTonsPerHaul: number
-  targetTonsPerHaul: number
-  currentAnnualHauls: number
-  optimizedAnnualHauls: number
-  haulsEliminated: number
-  grossAnnualSavings: number
-  netYear1Savings: number
-  netAnnualSavingsYear2Plus: number
-  roiPercent: number
-  paybackMonths: number
+  recommend: boolean;
+  avgTonsPerHaul: number;
+  targetTonsPerHaul: number;
+  currentAnnualHauls: number;
+  optimizedAnnualHauls: number;
+  haulsEliminated: number;
+  grossAnnualSavings: number;
+  netYear1Savings: number;
+  netAnnualSavingsYear2Plus: number;
+  roiPercent: number;
+  paybackMonths: number;
 }
 
 export interface WastewiseAnalyticsResult {
   metrics: {
-    yardsPerDoor: number
-    costPerDoor: number
-    totalSpend: number
+    yardsPerDoor: number;
+    costPerDoor: number;
+    totalSpend: number;
     dateRange: {
-      start: string
-      end: string
-    }
-  }
+      start: string;
+      end: string;
+    };
+  };
   optimizations: Array<{
-    type: string
-    recommend: boolean
-    savings?: number
-    details?: any
-  }>
-  leaseUp: boolean
-  totalSavings: number
+    type: string;
+    recommend: boolean;
+    savings?: number;
+    details?: any;
+  }>;
+  leaseUp: boolean;
+  totalSavings: number;
 }
 
 export interface ContractExtractorResult {
   // Summary
   summary: {
-    contractsProcessed: number
-    termsExtracted: number
-    failedExtractions: number
-  }
+    contractsProcessed: number;
+    termsExtracted: number;
+    failedExtractions: number;
+  };
 
   // Extracted contract data
-  contracts: ContractData[]
+  contracts: ContractData[];
 
   // Processing details
-  processingDetails: ProcessingDetail[]
+  processingDetails: ProcessingDetail[];
 
   // AI usage
   aiUsage: {
-    totalRequests: number
-    totalTokensInput: number
-    totalTokensOutput: number
-    totalCostUsd: number
-  }
+    totalRequests: number;
+    totalTokensInput: number;
+    totalTokensOutput: number;
+    totalCostUsd: number;
+  };
 }
 
 export interface ContractData {
   // Source
-  sourceFile: string
-  extractionDate: string
+  sourceFile: string;
+  extractionDate: string;
 
   // Property & Vendor
   property: {
-    name: string
-    address: string
-    units?: number
-  }
+    name: string;
+    address: string;
+    units?: number;
+  };
   vendor: {
-    name: string
-    contact?: string
-    phone?: string
-    email?: string
-  }
+    name: string;
+    contact?: string;
+    phone?: string;
+    email?: string;
+  };
 
   // Contract Dates
   contractDates: {
-    effectiveDate: string
-    expirationDate: string
-    termMonths: number
-    autoRenew: boolean
-  }
+    effectiveDate: string;
+    expirationDate: string;
+    termMonths: number;
+    autoRenew: boolean;
+  };
 
   // Services
-  services: ContractService[]
+  services: ContractService[];
 
   // Pricing
   pricing: {
-    monthlyBase?: number
-    perPickup?: number
-    perTon?: number
-    fuelSurcharge?: number
-    otherFees?: { description: string; amount: number }[]
-    escalationClause?: string
-    cpiAdjustment: boolean
-  }
+    monthlyBase?: number;
+    perPickup?: number;
+    perTon?: number;
+    fuelSurcharge?: number;
+    otherFees?: { description: string; amount: number }[];
+    escalationClause?: string;
+    cpiAdjustment: boolean;
+  };
 
   // Terms & Obligations
   terms: {
-    terminationNoticeDays: number
-    earlyTerminationPenalty?: string
-    insuranceRequired: boolean
-    paymentTerms: string
-    latePenalty?: string
-  }
+    terminationNoticeDays: number;
+    earlyTerminationPenalty?: string;
+    insuranceRequired: boolean;
+    paymentTerms: string;
+    latePenalty?: string;
+  };
 }
 
 export interface ContractService {
-  containerType: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' | 'OTHER'
-  containerSize: number // cubic yards
-  frequency: string // e.g., "2x/week", "monthly"
-  serviceDays?: string // e.g., "Mon, Thu"
+  containerType: "COMPACTOR" | "DUMPSTER" | "OPEN_TOP" | "OTHER";
+  containerSize: number; // cubic yards
+  frequency: string; // e.g., "2x/week", "monthly"
+  serviceDays?: string; // e.g., "Mon, Thu"
 }
 
 export interface BatchExtractorResult {
   // Summary
   summary: {
-    totalFilesProcessed: number
-    invoicesExtracted: number
-    haulLogsExtracted: number
-    failedFiles: number
-  }
+    totalFilesProcessed: number;
+    invoicesExtracted: number;
+    haulLogsExtracted: number;
+    failedFiles: number;
+  };
 
   // Extracted data
-  invoices: InvoiceData[]
-  haulLogs: HaulLogEntry[]
+  invoices: InvoiceData[];
+  haulLogs: HaulLogEntry[];
 
   // Processing details
-  processingDetails: ProcessingDetail[]
+  processingDetails: ProcessingDetail[];
 
   // AI usage
   aiUsage: {
-    totalRequests: number
-    totalTokensInput: number
-    totalTokensOutput: number
-    totalCostUsd: number
-  }
+    totalRequests: number;
+    totalTokensInput: number;
+    totalTokensOutput: number;
+    totalCostUsd: number;
+  };
 }
 
 export interface InvoiceData {
   // Source
-  sourceFile: string
-  extractionDate: string
+  sourceFile: string;
+  extractionDate: string;
 
   // Property
-  propertyName: string
-  propertyAddress: string
-  units?: number
+  propertyName: string;
+  propertyAddress: string;
+  units?: number;
 
   // Service
-  servicePeriodStart: string
-  servicePeriodEnd: string
-  invoiceNumber: string
-  billingDate: string
+  servicePeriodStart: string;
+  servicePeriodEnd: string;
+  invoiceNumber: string;
+  billingDate: string;
 
   // Line items
-  lineItems: InvoiceLineItem[]
+  lineItems: InvoiceLineItem[];
 
   // Totals
-  subtotal: number
-  tax: number
-  total: number
+  subtotal: number;
+  tax: number;
+  total: number;
 
   // Vendor
-  vendorName: string
-  vendorContact?: string
+  vendorName: string;
+  vendorContact?: string;
 }
 
 export interface InvoiceLineItem {
-  description: string
-  containerType: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' | 'OTHER'
-  containerSize: number // cubic yards or tons
-  quantity: number
-  frequency: string // e.g., "2x/week", "1x/month"
-  unitPrice: number
-  totalPrice: number
+  description: string;
+  containerType: "COMPACTOR" | "DUMPSTER" | "OPEN_TOP" | "OTHER";
+  containerSize: number; // cubic yards or tons
+  quantity: number;
+  frequency: string; // e.g., "2x/week", "1x/month"
+  unitPrice: number;
+  totalPrice: number;
 }
 
 export interface HaulLogEntry {
   // Source
-  sourceFile: string
+  sourceFile: string;
 
   // Service details
-  date: string
-  time?: string
-  containerType: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' | 'OTHER'
-  containerSize: number
-  weight?: number // tons
-  volume?: number // cubic yards
-  serviceType: 'PICKUP' | 'DELIVERY' | 'EXCHANGE' | 'OTHER'
-  notes?: string
+  date: string;
+  time?: string;
+  containerType: "COMPACTOR" | "DUMPSTER" | "OPEN_TOP" | "OTHER";
+  containerSize: number;
+  weight?: number; // tons
+  volume?: number; // cubic yards
+  serviceType: "PICKUP" | "DELIVERY" | "EXCHANGE" | "OTHER";
+  notes?: string;
 }
 
 export interface ProcessingDetail {
-  fileId: string
-  fileName: string
-  fileType: string
-  status: 'success' | 'failed'
-  extractedRecords: number
-  error?: string
+  fileId: string;
+  fileName: string;
+  fileType: string;
+  status: "success" | "failed";
+  extractedRecords: number;
+  error?: string;
 }
 
 /**
@@ -462,75 +464,80 @@ export interface WasteWiseAnalyticsCompleteResult {
   /** Summary metrics across all analyses */
   summary: {
     /** Total potential savings identified */
-    totalSavingsPotential: number
+    totalSavingsPotential: number;
     /** Current monthly cost */
-    currentMonthlyCost: number
+    currentMonthlyCost: number;
     /** Optimized monthly cost (after recommendations) */
-    optimizedMonthlyCost: number
+    optimizedMonthlyCost: number;
     /** Savings percentage */
-    savingsPercentage: number
+    savingsPercentage: number;
     /** Analysis date range */
     dateRange: {
-      start: string
-      end: string
-    }
+      start: string;
+      end: string;
+    };
     /** Total invoices analyzed */
-    totalInvoices: number
+    totalInvoices: number;
     /** Total hauls tracked (if compactor) */
-    totalHauls?: number
-  }
+    totalHauls?: number;
+  };
 
   /** Invoice data extraction results */
-  invoiceData?: BatchExtractorResult
+  invoiceData?: BatchExtractorResult;
 
   /** Contract terms extraction results (if contract provided) */
-  contractTerms?: ContractExtractorResult
+  contractTerms?: ContractExtractorResult;
 
   /** Compactor optimization results (if applicable) */
-  compactorOptimization?: CompactorOptimizationResult
+  compactorOptimization?: CompactorOptimizationResult;
 
   /** Regulatory compliance results (if location provided) */
-  regulatoryCompliance?: RegulatoryResearchResult
+  regulatoryCompliance?: RegulatoryResearchResult;
 
   /** All optimization recommendations */
   recommendations: Array<{
-    type: 'compactor_monitors' | 'contamination_reduction' | 'bulk_subscription' | 'regulatory_compliance' | 'other'
-    priority: 1 | 2 | 3 | 4 | 5
-    title: string
-    description: string
-    recommend: boolean
-    savings?: number
-    implementation?: string
-    confidence?: 'HIGH' | 'MEDIUM' | 'LOW'
-  }>
+    type:
+      | "compactor_monitors"
+      | "contamination_reduction"
+      | "bulk_subscription"
+      | "regulatory_compliance"
+      | "other";
+    priority: 1 | 2 | 3 | 4 | 5;
+    title: string;
+    description: string;
+    recommend: boolean;
+    savings?: number;
+    implementation?: string;
+    confidence?: "HIGH" | "MEDIUM" | "LOW";
+  }>;
 
   /** Generated reports */
   reports: {
     excelWorkbook: {
-      fileName: string
-      storagePath: string
-      downloadUrl: string
-      size: number
-    }
+      fileName: string;
+      storagePath: string;
+      downloadUrl: string;
+      size: number;
+    };
     htmlDashboard: {
-      fileName: string
-      storagePath: string
-      downloadUrl: string
-      size: number
-    }
-  }
+      fileName: string;
+      storagePath: string;
+      downloadUrl: string;
+      size: number;
+    };
+  };
 
   /** Execution metadata */
-  executionTime: number
+  executionTime: number;
   aiUsage: {
-    totalRequests: number
-    totalTokensInput: number
-    totalTokensOutput: number
-    totalCostUsd: number
-  }
+    totalRequests: number;
+    totalTokensInput: number;
+    totalTokensOutput: number;
+    totalCostUsd: number;
+  };
 
   /** Property is in lease-up (prevents optimization recommendations) */
-  leaseUpDetected: boolean
+  leaseUpDetected: boolean;
 }
 
 /**
@@ -542,107 +549,107 @@ export interface WasteWiseAnalyticsCompleteResult {
 export interface RegulatoryResearchResult {
   /** Property location */
   location: {
-    city: string
-    state: string
-    county?: string
-  }
+    city: string;
+    state: string;
+    county?: string;
+  };
 
   /** Ordinances found and analyzed */
-  ordinances: OrdinanceInfo[]
+  ordinances: OrdinanceInfo[];
 
   /** Waste management requirements extracted from ordinances */
   requirements: {
-    waste: WasteRequirement[]
-    recycling: RecyclingRequirement[]
-    composting: CompostingRequirement[]
-  }
+    waste: WasteRequirement[];
+    recycling: RecyclingRequirement[];
+    composting: CompostingRequirement[];
+  };
 
   /** Compliance assessment */
   compliance: {
-    status: 'COMPLIANT' | 'NON_COMPLIANT' | 'UNKNOWN'
-    issues: ComplianceIssue[]
-    recommendations: string[]
-  }
+    status: "COMPLIANT" | "NON_COMPLIANT" | "UNKNOWN";
+    issues: ComplianceIssue[];
+    recommendations: string[];
+  };
 
   /** Penalties for non-compliance */
   penalties: {
-    type: string
-    description: string
-    amount?: string
-  }[]
+    type: string;
+    description: string;
+    amount?: string;
+  }[];
 
   /** Licensed haulers (if applicable) */
   licensedHaulers: {
-    name: string
-    licenseNumber?: string
-    contact?: string
-  }[]
+    name: string;
+    licenseNumber?: string;
+    contact?: string;
+  }[];
 
   /** Regulatory contacts */
   contacts: {
-    department: string
-    phone?: string
-    email?: string
-    website?: string
-  }[]
+    department: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+  }[];
 
   /** Confidence in the research results */
-  confidence: 'HIGH' | 'MEDIUM' | 'LOW'
+  confidence: "HIGH" | "MEDIUM" | "LOW";
 
   /** Sources consulted */
   sources: {
-    title: string
-    url: string
-    accessedDate: string
-    relevance: number
-  }[]
+    title: string;
+    url: string;
+    accessedDate: string;
+    relevance: number;
+  }[];
 
   /** Metadata */
-  researchDate: string
-  expirationDate: string // When research should be refreshed
+  researchDate: string;
+  expirationDate: string; // When research should be refreshed
 }
 
 export interface OrdinanceInfo {
-  title: string
-  url: string
-  jurisdiction: string // e.g., "City of Austin"
-  chapter?: string
-  section?: string
-  effectiveDate?: string
-  summary: string
-  fullText?: string
-  relevantExcerpts: string[]
+  title: string;
+  url: string;
+  jurisdiction: string; // e.g., "City of Austin"
+  chapter?: string;
+  section?: string;
+  effectiveDate?: string;
+  summary: string;
+  fullText?: string;
+  relevantExcerpts: string[];
 }
 
 export interface WasteRequirement {
-  requirement: string
-  mandatory: boolean
-  frequency?: string // e.g., "2x per week minimum"
-  containerType?: string
-  source: string // Which ordinance/section
+  requirement: string;
+  mandatory: boolean;
+  frequency?: string; // e.g., "2x per week minimum"
+  containerType?: string;
+  source: string; // Which ordinance/section
 }
 
 export interface RecyclingRequirement {
-  requirement: string
-  mandatory: boolean
-  materials: string[] // e.g., ["cardboard", "plastic", "metal"]
-  frequency?: string
-  containerType?: string
-  source: string
+  requirement: string;
+  mandatory: boolean;
+  materials: string[]; // e.g., ["cardboard", "plastic", "metal"]
+  frequency?: string;
+  containerType?: string;
+  source: string;
 }
 
 export interface CompostingRequirement {
-  requirement: string
-  mandatory: boolean
-  materials: string[] // e.g., ["food waste", "yard waste"]
-  frequency?: string
-  source: string
+  requirement: string;
+  mandatory: boolean;
+  materials: string[]; // e.g., ["food waste", "yard waste"]
+  frequency?: string;
+  source: string;
 }
 
 export interface ComplianceIssue {
-  severity: 'HIGH' | 'MEDIUM' | 'LOW'
-  issue: string
-  requirement: string
-  currentStatus: string
-  recommendation: string
+  severity: "HIGH" | "MEDIUM" | "LOW";
+  issue: string;
+  requirement: string;
+  currentStatus: string;
+  recommendation: string;
 }

@@ -1,9 +1,9 @@
-import { cn } from '@/lib/utils'
-import type { ReactNode } from 'react'
+import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 
 interface ResponsiveTableProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 /**
@@ -14,10 +14,8 @@ interface ResponsiveTableProps {
  */
 export function ResponsiveTable({ children, className }: ResponsiveTableProps) {
   return (
-    <div className={cn('w-full overflow-x-auto', className)}>
-      <div className="inline-block min-w-full align-middle">
-        {children}
-      </div>
+    <div className={cn("w-full overflow-x-auto", className)}>
+      <div className="inline-block min-w-full align-middle">{children}</div>
     </div>
-  )
+  );
 }

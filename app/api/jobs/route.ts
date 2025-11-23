@@ -11,91 +11,99 @@
  * - offset: Number of items to skip (default: 0)
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { validatePagination, isValidUUID } from '@/lib/api/validation'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { validatePagination, isValidUUID } from "@/lib/api/validation";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Check authentication
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Parse query parameters
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    const jobType = searchParams.get('jobType')
-    const projectId = searchParams.get('projectId')
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
+    const jobType = searchParams.get("jobType");
+    const projectId = searchParams.get("projectId");
     const { limit, offset } = validatePagination(
-      searchParams.get('limit') ?? undefined,
-      searchParams.get('offset') ?? undefined
-    )
+      searchParams.get("limit") ?? undefined,
+      searchParams.get("offset") ?? undefined,
+    );
 
     // Validate projectId if provided
     if (projectId && !isValidUUID(projectId)) {
       return NextResponse.json(
-        { error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+        { error: "Invalid project ID format" },
+        { status: 400 },
+      );
     }
 
     // Build query
     let query = supabase
-      .from('analysis_jobs')
-      .select('*', { count: 'exact' })
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .from("analysis_jobs")
+      .select("*", { count: "exact" })
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
     // Apply filters
     if (status) {
-      const validStatuses = ['pending', 'processing', 'completed', 'failed', 'cancelled']
+      const validStatuses = [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "cancelled",
+      ];
       if (!validStatuses.includes(status)) {
         return NextResponse.json(
           {
-            error: 'Invalid status. Must be one of: ' + validStatuses.join(', '),
+            error:
+              "Invalid status. Must be one of: " + validStatuses.join(", "),
           },
-          { status: 400 }
-        )
+          { status: 400 },
+        );
       }
-      query = query.eq('status', status)
+      query = query.eq("status", status);
     }
 
     if (jobType) {
       const validJobTypes = [
-        'invoice_extraction',
-        'regulatory_research',
-        'complete_analysis',
-        'report_generation',
-      ]
+        "invoice_extraction",
+        "regulatory_research",
+        "complete_analysis",
+        "report_generation",
+      ];
       if (!validJobTypes.includes(jobType)) {
         return NextResponse.json(
           {
-            error: 'Invalid job type. Must be one of: ' + validJobTypes.join(', '),
+            error:
+              "Invalid job type. Must be one of: " + validJobTypes.join(", "),
           },
-          { status: 400 }
-        )
+          { status: 400 },
+        );
       }
-      query = query.eq('job_type', jobType)
+      query = query.eq("job_type", jobType);
     }
 
     if (projectId) {
-      query = query.eq('project_id', projectId)
+      query = query.eq("project_id", projectId);
     }
 
     // Execute query
-    const { data: jobs, error, count } = await query
+    const { data: jobs, error, count } = await query;
 
     if (error) {
-      throw error
+      throw error;
     }
 
     // Format response
@@ -116,7 +124,7 @@ export async function GET(request: NextRequest) {
       },
       hasError: !!job.error_message,
       hasResult: !!job.result_data,
-    }))
+    }));
 
     return NextResponse.json({
       jobs: formattedJobs,
@@ -126,12 +134,12 @@ export async function GET(request: NextRequest) {
         offset,
         hasMore: (count || 0) > offset + limit,
       },
-    })
+    });
   } catch (error) {
-    console.error('Error fetching jobs:', error)
+    console.error("Error fetching jobs:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch jobs' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch jobs" },
+      { status: 500 },
+    );
   }
 }

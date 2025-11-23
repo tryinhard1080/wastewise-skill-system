@@ -11,12 +11,14 @@ This directory contains predefined sandbox configurations for different developm
 **Purpose**: Full development access for building features
 
 **Use Cases**:
+
 - Frontend development (UI components, pages, forms)
 - Backend development (API routes, database queries)
 - Skills development (calculation logic, AI integrations)
 - General coding tasks
 
 **Access**:
+
 - ✅ Write: All project directories (app, components, lib, tests, docs)
 - ❌ Denied: Sensitive files (.env, credentials, config)
 - ✅ Network: All approved project APIs
@@ -31,13 +33,15 @@ This directory contains predefined sandbox configurations for different developm
 **Purpose**: Isolated testing environment
 
 **Use Cases**:
+
 - Writing unit tests
 - Creating test fixtures
 - Running test suites
 - Test-driven development (TDD)
 
 **Access**:
-- ✅ Write: Test directories only (__tests__, lib/evals)
+
+- ✅ Write: Test directories only (**tests**, lib/evals)
 - ✅ Read: Source code (for test creation)
 - ❌ Denied: Production databases, external APIs
 - ✅ Network: Anthropic API only (for mocks)
@@ -51,13 +55,15 @@ This directory contains predefined sandbox configurations for different developm
 **Purpose**: Documentation updates without code access
 
 **Use Cases**:
+
 - Writing documentation
 - Updating README files
 - Creating guides and tutorials
 - Maintaining .claude instructions
 
 **Access**:
-- ✅ Write: Documentation directories only (docs, .claude, *.md)
+
+- ✅ Write: Documentation directories only (docs, .claude, \*.md)
 - ✅ Read: Source code (for accuracy)
 - ❌ Network: No network access (offline work)
 - ⚠️ Commands: Markdown linters only
@@ -71,6 +77,7 @@ This directory contains predefined sandbox configurations for different developm
 **Purpose**: Code analysis without modifications
 
 **Use Cases**:
+
 - Code exploration and analysis
 - Security audits
 - Performance profiling
@@ -78,6 +85,7 @@ This directory contains predefined sandbox configurations for different developm
 - Answering codebase questions
 
 **Access**:
+
 - ❌ Write: No write access anywhere
 - ✅ Read: Full source code access
 - ✅ Network: Full access (for research/documentation)
@@ -120,15 +128,15 @@ The base `.claude/sandbox.json` defines the `dev` profile as default. Other prof
 
 ## Profile Comparison
 
-| Feature | Dev | Testing | Docs | ReadOnly |
-|---------|-----|---------|------|----------|
-| Write source code | ✅ | ❌ | ❌ | ❌ |
-| Write tests | ✅ | ✅ | ❌ | ❌ |
-| Write docs | ✅ | ❌ | ✅ | ❌ |
-| Read source | ✅ | ✅ | ✅ | ✅ |
-| Network access | Full | Limited | None | Full |
-| Git operations | Excluded | Excluded | Excluded | ReadOnly |
-| Database access | Full | None | None | ReadOnly |
+| Feature           | Dev      | Testing  | Docs     | ReadOnly |
+| ----------------- | -------- | -------- | -------- | -------- |
+| Write source code | ✅       | ❌       | ❌       | ❌       |
+| Write tests       | ✅       | ✅       | ❌       | ❌       |
+| Write docs        | ✅       | ❌       | ✅       | ❌       |
+| Read source       | ✅       | ✅       | ✅       | ✅       |
+| Network access    | Full     | Limited  | None     | Full     |
+| Git operations    | Excluded | Excluded | Excluded | ReadOnly |
+| Database access   | Full     | None     | None     | ReadOnly |
 
 ---
 
@@ -137,6 +145,7 @@ The base `.claude/sandbox.json` defines the `dev` profile as default. Other prof
 ### All Profiles Block
 
 **Filesystem**:
+
 - `.env` and `.env.*` (environment variables)
 - `.credentials.json` (OAuth credentials)
 - `supabase/config.toml` (database config)
@@ -145,6 +154,7 @@ The base `.claude/sandbox.json` defines the `dev` profile as default. Other prof
 - Build artifacts (`.next/`, `dist/`)
 
 **Commands**:
+
 - Sensitive operations require explicit approval
 - Excluded commands use standard permission flow
 - Auto-approval within sandbox boundaries
@@ -203,22 +213,26 @@ pnpm test __tests__/security/sandbox-compliance.test.ts
 ### Expected Behaviors
 
 **Dev Profile**:
+
 - ✅ Write to `./app/page.tsx` succeeds
 - ❌ Read `.env` fails
 - ✅ Fetch from `api.anthropic.com` succeeds
 - ❌ Fetch from `malicious.com` requires permission
 
 **Testing Profile**:
+
 - ✅ Write to `./__tests__/unit/calc.test.ts` succeeds
 - ❌ Write to `./app/page.tsx` fails
 - ❌ Fetch from `supabase.co` fails (no production DB)
 
 **Docs Profile**:
+
 - ✅ Write to `./docs/guide.md` succeeds
 - ❌ Write to `./lib/utils.ts` fails
 - ❌ Any network request fails (offline)
 
 **ReadOnly Profile**:
+
 - ❌ Any write operation fails
 - ✅ Read any source file succeeds
 - ✅ Any approved network request succeeds
@@ -236,6 +250,7 @@ pnpm test __tests__/security/sandbox-compliance.test.ts
 
 **Problem**: Legitimate operation requires permission
 **Solution**:
+
 1. Check active profile matches task type
 2. Review profile's `allowed_write_paths`
 3. Switch to appropriate profile or extend current one
@@ -244,6 +259,7 @@ pnpm test __tests__/security/sandbox-compliance.test.ts
 
 **Problem**: API call to approved domain blocked
 **Solution**:
+
 1. Verify domain in profile's `allowed_domains`
 2. Check for typos (case-sensitive)
 3. Add domain to profile if missing
@@ -268,6 +284,7 @@ pnpm test __tests__/security/sandbox-compliance.test.ts
 **Next Review**: 2025-12-21
 
 **Maintenance Checklist**:
+
 - [ ] Verify all profiles still align with project structure
 - [ ] Check for new sensitive files to deny
 - [ ] Review network domains for deprecated services

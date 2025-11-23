@@ -4,24 +4,24 @@
  * View and export admin audit logs
  */
 
-'use client'
+"use client";
 
-import { AuditLogTable } from '@/components/admin/AuditLogTable'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAuditLogs, exportAuditLogs } from '@/lib/hooks/useAdminData'
-import { toast } from 'sonner'
+import { AuditLogTable } from "@/components/admin/AuditLogTable";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuditLogs, exportAuditLogs } from "@/lib/hooks/useAdminData";
+import { toast } from "sonner";
 
 export default function AuditPage() {
-  const { data, isLoading } = useAuditLogs()
+  const { data, isLoading } = useAuditLogs();
 
   const handleExport = async () => {
     try {
-      await exportAuditLogs()
-      toast.success('Audit logs exported successfully')
+      await exportAuditLogs();
+      toast.success("Audit logs exported successfully");
     } catch (error) {
-      toast.error('Failed to export audit logs')
+      toast.error("Failed to export audit logs");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -37,11 +37,8 @@ export default function AuditPage() {
       {isLoading ? (
         <Skeleton className="h-96" />
       ) : (
-        <AuditLogTable
-          logs={data?.logs || []}
-          onExport={handleExport}
-        />
+        <AuditLogTable logs={data?.logs || []} onExport={handleExport} />
       )}
     </div>
-  )
+  );
 }

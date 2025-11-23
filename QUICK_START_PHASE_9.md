@@ -25,6 +25,7 @@ You have a **fully functional core application** with:
 - ✅ Production-ready codebase (TypeScript strict, no vulnerabilities)
 
 **You can already**:
+
 1. Sign up users
 2. Create projects
 3. Upload invoices
@@ -37,6 +38,7 @@ You have a **fully functional core application** with:
 ## ⏳ What's Missing (The Final 10%)
 
 ### Critical for Launch
+
 1. **Regulatory Research Skill** - Extract municipal ordinances and assess compliance
 2. **User Settings** - Profile, password change, preferences
 3. **Subscription Billing** - Stripe integration with tiered pricing
@@ -47,6 +49,7 @@ You have a **fully functional core application** with:
 8. **Complete Testing** - 100% coverage for calculations
 
 ### Nice to Have (Post-Launch)
+
 - Team management (multi-user organizations)
 - Advanced analytics
 - Mobile app
@@ -58,6 +61,7 @@ You have a **fully functional core application** with:
 ## 🚀 How to Start Phase 9
 
 ### Option 1: Sequential Approach (Recommended)
+
 **Best for**: Single developer, systematic progress
 
 ```bash
@@ -83,6 +87,7 @@ You have a **fully functional core application** with:
 ```
 
 ### Option 2: Parallel Approach
+
 **Best for**: Team of 2-3 developers
 
 ```bash
@@ -103,9 +108,11 @@ You have a **fully functional core application** with:
 ```
 
 ### Option 3: MVP Launch (Fastest to Market)
+
 **Best for**: Get to market quickly, iterate later
 
 **Week 1-2: Minimum Viable Product**
+
 1. ✅ Skip regulatory research (add post-launch)
 2. ✅ Basic user settings only
 3. ✅ Manual billing (no Stripe yet)
@@ -114,6 +121,7 @@ You have a **fully functional core application** with:
 6. ✅ Launch with current features
 
 **Post-Launch: Iterate**
+
 - Add features based on user feedback
 - Implement billing after first 10 customers
 - Build admin tools as needed
@@ -123,6 +131,7 @@ You have a **fully functional core application** with:
 ## 📋 Immediate Next Steps (This Week)
 
 ### Day 1-2: Planning & Setup
+
 - [ ] Review Phase 9 plan (PHASE_9_COMPLETION_PLAN.md)
 - [ ] Decide on approach (Sequential/Parallel/MVP)
 - [ ] Choose web search provider (Exa recommended: $50/month)
@@ -130,12 +139,14 @@ You have a **fully functional core application** with:
 - [ ] Plan user settings UI/UX
 
 ### Day 3-4: Start Implementation
+
 - [ ] Begin regulatory research skill implementation
 - [ ] Set up web search integration
 - [ ] Create ordinance extraction prompts
 - [ ] Build basic skill structure
 
 ### Day 5: Testing & Review
+
 - [ ] Test regulatory skill with sample data
 - [ ] Review progress
 - [ ] Plan next week's work
@@ -145,10 +156,12 @@ You have a **fully functional core application** with:
 ## 💰 Budget Requirements
 
 ### One-Time Costs
+
 - Development: 8 weeks @ $100/hr × 40hrs = **$32,000**
 - Stripe setup: **$0** (no upfront cost)
 
 ### Monthly Operating Costs
+
 - Supabase Pro: **$25/month**
 - Vercel Pro: **$20/month**
 - Anthropic API: **~$500/month** (usage-based)
@@ -159,6 +172,7 @@ You have a **fully functional core application** with:
 **Total Monthly**: ~$636/month (~$7,632/year)
 
 ### Break-Even Analysis
+
 - Monthly cost: $636
 - If pricing at $49/month (Professional tier)
 - Need **13 paying customers** to break even on operating costs
@@ -169,6 +183,7 @@ You have a **fully functional core application** with:
 ## 🎯 Success Criteria (Launch Readiness)
 
 ### Technical Checklist
+
 - [ ] All 4 skills working (including regulatory)
 - [ ] User settings functional
 - [ ] Stripe integration tested
@@ -180,6 +195,7 @@ You have a **fully functional core application** with:
 - [ ] Documentation complete
 
 ### Business Checklist
+
 - [ ] Pricing finalized
 - [ ] Terms of service written
 - [ ] Privacy policy written
@@ -188,6 +204,7 @@ You have a **fully functional core application** with:
 - [ ] Launch announcement prepared
 
 ### User Experience Checklist
+
 - [ ] <1 minute signup to first analysis
 - [ ] <5 minutes analysis completion
 - [ ] Reports download successfully
@@ -200,6 +217,7 @@ You have a **fully functional core application** with:
 ## 📊 Weekly Milestones
 
 ### Week 1 Milestone
+
 - ✅ Regulatory research skill implemented
 - ✅ Tests passing
 - ✅ Integrated into wastewise-analytics
@@ -207,6 +225,7 @@ You have a **fully functional core application** with:
 **Demo**: Show ordinance extraction for Austin, TX property
 
 ### Week 2 Milestone
+
 - ✅ User settings page live
 - ✅ Profile updates working
 - ✅ Password change functional
@@ -214,6 +233,7 @@ You have a **fully functional core application** with:
 **Demo**: Update profile, change password
 
 ### Week 3 Milestone
+
 - ✅ Stripe integration complete
 - ✅ Subscription creation working
 - ✅ Webhook handlers tested
@@ -221,6 +241,7 @@ You have a **fully functional core application** with:
 **Demo**: Subscribe to Professional plan
 
 ### Week 4 Milestone
+
 - ✅ Admin dashboard deployed
 - ✅ Job monitoring active
 - ✅ User management functional
@@ -228,6 +249,7 @@ You have a **fully functional core application** with:
 **Demo**: View system metrics, manage users
 
 ### Week 5 Milestone
+
 - ✅ Production deployment successful
 - ✅ Custom domain configured
 - ✅ SSL active
@@ -235,6 +257,7 @@ You have a **fully functional core application** with:
 **Demo**: Access live site at wastewise.com
 
 ### Week 6 Milestone
+
 - ✅ Lighthouse score >90
 - ✅ Performance optimized
 - ✅ Caching implemented
@@ -242,6 +265,7 @@ You have a **fully functional core application** with:
 **Demo**: Fast page loads, optimized bundle
 
 ### Week 7 Milestone
+
 - ✅ Test coverage >90%
 - ✅ All tests passing
 - ✅ Integration tests complete
@@ -249,6 +273,7 @@ You have a **fully functional core application** with:
 **Demo**: Test suite execution
 
 ### Week 8 Milestone
+
 - ✅ Documentation complete
 - ✅ Launch checklist done
 - ✅ Beta users onboarded
@@ -289,16 +314,19 @@ vercel --prod     # Production deployment
 ## 📚 Key Documents
 
 ### Planning
+
 - `PHASE_9_COMPLETION_PLAN.md` - Full 8-week plan (this document)
 - `QUICK_START_PHASE_9.md` - Quick reference (you are here)
 
 ### Technical Docs
+
 - `README.md` - Project overview and setup
 - `docs/API.md` - API documentation
 - `docs/DEPLOYMENT.md` - Deployment guide
 - `docs/TESTING.md` - Testing guide
 
 ### Previous Phases
+
 - `PHASE_7_COMPLETE.md` - Backend infrastructure summary
 - `PHASE_8_STATUS.md` - Processing page summary
 - `.claude/CLAUDE.md` - Project instructions
@@ -308,22 +336,27 @@ vercel --prod     # Production deployment
 ## 🚨 Common Pitfalls to Avoid
 
 ### 1. Scope Creep
+
 ❌ "Let's add just one more feature..."
 ✅ Stick to the plan, log nice-to-haves for v2
 
 ### 2. Premature Optimization
+
 ❌ Optimizing before measuring
 ✅ Use Lighthouse to identify real bottlenecks
 
 ### 3. Incomplete Testing
+
 ❌ "It works on my machine"
 ✅ Test in production-like environment
 
 ### 4. Poor Error Handling
+
 ❌ Generic error messages
 ✅ Helpful, actionable error messages
 
 ### 5. Ignoring Security
+
 ❌ Skipping security review
 ✅ Complete security checklist before launch
 
@@ -332,18 +365,21 @@ vercel --prod     # Production deployment
 ## 💡 Pro Tips
 
 ### For Development
+
 1. **Test early, test often** - Run tests after every feature
 2. **Use feature flags** - Deploy to prod, enable gradually
 3. **Monitor from day 1** - Set up Sentry before you need it
 4. **Document as you go** - Don't wait until the end
 
 ### For Launch
+
 1. **Soft launch first** - Private beta with 10 users
 2. **Gather feedback** - Weekly user interviews
 3. **Iterate quickly** - Ship fixes within 24 hours
 4. **Celebrate wins** - Acknowledge milestones
 
 ### For Growth
+
 1. **Focus on core value** - Optimization that saves money
 2. **Listen to users** - Build what they need, not what's cool
 3. **Measure everything** - Data-driven decisions
@@ -365,6 +401,7 @@ vercel --prod     # Production deployment
 ✅ Happy customers saving money on waste management
 
 **The platform will**:
+
 - Process invoices automatically
 - Generate accurate optimization recommendations
 - Save customers 15-30% on waste costs
@@ -376,18 +413,21 @@ vercel --prod     # Production deployment
 ## 📞 Getting Help
 
 ### Stuck on Implementation?
+
 1. Review relevant phase documentation
 2. Check existing code examples in `lib/skills/`
 3. Consult `.claude/quality-checklist.md`
 4. Use the evals framework for validation
 
 ### Need Architecture Guidance?
+
 1. Review `docs/API.md` for patterns
 2. Check database schema in `supabase/migrations/`
 3. Follow existing skill implementations
 4. Reference `.claude/CLAUDE.md` for rules
 
 ### Questions?
+
 - Check FAQ in user documentation
 - Review troubleshooting guide
 - Consult deployment guide for production issues

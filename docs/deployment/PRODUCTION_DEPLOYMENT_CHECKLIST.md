@@ -1,10 +1,10 @@
 # Production Deployment Checklist
 
-**Date**: _______________
-**Deployer**: _______________
+**Date**: ******\_\_\_******
+**Deployer**: ******\_\_\_******
 **Deployment Type**: [ ] Initial [ ] Update [ ] Hotfix [ ] Rollback
-**Git Commit**: _______________
-**Staging Validation**: [ ] Complete [ ] Partial [ ] Skipped (explain): _______________
+**Git Commit**: ******\_\_\_******
+**Staging Validation**: [ ] Complete [ ] Partial [ ] Skipped (explain): ******\_\_\_******
 
 ---
 
@@ -39,10 +39,11 @@
 - [ ] No security incidents
 
 **Staging Metrics**:
-- Job success rate: ________%
-- Average response time: ______ms
-- Error rate: ________%
-- Uptime: ________%
+
+- Job success rate: **\_\_\_\_**%
+- Average response time: **\_\_**ms
+- Error rate: **\_\_\_\_**%
+- Uptime: **\_\_\_\_**%
 
 ---
 
@@ -53,6 +54,7 @@ pnpm run pre-deploy:checks
 ```
 
 **MUST PASS ALL**:
+
 - [ ] TypeScript: 0 errors
 - [ ] ESLint: 0 errors, 0 warnings
 - [ ] Unit tests: 100% passing
@@ -77,6 +79,7 @@ pnpm run pre-deploy:checks
 - [ ] Custom domain verified
 
 **Environment Variables Checklist**:
+
 - [ ] `NEXT_PUBLIC_SUPABASE_URL` (production)
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` (production)
 - [ ] `SUPABASE_SERVICE_KEY` (production)
@@ -94,6 +97,7 @@ pnpm run pre-deploy:checks
 ### 1.4 Monitoring & Alerting Setup ✅
 
 **Sentry (Error Tracking)**:
+
 - [ ] Production project created
 - [ ] DSN configured in environment variables
 - [ ] Source maps upload configured
@@ -102,6 +106,7 @@ pnpm run pre-deploy:checks
 - [ ] Test error sent and received
 
 **Uptime Monitoring** (UptimeRobot, Pingdom, etc.):
+
 - [ ] Frontend health check (https://app.wastewise.io/api/health)
 - [ ] Worker health check (https://app.wastewise.io/api/health/worker)
 - [ ] Check interval: 1 minute
@@ -109,6 +114,7 @@ pnpm run pre-deploy:checks
 - [ ] Incident escalation configured
 
 **Database Monitoring**:
+
 - [ ] Supabase database metrics enabled
 - [ ] Connection pool alerts (>80% → warning)
 - [ ] Query performance tracking
@@ -116,6 +122,7 @@ pnpm run pre-deploy:checks
 - [ ] Daily backup configured
 
 **Worker Monitoring**:
+
 - [ ] Job processing rate tracked
 - [ ] Job failure rate alerts (>10% → critical)
 - [ ] Worker crash alerts (immediate)
@@ -142,6 +149,7 @@ bash scripts/restore-database.sh
 - [ ] RPO (Recovery Point Objective): <15 minutes
 
 **Backup Schedule**:
+
 - Daily: Full database backup at 2 AM UTC
 - Weekly: Complete system snapshot (Sunday 3 AM UTC)
 - Monthly: Archival backup (first Sunday of month)
@@ -151,16 +159,17 @@ bash scripts/restore-database.sh
 ### 1.6 Team Readiness ✅
 
 - [ ] All team members notified of deployment window
-- [ ] On-call engineer assigned: _______________
-- [ ] Backup engineer assigned: _______________
+- [ ] On-call engineer assigned: ******\_\_\_******
+- [ ] Backup engineer assigned: ******\_\_\_******
 - [ ] Stakeholder communication plan ready
 - [ ] User notification drafted (if downtime expected)
 - [ ] Status page updated (if using)
 
 **Deployment Window**:
-- Start: _______________ (UTC)
-- Expected duration: _______________
-- Rollback deadline: _______________ (if issues found)
+
+- Start: ******\_\_\_****** (UTC)
+- Expected duration: ******\_\_\_******
+- Rollback deadline: ******\_\_\_****** (if issues found)
 
 ---
 
@@ -169,10 +178,11 @@ bash scripts/restore-database.sh
 ### 2.1 Production Database Setup
 
 **Create Production Supabase Project**:
+
 - [ ] Project created: wastewise-production
-- [ ] Region: _______________ (closest to users)
-- [ ] Database password: _______________ (stored securely)
-- [ ] Project reference ID: _______________
+- [ ] Region: ******\_\_\_****** (closest to users)
+- [ ] Database password: ******\_\_\_****** (stored securely)
+- [ ] Project reference ID: ******\_\_\_******
 
 ```bash
 # Link to production
@@ -192,8 +202,8 @@ bash scripts/backup-database.sh
 ```
 
 - [ ] Pre-migration backup completed
-- [ ] Backup file location: _______________
-- [ ] Backup verified (checksum): _______________
+- [ ] Backup file location: ******\_\_\_******
+- [ ] Backup verified (checksum): ******\_\_\_******
 
 ---
 
@@ -215,6 +225,7 @@ npx supabase db push
 - [ ] All RLS policies applied
 
 **Verify Schema**:
+
 - [ ] 12 tables exist (profiles, projects, analysis_jobs, etc.)
 - [ ] All indexes created
 - [ ] All constraints applied
@@ -241,6 +252,7 @@ psql $DATABASE_URL -c "SELECT count(*) FROM information_schema.tables WHERE tabl
 ### 3.1 Vercel/Netlify Production Setup
 
 **Connect Repository**:
+
 - [ ] Production project created
 - [ ] Git branch: `master` (or `main`)
 - [ ] Build command: `pnpm build`
@@ -295,6 +307,7 @@ RATE_LIMIT_WINDOW=60000      # 1 minute in ms
 ### 3.3 Deploy Frontend (Zero-Downtime)
 
 **Pre-Deployment**:
+
 ```bash
 # Build locally to verify
 pnpm build
@@ -308,6 +321,7 @@ du -sh .next
 - [ ] No build warnings
 
 **Deploy**:
+
 ```bash
 # Push to production branch
 git push origin master:production
@@ -319,7 +333,7 @@ vercel deploy --prod
 - [ ] Deployment initiated
 - [ ] Build logs reviewed (no errors)
 - [ ] Build completed successfully
-- [ ] Deployment URL: _______________
+- [ ] Deployment URL: ******\_\_\_******
 
 ---
 
@@ -333,6 +347,7 @@ vercel deploy --prod
 - [ ] www → non-www redirect configured
 
 **Verify DNS**:
+
 ```bash
 dig app.wastewise.io
 curl -I https://app.wastewise.io
@@ -345,6 +360,7 @@ curl -I https://app.wastewise.io
 ### 4.1 Choose Deployment Strategy
 
 **Option A: AWS ECS (Recommended for Production)**
+
 - [ ] ECS cluster created: wastewise-production
 - [ ] Task definition created
 - [ ] Service configured (desired count: 2 for redundancy)
@@ -352,11 +368,13 @@ curl -I https://app.wastewise.io
 - [ ] Health checks configured
 
 **Option B: Google Cloud Run**
+
 - [ ] Cloud Run service created
 - [ ] Scaling: Min 1, Max 5
 - [ ] Health checks configured
 
 **Option C: Dedicated Server**
+
 - [ ] Production server provisioned
 - [ ] High availability: 2+ servers with load balancer
 - [ ] Failover configured
@@ -379,13 +397,14 @@ docker push <registry>/wastewise-worker:v1.0.0
 - [ ] Image built successfully
 - [ ] Image tagged with version number
 - [ ] Image pushed to registry
-- [ ] Image size: _______ MB
+- [ ] Image size: **\_\_\_** MB
 
 ---
 
 ### 4.3 Deploy Worker with Redundancy
 
 **AWS ECS Deployment**:
+
 ```bash
 # Update ECS service
 aws ecs update-service \
@@ -401,6 +420,7 @@ aws ecs update-service \
 - [ ] Logs showing "Worker started"
 
 **Environment Variables (Worker)**:
+
 - [ ] All Supabase credentials (production)
 - [ ] ANTHROPIC_API_KEY (production)
 - [ ] LOG_LEVEL=info (not debug in production)
@@ -454,6 +474,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 ### 5.2 Manual End-to-End Test
 
 **Create Test Account**:
+
 ```bash
 # Use a production test account
 Email: production-test@wastewise.io
@@ -543,6 +564,7 @@ pnpm load-test https://app.wastewise.io
 - [ ] **CORS**: Only allowed origins can access API
 
 **Test Rate Limiting**:
+
 ```bash
 # Should get 429 after 100 requests
 for i in {1..120}; do curl https://app.wastewise.io/api/health; done
@@ -559,11 +581,12 @@ for i in {1..120}; do curl https://app.wastewise.io/api/health; done
 - [ ] Release created: `v1.0.0`
 - [ ] Error grouping configured
 - [ ] Alert rules set:
-  - [ ] >10 errors/min → Slack #production-alerts
+  - [ ] > 10 errors/min → Slack #production-alerts
   - [ ] Critical error → PagerDuty (immediate)
   - [ ] Daily error summary → Email
 
 **Test Sentry**:
+
 ```bash
 # Trigger test error (remove after verification)
 curl https://app.wastewise.io/api/debug/sentry-test
@@ -598,6 +621,7 @@ curl https://app.wastewise.io/api/debug/sentry-test
    - Alert if connections >80% pool
 
 **Alert Channels**:
+
 - [ ] Email: devops@wastewise.io
 - [ ] Slack: #production-alerts
 - [ ] SMS: +1-XXX-XXX-XXXX (on-call engineer)
@@ -637,6 +661,7 @@ curl https://app.wastewise.io/api/debug/sentry-test
 ### 7.1 Automated Backup Configuration
 
 **Daily Backups**:
+
 ```bash
 # Add to cron (2 AM UTC daily)
 0 2 * * * /opt/wastewise/scripts/backup-database.sh >> /var/log/backup.log 2>&1
@@ -649,6 +674,7 @@ curl https://app.wastewise.io/api/debug/sentry-test
 - [ ] Old backups auto-deleted after retention period
 
 **Weekly Backups**:
+
 ```bash
 # Add to cron (Sunday 3 AM UTC)
 0 3 * * 0 /opt/wastewise/scripts/backup-full-system.sh >> /var/log/backup.log 2>&1
@@ -676,6 +702,7 @@ curl https://app.wastewise.io/api/debug/sentry-test
 ### 7.3 Disaster Recovery Plan
 
 **Documented Procedures**:
+
 - [ ] Complete database restore procedure
 - [ ] RTO: <1 hour (how fast can we recover)
 - [ ] RPO: <15 minutes (how much data can we lose)
@@ -683,8 +710,9 @@ curl https://app.wastewise.io/api/debug/sentry-test
 - [ ] Team trained on recovery procedures
 
 **Recovery Test**:
+
 - [ ] Schedule quarterly DR tests
-- [ ] Next test date: _______________
+- [ ] Next test date: ******\_\_\_******
 - [ ] Document lessons learned
 
 ---
@@ -703,6 +731,7 @@ curl https://app.wastewise.io/api/debug/sentry-test
 ### 8.2 Post-Deployment Monitoring (First 4 Hours)
 
 **Hour 1 (Active Monitoring)**:
+
 - [ ] Watch error logs continuously
 - [ ] Monitor job success rate
 - [ ] Check database performance
@@ -710,17 +739,20 @@ curl https://app.wastewise.io/api/debug/sentry-test
 - [ ] No critical errors
 
 **Hour 2-4 (Periodic Checks)**:
+
 - [ ] Check every 30 minutes
 - [ ] Review error rates
 - [ ] Check uptime monitors
 - [ ] Verify alerts working
 
 **First 24 Hours**:
+
 - [ ] Check every 4 hours
 - [ ] Review daily summary
 - [ ] Address any warnings
 
 **First Week**:
+
 - [ ] Daily health checks
 - [ ] Weekly review meeting
 - [ ] Document any issues
@@ -730,6 +762,7 @@ curl https://app.wastewise.io/api/debug/sentry-test
 ### 8.3 Team Notification
 
 **Internal Notification**:
+
 ```
 ✅ PRODUCTION DEPLOYMENT COMPLETE
 
@@ -754,6 +787,7 @@ Please monitor #production-alerts for any issues.
 - [ ] Status page updated (if using)
 
 **User Communication** (if applicable):
+
 - [ ] Announcement email sent
 - [ ] Social media update posted
 - [ ] Blog post published
@@ -766,14 +800,16 @@ Please monitor #production-alerts for any issues.
 ### 9.1 When to Rollback
 
 **CRITICAL - Rollback immediately if**:
+
 - Critical functionality broken (users can't create projects, run analysis, download reports)
 - Data loss or corruption detected
 - Security vulnerability discovered
-- >50% job failure rate
+- > 50% job failure rate
 - Database performance degraded >3x
 - Worker constantly crashing
 
 **WARNING - Consider rollback if**:
+
 - Error rate >10%
 - Performance degraded >2x
 - Multiple user complaints
@@ -784,6 +820,7 @@ Please monitor #production-alerts for any issues.
 ### 9.2 Rollback Procedure
 
 **Step 1: Notify Team**
+
 ```
 🚨 PRODUCTION ROLLBACK IN PROGRESS
 
@@ -795,6 +832,7 @@ ETA: [Time to complete rollback]
 ---
 
 **Step 2: Rollback Frontend**
+
 ```bash
 # Vercel
 vercel rollback <previous-deployment-url>
@@ -811,6 +849,7 @@ git push origin v0.9.0:production
 ---
 
 **Step 3: Rollback Worker**
+
 ```bash
 # AWS ECS
 aws ecs update-service \
@@ -830,6 +869,7 @@ docker service update --image <registry>/wastewise-worker:v0.9.0
 ---
 
 **Step 4: Rollback Database (EXTREME CAUTION)**
+
 ```bash
 # Only if migrations caused the issue
 npx supabase migration repair <migration-name> --status reverted
@@ -848,6 +888,7 @@ bash scripts/restore-database.sh <backup-file>
 ---
 
 **Step 5: Verify Rollback**
+
 ```bash
 # Run smoke tests
 STAGING_URL=https://app.wastewise.io pnpm smoke-tests
@@ -864,6 +905,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 ---
 
 **Step 6: Post-Rollback**
+
 - [ ] Update status page
 - [ ] Notify users (if impacted)
 - [ ] Create incident report
@@ -877,6 +919,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 ### 10.1 Deployment Success Checklist
 
 **Technical**:
+
 - [ ] All automated tests passing
 - [ ] All smoke tests passing
 - [ ] Manual E2E test successful
@@ -887,6 +930,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 - [ ] Error rate <1%
 
 **Operational**:
+
 - [ ] Monitoring active and alerting
 - [ ] Backups running successfully
 - [ ] Team notified
@@ -894,6 +938,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 - [ ] On-call schedule confirmed
 
 **Business**:
+
 - [ ] Users can access application
 - [ ] Core workflows functional
 - [ ] No customer complaints
@@ -953,18 +998,19 @@ Next Review: 2025-11-23 15:00 UTC (24-hour checkpoint)
 
 ### 10.3 Final Sign-Off
 
-**Technical Lead**: _______________
-**Date**: _______________
+**Technical Lead**: ******\_\_\_******
+**Date**: ******\_\_\_******
 
-**DevOps Lead**: _______________
-**Date**: _______________
+**DevOps Lead**: ******\_\_\_******
+**Date**: ******\_\_\_******
 
-**Product Manager**: _______________
-**Date**: _______________
+**Product Manager**: ******\_\_\_******
+**Date**: ******\_\_\_******
 
 **Overall Deployment Status**: [ ] Success [ ] Success with Issues [ ] Failed
 
 **Post-Deployment Actions**:
+
 - [ ] Schedule 24-hour review
 - [ ] Schedule 1-week review
 - [ ] Plan next deployment improvements
@@ -975,13 +1021,15 @@ Next Review: 2025-11-23 15:00 UTC (24-hour checkpoint)
 ## Appendix: Quick Reference
 
 ### Emergency Contacts
-- **Technical Lead**: _______________
-- **DevOps Lead**: _______________
-- **On-Call Engineer**: _______________
-- **Backup Engineer**: _______________
-- **Security Team**: _______________
+
+- **Technical Lead**: ******\_\_\_******
+- **DevOps Lead**: ******\_\_\_******
+- **On-Call Engineer**: ******\_\_\_******
+- **Backup Engineer**: ******\_\_\_******
+- **Security Team**: ******\_\_\_******
 
 ### Critical URLs
+
 - **Production**: https://app.wastewise.io
 - **Admin Dashboard**: https://app.wastewise.io/admin
 - **API Docs**: https://app.wastewise.io/api-docs
@@ -989,12 +1037,14 @@ Next Review: 2025-11-23 15:00 UTC (24-hour checkpoint)
 - **Worker Health**: https://app.wastewise.io/api/health/worker
 
 ### Monitoring Dashboards
+
 - **Sentry**: https://sentry.io/wastewise-production
 - **Uptime**: https://uptimerobot.com
 - **Supabase**: https://supabase.com/dashboard/project/<prod-ref>
 - **Vercel**: https://vercel.com/wastewise/production
 
 ### Useful Commands
+
 ```bash
 # Health checks
 curl https://app.wastewise.io/api/health

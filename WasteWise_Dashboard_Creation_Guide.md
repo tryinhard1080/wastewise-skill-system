@@ -7,6 +7,7 @@
 ## 📋 Prerequisites
 
 Before you begin, ensure you have:
+
 - [ ] Access to Claude.ai (Projects feature)
 - [ ] WasteWise Complete Suite skill loaded in your project
 - [ ] Property invoice files (PDF, Excel, or CSV format)
@@ -47,6 +48,7 @@ Please generate both files following the WasteWise standards.
 ```
 
 **Example:**
+
 ```
 Please analyze these waste invoices using the WasteWise Complete Suite skill.
 
@@ -66,6 +68,7 @@ Please generate both files following the WasteWise standards.
 ### Step 3: Wait for Analysis
 
 Claude will:
+
 1. ✅ Read the WasteWise skill (automatically)
 2. ✅ Process all invoices
 3. ✅ Extract property data
@@ -88,6 +91,7 @@ Claude will provide two download links:
 ```
 
 **Click each link to download:**
+
 - Excel file: `[Property_Name]_WasteWise_Analysis.xlsx`
 - HTML file: `[Property_Name]_Dashboard.html`
 
@@ -100,7 +104,7 @@ If you already have an Excel workbook and only need the dashboard:
 ### Prompt Template:
 
 ```
-I have already completed the WasteWise analysis for [Property Name]. 
+I have already completed the WasteWise analysis for [Property Name].
 
 Can you create ONLY the interactive HTML dashboard using the following data:
 
@@ -151,11 +155,12 @@ If you want to modify the dashboard I just created:
 
 **Search for:** `const kpi = {`
 **Replace with your values:**
+
 ```javascript
 const kpi = {
-    avgCost: 4508.21,  // YOUR AVERAGE MONTHLY COST
-    cpd: 14.64,        // YOUR COST PER DOOR
-    savings: 18128     // YOUR ANNUAL SAVINGS
+  avgCost: 4508.21, // YOUR AVERAGE MONTHLY COST
+  cpd: 14.64, // YOUR COST PER DOOR
+  savings: 18128, // YOUR ANNUAL SAVINGS
 };
 ```
 
@@ -218,6 +223,7 @@ Please generate the complete HTML file as a single self-contained document with 
 ## 📊 What You Get
 
 ### Excel Workbook (9 tabs):
+
 1. **SUMMARY_FULL** - Executive overview with 2026 savings headline
 2. **EXPENSE_ANALYSIS** - Row-based format with all invoice numbers
 3. **HAUL_LOG** - Compactor pickups (if applicable)
@@ -229,6 +235,7 @@ Please generate the complete HTML file as a single self-contained document with 
 9. **QUALITY_CHECK** - Validation summary
 
 ### HTML Dashboard (6 tabs):
+
 1. **Dashboard** - KPI cards + projected spend/tonnage charts
 2. **Expense Analysis** - Monthly trends + detailed table with filters
 3. **Haul Log** - Filterable table + summary stats
@@ -237,6 +244,7 @@ Please generate the complete HTML file as a single self-contained document with 
 6. **Regulatory Compliance** - Ordinance findings
 
 ### Key Features Included:
+
 ✅ **Accessibility:** ARIA labels, keyboard navigation, focus states
 ✅ **Print Support:** Optimized print CSS, dedicated print button
 ✅ **Mobile Responsive:** Stacks on small screens, collapsible elements
@@ -258,13 +266,19 @@ In the HTML file, find the style section and modify:
 
 ```css
 /* Primary brand color */
-.text-blue-600 { color: #2563eb; } /* Change to your brand color */
+.text-blue-600 {
+  color: #2563eb;
+} /* Change to your brand color */
 
 /* Success/savings color */
-.text-green-600 { color: #22c55e; } /* Change if needed */
+.text-green-600 {
+  color: #22c55e;
+} /* Change if needed */
 
 /* Alert color */
-.text-red-600 { color: #dc2626; } /* Change if needed */
+.text-red-600 {
+  color: #dc2626;
+} /* Change if needed */
 ```
 
 ### Add Your Logo
@@ -272,7 +286,7 @@ In the HTML file, find the style section and modify:
 Find the header section and add:
 
 ```html
-<img src="your-logo.png" alt="Company Logo" class="h-12 w-auto">
+<img src="your-logo.png" alt="Company Logo" class="h-12 w-auto" />
 ```
 
 ### Modify Chart Colors
@@ -304,11 +318,13 @@ This avoids token limits. Start with Phase 1.
 ### Charts not displaying
 
 **Check:**
+
 1. Internet connection (CDN libraries need to load)
 2. Browser console for JavaScript errors (F12 → Console tab)
 3. Chart.js CDN links are accessible
 
 **Fix:** Open the HTML file and verify these CDN links work:
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.0"></script>
@@ -317,6 +333,7 @@ This avoids token limits. Start with Phase 1.
 ### Excel export not working
 
 **Check:**
+
 1. SheetJS library loaded: `https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js`
 2. Browser allows downloads (check permissions)
 3. JavaScript console for errors
@@ -324,6 +341,7 @@ This avoids token limits. Start with Phase 1.
 ### Filters not working
 
 **Check:**
+
 1. Filter dropdown IDs match JavaScript: `month-filter`, `status-filter`, `account-filter`
 2. Event listeners attached correctly
 3. No JavaScript errors in console
@@ -331,6 +349,7 @@ This avoids token limits. Start with Phase 1.
 ### Print layout broken
 
 **Try:**
+
 1. Use Chrome/Edge (best print support)
 2. Check print preview before printing
 3. Ensure `@media print` CSS rules are present
@@ -355,6 +374,7 @@ Please analyze Property 1 first, then I'll upload files for Property 2.
 ### 2. Reuse Dashboard Template
 
 Save the HTML file as a template. For new properties, just update the data arrays:
+
 - `kpi` object
 - `invoiceData` array
 - `haulLogData` array
@@ -364,16 +384,19 @@ Save the HTML file as a template. For new properties, just update the data array
 ### 3. Share Dashboards Internally
 
 **Option A: Email**
+
 - Attach HTML file directly
 - Recipients can open in any browser
 - All functionality works offline (except CDN libraries)
 
 **Option B: Internal SharePoint/Google Drive**
+
 - Upload HTML file
 - Share link with team
 - Everyone sees same interactive dashboard
 
 **Option C: Embed in Intranet**
+
 - Host on internal web server
 - Iframe into existing pages
 - No external dependencies except CDN
@@ -381,6 +404,7 @@ Save the HTML file as a template. For new properties, just update the data array
 ### 4. Schedule Regular Updates
 
 Create a workflow:
+
 1. Download invoices monthly (1st week of month)
 2. Upload to Claude.ai
 3. Generate updated dashboard
@@ -390,6 +414,7 @@ Create a workflow:
 ### 5. Use as Presentation Tool
 
 During meetings:
+
 - Open dashboard in browser
 - Use tabs to navigate topics
 - Print specific tabs for handouts
@@ -433,21 +458,25 @@ Example:
 ### Common Requests
 
 **Add new chart:**
+
 ```
 Add a pie chart showing expense breakdown by category (disposal, rental, contamination, etc.)
 ```
 
 **Change benchmark:**
+
 ```
 Change the garden-style benchmark from $15/door to $18/door based on our regional data
 ```
 
 **Add export option:**
+
 ```
 Add a "Download CSV" button for the haul log table
 ```
 
 **Modify colors:**
+
 ```
 Change the color scheme to match Greystar branding (use #003B5C as primary color)
 ```
@@ -459,11 +488,13 @@ Change the color scheme to match Greystar branding (use #003B5C as primary color
 ### Understanding the Code
 
 **HTML Structure:**
+
 - `<head>` - CDN libraries, CSS styles
 - `<body>` - Dashboard content (header, tabs, charts, tables)
 - `<script>` - JavaScript for interactivity
 
 **Key JavaScript Components:**
+
 - `const kpi = {...}` - KPI data
 - `function showTab(tabId)` - Tab switching logic
 - `function createProjectedSpendChart()` - Chart generation
@@ -475,6 +506,7 @@ Change the color scheme to match Greystar branding (use #003B5C as primary color
 For customizing charts: https://www.chartjs.org/docs/latest/
 
 **Common modifications:**
+
 - Colors: `borderColor`, `backgroundColor`
 - Type: `type: 'line'` vs `type: 'bar'`
 - Labels: `label: 'Your Label'`
@@ -485,6 +517,7 @@ For customizing charts: https://www.chartjs.org/docs/latest/
 For styling customization: https://tailwindcss.com/docs
 
 **Common classes:**
+
 - Colors: `text-blue-600`, `bg-green-50`
 - Spacing: `p-4` (padding), `m-2` (margin)
 - Layout: `flex`, `grid`, `hidden`
@@ -497,6 +530,7 @@ For styling customization: https://tailwindcss.com/docs
 Before sharing your dashboard with stakeholders, verify:
 
 ### Data Accuracy
+
 - [ ] Property name is correct
 - [ ] Unit count is accurate
 - [ ] All invoice numbers included
@@ -505,6 +539,7 @@ Before sharing your dashboard with stakeholders, verify:
 - [ ] Haul log dates in chronological order
 
 ### Functionality
+
 - [ ] All 6 tabs load correctly
 - [ ] Charts render properly
 - [ ] Filters work on Expense and Haul Log tabs
@@ -513,12 +548,14 @@ Before sharing your dashboard with stakeholders, verify:
 - [ ] Mobile view is readable
 
 ### Branding
+
 - [ ] "WasteWise by THE Trash Hub" appears correctly
 - [ ] No mention of "Advantage Waste" anywhere
 - [ ] Contact info is accurate (Keith Conrad, Cole Myers)
 - [ ] Colors match your brand guidelines
 
 ### Professional Polish
+
 - [ ] No spelling errors
 - [ ] Numbers formatted consistently ($X,XXX.XX)
 - [ ] Charts have proper labels and legends
@@ -541,11 +578,13 @@ Before sharing your dashboard with stakeholders, verify:
 ## 📝 Example Workflow (Complete)
 
 **Day 1 - Setup:**
+
 1. Create WasteWise project in Claude.ai (if not already done)
 2. Ensure skill is loaded
 3. Organize invoice files in a folder
 
 **Day 2 - Generate First Dashboard:**
+
 1. Upload 6-12 months of invoices for one property
 2. Use Method 1 prompt template
 3. Download Excel + HTML
@@ -553,18 +592,21 @@ Before sharing your dashboard with stakeholders, verify:
 5. Share with property manager for feedback
 
 **Day 3 - Iterate:**
+
 1. Make any needed corrections
 2. Customize branding
 3. Test print functionality
 4. Practice presenting dashboard
 
 **Week 2 - Scale:**
+
 1. Process 5 more properties
 2. Build library of dashboards
 3. Train regional managers on how to use
 4. Set up monthly update schedule
 
 **Ongoing:**
+
 1. Update dashboards monthly as new invoices arrive
 2. Track savings from implemented recommendations
 3. Refine benchmarks based on actual results

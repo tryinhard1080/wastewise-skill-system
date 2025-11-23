@@ -65,9 +65,7 @@
     "schemas": {
       "Error": {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "string",
@@ -86,11 +84,7 @@
       },
       "ValidationError": {
         "type": "object",
-        "required": [
-          "error",
-          "code",
-          "details"
-        ],
+        "required": ["error", "code", "details"],
         "properties": {
           "error": {
             "type": "string",
@@ -126,13 +120,7 @@
       },
       "PaginatedResponse": {
         "type": "object",
-        "required": [
-          "data",
-          "total",
-          "page",
-          "limit",
-          "totalPages"
-        ],
+        "required": ["data", "total", "page", "limit", "totalPages"],
         "properties": {
           "data": {
             "type": "array",
@@ -158,12 +146,7 @@
       },
       "User": {
         "type": "object",
-        "required": [
-          "id",
-          "email",
-          "role",
-          "created_at"
-        ],
+        "required": ["id", "email", "role", "created_at"],
         "properties": {
           "id": {
             "type": "string",
@@ -177,10 +160,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "admin",
-              "user"
-            ],
+            "enum": ["admin", "user"],
             "description": "User role"
           },
           "created_at": {
@@ -215,11 +195,7 @@
           },
           "property_type": {
             "type": "string",
-            "enum": [
-              "Garden-Style",
-              "Mid-Rise",
-              "High-Rise"
-            ],
+            "enum": ["Garden-Style", "Mid-Rise", "High-Rise"],
             "description": "Property type"
           },
           "units": {
@@ -230,11 +206,7 @@
           },
           "equipment_type": {
             "type": "string",
-            "enum": [
-              "COMPACTOR",
-              "DUMPSTER",
-              "BOTH"
-            ],
+            "enum": ["COMPACTOR", "DUMPSTER", "BOTH"],
             "description": "Waste equipment type"
           },
           "location": {
@@ -253,12 +225,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "draft",
-              "processing",
-              "completed",
-              "failed"
-            ],
+            "enum": ["draft", "processing", "completed", "failed"],
             "description": "Project status"
           },
           "created_at": {
@@ -273,12 +240,7 @@
       },
       "AnalysisJob": {
         "type": "object",
-        "required": [
-          "id",
-          "status",
-          "job_type",
-          "created_at"
-        ],
+        "required": ["id", "status", "job_type", "created_at"],
         "properties": {
           "id": {
             "type": "string",
@@ -305,12 +267,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed"
-            ],
+            "enum": ["pending", "processing", "completed", "failed"],
             "description": "Current job status"
           },
           "progress_percent": {
@@ -392,11 +349,7 @@
           },
           "file_type": {
             "type": "string",
-            "enum": [
-              "invoice",
-              "contract",
-              "haul_log"
-            ],
+            "enum": ["invoice", "contract", "haul_log"],
             "description": "Type of document"
           },
           "storage_path": {
@@ -419,18 +372,11 @@
       },
       "SystemHealth": {
         "type": "object",
-        "required": [
-          "status",
-          "timestamp"
-        ],
+        "required": ["status", "timestamp"],
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "healthy",
-              "degraded",
-              "unhealthy"
-            ]
+            "enum": ["healthy", "degraded", "unhealthy"]
           },
           "timestamp": {
             "type": "string",
@@ -444,11 +390,7 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "healthy",
-                      "degraded",
-                      "unhealthy"
-                    ]
+                    "enum": ["healthy", "degraded", "unhealthy"]
                   },
                   "latency_ms": {
                     "type": "number"
@@ -460,11 +402,7 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "healthy",
-                      "degraded",
-                      "unhealthy"
-                    ]
+                    "enum": ["healthy", "degraded", "unhealthy"]
                   },
                   "latency_ms": {
                     "type": "number"
@@ -476,11 +414,7 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "healthy",
-                      "degraded",
-                      "unhealthy"
-                    ]
+                    "enum": ["healthy", "degraded", "unhealthy"]
                   },
                   "latency_ms": {
                     "type": "number"
@@ -638,9 +572,7 @@
       "post": {
         "summary": "Create analysis job",
         "description": "Creates a background job for long-running waste analysis operations.\n\n**Async Job Pattern**:\n1. Create job with this endpoint → Returns `jobId`\n2. Poll `GET /api/jobs/{jobId}` every 2 seconds\n3. Check `status` field: `pending` → `processing` → `completed` or `failed`\n4. When completed, access results in `result_data` field\n\n**Processing Time**: 30 seconds to 5 minutes depending on job type and data volume\n",
-        "tags": [
-          "Analysis"
-        ],
+        "tags": ["Analysis"],
         "security": [
           {
             "BearerAuth": []
@@ -652,10 +584,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "projectId",
-                  "jobType"
-                ],
+                "required": ["projectId", "jobType"],
                 "properties": {
                   "projectId": {
                     "type": "string",
@@ -730,9 +659,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "pending"
-                      ],
+                      "enum": ["pending"],
                       "description": "Initial job status"
                     },
                     "message": {
@@ -826,9 +753,7 @@
       "get": {
         "summary": "API health check",
         "description": "Check if the API is responding. Does not require authentication.",
-        "tags": [
-          "Health"
-        ],
+        "tags": ["Health"],
         "security": [],
         "responses": {
           "200": {
@@ -862,9 +787,7 @@
       "get": {
         "summary": "Worker health check",
         "description": "Check if background workers are running and processing jobs",
-        "tags": [
-          "Health"
-        ],
+        "tags": ["Health"],
         "security": [],
         "responses": {
           "200": {
@@ -876,11 +799,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "healthy",
-                        "degraded",
-                        "unhealthy"
-                      ]
+                      "enum": ["healthy", "degraded", "unhealthy"]
                     },
                     "workersRunning": {
                       "type": "integer",
@@ -911,9 +830,7 @@
       "get": {
         "summary": "Get job status",
         "description": "Poll this endpoint to check the status of an analysis job.\n\n**Polling Pattern**:\n- Poll every 2 seconds while `status === \"pending\"` or `status === \"processing\"`\n- Stop polling when `status === \"completed\"` or `status === \"failed\"`\n- Use `progress_percent` and `current_step` to show progress to users\n",
-        "tags": [
-          "Jobs"
-        ],
+        "tags": ["Jobs"],
         "security": [
           {
             "BearerAuth": []
@@ -1027,9 +944,7 @@
       "get": {
         "summary": "List user's jobs",
         "description": "Get paginated list of analysis jobs for the authenticated user",
-        "tags": [
-          "Jobs"
-        ],
+        "tags": ["Jobs"],
         "security": [
           {
             "BearerAuth": []
@@ -1048,12 +963,7 @@
             "description": "Filter by job status",
             "schema": {
               "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed"
-              ]
+              "enum": ["pending", "processing", "completed", "failed"]
             }
           },
           {
@@ -1130,10 +1040,7 @@
       "post": {
         "summary": "Analyze specific project",
         "description": "Shortcut endpoint to create complete_analysis job for a project",
-        "tags": [
-          "Projects",
-          "Analysis"
-        ],
+        "tags": ["Projects", "Analysis"],
         "security": [
           {
             "BearerAuth": []
@@ -1199,9 +1106,7 @@
       "get": {
         "summary": "List all jobs (admin)",
         "description": "Get paginated list of all analysis jobs across all users. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1219,12 +1124,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed"
-              ]
+              "enum": ["pending", "processing", "completed", "failed"]
             }
           },
           {
@@ -1276,9 +1176,7 @@
       "get": {
         "summary": "Get job details (admin)",
         "description": "Get detailed information about any job. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1316,9 +1214,7 @@
       "post": {
         "summary": "Retry failed job (admin)",
         "description": "Create a new job with the same parameters as a failed job. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1370,9 +1266,7 @@
       "get": {
         "summary": "Get job queue metrics (admin)",
         "description": "Real-time metrics about job queue health and performance. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1470,9 +1364,7 @@
       "get": {
         "summary": "Get job statistics (admin)",
         "description": "Historical statistics and trends for job processing. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1485,12 +1377,7 @@
             "description": "Time period for statistics",
             "schema": {
               "type": "string",
-              "enum": [
-                "hour",
-                "day",
-                "week",
-                "month"
-              ],
+              "enum": ["hour", "day", "week", "month"],
               "default": "day"
             }
           }
@@ -1592,9 +1479,7 @@
       "get": {
         "summary": "Get worker health status (admin)",
         "description": "Detailed health information for all background workers. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1610,11 +1495,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "healthy",
-                        "degraded",
-                        "unhealthy"
-                      ]
+                      "enum": ["healthy", "degraded", "unhealthy"]
                     },
                     "workers": {
                       "type": "array",
@@ -1626,12 +1507,7 @@
                           },
                           "status": {
                             "type": "string",
-                            "enum": [
-                              "active",
-                              "idle",
-                              "stuck",
-                              "crashed"
-                            ]
+                            "enum": ["active", "idle", "stuck", "crashed"]
                           },
                           "current_job_id": {
                             "type": "string",
@@ -1689,9 +1565,7 @@
       "get": {
         "summary": "Get system health (admin)",
         "description": "Overall system health including all services. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1721,9 +1595,7 @@
       "get": {
         "summary": "Get system metrics (admin)",
         "description": "Performance and usage metrics for the system. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1840,9 +1712,7 @@
       "get": {
         "summary": "List all users (admin)",
         "description": "Get paginated list of all users. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1869,10 +1739,7 @@
             "description": "Filter by role",
             "schema": {
               "type": "string",
-              "enum": [
-                "admin",
-                "user"
-              ]
+              "enum": ["admin", "user"]
             }
           }
         ],
@@ -1915,9 +1782,7 @@
       "get": {
         "summary": "Get user details (admin)",
         "description": "Get detailed information about a specific user. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -1977,9 +1842,7 @@
       "patch": {
         "summary": "Update user (admin)",
         "description": "Update user role or status. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -2004,10 +1867,7 @@
                 "properties": {
                   "role": {
                     "type": "string",
-                    "enum": [
-                      "admin",
-                      "user"
-                    ]
+                    "enum": ["admin", "user"]
                   },
                   "is_active": {
                     "type": "boolean"
@@ -2044,9 +1904,7 @@
       "get": {
         "summary": "List all skills (admin)",
         "description": "Get configuration for all available skills. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -2122,9 +1980,7 @@
       "patch": {
         "summary": "Update skill configuration (admin)",
         "description": "Update conversion rates or thresholds for a skill. Admin only. USE WITH CAUTION.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []
@@ -2208,9 +2064,7 @@
       "get": {
         "summary": "Get audit log (admin)",
         "description": "Retrieve audit log of admin actions. Admin only.",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "BearerAuth": []

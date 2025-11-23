@@ -49,7 +49,7 @@ PAGES TO CREATE:
 
 4. PRICING SECTION:
    - Two tiers side-by-side:
-   
+
    FREE TIER:
    - Price: $0/month
    - 3 analyses per month
@@ -57,7 +57,7 @@ PAGES TO CREATE:
    - 7-day report access
    - Email support
    - CTA: "Get Started Free"
-   
+
    PRO TIER (recommended badge):
    - Price: $99/month
    - Unlimited analyses
@@ -115,7 +115,7 @@ Make it:
 
 ### Prompt 1.2: Authentication Setup
 
-```
+````
 Integrate Supabase authentication into the WasteWise application.
 
 SETUP:
@@ -181,11 +181,12 @@ CREATE POLICY "Users can view own profile" ON profiles
 
 CREATE POLICY "Users can update own profile" ON profiles
   FOR UPDATE USING (auth.uid() = id);
-```
+````
 
 AUTH FUNCTIONS:
 
 Create React hooks in src/hooks/useAuth.ts:
+
 - useAuth() - Returns current user, loading state, session
 - useSignUp() - Handles registration
 - useSignIn() - Handles login
@@ -195,60 +196,67 @@ Create React hooks in src/hooks/useAuth.ts:
 PROTECTED ROUTES:
 
 Create ProtectedRoute component:
+
 - Check if user is authenticated
 - If not, redirect to /login
 - If yes, render children
 - Show loading spinner while checking auth
 
 Apply to:
+
 - /dashboard
 - /new-analysis
 - /projects
 - /settings
 
 SESSION PERSISTENCE:
+
 - Store session in localStorage
 - Auto-refresh on app load
 - Redirect to dashboard if already logged in (on /login or /signup pages)
 
 COMPONENTS TO USE:
+
 - shadcn/ui: Form, Input, Button, Card, Label, Checkbox
 - React Hook Form for form validation
 - Zod for schema validation
 
 ERROR HANDLING:
+
 - Show toast notifications for:
-  * Invalid credentials
-  * Email already exists
-  * Network errors
-  * Password mismatch
+  - Invalid credentials
+  - Email already exists
+  - Network errors
+  - Password mismatch
 - User-friendly error messages (no technical jargon)
+
 ```
 
 ### Prompt 1.3: Dashboard Shell
 
 ```
+
 Create the main dashboard layout for authenticated users.
 
 LAYOUT STRUCTURE:
 
 1. SIDEBAR (left, fixed):
    Width: 260px desktop, collapsible on mobile
-   
+
    Top Section:
    - Logo and "WasteWise" text
    - User avatar and name dropdown
-     * View Profile
-     * Settings
-     * Logout
-   
+     - View Profile
+     - Settings
+     - Logout
+
    Navigation Menu:
    - Dashboard (Home icon) - /dashboard
    - New Analysis (Plus icon) - /new-analysis
    - Projects (Folder icon) - /projects
    - Settings (Settings icon) - /settings
    - Help (HelpCircle icon) - /help
-   
+
    Bottom Section:
    - Subscription tier badge (Free/Pro)
    - Usage meter (if Free tier): "2/3 analyses used"
@@ -257,7 +265,7 @@ LAYOUT STRUCTURE:
 2. MAIN CONTENT AREA:
    Padding: 24px
    Max-width: 1400px
-   
+
    Top Bar:
    - Page title (dynamic based on route)
    - Breadcrumbs
@@ -269,58 +277,63 @@ LAYOUT STRUCTURE:
    Welcome Section:
    - "Welcome back, [User Name]!" heading
    - Current date and time
-   
+
    Quick Stats Cards (3 columns):
    Card 1: Total Projects
    - Large number (count)
    - Trend indicator (vs last month)
    - Icon: FolderOpen
-   
+
    Card 2: Active Analyses
    - Count with "Processing" badge
    - Icon: Activity
-   
+
    Card 3: Total Savings Identified
    - Dollar amount (sum of all analyses)
    - Icon: TrendingUp, green color
-   
+
    Recent Projects Table:
    - Columns:
-     * Property Name (link to results)
-     * Date (relative: "2 days ago")
-     * Status (badge: Processing/Complete/Failed)
-     * Savings (if complete, green text)
-     * Actions dropdown (View, Download, Delete)
+     - Property Name (link to results)
+     - Date (relative: "2 days ago")
+     - Status (badge: Processing/Complete/Failed)
+     - Savings (if complete, green text)
+     - Actions dropdown (View, Download, Delete)
    - Empty state: "No projects yet. Start your first analysis!"
    - Pagination (10 per page)
-   
+
    Quick Actions:
    - Large "Start New Analysis" button (prominent, center)
    - "View All Projects" link
 
 MOBILE RESPONSIVE:
+
 - Sidebar: Hamburger menu, drawer from left
 - Stats cards: Stack vertically
 - Table: Horizontal scroll or card view
 - Touch-friendly tap targets (min 44px)
 
 COMPONENTS:
+
 - shadcn/ui: Sidebar, Card, Table, Badge, DropdownMenu, Avatar, Button
 - lucide-react for all icons
 - Smooth transitions and hover effects
 
 DATA FETCHING:
+
 - Fetch user's projects from Supabase on mount
 - Real-time subscriptions for status updates
 - Loading skeleton while fetching
 - Error state with retry button
 
 STYLING:
+
 - Light mode default (dark mode future feature)
 - Professional gray/white background
 - Green accents for positive metrics
 - Blue for primary actions
 - Subtle shadows and borders
+
 ```
 
 ---
@@ -330,6 +343,7 @@ STYLING:
 ### Prompt 2.1: New Analysis Page
 
 ```
+
 Create the New Analysis page where users upload files and enter property details.
 
 ROUTE: /new-analysis
@@ -348,6 +362,7 @@ STEP 1: PROPERTY DETAILS FORM
 Form Container (max-width 800px, centered, Card component):
 
 Required Fields:
+
 1. Property Name
    - Text input
    - Placeholder: "e.g., Columbia Square Living"
@@ -373,17 +388,19 @@ Required Fields:
    - Options: Garden-Style, Mid-Rise, High-Rise
    - Required
    - Helper text explaining each:
-     * Garden-Style: Low-rise apartments, typically 2-3 stories
-     * Mid-Rise: 4-10 stories
-     * High-Rise: 11+ stories
+     - Garden-Style: Low-rise apartments, typically 2-3 stories
+     - Mid-Rise: 4-10 stories
+     - High-Rise: 11+ stories
 
 Form Validation:
+
 - Real-time validation on blur
 - Show error messages below fields
 - Disable "Next" button until valid
 - Save draft automatically to localStorage every 30 seconds
 
 Bottom Actions:
+
 - "Cancel" button (secondary, left)
 - "Save Draft" button (secondary)
 - "Next Step" button (primary, right, disabled if invalid)
@@ -395,48 +412,54 @@ STEP 2: FILE UPLOAD
 Upload Zones (two separate sections):
 
 A. INVOICE FILES (multiple files allowed):
-   
-   Dropzone Component:
-   - Dashed border, light gray background
-   - Drag & drop area (min-height: 200px)
-   - Icon: Upload cloud icon
-   - Text: "Drag & drop invoice files here"
-   - Subtext: "or click to browse"
-   - "Accepted: PDF, Excel (.xlsx, .xls), CSV"
-   - Max size per file: 10MB
-   - Max total files: 20
-   
-   File Preview List:
-   - Show uploaded files as cards
-   - Each file card shows:
-     * File icon (based on type)
-     * File name (truncate if long)
-     * File size (formatted: "2.3 MB")
-     * Upload progress bar (if uploading)
-     * Remove button (X icon, top-right)
-   - Display in grid (3 columns on desktop)
-   
-   Validation:
-   - Check file type on select
-   - Check file size
-   - Show error toast if invalid
-   - Preview PDF first page (thumbnail)
+
+Dropzone Component:
+
+- Dashed border, light gray background
+- Drag & drop area (min-height: 200px)
+- Icon: Upload cloud icon
+- Text: "Drag & drop invoice files here"
+- Subtext: "or click to browse"
+- "Accepted: PDF, Excel (.xlsx, .xls), CSV"
+- Max size per file: 10MB
+- Max total files: 20
+
+File Preview List:
+
+- Show uploaded files as cards
+- Each file card shows:
+  - File icon (based on type)
+  - File name (truncate if long)
+  - File size (formatted: "2.3 MB")
+  - Upload progress bar (if uploading)
+  - Remove button (X icon, top-right)
+- Display in grid (3 columns on desktop)
+
+Validation:
+
+- Check file type on select
+- Check file size
+- Show error toast if invalid
+- Preview PDF first page (thumbnail)
 
 B. CONTRACT FILE (optional, single file):
-   
-   Similar dropzone but:
-   - Text: "Upload contract (optional)"
-   - Single file only
-   - Replace file if new one uploaded
-   - Show "No contract uploaded" if empty
+
+Similar dropzone but:
+
+- Text: "Upload contract (optional)"
+- Single file only
+- Replace file if new one uploaded
+- Show "No contract uploaded" if empty
 
 Upload Behavior:
+
 - Files are NOT uploaded to server yet (just staged)
 - Store in component state
 - Show total size of all files
 - Validate before allowing next step
 
 Bottom Actions:
+
 - "Back" button (to Step 1)
 - "Save Draft" button
 - "Next Step" button (disabled if no invoice files)
@@ -448,32 +471,39 @@ STEP 3: REVIEW & SUBMIT
 Summary View:
 
 Property Details Section:
+
 - Display all entered property info
 - "Edit" link to go back to Step 1
 
 Files Section:
+
 - List all invoice files (count)
 - Contract file name (if uploaded)
 - Total file size
 - "Edit" link to go back to Step 2
 
 Confirmation:
+
 - Checkbox: "I confirm the information is accurate"
 - Required to enable submit
 
 Cost Preview (if Pro user):
+
 - "This analysis is included in your Pro subscription"
 
 Cost Preview (if Free user):
+
 - "You have X analyses remaining this month"
 - OR "Upgrade to Pro for unlimited analyses"
 
 Submit Button:
+
 - Large primary button: "Start Analysis"
 - Loading state with spinner when clicked
 - Disabled until checkbox checked
 
 Process After Submit:
+
 1. Upload files to Supabase Storage
 2. Create project record in database
 3. Trigger analysis Edge Function
@@ -483,27 +513,32 @@ Process After Submit:
 ────────────────────────────────────
 
 COMPONENTS TO USE:
+
 - shadcn/ui: Form, Input, Select, Card, Button, Progress, Checkbox, Alert
 - react-dropzone for file upload
 - react-hook-form for form management
 - zod for validation schema
 
 ERROR HANDLING:
+
 - Network errors: Show retry button
 - File upload failures: Allow re-upload
 - Validation errors: Clear, specific messages
 - Session expiry: Redirect to login
 
 SAVE DRAFT FEATURE:
+
 - Save form data to Supabase projects table with status='draft'
 - Allow user to resume later
 - Show drafts on dashboard with "Continue" button
 - Auto-save every 30 seconds while on page
+
 ```
 
 ### Prompt 2.2: File Storage & Database Setup
 
 ```
+
 Set up Supabase storage and database schema for file handling.
 
 SUPABASE STORAGE BUCKETS:
@@ -531,13 +566,14 @@ Create three private buckets:
 RLS POLICIES FOR STORAGE:
 
 For 'invoices' bucket:
+
 ```sql
 -- Users can upload to their own folder
 CREATE POLICY "Users can upload own invoices"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
-  bucket_id = 'invoices' 
+  bucket_id = 'invoices'
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
@@ -571,25 +607,25 @@ DATABASE SCHEMA:
 CREATE TABLE projects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  
+
   -- Property info
   property_name TEXT NOT NULL,
   units INTEGER NOT NULL CHECK (units > 0),
   city TEXT NOT NULL,
   state TEXT NOT NULL,
   property_type TEXT NOT NULL CHECK (property_type IN ('Garden-Style', 'Mid-Rise', 'High-Rise')),
-  
+
   -- Status tracking
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'processing', 'complete', 'failed')),
   processing_started_at TIMESTAMPTZ,
   processing_completed_at TIMESTAMPTZ,
   error_message TEXT,
-  
+
   -- Metadata
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_accessed_at TIMESTAMPTZ,
-  
+
   -- Search
   search_vector tsvector GENERATED ALWAYS AS (
     to_tsvector('english', property_name || ' ' || city || ' ' || state)
@@ -604,13 +640,13 @@ CREATE INDEX projects_search_idx ON projects USING GIN(search_vector);
 CREATE TABLE project_files (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
-  
+
   file_type TEXT NOT NULL CHECK (file_type IN ('invoice', 'contract')),
   file_name TEXT NOT NULL,
   file_path TEXT NOT NULL, -- Storage path
   file_size BIGINT NOT NULL, -- Bytes
   mime_type TEXT NOT NULL,
-  
+
   uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -620,11 +656,11 @@ CREATE INDEX project_files_project_id_idx ON project_files(project_id);
 CREATE TABLE analysis_results (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL UNIQUE,
-  
+
   -- Generated files
   excel_file_path TEXT,
   html_file_path TEXT,
-  
+
   -- Summary data (for quick display)
   summary_data JSONB NOT NULL DEFAULT '{}'::jsonb,
   -- Example structure:
@@ -635,10 +671,10 @@ CREATE TABLE analysis_results (
   --   "optimizations_count": 3,
   --   "confidence": "HIGH"
   -- }
-  
+
   -- Processing metrics
   processing_time_seconds INTEGER,
-  
+
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -649,12 +685,12 @@ CREATE TABLE error_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  
+
   error_type TEXT NOT NULL,
   error_message TEXT NOT NULL,
   stack_trace TEXT,
   context JSONB DEFAULT '{}'::jsonb,
-  
+
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -728,22 +764,22 @@ REACT FILE UPLOAD SERVICE:
 Create src/services/fileService.ts:
 
 ```typescript
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 
 export const uploadInvoiceFile = async (
   file: File,
   userId: string,
-  projectId: string
+  projectId: string,
 ): Promise<string> => {
   const filePath = `${userId}/${projectId}/${file.name}`;
-  
+
   const { data, error } = await supabase.storage
-    .from('invoices')
+    .from("invoices")
     .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false
+      cacheControl: "3600",
+      upsert: false,
     });
-  
+
   if (error) throw error;
   return data.path;
 };
@@ -751,17 +787,17 @@ export const uploadInvoiceFile = async (
 export const uploadContractFile = async (
   file: File,
   userId: string,
-  projectId: string
+  projectId: string,
 ): Promise<string> => {
   const filePath = `${userId}/${projectId}/${file.name}`;
-  
+
   const { data, error } = await supabase.storage
-    .from('contracts')
+    .from("contracts")
     .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false
+      cacheControl: "3600",
+      upsert: false,
     });
-  
+
   if (error) throw error;
   return data.path;
 };
@@ -769,12 +805,12 @@ export const uploadContractFile = async (
 export const getSignedUrl = async (
   bucket: string,
   path: string,
-  expiresIn: number = 3600
+  expiresIn: number = 3600,
 ): Promise<string> => {
   const { data, error } = await supabase.storage
     .from(bucket)
     .createSignedUrl(path, expiresIn);
-  
+
   if (error) throw error;
   return data.signedUrl;
 };
@@ -789,6 +825,7 @@ TEST THE SETUP:
 3. Verify project record created in database
 4. Test RLS by creating second user
 5. Verify second user cannot access first user's files
+
 ```
 
 ---
@@ -798,6 +835,7 @@ TEST THE SETUP:
 ### Prompt 3.1: Supabase Edge Function Setup
 
 ```
+
 Create Supabase Edge Function to process waste analysis.
 
 SETUP:
@@ -811,122 +849,126 @@ SETUP:
 Location: supabase/functions/process-waste-analysis/index.ts
 
 ```typescript
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Initialize Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
   try {
     // CORS headers
-    if (req.method === 'OPTIONS') {
-      return new Response('ok', {
+    if (req.method === "OPTIONS") {
+      return new Response("ok", {
         headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-        }
-      })
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers":
+            "authorization, x-client-info, apikey, content-type",
+        },
+      });
     }
 
     // Parse request
-    const { projectId } = await req.json()
-    
+    const { projectId } = await req.json();
+
     if (!projectId) {
-      throw new Error('projectId is required')
+      throw new Error("projectId is required");
     }
 
-    console.log(`Starting analysis for project: ${projectId}`)
+    console.log(`Starting analysis for project: ${projectId}`);
 
     // Update project status to processing
     await supabase
-      .from('projects')
+      .from("projects")
       .update({
-        status: 'processing',
-        processing_started_at: new Date().toISOString()
+        status: "processing",
+        processing_started_at: new Date().toISOString(),
       })
-      .eq('id', projectId)
+      .eq("id", projectId);
 
     // Fetch project details
     const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', projectId)
-      .single()
+      .from("projects")
+      .select("*")
+      .eq("id", projectId)
+      .single();
 
-    if (projectError) throw projectError
+    if (projectError) throw projectError;
 
     // Fetch project files
     const { data: files, error: filesError } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', projectId)
+      .from("project_files")
+      .select("*")
+      .eq("project_id", projectId);
 
-    if (filesError) throw filesError
+    if (filesError) throw filesError;
 
     // Process invoice files
-    const invoiceFiles = files.filter(f => f.file_type === 'invoice')
-    const contractFile = files.find(f => f.file_type === 'contract')
+    const invoiceFiles = files.filter((f) => f.file_type === "invoice");
+    const contractFile = files.find((f) => f.file_type === "contract");
 
-    console.log(`Processing ${invoiceFiles.length} invoice files`)
+    console.log(`Processing ${invoiceFiles.length} invoice files`);
 
     // Download and process each invoice
-    const invoiceData = []
+    const invoiceData = [];
     for (const file of invoiceFiles) {
       const { data: fileData, error: downloadError } = await supabase.storage
-        .from('invoices')
-        .download(file.file_path)
+        .from("invoices")
+        .download(file.file_path);
 
       if (downloadError) {
-        console.error(`Error downloading ${file.file_name}:`, downloadError)
-        continue
+        console.error(`Error downloading ${file.file_name}:`, downloadError);
+        continue;
       }
 
       // Extract invoice data using OpenAI Vision API
-      const extracted = await extractInvoiceData(fileData, file.file_name)
-      invoiceData.push(extracted)
+      const extracted = await extractInvoiceData(fileData, file.file_name);
+      invoiceData.push(extracted);
     }
 
-    console.log(`Extracted ${invoiceData.length} invoices`)
+    console.log(`Extracted ${invoiceData.length} invoices`);
 
     // Process contract if provided
-    let contractData = null
+    let contractData = null;
     if (contractFile) {
-      const { data: contractFileData, error: contractDownloadError } = await supabase.storage
-        .from('contracts')
-        .download(contractFile.file_path)
+      const { data: contractFileData, error: contractDownloadError } =
+        await supabase.storage
+          .from("contracts")
+          .download(contractFile.file_path);
 
       if (!contractDownloadError) {
-        contractData = await extractContractTerms(contractFileData)
+        contractData = await extractContractTerms(contractFileData);
       }
     }
 
     // Conduct regulatory research
-    console.log(`Researching regulations for ${project.city}, ${project.state}`)
+    console.log(
+      `Researching regulations for ${project.city}, ${project.state}`,
+    );
     const regulatoryData = await conductRegulatoryResearch(
       project.city,
-      project.state
-    )
+      project.state,
+    );
 
     // Calculate optimizations
     const optimizations = await calculateOptimizations(
       invoiceData,
       project.units,
-      project.property_type
-    )
+      project.property_type,
+    );
 
     // Validate results
     const validation = await validateAnalysis(
       invoiceData,
       optimizations,
-      regulatoryData
-    )
+      regulatoryData,
+    );
 
     if (!validation.passed) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`)
+      throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
     }
 
     // Generate Excel workbook
@@ -935,128 +977,130 @@ serve(async (req) => {
       invoiceData,
       contractData,
       regulatoryData,
-      optimizations
-    })
+      optimizations,
+    });
 
     // Upload Excel to storage
-    const excelFileName = `${project.property_name.replace(/\s+/g, '_')}_Analysis.xlsx`
-    const excelPath = `${project.user_id}/${projectId}/${excelFileName}`
-    
-    await supabase.storage
-      .from('outputs')
-      .upload(excelPath, excelBuffer, {
-        contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        upsert: true
-      })
+    const excelFileName = `${project.property_name.replace(/\s+/g, "_")}_Analysis.xlsx`;
+    const excelPath = `${project.user_id}/${projectId}/${excelFileName}`;
+
+    await supabase.storage.from("outputs").upload(excelPath, excelBuffer, {
+      contentType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      upsert: true,
+    });
 
     // Generate HTML dashboard
     const htmlContent = await generateHtmlDashboard({
       project,
       invoiceData,
       optimizations,
-      regulatoryData
-    })
+      regulatoryData,
+    });
 
     // Upload HTML to storage
-    const htmlFileName = `${project.property_name.replace(/\s+/g, '_')}_Dashboard.html`
-    const htmlPath = `${project.user_id}/${projectId}/${htmlFileName}`
-    
-    await supabase.storage
-      .from('outputs')
-      .upload(htmlPath, htmlContent, {
-        contentType: 'text/html',
-        upsert: true
-      })
+    const htmlFileName = `${project.property_name.replace(/\s+/g, "_")}_Dashboard.html`;
+    const htmlPath = `${project.user_id}/${projectId}/${htmlFileName}`;
+
+    await supabase.storage.from("outputs").upload(htmlPath, htmlContent, {
+      contentType: "text/html",
+      upsert: true,
+    });
 
     // Calculate summary data
     const totalSavings = optimizations
-      .filter(o => o.recommend)
-      .reduce((sum, o) => sum + (o.calculation_breakdown?.net_year1_savings || 0), 0)
+      .filter((o) => o.recommend)
+      .reduce(
+        (sum, o) => sum + (o.calculation_breakdown?.net_year1_savings || 0),
+        0,
+      );
 
-    const avgMonthlyCost = invoiceData.reduce((sum, inv) => sum + inv.total, 0) / 
-                          new Set(invoiceData.map(inv => inv.month)).size
+    const avgMonthlyCost =
+      invoiceData.reduce((sum, inv) => sum + inv.total, 0) /
+      new Set(invoiceData.map((inv) => inv.month)).size;
 
     // Save analysis results
-    await supabase
-      .from('analysis_results')
-      .upsert({
-        project_id: projectId,
-        excel_file_path: excelPath,
-        html_file_path: htmlPath,
-        summary_data: {
-          total_savings: totalSavings,
-          monthly_cost: avgMonthlyCost,
-          cost_per_door: avgMonthlyCost / project.units,
-          optimizations_count: optimizations.filter(o => o.recommend).length,
-          confidence: regulatoryData?.confidence_score || 'MEDIUM'
-        },
-        processing_time_seconds: Math.floor((Date.now() - new Date(project.processing_started_at).getTime()) / 1000)
-      })
+    await supabase.from("analysis_results").upsert({
+      project_id: projectId,
+      excel_file_path: excelPath,
+      html_file_path: htmlPath,
+      summary_data: {
+        total_savings: totalSavings,
+        monthly_cost: avgMonthlyCost,
+        cost_per_door: avgMonthlyCost / project.units,
+        optimizations_count: optimizations.filter((o) => o.recommend).length,
+        confidence: regulatoryData?.confidence_score || "MEDIUM",
+      },
+      processing_time_seconds: Math.floor(
+        (Date.now() - new Date(project.processing_started_at).getTime()) / 1000,
+      ),
+    });
 
     // Update project status
     await supabase
-      .from('projects')
+      .from("projects")
       .update({
-        status: 'complete',
-        processing_completed_at: new Date().toISOString()
+        status: "complete",
+        processing_completed_at: new Date().toISOString(),
       })
-      .eq('id', projectId)
+      .eq("id", projectId);
 
     // Send completion email
-    await sendCompletionEmail(project.user_id, project.property_name, totalSavings)
+    await sendCompletionEmail(
+      project.user_id,
+      project.property_name,
+      totalSavings,
+    );
 
-    console.log(`Analysis complete for project: ${projectId}`)
+    console.log(`Analysis complete for project: ${projectId}`);
 
     return new Response(
       JSON.stringify({
         success: true,
         projectId,
         totalSavings,
-        processingTime: Math.floor((Date.now() - new Date(project.processing_started_at).getTime()) / 1000)
+        processingTime: Math.floor(
+          (Date.now() - new Date(project.processing_started_at).getTime()) /
+            1000,
+        ),
       }),
       {
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      }
-    )
-
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
+    );
   } catch (error) {
-    console.error('Error processing analysis:', error)
+    console.error("Error processing analysis:", error);
 
     // Log error to database
     if (projectId) {
       await supabase
-        .from('projects')
+        .from("projects")
         .update({
-          status: 'failed',
-          error_message: error.message
-        })
-        .eq('id', projectId)
-
-      await supabase
-        .from('error_logs')
-        .insert({
-          project_id: projectId,
-          error_type: 'PROCESSING_ERROR',
+          status: "failed",
           error_message: error.message,
-          stack_trace: error.stack
         })
+        .eq("id", projectId);
+
+      await supabase.from("error_logs").insert({
+        project_id: projectId,
+        error_type: "PROCESSING_ERROR",
+        error_message: error.message,
+        stack_trace: error.stack,
+      });
     }
 
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      }
-    )
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
   }
-})
+});
 
 // Helper functions (implement these next)
 async function extractInvoiceData(fileData: Blob, fileName: string) {
@@ -1071,13 +1115,21 @@ async function conductRegulatoryResearch(city: string, state: string) {
   // TODO: Implement using Tavily Search API
 }
 
-async function calculateOptimizations(invoiceData: any[], units: number, propertyType: string) {
+async function calculateOptimizations(
+  invoiceData: any[],
+  units: number,
+  propertyType: string,
+) {
   // TODO: Implement calculation logic
 }
 
-async function validateAnalysis(invoiceData: any[], optimizations: any[], regulatoryData: any) {
+async function validateAnalysis(
+  invoiceData: any[],
+  optimizations: any[],
+  regulatoryData: any,
+) {
   // TODO: Implement validation logic
-  return { passed: true, errors: [], warnings: [] }
+  return { passed: true, errors: [], warnings: [] };
 }
 
 async function generateExcelWorkbook(data: any) {
@@ -1088,7 +1140,11 @@ async function generateHtmlDashboard(data: any) {
   // TODO: Implement HTML generation
 }
 
-async function sendCompletionEmail(userId: string, propertyName: string, savings: number) {
+async function sendCompletionEmail(
+  userId: string,
+  propertyName: string,
+  savings: number,
+) {
   // TODO: Implement using Resend
 }
 ```
@@ -1098,6 +1154,7 @@ async function sendCompletionEmail(userId: string, propertyName: string, savings
 ENVIRONMENT VARIABLES:
 
 In Supabase dashboard → Settings → Edge Functions:
+
 - OPENAI_API_KEY: Your OpenAI API key
 - TAVILY_API_KEY: Your Tavily Search API key (for web search)
 - RESEND_API_KEY: Your Resend API key (for emails)
@@ -1111,13 +1168,16 @@ In React app, create service function:
 src/services/analysisService.ts:
 
 ```typescript
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 
 export const startAnalysis = async (projectId: string) => {
   // Call Edge Function
-  const { data, error } = await supabase.functions.invoke('process-waste-analysis', {
-    body: { projectId }
-  });
+  const { data, error } = await supabase.functions.invoke(
+    "process-waste-analysis",
+    {
+      body: { projectId },
+    },
+  );
 
   if (error) throw error;
   return data;
@@ -1139,11 +1199,13 @@ navigate(`/projects/${projectId}/processing`);
 TESTING:
 
 1. Deploy Edge Function using Supabase CLI:
+
    ```bash
    supabase functions deploy process-waste-analysis
    ```
 
 2. Test with curl:
+
    ```bash
    curl -X POST https://[PROJECT_REF].supabase.co/functions/v1/process-waste-analysis \
      -H "Authorization: Bearer [ANON_KEY]" \
@@ -1159,6 +1221,7 @@ TESTING:
    - Project status updates to 'processing' then 'complete'
    - Files appear in outputs bucket
    - analysis_results record created
+
 ```
 
 ---
@@ -1168,6 +1231,7 @@ TESTING:
 ### Prompt 4.1: Processing Status Page
 
 ```
+
 Create processing status page that shows real-time analysis progress.
 
 ROUTE: /projects/:projectId/processing
@@ -1187,14 +1251,14 @@ Center-aligned container (max-width: 600px):
    - Fade in/out as status updates
 
 3. PROGRESS STEPS (vertical timeline):
-   
+
    Step 1: "Uploading Files" ✓ (complete, green checkmark)
    Step 2: "Processing Invoices" 🔄 (in progress, spinning icon)
    Step 3: "Analyzing Costs" ⏳ (pending, gray)
    Step 4: "Researching Regulations" ⏳ (pending, gray)
    Step 5: "Generating Reports" ⏳ (pending, gray)
    Step 6: "Finalizing" ⏳ (pending, gray)
-   
+
    Display with:
    - Icon for each step (changes based on status)
    - Status text
@@ -1215,15 +1279,15 @@ Center-aligned container (max-width: 600px):
 
 6. TIPS SECTION:
    - Rotating tips while waiting:
-     * "Did you know? Most properties save 10-30% on waste costs"
-     * "Tip: Compactor monitoring can reduce pickups by 20%"
-     * "We're analyzing local ordinances for compliance"
+     - "Did you know? Most properties save 10-30% on waste costs"
+     - "Tip: Compactor monitoring can reduce pickups by 20%"
+     - "We're analyzing local ordinances for compliance"
    - Fade in/out animation every 5 seconds
 
 7. ACTIONS:
    - "Cancel Analysis" button (secondary, bottom-left)
-     * Shows confirmation dialog
-     * Allows user to cancel and return to dashboard
+     - Shows confirmation dialog
+     - Allows user to cancel and return to dashboard
    - Note: "You'll be notified via email when complete"
 
 ────────────────────────────────────
@@ -1255,7 +1319,7 @@ export const ProcessingStatus = ({ projectId }: { projectId: string }) => {
         (payload) => {
           const newStatus = payload.new.status;
           setStatus(newStatus);
-          
+
           // Update step based on status
           if (newStatus === 'complete') {
             setCurrentStep(6);
@@ -1298,14 +1362,16 @@ export const ProcessingStatus = ({ projectId }: { projectId: string }) => {
 ERROR HANDLING:
 
 If analysis fails:
+
 - Redirect to error page
 - Display error message
 - Offer to:
-  * Try again
-  * Contact support
-  * Go back to dashboard
+  - Try again
+  - Contact support
+  - Go back to dashboard
 
 Error page shows:
+
 - Friendly error message (not technical)
 - Error ID for support reference
 - "What went wrong?" explanation
@@ -1317,6 +1383,7 @@ Error page shows:
 SUCCESS TRANSITION:
 
 When status changes to 'complete':
+
 1. Show all steps complete with checkmarks
 2. Display success message: "Analysis Complete! 🎉"
 3. Show preview of savings: "Potential savings identified: $15,234"
@@ -1327,21 +1394,25 @@ When status changes to 'complete':
 ────────────────────────────────────
 
 COMPONENTS:
+
 - shadcn/ui: Card, Progress, Badge, Button, Alert
 - framer-motion for animations
 - lucide-react for icons (Check, Loader, AlertCircle)
 - Lottie for animated illustrations
 
 MOBILE OPTIMIZATION:
+
 - Stack timeline vertically
 - Larger touch targets for buttons
 - Prevent screen sleep (keep-awake)
 - Show "Safe to close" message (email notification)
+
 ```
 
 ### Prompt 4.2: Results View Page
 
 ```
+
 Create comprehensive results page displaying analysis outcomes.
 
 ROUTE: /projects/:projectId/results
@@ -1376,32 +1447,35 @@ DOWNLOAD SECTION (container, max-width 1200px):
 Large download cards (2 columns on desktop):
 
 Card 1: Excel Workbook
+
 - Icon: Excel file icon (green)
 - Title: "Detailed Analysis Workbook"
 - Description: "8-tab Excel with comprehensive breakdown"
 - File size: "2.3 MB"
 - Features list:
-  * Expense analysis by month
-  * Optimization opportunities
-  * Contract risk assessment
-  * Regulatory compliance
+  - Expense analysis by month
+  - Optimization opportunities
+  - Contract risk assessment
+  - Regulatory compliance
 - Large "Download Excel" button (primary)
 - "Quick preview" link (opens preview modal)
 
 Card 2: Interactive Dashboard
+
 - Icon: Globe/chart icon (blue)
 - Title: "Interactive HTML Dashboard"
 - Description: "6-tab visual report with charts"
 - File size: "1.8 MB"
 - Features list:
-  * Executive KPIs
-  * Monthly trends
-  * Optimization details
-  * Compliance checklist
+  - Executive KPIs
+  - Monthly trends
+  - Optimization details
+  - Compliance checklist
 - Large "View Dashboard" button (primary, opens in new tab)
 - "Download HTML" button (secondary)
 
 Additional Option:
+
 - Small "Download Both (ZIP)" button below cards
 - Bundles both files
 
@@ -1412,8 +1486,9 @@ EXECUTIVE SUMMARY TABS:
 Tab-based interface showing key findings:
 
 Tab 1: OPTIMIZATION OPPORTUNITIES
+
 - 3 opportunity cards (if identified):
-  
+
   Opportunity 1: Install Compactor Monitors
   - Description (2-3 sentences)
   - Annual savings: $8,500
@@ -1422,13 +1497,14 @@ Tab 1: OPTIMIZATION OPPORTUNITIES
   - Implementation timeline: 2-4 weeks
   - Contact info: Keith Conrad (DSQ Technologies)
   - "Learn More" button
-  
+
   (Similar cards for opportunities 2 & 3)
 
 - If no opportunities:
   "Your waste management is already optimized! No cost savings opportunities identified at this time."
 
 Tab 2: REGULATORY COMPLIANCE
+
 - Confidence score badge: HIGH/MEDIUM/LOW
 - Quick checklist:
   ✓ Recycling compliance verified
@@ -1438,14 +1514,16 @@ Tab 2: REGULATORY COMPLIANCE
 - Map showing property location
 
 Tab 3: MONTHLY TRENDS
+
 - Line chart: Cost per door over time
 - Bar chart: Expense breakdown by category
 - Key insights (AI-generated):
-  * Bulk charges increased 15% in last 3 months
-  * Contamination fees decreased (good!)
-  * Consider negotiating contract renewal
+  - Bulk charges increased 15% in last 3 months
+  - Contamination fees decreased (good!)
+  - Consider negotiating contract renewal
 
 Tab 4: CONTRACT INSIGHTS (if contract provided)
+
 - Contract term: X years
 - Expiration date (highlighted if within 6 months)
 - Key risks identified: 2 HIGH, 1 MEDIUM
@@ -1457,11 +1535,13 @@ Tab 4: CONTRACT INSIGHTS (if contract provided)
 ACTIONS SECTION:
 
 Primary Actions (prominent buttons):
+
 - "Share Report" - Generate shareable link
 - "Start Another Analysis" - Go to new analysis page
 - "Export to PDF" (future feature, grayed out)
 
 Secondary Actions (smaller links):
+
 - "Add to Favorites" - Star this project
 - "Schedule Follow-Up" - Set reminder
 - "Print Summary" - Opens print dialog
@@ -1472,6 +1552,7 @@ Secondary Actions (smaller links):
 SHARE MODAL (triggered by "Share Report" button):
 
 Modal Content:
+
 - Title: "Share This Report"
 - Options:
   1. Generate Public Link
@@ -1480,7 +1561,6 @@ Modal Content:
      - Expiration dropdown: 7 days / 30 days / Never
      - "Generate Link" button
      - Once generated: Copy link button, QR code
-  
   2. Send via Email
      - Email input (multiple recipients)
      - Message textarea (optional)
@@ -1497,13 +1577,13 @@ const downloadExcel = async () => {
   try {
     // Get signed URL from Supabase
     const { data: urlData, error } = await supabase.storage
-      .from('outputs')
+      .from("outputs")
       .createSignedUrl(analysis.excel_file_path, 3600);
 
     if (error) throw error;
 
     // Trigger download
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = urlData.signedUrl;
     link.download = `${project.property_name}_Analysis.xlsx`;
     document.body.appendChild(link);
@@ -1511,13 +1591,13 @@ const downloadExcel = async () => {
     document.body.removeChild(link);
 
     // Track download
-    await trackDownload(projectId, 'excel');
+    await trackDownload(projectId, "excel");
 
     // Show success toast
-    toast.success('Excel workbook downloaded!');
+    toast.success("Excel workbook downloaded!");
   } catch (error) {
-    console.error('Download error:', error);
-    toast.error('Failed to download file. Please try again.');
+    console.error("Download error:", error);
+    toast.error("Failed to download file. Please try again.");
   }
 };
 
@@ -1525,31 +1605,31 @@ const viewDashboard = async () => {
   try {
     // Get signed URL
     const { data: urlData, error } = await supabase.storage
-      .from('outputs')
+      .from("outputs")
       .createSignedUrl(analysis.html_file_path, 3600);
 
     if (error) throw error;
 
     // Open in new tab
-    window.open(urlData.signedUrl, '_blank');
+    window.open(urlData.signedUrl, "_blank");
 
     // Track view
-    await trackDownload(projectId, 'html_view');
+    await trackDownload(projectId, "html_view");
   } catch (error) {
-    console.error('View error:', error);
-    toast.error('Failed to open dashboard. Please try again.');
+    console.error("View error:", error);
+    toast.error("Failed to open dashboard. Please try again.");
   }
 };
 
 const downloadBothAsZip = async () => {
   try {
-    const JSZip = (await import('jszip')).default;
+    const JSZip = (await import("jszip")).default;
     const zip = new JSZip();
 
     // Get both files
     const excelResponse = await fetch(excelSignedUrl);
     const excelBlob = await excelResponse.blob();
-    
+
     const htmlResponse = await fetch(htmlSignedUrl);
     const htmlBlob = await htmlResponse.blob();
 
@@ -1558,20 +1638,20 @@ const downloadBothAsZip = async () => {
     zip.file(`${project.property_name}_Dashboard.html`, htmlBlob);
 
     // Generate zip
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const zipBlob = await zip.generateAsync({ type: "blob" });
 
     // Trigger download
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(zipBlob);
     link.download = `${project.property_name}_WasteWise_Reports.zip`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    toast.success('Reports downloaded as ZIP!');
+    toast.success("Reports downloaded as ZIP!");
   } catch (error) {
-    console.error('ZIP download error:', error);
-    toast.error('Failed to create ZIP file.');
+    console.error("ZIP download error:", error);
+    toast.error("Failed to create ZIP file.");
   }
 };
 ```
@@ -1581,6 +1661,7 @@ const downloadBothAsZip = async () => {
 DATA FETCHING:
 
 On page load:
+
 1. Fetch project details
 2. Fetch analysis results
 3. Parse summary_data JSONB
@@ -1588,6 +1669,7 @@ On page load:
 5. Show loading skeleton while fetching
 
 Real-time updates:
+
 - Subscribe to analysis_results table
 - Update page if results change
 - Handle multiple users viewing same project
@@ -1595,6 +1677,7 @@ Real-time updates:
 ────────────────────────────────────
 
 COMPONENTS:
+
 - shadcn/ui: Card, Button, Tabs, Badge, Dialog, Progress
 - framer-motion for animations
 - Chart.js / Recharts for charts
@@ -1602,12 +1685,15 @@ COMPONENTS:
 - lucide-react for icons
 
 MOBILE OPTIMIZATION:
+
 - Stack download cards vertically
 - Collapsible sections
 - Simplified charts
 - Sticky "Download" button at bottom
+
 ```
 
 ---
 
 *End of Phase 4 prompts. Continue with Phase 5 (Polish & Production) when ready.*
+```

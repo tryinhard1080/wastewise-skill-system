@@ -4,17 +4,17 @@
  * Displays analysis job results with visualizations and recommendations
  */
 
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
   TrendingDown,
@@ -23,46 +23,46 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-} from 'lucide-react'
-import Link from 'next/link'
-import { format } from 'date-fns'
-import { ResultsDashboard } from '@/components/job/results-dashboard'
+} from "lucide-react";
+import Link from "next/link";
+import { format } from "date-fns";
+import { ResultsDashboard } from "@/components/job/results-dashboard";
 
 interface JobResultsPageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export default async function JobResultsPage({ params }: JobResultsPageProps) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // Fetch job with project info
   const { data: job, error } = await supabase
-    .from('analysis_jobs')
+    .from("analysis_jobs")
     .select(
       `
       *,
       projects(*)
-    `
+    `,
     )
-    .eq('id', params.id)
-    .eq('user_id', user.id)
-    .single()
+    .eq("id", params.id)
+    .eq("user_id", user.id)
+    .single();
 
   if (error || !job) {
-    redirect('/dashboard')
+    redirect("/dashboard");
   }
 
-  const project = job.projects
+  const project = job.projects;
 
   return (
     <div className="space-y-6">
@@ -75,24 +75,24 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
         </Link>
         <div className="flex-1">
           <h1 className="text-3xl font-bold tracking-tight capitalize">
-            {job.job_type.replace(/_/g, ' ')} Results
+            {job.job_type.replace(/_/g, " ")} Results
           </h1>
           <p className="text-muted-foreground">{project.property_name}</p>
         </div>
         <Badge
           variant={
-            job.status === 'completed'
-              ? 'default'
-              : job.status === 'failed'
-              ? 'destructive'
-              : 'secondary'
+            job.status === "completed"
+              ? "default"
+              : job.status === "failed"
+                ? "destructive"
+                : "secondary"
           }
           className="text-base px-4 py-2"
         >
-          {job.status === 'completed' && (
+          {job.status === "completed" && (
             <CheckCircle2 className="mr-2 h-4 w-4" />
           )}
-          {job.status === 'failed' && <XCircle className="mr-2 h-4 w-4" />}
+          {job.status === "failed" && <XCircle className="mr-2 h-4 w-4" />}
           {job.status}
         </Badge>
       </div>
@@ -107,12 +107,11 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
           <CardContent>
             <div className="text-2xl font-bold">
               {job.started_at
-                ? format(new Date(job.started_at), 'MMM d, yyyy')
-                : 'Not started'}
+                ? format(new Date(job.started_at), "MMM d, yyyy")
+                : "Not started"}
             </div>
             <p className="text-xs text-muted-foreground">
-              {job.started_at &&
-                format(new Date(job.started_at), 'h:mm a')}
+              {job.started_at && format(new Date(job.started_at), "h:mm a")}
             </p>
           </CardContent>
         </Card>
@@ -127,12 +126,12 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
               {job.duration_seconds
                 ? `${job.duration_seconds}s`
                 : job.started_at && job.completed_at
-                ? `${Math.round(
-                    (new Date(job.completed_at).getTime() -
-                      new Date(job.started_at).getTime()) /
-                      1000
-                  )}s`
-                : 'N/A'}
+                  ? `${Math.round(
+                      (new Date(job.completed_at).getTime() -
+                        new Date(job.started_at).getTime()) /
+                        1000,
+                    )}s`
+                  : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">Processing time</p>
           </CardContent>
@@ -155,13 +154,13 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
       </div>
 
       {/* Results or Error */}
-      {job.status === 'completed' && job.result_data ? (
+      {job.status === "completed" && job.result_data ? (
         <ResultsDashboard
           results={job.result_data as any}
           jobType={job.job_type}
           project={project}
         />
-      ) : job.status === 'failed' ? (
+      ) : job.status === "failed" ? (
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -175,7 +174,7 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
                 Error Details
               </p>
               <p className="text-sm text-red-700">
-                {job.error_message || 'Unknown error occurred'}
+                {job.error_message || "Unknown error occurred"}
               </p>
               {job.error_code && (
                 <p className="text-xs text-red-600 mt-2">
@@ -197,5 +196,5 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }

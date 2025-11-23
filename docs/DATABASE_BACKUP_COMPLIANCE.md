@@ -18,6 +18,7 @@ This document defines compliance requirements for WasteWise database backups to 
 #### Data Protection Requirements
 
 **Article 5 - Principles**:
+
 - **Lawfulness, Fairness, Transparency**: Backups must be documented and disclosed in privacy policy
 - **Purpose Limitation**: Backup data only used for disaster recovery, not secondary purposes
 - **Data Minimization**: Only backup necessary data fields
@@ -26,11 +27,13 @@ This document defines compliance requirements for WasteWise database backups to 
 - **Integrity & Confidentiality**: Encryption at rest and in transit
 
 **Article 17 - Right to Erasure ("Right to be Forgotten")**:
+
 - User deletion requests must cascade to backups
 - Implement backup purging procedures for deleted user data
 - Document retention exceptions (legal holds, compliance)
 
 **Article 32 - Security of Processing**:
+
 - Encryption: AES-256 for backups at rest
 - Access controls: Role-based access to backup systems
 - Audit logging: All backup access and restoration logged
@@ -70,21 +73,25 @@ This document defines compliance requirements for WasteWise database backups to 
 #### Trust Services Criteria
 
 **Security**:
+
 - Access controls to backup systems (MFA, least privilege)
 - Encryption in transit and at rest
 - Network segmentation for backup infrastructure
 
 **Availability**:
+
 - RTO: 1 hour, RPO: 24 hours
 - Quarterly backup testing and validation
 - Documented incident response procedures
 
 **Confidentiality**:
+
 - Encryption of sensitive fields (API keys, passwords)
 - Access logging and monitoring
 - Background checks for personnel with backup access
 
 **Processing Integrity**:
+
 - Backup verification (checksums, test restores)
 - Change management for backup procedures
 - Version control for backup scripts
@@ -102,17 +109,18 @@ This document defines compliance requirements for WasteWise database backups to 
 
 ### Production Database Backups
 
-| Backup Type | Retention Period | Rationale | Compliance Basis |
-|-------------|------------------|-----------|------------------|
-| **Daily Full Backups** | 90 days | Business continuity + regulatory requirements | GDPR Article 5(e), SOC 2 |
-| **Weekly Full Backups** | 1 year | Long-term recovery, audit trail | Tax regulations, SOC 2 |
-| **Monthly Archival** | 7 years | Legal holds, financial records | Tax law (IRS), GAAP |
-| **PITR Logs** | 30 days | Point-in-time recovery for recent data | Business continuity |
-| **Pre-deployment** | 90 days | Rollback capability | Change management |
+| Backup Type             | Retention Period | Rationale                                     | Compliance Basis         |
+| ----------------------- | ---------------- | --------------------------------------------- | ------------------------ |
+| **Daily Full Backups**  | 90 days          | Business continuity + regulatory requirements | GDPR Article 5(e), SOC 2 |
+| **Weekly Full Backups** | 1 year           | Long-term recovery, audit trail               | Tax regulations, SOC 2   |
+| **Monthly Archival**    | 7 years          | Legal holds, financial records                | Tax law (IRS), GAAP      |
+| **PITR Logs**           | 30 days          | Point-in-time recovery for recent data        | Business continuity      |
+| **Pre-deployment**      | 90 days          | Rollback capability                           | Change management        |
 
 ### User Data Retention After Deletion
 
 **Standard Process**:
+
 1. User requests account deletion
 2. Soft delete in production database (30-day grace period)
 3. Hard delete from production after grace period
@@ -120,6 +128,7 @@ This document defines compliance requirements for WasteWise database backups to 
 5. Document retention exception in privacy policy
 
 **Legal Hold Exception**:
+
 - If user data subject to legal hold, retain in secure archive
 - Document legal basis (court order, investigation)
 - Isolate from regular backups
@@ -130,11 +139,13 @@ This document defines compliance requirements for WasteWise database backups to 
 **Recommendation**: True deletion (not anonymization) for GDPR compliance
 
 **Why**:
+
 - GDPR requires erasure, not just anonymization
 - Anonymization difficult to prove in backups
 - Pseudonymization allowed for legitimate interests (with safeguards)
 
 **Implementation**:
+
 ```sql
 -- Purge user from backups (run on each backup before expiration)
 DELETE FROM users WHERE id = 'user-to-delete';
@@ -150,17 +161,20 @@ DELETE FROM analysis_jobs WHERE user_id = 'user-to-delete';
 **Requirement**: AES-256 encryption for all backups
 
 **Supabase Implementation**:
+
 - Database encryption: Enabled by default (Supabase manages keys)
 - Storage buckets: Server-side encryption with AWS KMS
 - Backup archives: Encrypted before transfer to S3/R2
 
 **Key Management**:
+
 - Supabase database: Managed by Supabase (AWS KMS)
 - Custom backups: Use GPG or AWS KMS for encryption
 - Key rotation: Annual (or per security policy)
 - Key access: Restricted to infrastructure team (MFA required)
 
 **Verification**:
+
 ```bash
 # Check if backup is encrypted
 gpg --list-packets wastewise-backup-2025-11-22.sql.gpg
@@ -174,11 +188,13 @@ aws s3api head-object --bucket backups --key wastewise-backup.sql \
 **Requirement**: TLS 1.2+ for all backup transfers
 
 **Implementation**:
+
 - Supabase connections: `sslmode=require`
 - S3/R2 uploads: HTTPS only (verified in script)
 - pg_dump/pg_restore: Use SSL connection strings
 
 **Verification**:
+
 ```bash
 # Verify SSL connection
 psql "postgresql://user@host:5432/db?sslmode=verify-full" \
@@ -188,11 +204,13 @@ psql "postgresql://user@host:5432/db?sslmode=verify-full" \
 ### Field-Level Encryption (Optional)
 
 **Consider for**:
+
 - API keys (if stored in database)
 - User passwords (already hashed with bcrypt)
 - Sensitive PII (addresses, phone numbers)
 
 **Implementation**: Use Supabase's `pgcrypto` extension
+
 ```sql
 -- Encrypt sensitive field before backup
 UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
@@ -206,24 +224,26 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 
 **Roles**:
 
-| Role | Access Level | Personnel | MFA Required |
-|------|--------------|-----------|--------------|
-| **Backup Admin** | Full (create, restore, delete) | Infrastructure lead | Yes |
-| **Backup Operator** | Create, view (no delete) | DevOps team | Yes |
-| **Auditor** | View logs, read-only | Security team, compliance | Yes |
-| **Emergency Recovery** | Restore only (break-glass) | CTO, lead engineer | Yes |
+| Role                   | Access Level                   | Personnel                 | MFA Required |
+| ---------------------- | ------------------------------ | ------------------------- | ------------ |
+| **Backup Admin**       | Full (create, restore, delete) | Infrastructure lead       | Yes          |
+| **Backup Operator**    | Create, view (no delete)       | DevOps team               | Yes          |
+| **Auditor**            | View logs, read-only           | Security team, compliance | Yes          |
+| **Emergency Recovery** | Restore only (break-glass)     | CTO, lead engineer        | Yes          |
 
 **Access Review**: Quarterly (document in audit log)
 
 ### Supabase Access
 
 **Service Role Key**:
+
 - Stored in password manager (1Password, Vault)
 - Rotated annually or on personnel change
 - Never committed to git
 - Used only in backup/restore scripts
 
 **Database Credentials**:
+
 - Separate read-only user for backups (`backup_user`)
 - Separate write user for restores (`restore_admin`)
 - MFA for all database admin access
@@ -232,6 +252,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### Backup Storage Access
 
 **S3/R2 Bucket**:
+
 - Private (no public access)
 - IAM policy: Least privilege (backup role can write, restore role can read)
 - Versioning enabled (protect against accidental deletion)
@@ -239,6 +260,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 - Access logging to CloudWatch/Cloudflare Analytics
 
 **Access Policy Example** (AWS S3):
+
 ```json
 {
   "Version": "2012-10-17",
@@ -264,6 +286,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### Required Logs
 
 **Backup Operations**:
+
 - Timestamp of backup start/completion
 - User/system that initiated backup
 - Backup type (full, incremental, PITR)
@@ -272,6 +295,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 - Retention expiration date
 
 **Restore Operations**:
+
 - Timestamp of restore start/completion
 - User that initiated restore
 - Restore target (full database, table, point-in-time)
@@ -280,6 +304,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 - Success/failure status
 
 **Access Events**:
+
 - Backup file downloads
 - Backup storage access (S3/R2)
 - Backup system logins
@@ -299,6 +324,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 - **Audit trail**: Separate secure database (append-only)
 
 **Example Log Entry**:
+
 ```json
 {
   "timestamp": "2025-11-22T14:30:00Z",
@@ -321,12 +347,14 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 **Scenario 1**: Backup file stolen (unauthorized download)
 
 **Immediate Actions** (0-15 min):
+
 1. Revoke access credentials for backup storage
 2. Rotate encryption keys
 3. Review access logs to identify scope
 4. Notify security team
 
 **Follow-up** (15-72 hours):
+
 1. Assess data exposure (was backup encrypted?)
 2. If unencrypted: GDPR breach notification (72 hours)
 3. User notification (if high risk to rights/freedoms)
@@ -336,11 +364,13 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 **Scenario 2**: Backup storage misconfigured (public exposure)
 
 **Immediate Actions** (0-5 min):
+
 1. Disable public access immediately
 2. Review who accessed backups (S3 access logs)
 3. Rotate all encryption keys
 
 **Follow-up** (5-72 hours):
+
 1. Verify no data exfiltration occurred
 2. If exposure confirmed: GDPR breach notification
 3. Security audit of all storage configurations
@@ -349,15 +379,18 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### Notification Requirements
 
 **GDPR (Article 33)**:
+
 - Notify supervisory authority within **72 hours** of breach awareness
 - Include: Nature of breach, affected data categories, likely consequences, mitigation measures
 - Document breach in internal register (even if not reported)
 
 **CCPA**:
+
 - Notify affected California residents without unreasonable delay
 - If >500 CA residents: Notify California Attorney General
 
 **Users**:
+
 - Notify affected users if breach likely to result in high risk
 - Provide: Nature of breach, mitigation steps, contact information
 
@@ -366,6 +399,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### Quarterly Reviews
 
 **Q1, Q2, Q3, Q4 Checklist**:
+
 - [ ] Verify backup retention matches policy (90 days, 1 year, 7 years)
 - [ ] Test backup restoration (see DATABASE_BACKUP_TESTING.md)
 - [ ] Review access logs for anomalies
@@ -378,6 +412,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### Annual Audits
 
 **SOC 2 Audit** (if applicable):
+
 - Provide backup procedures documentation
 - Evidence of quarterly backup testing
 - Access control reviews
@@ -385,6 +420,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 - Incident response testing
 
 **Internal Security Audit**:
+
 - Penetration testing of backup infrastructure
 - Vulnerability scanning
 - Access control validation
@@ -392,27 +428,29 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 
 ### Metrics to Track
 
-| Metric | Target | Frequency |
-|--------|--------|-----------|
-| **Backup Success Rate** | >99.5% | Daily |
-| **RTO (Recovery Time)** | <1 hour | Quarterly test |
-| **RPO (Data Loss)** | <24 hours | Quarterly test |
-| **Encryption Coverage** | 100% | Monthly verification |
-| **Access Review Completion** | 100% | Quarterly |
-| **User Deletion Backlog** | <7 days | Weekly |
-| **Backup Storage Cost** | <$500/month | Monthly |
+| Metric                       | Target      | Frequency            |
+| ---------------------------- | ----------- | -------------------- |
+| **Backup Success Rate**      | >99.5%      | Daily                |
+| **RTO (Recovery Time)**      | <1 hour     | Quarterly test       |
+| **RPO (Data Loss)**          | <24 hours   | Quarterly test       |
+| **Encryption Coverage**      | 100%        | Monthly verification |
+| **Access Review Completion** | 100%        | Quarterly            |
+| **User Deletion Backlog**    | <7 days     | Weekly               |
+| **Backup Storage Cost**      | <$500/month | Monthly              |
 
 ## Legal Holds & eDiscovery
 
 ### Legal Hold Process
 
 **Trigger Events**:
+
 - Litigation notification
 - Regulatory investigation
 - Law enforcement request
 - Internal investigation
 
 **Procedure**:
+
 1. Legal team issues hold notice
 2. Identify affected user accounts/projects
 3. Isolate relevant backups (copy to secure archive)
@@ -421,6 +459,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 6. Notify affected personnel (no data destruction)
 
 **Hold Archive**:
+
 - Location: Separate S3/R2 bucket (`wastewise-legal-holds`)
 - Access: Legal team + compliance officer only
 - Retention: Until hold released + 30 days
@@ -429,6 +468,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### eDiscovery Requests
 
 **Responding to Requests**:
+
 1. Verify request legitimacy (court order, subpoena)
 2. Scope data to specific user/date range
 3. Restore relevant backup to isolated environment
@@ -437,6 +477,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 6. Log disclosure (who, what, when, legal basis)
 
 **Data Minimization**:
+
 - Only provide data explicitly requested
 - Redact non-relevant user data
 - Use pseudonymization where possible
@@ -449,11 +490,13 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 **Mechanism**: Standard Contractual Clauses (SCCs)
 
 **Requirements**:
+
 - Supabase DPA includes SCCs
 - Backup storage in EU region (if possible)
 - If US storage: Document additional safeguards
 
 **Transfer Impact Assessment (TIA)**:
+
 - Assess laws in destination country (US CLOUD Act, FISA)
 - Document encryption safeguards
 - User notification in privacy policy
@@ -463,6 +506,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 **Preferred**: Store backups in same region as production database
 
 **Supabase Regions**:
+
 - Production: `eu-west-1` (Ireland)
 - Backups: Same region or `eu-central-1` (Frankfurt)
 
@@ -473,6 +517,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ### Required Disclosures
 
 **Users must be informed**:
+
 - Backup practices (frequency, retention)
 - Data in backups (all user data included)
 - Retention periods (90 days, 1 year, 7 years)
@@ -481,6 +526,7 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 - Third-party processors (Supabase, AWS/Cloudflare)
 
 **Example Language**:
+
 > "We create daily encrypted backups of our database for disaster recovery purposes. Backups are retained for 90 days and stored securely with AES-256 encryption. If you delete your account, your data will be removed from our production database within 30 days, but may persist in backups for up to 90 days before permanent deletion."
 
 ## Compliance Violations & Remediation
@@ -505,25 +551,29 @@ UPDATE users SET address = pgp_sym_encrypt(address, 'encryption-key');
 ## Contact Information
 
 **Data Protection Officer (DPO)**:
+
 - Email: dpo@wastewise.com
 - Phone: [TBD]
 
 **Security Team**:
+
 - Email: security@wastewise.com
 - Incident hotline: [TBD]
 
 **Legal Team**:
+
 - Email: legal@wastewise.com
 
 **Supabase Support**:
+
 - Email: support@supabase.io
 - Emergency: Escalate via dashboard
 
 ## Document History
 
-| Version | Date | Changes | Author |
-|---------|------|---------|--------|
-| 1.0.0 | 2025-11-22 | Initial compliance framework | Infrastructure Team |
+| Version | Date       | Changes                      | Author              |
+| ------- | ---------- | ---------------------------- | ------------------- |
+| 1.0.0   | 2025-11-22 | Initial compliance framework | Infrastructure Team |
 
 ## Related Documents
 

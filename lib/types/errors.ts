@@ -15,11 +15,11 @@ export class AppError extends Error {
     message: string,
     public code: string,
     public statusCode: number = 500,
-    public details?: any
+    public details?: any,
   ) {
-    super(message)
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
   }
 
   /**
@@ -32,7 +32,7 @@ export class AppError extends Error {
         code: this.code,
         details: this.details,
       },
-    }
+    };
   }
 }
 
@@ -40,8 +40,8 @@ export class AppError extends Error {
  * Authentication errors (401)
  */
 export class AuthenticationError extends AppError {
-  constructor(message: string = 'Authentication required', details?: any) {
-    super(message, 'AUTHENTICATION_ERROR', 401, details)
+  constructor(message: string = "Authentication required", details?: any) {
+    super(message, "AUTHENTICATION_ERROR", 401, details);
   }
 }
 
@@ -49,8 +49,8 @@ export class AuthenticationError extends AppError {
  * Authorization errors (403)
  */
 export class AuthorizationError extends AppError {
-  constructor(message: string = 'Access denied', details?: any) {
-    super(message, 'AUTHORIZATION_ERROR', 403, details)
+  constructor(message: string = "Access denied", details?: any) {
+    super(message, "AUTHORIZATION_ERROR", 403, details);
   }
 }
 
@@ -59,8 +59,10 @@ export class AuthorizationError extends AppError {
  */
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string, details?: any) {
-    const message = id ? `${resource} '${id}' not found` : `${resource} not found`
-    super(message, 'NOT_FOUND', 404, { resource, id, ...details })
+    const message = id
+      ? `${resource} '${id}' not found`
+      : `${resource} not found`;
+    super(message, "NOT_FOUND", 404, { resource, id, ...details });
   }
 }
 
@@ -69,18 +71,18 @@ export class NotFoundError extends AppError {
  */
 export class ValidationError extends AppError {
   constructor(
-    message: string = 'Validation failed',
+    message: string = "Validation failed",
     public validationErrors: Array<{
-      field: string
-      message: string
-      code?: string
+      field: string;
+      message: string;
+      code?: string;
     }>,
-    details?: any
+    details?: any,
   ) {
-    super(message, 'VALIDATION_ERROR', 400, {
+    super(message, "VALIDATION_ERROR", 400, {
       validationErrors,
       ...details,
-    })
+    });
   }
 }
 
@@ -88,8 +90,12 @@ export class ValidationError extends AppError {
  * Business logic errors (422)
  */
 export class BusinessLogicError extends AppError {
-  constructor(message: string, code: string = 'BUSINESS_LOGIC_ERROR', details?: any) {
-    super(message, code, 422, details)
+  constructor(
+    message: string,
+    code: string = "BUSINESS_LOGIC_ERROR",
+    details?: any,
+  ) {
+    super(message, code, 422, details);
   }
 }
 
@@ -98,11 +104,11 @@ export class BusinessLogicError extends AppError {
  */
 export class ExternalServiceError extends AppError {
   constructor(service: string, message: string, details?: any) {
-    super(`External service error: ${service}`, 'EXTERNAL_SERVICE_ERROR', 502, {
+    super(`External service error: ${service}`, "EXTERNAL_SERVICE_ERROR", 502, {
       service,
       originalMessage: message,
       ...details,
-    })
+    });
   }
 }
 
@@ -110,11 +116,15 @@ export class ExternalServiceError extends AppError {
  * Rate limit errors (429)
  */
 export class RateLimitError extends AppError {
-  constructor(message: string = 'Rate limit exceeded', retryAfter?: number, details?: any) {
-    super(message, 'RATE_LIMIT_EXCEEDED', 429, {
+  constructor(
+    message: string = "Rate limit exceeded",
+    retryAfter?: number,
+    details?: any,
+  ) {
+    super(message, "RATE_LIMIT_EXCEEDED", 429, {
       retryAfter,
       ...details,
-    })
+    });
   }
 }
 
@@ -123,11 +133,16 @@ export class RateLimitError extends AppError {
  */
 export class TimeoutError extends AppError {
   constructor(operation: string, timeoutMs: number, details?: any) {
-    super(`Operation '${operation}' timed out after ${timeoutMs}ms`, 'TIMEOUT_ERROR', 408, {
-      operation,
-      timeoutMs,
-      ...details,
-    })
+    super(
+      `Operation '${operation}' timed out after ${timeoutMs}ms`,
+      "TIMEOUT_ERROR",
+      408,
+      {
+        operation,
+        timeoutMs,
+        ...details,
+      },
+    );
   }
 }
 
@@ -136,8 +151,13 @@ export class TimeoutError extends AppError {
  */
 
 export class SkillExecutionError extends AppError {
-  constructor(skillName: string, message: string, code: string = 'SKILL_EXECUTION_ERROR', details?: any) {
-    super(message, code, 500, { skillName, ...details })
+  constructor(
+    skillName: string,
+    message: string,
+    code: string = "SKILL_EXECUTION_ERROR",
+    details?: any,
+  ) {
+    super(message, code, 500, { skillName, ...details });
   }
 }
 
@@ -146,21 +166,26 @@ export class InsufficientDataError extends SkillExecutionError {
     super(
       skillName,
       `Insufficient data for ${skillName}`,
-      'INSUFFICIENT_DATA',
-      { requiredData, ...details }
-    )
+      "INSUFFICIENT_DATA",
+      { requiredData, ...details },
+    );
   }
 }
 
 export class FormulaValidationError extends SkillExecutionError {
   constructor(skillName: string, message: string, details?: any) {
-    super(skillName, message, 'FORMULA_VALIDATION_ERROR', details)
+    super(skillName, message, "FORMULA_VALIDATION_ERROR", details);
   }
 }
 
 export class SkillCancelledError extends SkillExecutionError {
   constructor(skillName: string, details?: any) {
-    super(skillName, `${skillName} execution was cancelled`, 'SKILL_CANCELLED', details)
+    super(
+      skillName,
+      `${skillName} execution was cancelled`,
+      "SKILL_CANCELLED",
+      details,
+    );
   }
 }
 
@@ -170,7 +195,7 @@ export class SkillCancelledError extends SkillExecutionError {
 
 export class AIServiceError extends ExternalServiceError {
   constructor(provider: string, message: string, cost?: number, details?: any) {
-    super(`AI-${provider}`, message, { cost, ...details })
+    super(`AI-${provider}`, message, { cost, ...details });
   }
 }
 
@@ -180,7 +205,7 @@ export class AIQuotaExceededError extends RateLimitError {
       provider,
       quotaType,
       ...details,
-    })
+    });
   }
 }
 
@@ -190,11 +215,11 @@ export class AIQuotaExceededError extends RateLimitError {
 
 export class DatabaseError extends AppError {
   constructor(operation: string, message: string, details?: any) {
-    super(`Database error during ${operation}`, 'DATABASE_ERROR', 500, {
+    super(`Database error during ${operation}`, "DATABASE_ERROR", 500, {
       operation,
       originalMessage: message,
       ...details,
-    })
+    });
   }
 }
 
@@ -203,30 +228,45 @@ export class DatabaseError extends AppError {
  */
 
 export class FileProcessingError extends AppError {
-  constructor(fileName: string, message: string, code: string = 'FILE_PROCESSING_ERROR', details?: any) {
-    super(message, code, 422, { fileName, ...details })
+  constructor(
+    fileName: string,
+    message: string,
+    code: string = "FILE_PROCESSING_ERROR",
+    details?: any,
+  ) {
+    super(message, code, 422, { fileName, ...details });
   }
 }
 
 export class InvalidFileTypeError extends FileProcessingError {
-  constructor(fileName: string, expectedTypes: string[], actualType?: string, details?: any) {
+  constructor(
+    fileName: string,
+    expectedTypes: string[],
+    actualType?: string,
+    details?: any,
+  ) {
     super(
       fileName,
-      `Invalid file type for ${fileName}. Expected: ${expectedTypes.join(', ')}`,
-      'INVALID_FILE_TYPE',
-      { expectedTypes, actualType, ...details }
-    )
+      `Invalid file type for ${fileName}. Expected: ${expectedTypes.join(", ")}`,
+      "INVALID_FILE_TYPE",
+      { expectedTypes, actualType, ...details },
+    );
   }
 }
 
 export class FileTooLargeError extends FileProcessingError {
-  constructor(fileName: string, maxSizeBytes: number, actualSizeBytes: number, details?: any) {
+  constructor(
+    fileName: string,
+    maxSizeBytes: number,
+    actualSizeBytes: number,
+    details?: any,
+  ) {
     super(
       fileName,
       `File ${fileName} exceeds maximum size of ${maxSizeBytes} bytes`,
-      'FILE_TOO_LARGE',
-      { maxSizeBytes, actualSizeBytes, ...details }
-    )
+      "FILE_TOO_LARGE",
+      { maxSizeBytes, actualSizeBytes, ...details },
+    );
   }
 }
 
@@ -237,22 +277,22 @@ export class FileTooLargeError extends FileProcessingError {
  */
 export function normalizeError(error: unknown): AppError {
   if (error instanceof AppError) {
-    return error
+    return error;
   }
 
   if (error instanceof Error) {
-    return new AppError(error.message, 'INTERNAL_ERROR', 500, {
+    return new AppError(error.message, "INTERNAL_ERROR", 500, {
       originalError: error.name,
       stack: error.stack,
-    })
+    });
   }
 
   return new AppError(
-    typeof error === 'string' ? error : 'An unknown error occurred',
-    'UNKNOWN_ERROR',
+    typeof error === "string" ? error : "An unknown error occurred",
+    "UNKNOWN_ERROR",
     500,
-    { originalError: error }
-  )
+    { originalError: error },
+  );
 }
 
 /**
@@ -266,11 +306,11 @@ export function normalizeError(error: unknown): AppError {
  * }
  */
 export function errorResponse(error: unknown): Response {
-  const appError = normalizeError(error)
+  const appError = normalizeError(error);
 
   return Response.json(appError.toJSON(), {
     status: appError.statusCode,
-  })
+  });
 }
 
 /**
@@ -278,55 +318,55 @@ export function errorResponse(error: unknown): Response {
  */
 export const ErrorCodes = {
   // Authentication & Authorization
-  AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
-  AUTHORIZATION_ERROR: 'AUTHORIZATION_ERROR',
-  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
-  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+  AUTHENTICATION_ERROR: "AUTHENTICATION_ERROR",
+  AUTHORIZATION_ERROR: "AUTHORIZATION_ERROR",
+  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+  TOKEN_EXPIRED: "TOKEN_EXPIRED",
 
   // Validation
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  MISSING_REQUIRED_FIELD: 'MISSING_REQUIRED_FIELD',
-  INVALID_FORMAT: 'INVALID_FORMAT',
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  MISSING_REQUIRED_FIELD: "MISSING_REQUIRED_FIELD",
+  INVALID_FORMAT: "INVALID_FORMAT",
 
   // Business Logic
-  BUSINESS_LOGIC_ERROR: 'BUSINESS_LOGIC_ERROR',
-  INSUFFICIENT_DATA: 'INSUFFICIENT_DATA',
-  FORMULA_VALIDATION_ERROR: 'FORMULA_VALIDATION_ERROR',
+  BUSINESS_LOGIC_ERROR: "BUSINESS_LOGIC_ERROR",
+  INSUFFICIENT_DATA: "INSUFFICIENT_DATA",
+  FORMULA_VALIDATION_ERROR: "FORMULA_VALIDATION_ERROR",
 
   // Skills
-  SKILL_EXECUTION_ERROR: 'SKILL_EXECUTION_ERROR',
-  SKILL_NOT_FOUND: 'SKILL_NOT_FOUND',
-  SKILL_CANCELLED: 'SKILL_CANCELLED',
-  INVALID_JOB_TYPE: 'INVALID_JOB_TYPE',
+  SKILL_EXECUTION_ERROR: "SKILL_EXECUTION_ERROR",
+  SKILL_NOT_FOUND: "SKILL_NOT_FOUND",
+  SKILL_CANCELLED: "SKILL_CANCELLED",
+  INVALID_JOB_TYPE: "INVALID_JOB_TYPE",
 
   // External Services
-  EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
-  AI_SERVICE_ERROR: 'AI_SERVICE_ERROR',
-  AI_QUOTA_EXCEEDED: 'AI_QUOTA_EXCEEDED',
+  EXTERNAL_SERVICE_ERROR: "EXTERNAL_SERVICE_ERROR",
+  AI_SERVICE_ERROR: "AI_SERVICE_ERROR",
+  AI_QUOTA_EXCEEDED: "AI_QUOTA_EXCEEDED",
 
   // Database
-  DATABASE_ERROR: 'DATABASE_ERROR',
-  DUPLICATE_ENTRY: 'DUPLICATE_ENTRY',
-  FOREIGN_KEY_VIOLATION: 'FOREIGN_KEY_VIOLATION',
+  DATABASE_ERROR: "DATABASE_ERROR",
+  DUPLICATE_ENTRY: "DUPLICATE_ENTRY",
+  FOREIGN_KEY_VIOLATION: "FOREIGN_KEY_VIOLATION",
 
   // Files
-  FILE_PROCESSING_ERROR: 'FILE_PROCESSING_ERROR',
-  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
-  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  FILE_PROCESSING_ERROR: "FILE_PROCESSING_ERROR",
+  INVALID_FILE_TYPE: "INVALID_FILE_TYPE",
+  FILE_TOO_LARGE: "FILE_TOO_LARGE",
 
   // Resources
-  NOT_FOUND: 'NOT_FOUND',
-  RESOURCE_DELETED: 'RESOURCE_DELETED',
+  NOT_FOUND: "NOT_FOUND",
+  RESOURCE_DELETED: "RESOURCE_DELETED",
 
   // Rate Limiting
-  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+  RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED",
 
   // Timeouts
-  TIMEOUT_ERROR: 'TIMEOUT_ERROR',
+  TIMEOUT_ERROR: "TIMEOUT_ERROR",
 
   // Generic
-  INTERNAL_ERROR: 'INTERNAL_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-} as const
+  INTERNAL_ERROR: "INTERNAL_ERROR",
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
+} as const;
 
-export type ErrorCode = keyof typeof ErrorCodes
+export type ErrorCode = keyof typeof ErrorCodes;

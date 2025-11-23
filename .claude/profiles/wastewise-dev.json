@@ -49,11 +49,6 @@
     "auto_approve_in_sandbox": true
   },
   "agents": {
-    "recommended_for": [
-      "frontend-dev",
-      "backend-dev",
-      "coder",
-      "skills-agent"
-    ]
+    "recommended_for": ["frontend-dev", "backend-dev", "coder", "skills-agent"]
   }
 }

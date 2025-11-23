@@ -26,6 +26,7 @@ All API endpoints require authentication via Supabase JWT tokens.
 ### Getting a Token
 
 1. **Login**:
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -36,12 +37,14 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 2. **Use Token in Requests**:
+
 ```bash
 curl http://localhost:3000/api/projects \
   -H "Authorization: Bearer <your_token>"
 ```
 
 3. **Token Refresh** (tokens expire after 1 hour):
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/refresh \
   -H "Content-Type: application/json" \
@@ -67,6 +70,7 @@ curl -X POST http://localhost:3000/api/analyze \
 ```
 
 Response:
+
 ```json
 {
   "jobId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -83,6 +87,7 @@ curl http://localhost:3000/api/jobs/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
 ```
 
 Response (processing):
+
 ```json
 {
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -97,6 +102,7 @@ Response (processing):
 ### 3. Get Results (when completed)
 
 Response (completed):
+
 ```json
 {
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -105,7 +111,7 @@ Response (completed):
   "current_step": "Completed",
   "result_data": {
     "yardsPerDoor": 0.12,
-    "costPerDoor": 18.50,
+    "costPerDoor": 18.5,
     "optimizations": [
       {
         "type": "compactor_monitors",
@@ -166,14 +172,14 @@ All errors follow a consistent format:
 
 ### Common Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `UNAUTHORIZED` | 401 | Missing or invalid authentication token |
-| `FORBIDDEN` | 403 | Insufficient permissions for this operation |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request data (see details) |
-| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
-| `INTERNAL_ERROR` | 500 | Server error |
+| Code                  | HTTP Status | Description                                 |
+| --------------------- | ----------- | ------------------------------------------- |
+| `UNAUTHORIZED`        | 401         | Missing or invalid authentication token     |
+| `FORBIDDEN`           | 403         | Insufficient permissions for this operation |
+| `NOT_FOUND`           | 404         | Resource not found                          |
+| `VALIDATION_ERROR`    | 400         | Invalid request data (see details)          |
+| `RATE_LIMIT_EXCEEDED` | 429         | Too many requests                           |
+| `INTERNAL_ERROR`      | 500         | Server error                                |
 
 ## Pagination
 
@@ -190,6 +196,7 @@ curl "http://localhost:3000/api/jobs?page=2&limit=50" \
 ```
 
 Response:
+
 ```json
 {
   "data": [...],
@@ -203,12 +210,14 @@ Response:
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/login` - User login
 - `POST /api/auth/signup` - User registration
 - `POST /api/auth/logout` - User logout
 - `POST /api/auth/refresh` - Refresh access token
 
 ### Projects
+
 - `GET /api/projects` - List user's projects
 - `POST /api/projects` - Create new project
 - `GET /api/projects/{id}` - Get project details
@@ -216,18 +225,22 @@ Response:
 - `DELETE /api/projects/{id}` - Delete project
 
 ### Analysis
+
 - `POST /api/analyze` - Create analysis job
 - `POST /api/projects/{id}/analyze` - Analyze specific project
 
 ### Jobs
+
 - `GET /api/jobs` - List user's jobs
 - `GET /api/jobs/{id}` - Get job status
 
 ### Health
+
 - `GET /api/health` - API health check
 - `GET /api/health/worker` - Worker health check
 
 ### Admin (Admin Only)
+
 - `GET /api/admin/jobs` - List all jobs
 - `GET /api/admin/jobs/{id}` - Get job details
 - `POST /api/admin/jobs/{id}/retry` - Retry failed job
@@ -246,11 +259,13 @@ Response:
 ## Using the Interactive Documentation
 
 1. **Start the dev server**:
+
 ```bash
 pnpm dev
 ```
 
 2. **Open the API docs**:
+
 ```
 http://localhost:3000/api-docs
 ```
@@ -269,21 +284,25 @@ http://localhost:3000/api-docs
 ## Exporting the Specification
 
 ### Generate Both JSON and YAML
+
 ```bash
 pnpm export:openapi
 ```
 
 ### Generate JSON Only
+
 ```bash
 pnpm export:openapi:json
 ```
 
 ### Generate YAML Only
+
 ```bash
 pnpm export:openapi:yaml
 ```
 
 Output files:
+
 - `docs/api/openapi.json`
 - `docs/api/openapi.yaml`
 
@@ -294,6 +313,7 @@ pnpm validate:openapi
 ```
 
 This validates:
+
 - OpenAPI 3.0 compliance
 - Required fields present
 - Schema consistency
@@ -353,6 +373,7 @@ openapi-generator-cli generate \
 1. **Create the route file** (e.g., `app/api/my-endpoint/route.ts`)
 
 2. **Add JSDoc annotations**:
+
 ```typescript
 /**
  * @swagger
@@ -381,11 +402,13 @@ export async function GET(request: NextRequest) {
 ```
 
 3. **Validate the spec**:
+
 ```bash
 pnpm validate:openapi
 ```
 
 4. **Export the updated spec**:
+
 ```bash
 pnpm export:openapi
 ```
@@ -393,6 +416,7 @@ pnpm export:openapi
 ### Adding New Schemas
 
 1. **Add to `lib/api-docs/openapi-config.ts`**:
+
 ```typescript
 components: {
   schemas: {
@@ -411,6 +435,7 @@ components: {
 ```
 
 2. **Reference in routes**:
+
 ```typescript
 /**
  * @swagger
@@ -427,6 +452,7 @@ components: {
 ## Support
 
 For API support:
+
 - Email: support@wastewise.com
 - Documentation: https://wastewise.com/docs
 - Status: https://status.wastewise.com

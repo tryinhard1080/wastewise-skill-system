@@ -50,18 +50,21 @@ cat .claude/profiles/wastewise-dev.json
 
 ```typescript
 // In code
-import { getSandboxStats, detectSuspiciousPatterns } from '@/lib/observability/sandbox-logger'
+import {
+  getSandboxStats,
+  detectSuspiciousPatterns,
+} from "@/lib/observability/sandbox-logger";
 
 // Get statistics
-const stats = getSandboxStats()
-console.log('Total violations:', stats.total_violations)
-console.log('By severity:', stats.violations_by_severity)
+const stats = getSandboxStats();
+console.log("Total violations:", stats.total_violations);
+console.log("By severity:", stats.violations_by_severity);
 
 // Check for suspicious activity
-const patterns = detectSuspiciousPatterns()
+const patterns = detectSuspiciousPatterns();
 if (patterns.suspicious) {
-  console.error('Alert:', patterns.reasons)
-  console.info('Actions:', patterns.recommendations)
+  console.error("Alert:", patterns.reasons);
+  console.info("Actions:", patterns.recommendations);
 }
 ```
 
@@ -69,14 +72,14 @@ if (patterns.suspicious) {
 
 ## 🎯 Profile Selection Guide
 
-| Task | Profile | Command |
-|------|---------|---------|
-| Frontend development | dev (default) | `/sandbox` |
-| Backend development | dev (default) | `/sandbox` |
-| Writing tests | testing | `/sandbox-profile testing` |
-| Writing docs | docs | `/sandbox-profile docs` |
-| Code review | readonly | `/sandbox-profile readonly` |
-| Security audit | readonly | `/sandbox-profile readonly` |
+| Task                 | Profile       | Command                     |
+| -------------------- | ------------- | --------------------------- |
+| Frontend development | dev (default) | `/sandbox`                  |
+| Backend development  | dev (default) | `/sandbox`                  |
+| Writing tests        | testing       | `/sandbox-profile testing`  |
+| Writing docs         | docs          | `/sandbox-profile docs`     |
+| Code review          | readonly      | `/sandbox-profile readonly` |
+| Security audit       | readonly      | `/sandbox-profile readonly` |
 
 ---
 
@@ -159,6 +162,7 @@ pnpm test:watch __tests__/security/sandbox-compliance.test.ts
 ### Issue: Operations Require Permission
 
 **Diagnosis**:
+
 ```bash
 # Check if sandbox active
 /sandbox
@@ -174,6 +178,7 @@ cat .claude/sandbox.json
 ### Issue: Legitimate File Access Blocked
 
 **Diagnosis**:
+
 ```bash
 # Check allowed paths
 cat .claude/sandbox.json | grep -A 10 "allowed_write_paths"
@@ -186,6 +191,7 @@ cat .claude/sandbox.json | grep -A 10 "allowed_write_paths"
 ### Issue: Network Request Fails
 
 **Diagnosis**:
+
 ```bash
 # Check allowed domains
 cat .claude/sandbox.json | grep -A 8 "allowed_domains"
@@ -198,12 +204,14 @@ cat .claude/sandbox.json | grep -A 8 "allowed_domains"
 ### Issue: High Violation Count
 
 **Diagnosis**:
+
 ```typescript
-import { getSandboxStats } from '@/lib/observability/sandbox-logger'
-console.log(getSandboxStats())
+import { getSandboxStats } from "@/lib/observability/sandbox-logger";
+console.log(getSandboxStats());
 ```
 
 **Solution**:
+
 1. Review violations to understand patterns
 2. Adjust sandbox.json if violations are legitimate
 3. Investigate if violations are suspicious
@@ -212,12 +220,12 @@ console.log(getSandboxStats())
 
 ## 📊 Violation Severity Levels
 
-| Level | Examples | Action |
-|-------|----------|--------|
-| **Critical** | .env, credentials, secrets | Immediate investigation |
-| **High** | Permission escalation, deletions | Review and address |
-| **Medium** | Writes outside allowed paths | Check if legitimate |
-| **Low** | Reads, unapproved network | Monitor patterns |
+| Level        | Examples                         | Action                  |
+| ------------ | -------------------------------- | ----------------------- |
+| **Critical** | .env, credentials, secrets       | Immediate investigation |
+| **High**     | Permission escalation, deletions | Review and address      |
+| **Medium**   | Writes outside allowed paths     | Check if legitimate     |
+| **Low**      | Reads, unapproved network        | Monitor patterns        |
 
 ---
 
@@ -276,12 +284,14 @@ if (patterns.suspicious) {
 ## 🆘 Get Help
 
 **Common Questions**:
+
 1. Read `docs/SANDBOXING.md` - Comprehensive guide
 2. Check `~/.claude/sandboxing.md` - Global concepts
 3. Review `.claude/profiles/README.md` - Profile details
 4. Run sandbox tests to validate configuration
 
 **Still Stuck?**:
+
 - Check violation logs: `getSandboxStats()`
 - Review suspicious patterns: `detectSuspiciousPatterns()`
 - Verify configuration: `cat .claude/sandbox.json`

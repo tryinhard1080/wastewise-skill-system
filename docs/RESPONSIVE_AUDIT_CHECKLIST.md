@@ -7,6 +7,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 ## 1. Viewport Testing
 
 ### Mobile Small (375px)
+
 - [ ] No horizontal scrollbar
 - [ ] All content visible without zooming
 - [ ] Navigation accessible (hamburger menu if needed)
@@ -18,11 +19,13 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Modal/dialogs fit on screen
 
 ### Mobile Large (414px)
+
 - [ ] Same as Mobile Small
 - [ ] Layout improvements visible
 - [ ] No regressions from 375px
 
 ### Tablet (768px)
+
 - [ ] Grid layouts expand (typically 2 columns)
 - [ ] Navigation shows more items
 - [ ] Sidebars visible (if applicable)
@@ -30,6 +33,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Forms side-by-side where appropriate
 
 ### Desktop (1024px)
+
 - [ ] Full desktop layout active
 - [ ] All navigation visible
 - [ ] Optimal content width
@@ -37,6 +41,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Hover states functional
 
 ### Large Desktop (1440px)
+
 - [ ] Content centered with max-width
 - [ ] No excessive white space
 - [ ] Images high resolution
@@ -45,6 +50,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 ## 2. Component-Level Checks
 
 ### Navigation
+
 - [ ] Mobile: Hamburger menu or compact nav
 - [ ] Tablet: Expanded nav or horizontal menu
 - [ ] Desktop: Full navigation bar
@@ -52,6 +58,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Active states visible
 
 ### Forms
+
 - [ ] Inputs full-width on mobile
 - [ ] Labels above inputs on mobile
 - [ ] Grid layouts on tablet+ (side-by-side)
@@ -60,6 +67,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Dropdowns/selects functional on touch
 
 ### Tables
+
 - [ ] Horizontal scroll on mobile
 - [ ] Sticky headers (optional)
 - [ ] Readable cell content
@@ -67,6 +75,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Overflow indicators visible
 
 ### Cards/Grids
+
 - [ ] Mobile: 1 column
 - [ ] Tablet: 2-3 columns
 - [ ] Desktop: 3-4 columns
@@ -74,6 +83,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] No card overflow
 
 ### Modals/Dialogs
+
 - [ ] Full-screen or near-full on mobile
 - [ ] Centered on desktop
 - [ ] Close button accessible
@@ -81,6 +91,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Backdrop visible
 
 ### Images
+
 - [ ] Responsive sizing
 - [ ] Proper aspect ratios maintained
 - [ ] Lazy loading for below-fold
@@ -90,12 +101,14 @@ Use this checklist before merging any UI changes to ensure responsive design com
 ## 3. Accessibility Checks
 
 ### Touch Targets
+
 - [ ] All buttons min 44x44px on mobile
 - [ ] Links have adequate spacing
 - [ ] Form controls easy to tap
 - [ ] No accidental taps on adjacent elements
 
 ### Typography
+
 - [ ] Body text min 14px on mobile
 - [ ] Headings scale appropriately
 - [ ] Line height min 1.5 for paragraphs
@@ -103,12 +116,14 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Proper text wrapping
 
 ### Color & Contrast
+
 - [ ] 4.5:1 contrast for body text (WCAG AA)
 - [ ] 3:1 contrast for large text
 - [ ] Focus indicators visible
 - [ ] No color-only information
 
 ### Keyboard Navigation
+
 - [ ] Tab order logical
 - [ ] Focus visible on all interactive elements
 - [ ] Skip links present
@@ -117,6 +132,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 ## 4. Performance Checks
 
 ### Images
+
 - [ ] WebP/AVIF formats used
 - [ ] Proper `sizes` attribute
 - [ ] Width/height specified
@@ -124,12 +140,14 @@ Use this checklist before merging any UI changes to ensure responsive design com
 - [ ] Lazy loading for below-fold
 
 ### CSS
+
 - [ ] No unused Tailwind classes
 - [ ] Minimal custom CSS
 - [ ] No layout thrashing
 - [ ] Efficient responsive breakpoints
 
 ### JavaScript
+
 - [ ] No layout calculations in JS
 - [ ] Debounced resize handlers
 - [ ] Lazy load non-critical components
@@ -138,6 +156,7 @@ Use this checklist before merging any UI changes to ensure responsive design com
 ## 5. Automated Tests
 
 ### Playwright Tests
+
 ```bash
 # Run all responsive tests
 pnpm test:e2e responsive-viewports
@@ -150,6 +169,7 @@ pnpm test:e2e --grep "screenshot"
 ```
 
 ### Expected Results
+
 - [ ] All viewport tests pass
 - [ ] No horizontal scroll detected
 - [ ] No overflow elements found
@@ -159,6 +179,7 @@ pnpm test:e2e --grep "screenshot"
 ## 6. Manual Testing
 
 ### Device Testing
+
 - [ ] Tested on real iPhone (if available)
 - [ ] Tested on real Android (if available)
 - [ ] Tested on real iPad/tablet
@@ -166,12 +187,14 @@ pnpm test:e2e --grep "screenshot"
 - [ ] Tested on external monitor (>1440px)
 
 ### Browser Testing
+
 - [ ] Chrome (mobile & desktop)
 - [ ] Safari (mobile & desktop)
 - [ ] Firefox (desktop)
 - [ ] Edge (desktop)
 
 ### Orientation Testing
+
 - [ ] Portrait mode (mobile/tablet)
 - [ ] Landscape mode (mobile/tablet)
 - [ ] Layout adapts correctly
@@ -179,6 +202,7 @@ pnpm test:e2e --grep "screenshot"
 ## 7. Common Issues Checklist
 
 ### Layout
+
 - [ ] No fixed widths that break on mobile
 - [ ] No hardcoded pixel widths > 375px
 - [ ] Proper use of max-width
@@ -186,6 +210,7 @@ pnpm test:e2e --grep "screenshot"
 - [ ] No horizontal scroll
 
 ### Forms
+
 - [ ] Inputs stack on mobile
 - [ ] Buttons full-width on mobile
 - [ ] Adequate spacing between fields
@@ -193,6 +218,7 @@ pnpm test:e2e --grep "screenshot"
 - [ ] No cut-off labels
 
 ### Navigation
+
 - [ ] Mobile menu functional
 - [ ] Desktop navigation doesn't wrap
 - [ ] Active states visible
@@ -200,6 +226,7 @@ pnpm test:e2e --grep "screenshot"
 - [ ] Logo scales appropriately
 
 ### Content
+
 - [ ] Text doesn't overflow
 - [ ] Images scale properly
 - [ ] Videos responsive

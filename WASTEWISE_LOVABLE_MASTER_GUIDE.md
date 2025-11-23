@@ -1,4 +1,5 @@
 # WasteWise Complete Suite - Lovable Build Guide
+
 ## Consolidated Master Document for Development
 
 **Version**: 2.0  
@@ -27,7 +28,7 @@ This is NOT just another SaaS template. WasteWise has **specific business logic*
 # Yards Per Door - Compactor
 yards_per_door = (total_tons * 14.49) / units
 
-# Yards Per Door - Dumpster  
+# Yards Per Door - Dumpster
 yards_per_door = (qty * size * frequency * 4.33) / units
 
 # Cost Per Door
@@ -40,7 +41,7 @@ utilization = (avg_tons_per_haul / 8.0) * 100
 ### Benchmarks by Property Type
 
 | Property Type | Yards/Door | Cost/Door |
-|---------------|------------|-----------|
+| ------------- | ---------- | --------- |
 | Garden-Style  | 2.0-2.5    | $15-25    |
 | Mid-Rise      | 1.8-2.3    | $12-22    |
 | High-Rise     | 1.5-2.0    | $10-20    |
@@ -59,6 +60,7 @@ utilization = (avg_tons_per_haul / 8.0) * 100
 ### ❌ Issues Identified
 
 #### 1. **Duplication** (High Priority)
+
 - **Two rebuild plans**: LOVABLE_REBUILD_PLAN.md (2,897 lines) + WASTEWISE_LOVABLE_REBUILD_PLAN.md (1,388 lines)
 - **Two prompts libraries**: WASTEWISE_LOVABLE_PROMPTS.md (1,613 lines) + WASTEWISE_PROMPTS_LIBRARY.md (1,233 lines)
 - **Three quick references**: Confusing overlap
@@ -66,7 +68,9 @@ utilization = (avg_tons_per_haul / 8.0) * 100
 **Fix**: This consolidated document replaces all of them
 
 #### 2. **Missing WasteWise Business Logic** (Critical)
+
 The existing documents focus on UI/UX but don't capture:
+
 - Specific optimization thresholds (7-ton rule)
 - Validation framework (40+ checks)
 - Regulatory research protocols
@@ -78,16 +82,19 @@ The existing documents focus on UI/UX but don't capture:
 **Fix**: Integrated below in Phase 3
 
 #### 3. **Generic Component Architecture** (Medium Priority)
+
 COMPONENT_ARCHITECTURE.md is a generic SaaS landing page template, not tailored to WasteWise
 
 **Fix**: Updated landing page specs below
 
 #### 4. **No Integration with Skill Files** (Critical)
-The documents don't reference the comprehensive SKILL__2_UPDATED.md (3,064 lines) that contains ALL the actual business logic
+
+The documents don't reference the comprehensive SKILL\_\_2_UPDATED.md (3,064 lines) that contains ALL the actual business logic
 
 **Fix**: Extracted and integrated throughout this document
 
 #### 5. **Token Management Not Integrated** (Medium Priority)
+
 SKILL_MD_TOKEN_UPDATES.md improvements not reflected in build plan
 
 **Fix**: Added to Phase 3
@@ -99,6 +106,7 @@ SKILL_MD_TOKEN_UPDATES.md improvements not reflected in build plan
 ### Technology Stack (Final)
 
 **Frontend**:
+
 - React 18 + TypeScript
 - Tailwind CSS + shadcn/ui
 - Chart.js for visualizations
@@ -106,20 +114,24 @@ SKILL_MD_TOKEN_UPDATES.md improvements not reflected in build plan
 - Zustand for state management
 
 **Backend**:
+
 - Supabase (PostgreSQL + Auth + Storage + Edge Functions)
 - Row Level Security (RLS) enabled
 - Real-time subscriptions
 
 **AI/External Services**:
+
 - OpenAI GPT-4o: Invoice data extraction
 - Anthropic Claude Sonnet 4.5: Regulatory research
 - Brave Search API: Web ordinance lookup
 
 **File Generation**:
+
 - ExcelJS: Excel workbook generation
 - Custom HTML: Interactive dashboards
 
 **Infrastructure**:
+
 - Lovable.dev: Development & deployment
 - GitHub: Version control
 - Sentry: Error tracking (optional)
@@ -347,38 +359,38 @@ create index idx_ordinance_location_key on ordinance_database(location_key);
 -- Projects
 alter table projects enable row level security;
 
-create policy "Users view own projects" 
-  on projects for select 
+create policy "Users view own projects"
+  on projects for select
   using (auth.uid() = user_id);
 
-create policy "Users create own projects" 
-  on projects for insert 
+create policy "Users create own projects"
+  on projects for insert
   with check (auth.uid() = user_id);
 
-create policy "Users update own projects" 
-  on projects for update 
+create policy "Users update own projects"
+  on projects for update
   using (auth.uid() = user_id);
 
-create policy "Users delete own projects" 
-  on projects for delete 
+create policy "Users delete own projects"
+  on projects for delete
   using (auth.uid() = user_id);
 
 -- Project Files
 alter table project_files enable row level security;
 
-create policy "Users view own project files" 
-  on project_files for select 
+create policy "Users view own project files"
+  on project_files for select
   using (exists (
-    select 1 from projects 
-    where projects.id = project_files.project_id 
+    select 1 from projects
+    where projects.id = project_files.project_id
     and projects.user_id = auth.uid()
   ));
 
-create policy "Users create own project files" 
-  on project_files for insert 
+create policy "Users create own project files"
+  on project_files for insert
   with check (exists (
-    select 1 from projects 
-    where projects.id = project_files.project_id 
+    select 1 from projects
+    where projects.id = project_files.project_id
     and projects.user_id = auth.uid()
   ));
 
@@ -397,6 +409,7 @@ create policy "Users create own project files"
 #### Hour 1-2: Landing Page
 
 **Prompt 1A**: Landing Page Hero
+
 ```
 Create a modern SaaS landing page for "WasteWise by THE Trash Hub" - waste management analysis for multifamily properties.
 
@@ -434,6 +447,7 @@ Make fully responsive and mobile-first.
 ```
 
 **Prompt 1B**: Features Section
+
 ```
 Add FEATURES section after hero with WasteWise-specific capabilities:
 
@@ -447,11 +461,11 @@ Row 1:
 1. Automated Invoice Processing
    - Icon: FileText
    - "Upload PDFs, Excel, or CSV - AI extracts all data automatically"
-   
+
 2. Regulatory Compliance Research
    - Icon: Shield
    - "Automatic lookup of local recycling and composting ordinances"
-   
+
 3. AI-Powered Optimization
    - Icon: Sparkles/Brain
    - "Identify savings opportunities with proprietary algorithms"
@@ -460,11 +474,11 @@ Row 2:
 4. Compactor Utilization Analysis
    - Icon: BarChart
    - "Calculate tons/haul and recommend monitor installations"
-   
+
 5. Contract Risk Assessment
    - Icon: FileSearch
    - "Extract terms, identify risks, set calendar reminders"
-   
+
 6. Professional Reports
    - Icon: Download
    - "Excel workbooks + interactive HTML dashboards"
@@ -481,6 +495,7 @@ CARD STYLING:
 #### Hour 3-4: How It Works & Pricing
 
 **Prompt 1C**: Process & Pricing
+
 ```
 Add HOW IT WORKS and PRICING sections:
 
@@ -492,17 +507,17 @@ Title: "From Invoice to Insights in 4 Steps"
    - Icon: Upload cloud
    - "Upload waste invoices and contracts"
    - "Supports PDF, Excel, CSV, images"
-   
+
 2. Property Info
    - Icon: Building
    - "Enter property details"
    - "Name, units, location, property type"
-   
+
 3. AI Analysis
    - Icon: CPU/Sparkles
    - "Automated data extraction & research"
    - "Calculations, ordinance lookup, optimization"
-   
+
 4. Download Reports
    - Icon: FileCheck
    - "Excel + HTML dashboards ready"
@@ -547,6 +562,7 @@ Highlight Professional with green border and subtle background.
 #### Hour 5-6: Authentication
 
 **Prompt 2**: Auth System
+
 ```
 Implement Supabase authentication:
 
@@ -595,6 +611,7 @@ Use Supabase Auth, match design system colors.
 #### Hour 7-8: Dashboard Shell
 
 **Prompt 3**: Dashboard Layout
+
 ```
 Create main dashboard at /dashboard (protected):
 
@@ -654,6 +671,7 @@ Make fully responsive with mobile sidebar.
 #### Create Project Wizard
 
 **Prompt 4**: Multi-Step Form
+
 ```
 Create project creation wizard at /projects/new with 3 steps:
 
@@ -665,18 +683,18 @@ Form fields:
 - Property name (text, required)
   * Placeholder: "e.g., Columbia Square Apartments"
   * Validation: 3-100 characters
-  
+
 - Units (number, required)
   * Placeholder: "Number of residential units"
   * Validation: 10-2000
   * Helper text: "Must be between 10 and 2,000 units"
-  
+
 - City (text, required)
   * Autocomplete with US cities
-  
+
 - State (select, required)
   * Dropdown with all US states
-  
+
 - Property Type (select, required)
   * Options: Garden-Style, Mid-Rise, High-Rise
   * Info tooltip explaining each type
@@ -746,6 +764,7 @@ Match design system.
 #### Processing Page
 
 **Prompt 5**: Processing UI
+
 ```
 Create processing page at /projects/[id]/processing:
 
@@ -817,7 +836,8 @@ This is where WasteWise becomes REAL. This phase implements the actual business 
 #### Supabase Edge Function: Invoice Extraction
 
 **Prompt 6A**: Invoice Processing Setup
-```
+
+````
 Create Supabase Edge Function: extract-invoice-data
 
 ENDPOINT: POST /functions/v1/extract-invoice-data
@@ -874,39 +894,42 @@ RULES:
 - Itemize charges as specifically as possible
 
 Return ONLY valid JSON.`;
-```
+````
 
-   d. Parse OpenAI response
-   e. Validate extracted data
-   f. Insert into invoice_data table
-   g. Update project progress
+d. Parse OpenAI response
+e. Validate extracted data
+f. Insert into invoice_data table
+g. Update project progress
 
 5. Return summary of extraction
 
 RESPONSE:
 {
-  "success": true,
-  "invoices_processed": 8,
-  "total_spend": 15234.67,
-  "date_range": {
-    "start": "2024-01-01",
-    "end": "2024-08-31"
-  }
+"success": true,
+"invoices_processed": 8,
+"total_spend": 15234.67,
+"date_range": {
+"start": "2024-01-01",
+"end": "2024-08-31"
+}
 }
 
 ERROR HANDLING:
+
 - Catch PDF parsing errors
 - Retry OpenAI calls (max 3 attempts)
 - Log all errors
 - Update project.error_message if fatal
 
 Use Deno, integrate with Supabase client.
+
 ```
 
 #### Business Logic: Optimization Analysis
 
 **Prompt 6B**: Optimization Calculations
 ```
+
 Create Supabase Edge Function: analyze-optimizations
 
 ENDPOINT: POST /functions/v1/analyze-optimizations
@@ -918,7 +941,7 @@ CRITICAL BUSINESS RULES (from SKILL.md):
    Recommend IF:
    - Average tons/haul < 7.0 (CRITICAL: NOT <5 or <6)
    - AND max interval ≤ 14 days
-   
+
    Calculate:
    - Current avg tons/haul
    - Target: 8.5 tons/haul
@@ -933,7 +956,7 @@ CRITICAL BUSINESS RULES (from SKILL.md):
 2. CONTAMINATION REDUCTION:
    Recommend IF:
    - Contamination charges > 3% of total spend
-   
+
    Calculate:
    - Total contamination from invoices
    - Percentage of total spend
@@ -943,7 +966,7 @@ CRITICAL BUSINESS RULES (from SKILL.md):
 3. BULK TRASH SUBSCRIPTION:
    Recommend IF:
    - Average bulk charges > $500/month
-   
+
    Calculate:
    - Average monthly bulk charges
    - Subscription cost: $400/month
@@ -951,135 +974,141 @@ CRITICAL BUSINESS RULES (from SKILL.md):
 
 4. LEASE-UP DETECTION:
    Calculate yards per door:
-   - Compactor: (total_tons * 14.49) / units
-   - Dumpster: (qty * size * freq * 4.33) / units
-   
+   - Compactor: (total_tons \* 14.49) / units
+   - Dumpster: (qty _ size _ freq \* 4.33) / units
+
    Compare to benchmarks:
    - Garden-Style: 2.0-2.5 YPD
    - Mid-Rise: 1.8-2.3 YPD
    - High-Rise: 1.5-2.0 YPD
-   
+
    If > 40% below minimum:
    - Flag as lease-up
    - DO NOT recommend optimizations
    - Add note: "Reassess at 90% occupancy"
 
 IMPLEMENTATION:
+
 ```typescript
 export async function analyzeOptimizations(projectId: string) {
   // 1. Fetch project data
   const project = await supabase
-    .from('projects')
-    .select('*, invoice_data(*), haul_log(*)')
-    .eq('id', projectId)
+    .from("projects")
+    .select("*, invoice_data(*), haul_log(*)")
+    .eq("id", projectId)
     .single();
-  
+
   // 2. Calculate metrics
   const totalSpend = sumInvoices(project.invoice_data);
   const avgMonthlySpend = totalSpend / project.analysis_period_months;
   const costPerDoor = avgMonthlySpend / project.units;
-  
+
   // 3. Check for compactor
-  const hasCompactor = project.equipment_type === 'COMPACTOR';
-  
+  const hasCompactor = project.equipment_type === "COMPACTOR";
+
   const optimizations = [];
-  
+
   // 4. COMPACTOR OPTIMIZATION
   if (hasCompactor && project.haul_log.length > 0) {
-    const avgTons = average(project.haul_log.map(h => h.tonnage));
-    const maxInterval = Math.max(...project.haul_log.map(h => h.days_since_last || 0));
-    
+    const avgTons = average(project.haul_log.map((h) => h.tonnage));
+    const maxInterval = Math.max(
+      ...project.haul_log.map((h) => h.days_since_last || 0),
+    );
+
     // CRITICAL THRESHOLD CHECK
     if (avgTons < 7.0 && maxInterval <= 14) {
       const result = calculateCompactorOptimization({
         avgTons,
         haulLog: project.haul_log,
         units: project.units,
-        costPerHaul: getCostPerHaul(project.invoice_data)
+        costPerHaul: getCostPerHaul(project.invoice_data),
       });
-      
+
       optimizations.push({
-        opportunity_type: 'compactor_monitors',
+        opportunity_type: "compactor_monitors",
         recommend: true,
         priority: 1,
-        ...result
+        ...result,
       });
     }
   }
-  
+
   // 5. CONTAMINATION
-  const contaminationTotal = sumCharges(project.invoice_data, 'contamination');
+  const contaminationTotal = sumCharges(project.invoice_data, "contamination");
   const contaminationPct = (contaminationTotal / totalSpend) * 100;
-  
+
   if (contaminationPct > 3.0) {
     optimizations.push({
-      opportunity_type: 'contamination_reduction',
+      opportunity_type: "contamination_reduction",
       recommend: true,
       priority: 2,
-      title: 'Implement Contamination Reduction Program',
+      title: "Implement Contamination Reduction Program",
       calculation_breakdown: {
         current_annual_contamination: contaminationTotal,
         percentage_of_total_spend: contaminationPct,
         target_reduction: 50,
-        potential_annual_savings: contaminationTotal * 0.5
-      }
+        potential_annual_savings: contaminationTotal * 0.5,
+      },
     });
   }
-  
+
   // 6. BULK SUBSCRIPTION
   const bulkCharges = getMonthlyBulkCharges(project.invoice_data);
   const avgMonthlyBulk = average(bulkCharges);
-  
+
   if (avgMonthlyBulk > 500) {
     const subscriptionCost = 400;
     const savings = (avgMonthlyBulk - subscriptionCost) * 12;
-    
+
     if (savings > 0) {
       optimizations.push({
-        opportunity_type: 'bulk_subscription',
+        opportunity_type: "bulk_subscription",
         recommend: true,
         priority: 3,
-        title: 'Convert to Bulk Trash Subscription',
+        title: "Convert to Bulk Trash Subscription",
         calculation_breakdown: {
           current_avg_monthly: avgMonthlyBulk,
           subscription_monthly_cost: subscriptionCost,
-          net_annual_savings: savings
-        }
+          net_annual_savings: savings,
+        },
       });
     }
   }
-  
+
   // 7. Insert optimizations into database
   for (const opt of optimizations) {
-    await supabase
-      .from('optimizations')
-      .insert({
-        project_id: projectId,
-        ...opt
-      });
+    await supabase.from("optimizations").insert({
+      project_id: projectId,
+      ...opt,
+    });
   }
-  
+
   // 8. Update project total_savings
   const totalSavings = optimizations
-    .filter(o => o.recommend)
-    .reduce((sum, o) => sum + (o.calculation_breakdown.net_year1_savings || 0), 0);
-  
+    .filter((o) => o.recommend)
+    .reduce(
+      (sum, o) => sum + (o.calculation_breakdown.net_year1_savings || 0),
+      0,
+    );
+
   await supabase
-    .from('projects')
+    .from("projects")
     .update({ total_savings: totalSavings })
-    .eq('id', projectId);
-  
+    .eq("id", projectId);
+
   return { success: true, optimizations };
 }
 ```
 
 Store results in optimizations table.
+
 ```
 
 #### Regulatory Research
 
 **Prompt 6C**: Ordinance Lookup
 ```
+
 Create Supabase Edge Function: conduct-regulatory-research
 
 ENDPOINT: POST /functions/v1/conduct-regulatory-research
@@ -1088,17 +1117,18 @@ INPUT: { "project_id": "uuid", "city": "string", "state": "string" }
 TOKEN-EFFICIENT PROTOCOL (from SKILL_MD_TOKEN_UPDATES.md):
 
 1. CHECK CACHE FIRST:
+
 ```typescript
-const locationKey = `${city.toLowerCase().replace(' ', '_')}_${state.toLowerCase()}`;
+const locationKey = `${city.toLowerCase().replace(" ", "_")}_${state.toLowerCase()}`;
 
 const cached = await supabase
-  .from('ordinance_database')
-  .select('*')
-  .eq('location_key', locationKey)
+  .from("ordinance_database")
+  .select("*")
+  .eq("location_key", locationKey)
   .single();
 
 if (cached) {
-  console.log('✅ Using cached ordinance data');
+  console.log("✅ Using cached ordinance data");
   return formatCachedData(cached);
 }
 ```
@@ -1106,29 +1136,31 @@ if (cached) {
 2. IF NOT CACHED, CONDUCT LIVE RESEARCH (streamlined):
 
 Search 1: Municode.com (best source)
+
 ```typescript
 const query1 = `"${city}" "${state}" site:municode.com recycling ordinance`;
 const results1 = await braveSearch(query1);
 
-const municodeUrls = results1.web.results.filter(r => 
-  r.url.includes('municode.com')
+const municodeUrls = results1.web.results.filter((r) =>
+  r.url.includes("municode.com"),
 );
 
 if (municodeUrls.length > 0) {
   // Fetch ordinance content
-  const content = await fetch(municodeUrls[0].url).then(r => r.text());
-  
+  const content = await fetch(municodeUrls[0].url).then((r) => r.text());
+
   // Extract requirements using Claude
   const requirements = await extractRequirements(content, city);
-  
+
   // Cache for future use
   await cacheOrdinanceData(locationKey, requirements);
-  
+
   return requirements;
 }
 ```
 
 Search 2: City .gov (backup)
+
 ```typescript
 const query2 = `"${city}" "${state}" recycling multifamily requirements site:.gov`;
 const results2 = await braveSearch(query2);
@@ -1139,6 +1171,7 @@ const results2 = await braveSearch(query2);
 STOP AT 2 SEARCHES MAX. If insufficient data, flag for manual review.
 
 3. EXTRACT REQUIREMENTS using Claude API:
+
 ```typescript
 const extractionPrompt = `
 Analyze this ordinance content and extract waste management requirements for multifamily properties.
@@ -1188,18 +1221,21 @@ Focus on:
 `;
 
 const response = await anthropic.messages.create({
-  model: 'claude-sonnet-4-20250514',
+  model: "claude-sonnet-4-20250514",
   max_tokens: 2000,
-  messages: [{
-    role: 'user',
-    content: extractionPrompt
-  }]
+  messages: [
+    {
+      role: "user",
+      content: extractionPrompt,
+    },
+  ],
 });
 
 const requirements = JSON.parse(response.content[0].text);
 ```
 
 4. ASSIGN CONFIDENCE SCORE:
+
 - HIGH: Official sources, specific requirements, penalties documented
 - MEDIUM: Core info found, some details missing
 - LOW: Insufficient data - flag "HUMAN REVIEW REQUIRED"
@@ -1208,15 +1244,16 @@ const requirements = JSON.parse(response.content[0].text);
 
 RESPONSE:
 {
-  "success": true,
-  "confidence_score": "HIGH",
-  "recycling_mandatory": true,
-  "composting_mandatory": false,
-  "licensed_haulers_count": 5,
-  "cached": false
+"success": true,
+"confidence_score": "HIGH",
+"recycling_mandatory": true,
+"composting_mandatory": false,
+"licensed_haulers_count": 5,
+"cached": false
 }
 
 Integrate Brave Search API + Anthropic Claude API.
+
 ```
 
 ### Phase 4: Report Generation (Week 5) - 16 hours
@@ -1225,6 +1262,7 @@ Integrate Brave Search API + Anthropic Claude API.
 
 **Prompt 7A**: Excel Report Setup
 ```
+
 Create Supabase Edge Function: generate-excel-report
 
 ENDPOINT: POST /functions/v1/generate-excel-report
@@ -1233,32 +1271,44 @@ INPUT: { "project_id": "uuid" }
 Use ExcelJS library to create workbook with 8 tabs:
 
 TAB 1: SUMMARY
+
 - Property overview
 - Analysis period
 - Key metrics (cost/door, total spend)
 - Top 3 optimization opportunities
 
 TAB 2: SUMMARY_FULL
+
 - First line MUST BE: "Potential to Reduce 2026 Trash Expense by $XX,XXX"
 - Detailed findings
 - All optimization opportunities
 - Regulatory status
 
 TAB 3: EXPENSE_ANALYSIS (CRITICAL FORMAT)
+
 - ROW-BASED layout (each invoice = row)
 - Columns: Month | Vendor | Service Type | Invoice # | Amount | Cost/Door | Notes
 - Monthly subtotal rows with budget calculations
 - Grand total at bottom
 
 FORMATTING REQUIREMENTS (from wastewise_expense_format_template_UPDATED.md):
+
 ```typescript
 // Header row
-worksheet.getRow(3).values = ['Month', 'Vendor', 'Service Type', 'Invoice Number', 'Amount', 'Cost/Door', 'Notes'];
-worksheet.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+worksheet.getRow(3).values = [
+  "Month",
+  "Vendor",
+  "Service Type",
+  "Invoice Number",
+  "Amount",
+  "Cost/Door",
+  "Notes",
+];
+worksheet.getRow(3).font = { bold: true, color: { argb: "FFFFFFFF" } };
 worksheet.getRow(3).fill = {
-  type: 'pattern',
-  pattern: 'solid',
-  fgColor: { argb: 'FF4472C4' }
+  type: "pattern",
+  pattern: "solid",
+  fgColor: { argb: "FF4472C4" },
 };
 
 // Data rows
@@ -1268,46 +1318,58 @@ for (const invoice of invoices) {
     invoice.month,
     invoice.vendor_name,
     invoice.service_type,
-    invoice.invoice_number || 'N/A',
+    invoice.invoice_number || "N/A",
     invoice.total_amount,
     invoice.total_amount / project.units,
-    invoice.notes || generateDefaultNote(invoice.service_type)
+    invoice.notes || generateDefaultNote(invoice.service_type),
   ];
-  
+
   // Format currency
-  worksheet.getCell(row, 5).numFmt = '$#,##0.00';
-  worksheet.getCell(row, 6).numFmt = '$#,##0.00';
-  
+  worksheet.getCell(row, 5).numFmt = "$#,##0.00";
+  worksheet.getCell(row, 6).numFmt = "$#,##0.00";
+
   row++;
 }
 
 // Monthly subtotal
-worksheet.getRow(row).values = [null, null, null, `${month} TOTAL:`, monthTotal, monthTotal / project.units, `Monthly budget: $${(monthTotal/project.units).toFixed(2)}/door`];
+worksheet.getRow(row).values = [
+  null,
+  null,
+  null,
+  `${month} TOTAL:`,
+  monthTotal,
+  monthTotal / project.units,
+  `Monthly budget: $${(monthTotal / project.units).toFixed(2)}/door`,
+];
 worksheet.getRow(row).font = { bold: true, italic: true };
 worksheet.getRow(row).fill = {
-  type: 'pattern',
-  pattern: 'solid',
-  fgColor: { argb: 'FFE7E6E6' }
+  type: "pattern",
+  pattern: "solid",
+  fgColor: { argb: "FFE7E6E6" },
 };
 ```
 
 TAB 4: HAUL_LOG (if compactor)
+
 - Date | Tonnage | Days Since Last | Status
 - Flag low utilization (<7 tons)
 
 TAB 5: OPTIMIZATION
+
 - One row per opportunity
 - Full calculation breakdowns
 - Contact information
 - Implementation timeline
 
 TAB 6: CONTRACT_TERMS (if contract provided)
+
 - 7 clause categories
 - Verbatim contract text
 - Risk severity
 - Calendar reminders
 
 TAB 7: REGULATORY_COMPLIANCE
+
 - 8 sections (from SKILL.md Section 5):
   1. Ordinance Summary
   2. Waste Collection Requirements
@@ -1319,15 +1381,18 @@ TAB 7: REGULATORY_COMPLIANCE
   8. Research Confidence
 
 TAB 8: INSTRUCTIONS
+
 - How to use the workbook
 - Formula explanations
 - Contact information
 
 SAVE TO:
+
 - Supabase Storage: `reports/${project_id}/workbook.xlsx`
 - Return download URL
 
 VALIDATION BEFORE SAVE:
+
 - All 8 tabs present
 - First line of SUMMARY_FULL correct
 - All invoice numbers included
@@ -1335,12 +1400,14 @@ VALIDATION BEFORE SAVE:
 - Contract tab only if contract exists
 
 Use ExcelJS, return signed URL valid for 1 hour.
+
 ```
 
 #### HTML Dashboard Generator
 
 **Prompt 7B**: Interactive Dashboard
 ```
+
 Create Supabase Edge Function: generate-html-dashboard
 
 ENDPOINT: POST /functions/v1/generate-html-dashboard
@@ -1349,100 +1416,116 @@ INPUT: { "project_id": "uuid" }
 Generate standalone HTML file with 6 tabs:
 
 TAB 1 - DASHBOARD:
+
 - Executive KPIs (3 cards)
 - Gauge charts (Chart.js):
-  * Compactor utilization
-  * Average tons/haul
+  - Compactor utilization
+  - Average tons/haul
 - Savings opportunity summary
 
 TAB 2 - EXPENSE ANALYSIS:
+
 - Monthly cost trend (line chart)
 - Cost per door trend (line chart)
 - Charge breakdown (stacked bar chart)
 
 TAB 3 - HAUL LOG (if compactor):
+
 - Filterable table
 - Color-coded status (red = low utilization)
 - Export to CSV button
 
 TAB 4 - OPTIMIZATION:
+
 - Optimization cards with:
-  * Title and description
-  * Savings calculation breakdown
-  * ROI metrics (if applicable)
-  * Contact info
-  * Implementation timeline
+  - Title and description
+  - Savings calculation breakdown
+  - ROI metrics (if applicable)
+  - Contact info
+  - Implementation timeline
 
 TAB 5 - CONTRACT TERMS (if exists):
+
 - Risk matrix
 - Calendar reminders
 - Action items
 
 TAB 6 - REGULATORY:
+
 - Ordinance summary
 - Compliance checklist
 - Licensed haulers table
 - Confidence score badge
 
 TECH STACK:
+
 - Tailwind CSS (CDN)
 - Chart.js (CDN)
 - Alpine.js for interactivity (CDN)
 - No build step - standalone HTML
 
 TEMPLATE STRUCTURE:
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>WasteWise Analysis - {{property_name}}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <style>
-    /* Custom styles for gauge charts, tabs */
-  </style>
-</head>
-<body class="bg-slate-50">
-  <!-- Header with property info -->
-  <!-- Tab navigation -->
-  <!-- Tab content areas -->
-  <!-- Charts initialized with inline data -->
-  <script>
-    // All data embedded in JavaScript
-    const projectData = {{JSON_DATA}};
-    // Initialize charts
-    // Tab switching logic
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>WasteWise Analysis - {{property_name}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <style>
+      /* Custom styles for gauge charts, tabs */
+    </style>
+  </head>
+  <body class="bg-slate-50">
+    <!-- Header with property info -->
+    <!-- Tab navigation -->
+    <!-- Tab content areas -->
+    <!-- Charts initialized with inline data -->
+    <script>
+      // All data embedded in JavaScript
+      const projectData = {{JSON_DATA}};
+      // Initialize charts
+      // Tab switching logic
+    </script>
+  </body>
 </html>
 ```
 
 SAVE TO:
+
 - Supabase Storage: `reports/${project_id}/dashboard.html`
 - Return signed URL
 
 CRITICAL: Embed ALL data in HTML (no external API calls).
 Make it work offline once downloaded.
+
 ```
 
 ### Phase 5: Results Display (Week 6) - 8 hours
 
 **Prompt 8**: Results Page
 ```
+
 Create comprehensive results page at /projects/[id]/results:
 
 LAYOUT:
 Header:
+
 - Property name (large)
 - Analysis date range
 - "Download Reports" dropdown:
-  * Excel Workbook
-  * HTML Dashboard
-  * Both (ZIP)
+  - Excel Workbook
+  - HTML Dashboard
+  - Both (ZIP)
 
 Hero Card:
+
 - Large green box
 - "Potential 2026 Savings: $XX,XXX"
 - Breakdown: Show top 3 opportunities
@@ -1452,6 +1535,7 @@ Hero Card:
 
 TAB 1 - OVERVIEW:
 Grid of KPI cards:
+
 - Total Spend (period)
 - Avg Monthly Cost
 - Cost Per Door
@@ -1460,12 +1544,14 @@ Grid of KPI cards:
 - Regulatory Compliance Status
 
 Charts:
+
 - Monthly cost trend (line chart)
 - Vendor breakdown (pie chart)
 - Service type breakdown (bar chart)
 
 TAB 2 - INVOICES:
 Data table with:
+
 - Columns: Month, Date, Vendor, Invoice #, Service, Amount, Cost/Door
 - Sortable columns
 - Search/filter
@@ -1474,6 +1560,7 @@ Data table with:
 
 TAB 3 - OPTIMIZATIONS:
 For each opportunity:
+
 - Priority badge (1, 2, 3)
 - Title card (expandable)
 - Description
@@ -1485,11 +1572,12 @@ For each opportunity:
 - Implementation timeline
 
 TAB 4 - COMPLIANCE:
+
 - Ordinance summary card
 - Requirements checklist:
-  * Recycling (✓ ⚠ ✗)
-  * Composting (✓ ⚠ ✗)
-  * Licensed hauler used
+  - Recycling (✓ ⚠ ✗)
+  - Composting (✓ ⚠ ✗)
+  - Licensed hauler used
 - Confidence score badge
 - Licensed haulers table
 - Regulatory contacts
@@ -1498,15 +1586,18 @@ TAB 4 - COMPLIANCE:
 Use shadcn/ui Table, Card, Tabs, Badge.
 Fetch data from database tables.
 Real-time updates if status changes.
+
 ```
 
 ### Phase 6: Polish & Launch (Week 7) - 16 hours
 
 **Prompt 9A**: Mobile Responsiveness
 ```
+
 Audit and fix mobile responsiveness across all pages:
 
 PRIORITIES:
+
 1. Landing page hero - stack on mobile
 2. Dashboard - collapsible sidebar
 3. Project wizard - vertical stepper on mobile
@@ -1514,44 +1605,54 @@ PRIORITIES:
 5. Charts - responsive sizing
 
 Use Tailwind breakpoints:
+
 - sm: 640px
-- md: 768px  
+- md: 768px
 - lg: 1024px
 - xl: 1280px
 
 Test on:
+
 - iPhone SE (375px)
 - iPhone 12 Pro (390px)
 - iPad (768px)
 - Desktop (1440px)
+
 ```
 
 **Prompt 9B**: Loading States
 ```
+
 Add loading skeletons and states throughout:
 
 DASHBOARD:
+
 - Skeleton cards while loading projects
 - "Loading..." text with spinner
 
 PROJECT WIZARD:
+
 - Uploading... progress bar
 - "Processing" spinner after submit
 
 RESULTS PAGE:
+
 - Chart skeletons
 - Table skeletons
 - "Generating report..." for downloads
 
 Use shadcn/ui Skeleton component.
 Prevent layout shift during load.
+
 ```
 
 **Prompt 9C**: Error Handling
 ```
+
 Implement comprehensive error handling:
 
 TYPES OF ERRORS:
+
 1. Network errors (offline)
 2. Auth errors (session expired)
 3. Validation errors (bad input)
@@ -1559,6 +1660,7 @@ TYPES OF ERRORS:
 5. File errors (corrupt PDF)
 
 ERROR UI:
+
 - Toast notifications (shadcn/ui Toast)
 - Error boundaries (React)
 - Inline field errors (forms)
@@ -1566,19 +1668,23 @@ ERROR UI:
 - Error pages (404, 500)
 
 ACTIONS:
+
 - "Try Again" button
 - "Contact Support" link
 - "Go Back" navigation
 - Auto-retry (max 3)
 
 Log errors to Sentry (optional).
+
 ```
 
 **Prompt 9D**: Pricing Page
 ```
+
 Create dedicated pricing page at /pricing:
 
 Same pricing tiers as landing page, but with:
+
 - Feature comparison table
 - FAQ section below
 - "Start Free Trial" CTAs
@@ -1588,13 +1694,16 @@ Same pricing tiers as landing page, but with:
 Add toggle: Monthly / Annual (20% discount)
 
 Link from nav and landing page.
+
 ```
 
 **Prompt 9E**: Settings Pages
 ```
+
 Create user settings at /settings with tabs:
 
 PROFILE:
+
 - Name
 - Email (read-only)
 - Company name
@@ -1603,6 +1712,7 @@ PROFILE:
 - "Save Changes" button
 
 BILLING:
+
 - Current plan badge
 - Usage this month
 - "Upgrade" button
@@ -1610,19 +1720,22 @@ BILLING:
 - Billing history table
 
 NOTIFICATIONS:
+
 - Email preferences checkboxes:
-  * Analysis complete
-  * New features
-  * Weekly digest
+  - Analysis complete
+  - New features
+  - Weekly digest
 - "Save Preferences" button
 
 API (future):
+
 - API key display/regenerate
 - Usage metrics
 - Documentation link
 
 Use shadcn/ui Form, Tabs, Switch.
-```
+
+````
 
 ---
 
@@ -1822,9 +1935,9 @@ Before proceeding, verify this document includes:
 
 ---
 
-*WasteWise Lovable Master Guide v2.0*  
-*Consolidated from 10 source documents*  
-*Richard Bates - THE Trash Hub*  
+*WasteWise Lovable Master Guide v2.0*
+*Consolidated from 10 source documents*
+*Richard Bates - THE Trash Hub*
 *November 14, 2025*
 
 ---
@@ -1859,7 +1972,7 @@ def should_recommend_monitors(avg_tons, max_interval_days):
 def is_lease_up(yards_per_door, benchmark_min):
     variance = ((yards_per_door - benchmark_min) / benchmark_min) * 100
     return variance < -40
-```
+````
 
 ---
 

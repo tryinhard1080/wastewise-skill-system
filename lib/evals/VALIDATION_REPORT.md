@@ -19,13 +19,13 @@ The TypeScript implementation follows the **canonical formulas from WASTE_FORMUL
 
 ### 1. Formula Constants Validation
 
-| Constant | WASTE_FORMULAS_REFERENCE.md v2.0 | TypeScript (formulas.ts) | Python (compactor_calculator.py) | Match? |
-|----------|----------------------------------|--------------------------|----------------------------------|--------|
-| Compactor YPD conversion | 14.49 | 14.49 | N/A (uses 3.448) | ⚠️ Different |
-| Target capacity | 8.5 tons | 8.5 tons | 8.7 tons (calculated) | ❌ No |
-| Optimization threshold | <6.0 tons | <6.0 tons | <60% utilization | ❌ Different methodology |
-| Monitor install cost | $300 | $300 | N/A | ✓ |
-| Monitor monthly cost | $200 | $200 | N/A | ✓ |
+| Constant                 | WASTE_FORMULAS_REFERENCE.md v2.0 | TypeScript (formulas.ts) | Python (compactor_calculator.py) | Match?                   |
+| ------------------------ | -------------------------------- | ------------------------ | -------------------------------- | ------------------------ |
+| Compactor YPD conversion | 14.49                            | 14.49                    | N/A (uses 3.448)                 | ⚠️ Different             |
+| Target capacity          | 8.5 tons                         | 8.5 tons                 | 8.7 tons (calculated)            | ❌ No                    |
+| Optimization threshold   | <6.0 tons                        | <6.0 tons                | <60% utilization                 | ❌ Different methodology |
+| Monitor install cost     | $300                             | $300                     | N/A                              | ✓                        |
+| Monitor monthly cost     | $200                             | $200                     | N/A                              | ✓                        |
 
 ### 2. Methodology Comparison
 
@@ -46,6 +46,7 @@ if utilization < 60:
 ```
 
 **Issues**:
+
 - Uses container-specific max capacity (varies by size)
 - 60% threshold is arbitrary (not industry standard)
 - Doesn't account for industry best practices (8-9 tons target)
@@ -54,18 +55,19 @@ if utilization < 60:
 
 ```typescript
 // Use industry standard target capacity
-const TARGET_TONS = 8.5 // Midpoint of 8-9 ton industry standard
+const TARGET_TONS = 8.5; // Midpoint of 8-9 ton industry standard
 
 // Direct tons threshold (canonical)
-const OPTIMIZATION_THRESHOLD = 6.0 // Per v2.0 lines 201-232
+const OPTIMIZATION_THRESHOLD = 6.0; // Per v2.0 lines 201-232
 
 // Recommend if average tons per haul < threshold
 if (avgTonsPerHaul < OPTIMIZATION_THRESHOLD) {
-  recommendMonitoring()
+  recommendMonitoring();
 }
 ```
 
 **Advantages**:
+
 - Uses industry-standard target (8-9 tons for compactors)
 - Direct tons threshold (simpler, more transparent)
 - Aligns with WASTE_FORMULAS_REFERENCE.md v2.0 canonical criteria
@@ -74,17 +76,18 @@ if (avgTonsPerHaul < OPTIMIZATION_THRESHOLD) {
 ### 3. Test Case Comparison
 
 **Example Property**:
+
 - 200 units
 - 30 CY compactor
 - 5.25 tons/haul average
 - Weekly pickups (4 hauls in test period)
 
-| Metric | Python Result | TypeScript Result | Match? |
-|--------|---------------|-------------------|--------|
-| Avg tons/haul | 5.25 | 5.25 | ✓ Yes |
-| Max capacity | 8.7 tons | 8.5 tons (target) | ⚠️ Different methodology |
-| Utilization % | 60.3% | 61.8% (5.25/8.5) | ⚠️ Different base |
-| Recommend? | NO (<60% threshold not met) | YES (<6.0 tons threshold met) | ❌ Different |
+| Metric        | Python Result               | TypeScript Result             | Match?                   |
+| ------------- | --------------------------- | ----------------------------- | ------------------------ |
+| Avg tons/haul | 5.25                        | 5.25                          | ✓ Yes                    |
+| Max capacity  | 8.7 tons                    | 8.5 tons (target)             | ⚠️ Different methodology |
+| Utilization % | 60.3%                       | 61.8% (5.25/8.5)              | ⚠️ Different base        |
+| Recommend?    | NO (<60% threshold not met) | YES (<6.0 tons threshold met) | ❌ Different             |
 
 **Result**: Different recommendations due to different methodologies.
 
@@ -98,16 +101,18 @@ Per WASTE_FORMULAS_REFERENCE.md v2.0:
 ### When to Recommend Compactor Monitoring
 
 # CANONICAL CRITERIA - All 3 must be true
+
 recommendation_criteria = (
-    average_tons_per_haul < 6.0 AND
-    max_days_between_pickups <= 14 AND
-    property_has_compactor == True
+average_tons_per_haul < 6.0 AND
+max_days_between_pickups <= 14 AND
+property_has_compactor == True
 )
 ```
 
 **Source**: Lines 201-232
 
 **TypeScript Implementation**:
+
 ```typescript
 // lib/constants/formulas.ts lines 49-50
 export const COMPACTOR_OPTIMIZATION_THRESHOLD = 6.0; // tons per haul
@@ -115,10 +120,10 @@ export const COMPACTOR_TARGET_TONS = 8.5; // tons (industry standard midpoint of
 
 // lib/skills/skills/compactor-optimization.ts lines 167-171
 const recommend = shouldRecommendMonitoring(
-  avgTonsPerHaul,        // Must be < 6.0
-  maxDaysBetween,        // Must be <= 14
-  hasCompactor           // Must be true
-)
+  avgTonsPerHaul, // Must be < 6.0
+  maxDaysBetween, // Must be <= 14
+  hasCompactor, // Must be true
+);
 ```
 
 **Verdict**: ✓ TypeScript correctly implements canonical v2.0 criteria
@@ -129,19 +134,19 @@ const recommend = shouldRecommendMonitoring(
 
 ### Core Metrics (Where Methodologies Agree)
 
-| Calculation | Python | TypeScript | Difference | Status |
-|-------------|--------|------------|------------|--------|
-| Avg tons/haul | `total_tons / total_hauls` | `calculateTonsPerHaul()` | 0% | ✓ PASS |
-| Days between | `(date_n - date_n-1).days` | Same logic | 0% | ✓ PASS |
-| Annual hauls | `total_tons / avg_tons` | Same logic | 0% | ✓ PASS |
+| Calculation   | Python                     | TypeScript               | Difference | Status |
+| ------------- | -------------------------- | ------------------------ | ---------- | ------ |
+| Avg tons/haul | `total_tons / total_hauls` | `calculateTonsPerHaul()` | 0%         | ✓ PASS |
+| Days between  | `(date_n - date_n-1).days` | Same logic               | 0%         | ✓ PASS |
+| Annual hauls  | `total_tons / avg_tons`    | Same logic               | 0%         | ✓ PASS |
 
 ### Divergent Metrics (Due to Different Methodologies)
 
-| Calculation | Python Approach | TypeScript Approach | Canonical? |
-|-------------|-----------------|---------------------|------------|
-| Target capacity | Container-based (8.7 tons for 30CY) | Industry standard (8.5 tons) | TypeScript |
-| Optimization check | Utilization < 60% | Avg tons < 6.0 | TypeScript |
-| Capacity utilization | `(tons / max_capacity) * 100` | `(tons / 8.5) * 100` | TypeScript |
+| Calculation          | Python Approach                     | TypeScript Approach          | Canonical? |
+| -------------------- | ----------------------------------- | ---------------------------- | ---------- |
+| Target capacity      | Container-based (8.7 tons for 30CY) | Industry standard (8.5 tons) | TypeScript |
+| Optimization check   | Utilization < 60%                   | Avg tons < 6.0               | TypeScript |
+| Capacity utilization | `(tons / max_capacity) * 100`       | `(tons / 8.5) * 100`         | TypeScript |
 
 ---
 
@@ -174,6 +179,7 @@ export const TONS_TO_YARDS = 14.49; // cubic yards per ton
 **Difference**: 14.49 vs 3.448 = **4.2x discrepancy**
 
 **Analysis**:
+
 - Python uses 3.448, which appears to be a compacted density conversion
 - Canonical uses 14.49, which is EPA standard for mixed MSW
 - **Different use cases**: Python may be for compacted waste volume, canonical for loose equivalent
@@ -187,6 +193,7 @@ export const TONS_TO_YARDS = 14.49; // cubic yards per ton
 ### For TypeScript Implementation ✓
 
 **No changes needed**. The TypeScript implementation:
+
 - Correctly follows WASTE_FORMULAS_REFERENCE.md v2.0
 - Uses documented, canonical formulas
 - Implements industry-standard thresholds
@@ -197,6 +204,7 @@ export const TONS_TO_YARDS = 14.49; // cubic yards per ton
 **Update recommended** to align with v2.0 canonical formulas:
 
 1. **Update optimization threshold**:
+
    ```python
    # OLD (line 216)
    if utilization < 60:
@@ -207,6 +215,7 @@ export const TONS_TO_YARDS = 14.49; // cubic yards per ton
    ```
 
 2. **Update target capacity**:
+
    ```python
    # OLD
    max_capacity = (container_size_cy * 580) / 2000
@@ -217,6 +226,7 @@ export const TONS_TO_YARDS = 14.49; // cubic yards per ton
    ```
 
 3. **Update tons-to-yards conversion**:
+
    ```python
    # OLD
    def tons_to_yards(tonnage):

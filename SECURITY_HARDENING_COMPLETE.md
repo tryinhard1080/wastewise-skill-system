@@ -32,6 +32,7 @@ Comprehensive production-grade security hardening has been successfully implemen
 ```
 
 **Purpose**:
+
 - Distributed rate limiting across multiple server instances
 - XSS prevention through HTML sanitization
 - Production-ready security infrastructure
@@ -43,13 +44,15 @@ Comprehensive production-grade security hardening has been successfully implemen
 **File**: `lib/middleware/rate-limit.ts`
 
 **Features**:
+
 - ✅ Distributed rate limiting using Upstash Redis
 - ✅ Sliding window algorithm
 - ✅ Per-user and per-IP tracking
 - ✅ Graceful fallback if Redis unavailable
-- ✅ Standard rate limit headers (X-RateLimit-*)
+- ✅ Standard rate limit headers (X-RateLimit-\*)
 
 **Rate Limit Configurations**:
+
 ```typescript
 JOB_CREATION: 5 requests/minute       // Strict (expensive AI operations)
 STATUS_POLLING: 60 requests/minute    // Lenient (frequent polling)
@@ -60,14 +63,19 @@ AUTH: 5 requests/minute               // Strict (prevent brute force)
 ```
 
 **Usage Example**:
+
 ```typescript
-import { rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/middleware/rate-limit'
+import {
+  rateLimit,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/middleware/rate-limit";
 
 export async function POST(req: NextRequest) {
-  const result = await rateLimit(req, RATE_LIMITS.JOB_CREATION, userId)
+  const result = await rateLimit(req, RATE_LIMITS.JOB_CREATION, userId);
 
   if (result && !result.success) {
-    return rateLimitResponse(result)
+    return rateLimitResponse(result);
   }
 
   // ... rest of handler
@@ -75,6 +83,7 @@ export async function POST(req: NextRequest) {
 ```
 
 **Setup Required**:
+
 ```bash
 # .env.local
 UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
@@ -90,12 +99,14 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 **Validation Layers**:
 
 #### Layer 1: Client-Side Validation
+
 - File size limit: 10MB
 - Allowed MIME types: PDF, PNG, JPEG, Excel, CSV
 - Extension matching
 - File count limits (50 files per project)
 
 #### Layer 2: Server-Side Magic Bytes Validation
+
 - PDF: Checks for `%PDF` signature
 - PNG: Checks for PNG header (89 50 4E 47...)
 - JPEG: Checks for JPEG header (FF D8 FF)
@@ -103,6 +114,7 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 - CSV: Validates UTF-8 text (no null bytes)
 
 **Prevents**:
+
 - ✅ MIME type spoofing (malware.exe renamed to malware.pdf)
 - ✅ Directory traversal (`../../etc/passwd`)
 - ✅ Shell injection (`file; rm -rf /`)
@@ -110,17 +122,21 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 - ✅ Resource exhaustion (file size/count limits)
 
 **Example**:
+
 ```typescript
-import { validateFile, validateFileContent } from '@/lib/validation/file-validation'
+import {
+  validateFile,
+  validateFileContent,
+} from "@/lib/validation/file-validation";
 
 // Client-side
-const result = validateFile(file)
-if (!result.valid) throw new Error(result.error)
+const result = validateFile(file);
+if (!result.valid) throw new Error(result.error);
 
 // Server-side (magic bytes)
-const buffer = await file.arrayBuffer()
-const isValid = await validateFileContent(buffer, file.type)
-if (!isValid) throw new Error('File content mismatch')
+const buffer = await file.arrayBuffer();
+const isValid = await validateFileContent(buffer, file.type);
+if (!isValid) throw new Error("File content mismatch");
 ```
 
 ---
@@ -133,30 +149,31 @@ if (!isValid) throw new Error('File content mismatch')
 
 ```typescript
 // HTML content (allows safe tags only)
-sanitizeHTML(userInput)
+sanitizeHTML(userInput);
 // Removes: <script>, event handlers, javascript: protocol
 // Allows: <b>, <i>, <p>, <a>, etc.
 
 // Plain text (removes ALL HTML)
-sanitizeInput(userInput)
+sanitizeInput(userInput);
 
 // Filenames (prevents attacks)
-sanitizeFilename(filename)
+sanitizeFilename(filename);
 
 // Property names
-sanitizePropertyName(name)
+sanitizePropertyName(name);
 
 // Email addresses
-sanitizeEmail(email)
+sanitizeEmail(email);
 
 // URLs (validates protocol)
-sanitizeURL(url)
+sanitizeURL(url);
 
 // Phone numbers
-sanitizePhoneNumber(phone)
+sanitizePhoneNumber(phone);
 ```
 
 **XSS Attack Vectors Prevented**:
+
 - `<script>alert("XSS")</script>` → Removed
 - `<img src=x onerror=alert(1)>` → Removed
 - `javascript:alert(1)` → Blocked in URLs
@@ -170,6 +187,7 @@ sanitizePhoneNumber(phone)
 **File**: `middleware.ts`
 
 **CSP Directives**:
+
 ```typescript
 default-src 'self'                    // Only same-origin by default
 script-src 'self' 'nonce-{random}' https://cdn.jsdelivr.net
@@ -187,6 +205,7 @@ upgrade-insecure-requests             // Force HTTPS
 **Note**: Removed `'unsafe-inline'` from CSP (per security audit requirement)
 
 **Additional Security Headers**:
+
 - `X-Frame-Options: DENY`
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
@@ -227,6 +246,7 @@ upgrade-insecure-requests             // Force HTTPS
    - **Status**: ⏸️ 5 skipped (requires Supabase running)
 
 **Total Test Coverage**:
+
 ```
 Test Files:  3 (2 passing, 1 skipped)
 Tests:       91 total (75 passing, 16 skipped)
@@ -234,6 +254,7 @@ Duration:    3.5s
 ```
 
 **Run Tests**:
+
 ```bash
 # All security tests
 pnpm test __tests__/security/
@@ -249,6 +270,7 @@ pnpm test __tests__/security/xss-prevention.test.ts
 **Updated**: `.env.template`
 
 **New Variables**:
+
 ```bash
 # SECURITY - RATE LIMITING
 # Production-grade distributed rate limiting using Upstash Redis
@@ -268,6 +290,7 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 **Created**: `docs/SECURITY.md` (600+ lines)
 
 **Contents**:
+
 1. Security architecture overview
 2. Authentication & authorization
 3. Input validation & sanitization
@@ -280,6 +303,7 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 10. Security checklist (pre/post deployment)
 
 **Compliance Status**:
+
 - OWASP Top 10 (2021): 6/10 Pass, 4/10 Partial
 - GDPR: Partial (Phase 4 requirements documented)
 - API Security Top 10: 8/10 Pass, 2/10 Partial
@@ -313,6 +337,7 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 **Current Status**: Rate limiting middleware created, but NOT yet applied to API routes.
 
 **Routes to Update**:
+
 ```
 ✅ app/api/analyze/route.ts        (already has old rate limiting)
 ❌ app/api/jobs/[id]/route.ts      (needs rate limiting)
@@ -323,17 +348,28 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token-here
 ```
 
 **Pattern to Apply**:
+
 ```typescript
-import { rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/middleware/rate-limit'
+import {
+  rateLimit,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/middleware/rate-limit";
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Apply rate limiting
-  const rateLimitResult = await rateLimit(req, RATE_LIMITS.PROJECT_OPERATIONS, user?.id)
+  const rateLimitResult = await rateLimit(
+    req,
+    RATE_LIMITS.PROJECT_OPERATIONS,
+    user?.id,
+  );
   if (rateLimitResult && !rateLimitResult.success) {
-    return rateLimitResponse(rateLimitResult)
+    return rateLimitResponse(rateLimitResult);
   }
 
   // ... rest of handler
@@ -349,18 +385,21 @@ export async function POST(req: NextRequest) {
 ### Before Phase 4 Deployment
 
 **Infrastructure**:
+
 - [ ] Set up Upstash Redis account
 - [ ] Configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
 - [ ] Test rate limiting in staging environment
 - [ ] Apply rate limiting to ALL API routes (Task 3)
 
 **Monitoring**:
+
 - [ ] Set up Sentry error tracking
 - [ ] Monitor rate limit metrics
 - [ ] Set up alerts for failed authentication attempts
 - [ ] Monitor database query performance
 
 **Security Hardening (Phase 4)**:
+
 - [ ] Professional penetration testing
 - [ ] WAF configuration (Cloudflare/AWS)
 - [ ] Implement GDPR data export/deletion
@@ -372,16 +411,19 @@ export async function POST(req: NextRequest) {
 ## Security Posture Summary
 
 ### Before Security Hardening
+
 **Risk Score**: 🔴 **8.1/10 (HIGH RISK)**
 **Critical Vulnerabilities**: 4
 **Status**: ❌ **NOT PRODUCTION READY**
 
 ### After Security Hardening
+
 **Risk Score**: 🟡 **4.2/10 (MEDIUM RISK)**
 **Critical Vulnerabilities**: 0
 **Status**: ✅ **ACCEPTABLE FOR PHASE 7**
 
 ### Target (Phase 4)
+
 **Risk Score**: 🟢 **2.0/10 (LOW RISK)**
 **Critical Vulnerabilities**: 0
 **Status**: ✅ **PRODUCTION READY**
@@ -413,27 +455,35 @@ The application is now **acceptable for Phase 7** testing and development. Befor
 ## Quick Reference
 
 ### Run Security Tests
+
 ```bash
 pnpm test __tests__/security/
 ```
 
 ### Check Environment Configuration
+
 ```bash
 cat .env.template | grep UPSTASH
 ```
 
 ### Review Security Documentation
+
 ```bash
 cat docs/SECURITY.md
 ```
 
 ### Apply Rate Limiting Example
-```typescript
-import { rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/middleware/rate-limit'
 
-const result = await rateLimit(req, RATE_LIMITS.JOB_CREATION, userId)
+```typescript
+import {
+  rateLimit,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/middleware/rate-limit";
+
+const result = await rateLimit(req, RATE_LIMITS.JOB_CREATION, userId);
 if (result && !result.success) {
-  return rateLimitResponse(result)
+  return rateLimitResponse(result);
 }
 ```
 

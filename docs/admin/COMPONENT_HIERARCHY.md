@@ -29,6 +29,7 @@ Visual reference of the admin dashboard architecture.
 ## Component Dependencies
 
 ### Dashboard Overview (`/admin`)
+
 ```
 AdminDashboard
 ├── StatsCard (x4)
@@ -45,6 +46,7 @@ AdminDashboard
 ```
 
 ### User Management (`/admin/users`)
+
 ```
 UsersPage
 ├── UserTable
@@ -61,6 +63,7 @@ UsersPage
 ```
 
 ### User Detail (`/admin/users/[id]`)
+
 ```
 UserDetailPage
 ├── Button (back)
@@ -74,6 +77,7 @@ UserDetailPage
 ```
 
 ### Job Queue (`/admin/jobs`)
+
 ```
 JobsPage
 ├── StatsCard (x4)
@@ -91,6 +95,7 @@ JobsPage
 ```
 
 ### System Health (`/admin/system`)
+
 ```
 SystemPage
 ├── SystemHealthCard (x5)
@@ -109,6 +114,7 @@ SystemPage
 ```
 
 ### Skills Configuration (`/admin/skills`)
+
 ```
 SkillsPage
 ├── Card (Active Skills)
@@ -121,6 +127,7 @@ SkillsPage
 ```
 
 ### Audit Log (`/admin/audit`)
+
 ```
 AuditPage
 └── AuditLogTable
@@ -135,6 +142,7 @@ AuditPage
 ```
 
 ### Analytics (`/admin/analytics`)
+
 ```
 AnalyticsPage
 ├── Select (time period)
@@ -154,6 +162,7 @@ AnalyticsPage
 ## Shared Component Usage
 
 ### shadcn/ui Components Used
+
 - ✅ Card, CardHeader, CardTitle, CardContent
 - ✅ Button, Badge
 - ✅ Table, TableHeader, TableBody, TableRow, TableHead, TableCell
@@ -168,6 +177,7 @@ AnalyticsPage
 - ✅ Breadcrumb components
 
 ### External Libraries
+
 - ✅ `date-fns` - formatDistanceToNow, formatDuration, intervalToDuration
 - ✅ `recharts` - LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 - ✅ `swr` - Data fetching and caching
@@ -195,11 +205,13 @@ AnalyticsPage
 ```
 
 ### Real-time Updates
+
 - **Job Queue**: Auto-refreshes every 5 seconds
 - **System Health**: Auto-refreshes every 30 seconds
 - **Other pages**: Manual refresh or triggered by mutations
 
 ### Optimistic Updates
+
 - User disable/enable
 - Role changes
 - Job retries
@@ -229,16 +241,19 @@ All mutations use SWR's `mutate()` to immediately update the UI before the API c
 ## Performance Optimizations
 
 ### Code Splitting
+
 - Each admin page is a separate route (automatic code splitting)
 - Charts only loaded on pages that need them (System, Analytics)
 - Heavy components lazy-loaded
 
 ### Data Caching
+
 - SWR caches all GET requests
 - Revalidation on focus, reconnect, interval
 - Dedupe requests within 2 seconds
 
 ### Optimizations Applied
+
 - ✅ Server Components where possible (layouts, static pages)
 - ✅ Client Components only when needed (interactive tables, charts)
 - ✅ Memoization for expensive calculations (formatters, filters)

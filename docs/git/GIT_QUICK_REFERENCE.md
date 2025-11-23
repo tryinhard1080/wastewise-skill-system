@@ -18,6 +18,7 @@
 ## 📋 Daily Workflow
 
 ### Morning Routine
+
 ```bash
 ☐ git checkout main
 ☐ git pull origin main
@@ -26,6 +27,7 @@
 ```
 
 ### Making Changes
+
 ```bash
 ☐ # Edit files
 ☐ git status              # Check what changed
@@ -36,6 +38,7 @@
 ```
 
 ### Committing
+
 ```bash
 ☐ git commit -m "type(scope): message"
 ☐ # Examples:
@@ -46,6 +49,7 @@
 ```
 
 ### Pushing
+
 ```bash
 ☐ git push                # If branch already exists remotely
 ☐ # OR
@@ -87,18 +91,21 @@
 ## 🚨 Troubleshooting Quick Fixes
 
 ### Undo Last Commit (Not Pushed)
+
 ```bash
 git reset --soft HEAD~1   # Keep changes
 git reset --hard HEAD~1   # Discard changes
 ```
 
 ### Discard Local Changes
+
 ```bash
 git checkout -- <file>    # Single file
 git reset --hard HEAD     # All files (CAREFUL!)
 ```
 
 ### Stash Work in Progress
+
 ```bash
 git stash save "WIP: description"
 git stash list
@@ -106,6 +113,7 @@ git stash pop
 ```
 
 ### Merge Conflict Resolution
+
 ```bash
 ☐ Open conflicted files
 ☐ Look for <<<<<<< markers
@@ -116,6 +124,7 @@ git stash pop
 ```
 
 ### Update Branch with Latest Main
+
 ```bash
 git fetch origin
 git rebase origin/main
@@ -128,6 +137,7 @@ git push --force-with-lease
 ## 📊 Status Checks
 
 ### Check Current Status
+
 ```bash
 git status                    # What's changed
 git branch                    # Current branch
@@ -137,6 +147,7 @@ git diff --staged             # Staged changes
 ```
 
 ### Check Branch Status
+
 ```bash
 git branch -a                 # All branches
 git log main..HEAD            # Commits not in main
@@ -148,23 +159,27 @@ git diff main..HEAD           # File differences from main
 ## 🌿 Branch Management
 
 ### Create Branch
+
 ```bash
 git checkout -b feat/new-feature
 ```
 
 ### Switch Branch
+
 ```bash
 git checkout main
 git checkout feat/existing-feature
 ```
 
 ### Delete Branch
+
 ```bash
 git branch -d feat/merged-feature       # Local (after merge)
 git push origin --delete feat/old       # Remote
 ```
 
 ### List Branches
+
 ```bash
 git branch                    # Local only
 git branch -r                 # Remote only
@@ -176,12 +191,14 @@ git branch -a                 # All branches
 ## 🔄 Sync & Update
 
 ### Update Main
+
 ```bash
 git checkout main
 git pull origin main
 ```
 
 ### Update Feature Branch
+
 ```bash
 git checkout feat/my-feature
 git fetch origin
@@ -189,6 +206,7 @@ git rebase origin/main
 ```
 
 ### Pull Latest Changes
+
 ```bash
 git pull origin main          # Fetch + merge
 git fetch origin              # Fetch only (safer)
@@ -212,6 +230,7 @@ revert:    Revert previous commit
 ```
 
 ### Examples
+
 ```bash
 git commit -m "feat(skills): add invoice extraction skill"
 git commit -m "fix(worker): prevent null pointer exception"
@@ -243,6 +262,7 @@ git commit -m "chore(deps): update TypeScript to 5.3"
 ## ✅ PR Review Checklist
 
 ### As Author
+
 ```bash
 ☐ Self-review your code
 ☐ Check PR description is clear
@@ -255,6 +275,7 @@ git commit -m "chore(deps): update TypeScript to 5.3"
 ```
 
 ### As Reviewer
+
 ```bash
 ☐ Pull branch locally: git fetch && git checkout feat/branch
 ☐ Run tests: pnpm test
@@ -328,6 +349,7 @@ git remote prune origin          # Clean up stale branches
 ## 🆘 Emergency Commands
 
 ### Accidentally Committed Secrets
+
 ```bash
 # Remove from last commit (not pushed)
 git reset --soft HEAD~1
@@ -337,17 +359,20 @@ git commit -m "chore: update gitignore"
 ```
 
 ### Pushed Wrong Branch
+
 ```bash
 git push origin --delete wrong-branch
 ```
 
 ### Broke Everything
+
 ```bash
 git stash save "emergency stash"
 git reset --hard origin/main
 ```
 
 ### Lost Commits
+
 ```bash
 git reflog
 git cherry-pick <commit-hash>
@@ -358,16 +383,19 @@ git cherry-pick <commit-hash>
 ## 📞 Getting Help
 
 **Stuck on a merge conflict?**
+
 - Don't force push to main
 - Ask for help if unsure
 - Use `git status` to see current state
 
 **Not sure about a command?**
+
 - Use `git <command> --help`
 - Check the full Git Workflow Guide
 - Google the specific error message
 
 **Safety First:**
+
 - Never `git push --force` to main
 - Use `--force-with-lease` if you must force push
 - Always create a backup branch: `git branch backup-branch`
@@ -410,4 +438,4 @@ git revert <commit>
 ---
 
 **WasteWise Skill System** - Git Quick Reference  
-*Keep this handy for daily development!*
+_Keep this handy for daily development!_

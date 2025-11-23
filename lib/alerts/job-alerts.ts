@@ -13,57 +13,60 @@
  * Phase 7: Production readiness - enterprise alerting
  */
 
-import { createClient } from '@supabase/supabase-js'
-import type { Database, Tables } from '@/types/database.types'
-import { logger } from '@/lib/observability/logger'
+import { createClient } from "@supabase/supabase-js";
+import type { Database, Tables } from "@/types/database.types";
+import { logger } from "@/lib/observability/logger";
 import {
   sendEmailNotification,
   sendSlackNotification,
   sendPagerDutyNotification,
-} from './notification-service'
+} from "./notification-service";
 
-type AnalysisJob = Tables<'analysis_jobs'>
-type JobAlert = Tables<'job_alerts'>
+type AnalysisJob = Tables<"analysis_jobs">;
+type JobAlert = Tables<"job_alerts">;
 
 /**
  * Alert severity levels
  */
 export enum AlertSeverity {
-  WARNING = 'warning', // Informational, no immediate action required
-  ERROR = 'error', // Issue detected, should investigate
-  CRITICAL = 'critical', // Urgent issue, immediate action required
+  WARNING = "warning", // Informational, no immediate action required
+  ERROR = "error", // Issue detected, should investigate
+  CRITICAL = "critical", // Urgent issue, immediate action required
 }
 
 /**
  * Alert types
  */
 export enum AlertType {
-  JOB_FAILED = 'job_failed',
-  JOB_STUCK = 'job_stuck',
-  HIGH_ERROR_RATE = 'high_error_rate',
-  WORKER_DOWN = 'worker_down',
+  JOB_FAILED = "job_failed",
+  JOB_STUCK = "job_stuck",
+  HIGH_ERROR_RATE = "high_error_rate",
+  WORKER_DOWN = "worker_down",
 }
 
 /**
  * Notification channels
  */
 export enum NotificationChannel {
-  EMAIL = 'email',
-  SLACK = 'slack',
-  PAGERDUTY = 'pagerduty',
+  EMAIL = "email",
+  SLACK = "slack",
+  PAGERDUTY = "pagerduty",
 }
 
 /**
  * Alert thresholds (configurable via environment)
  */
 const ALERT_THRESHOLDS = {
-  JOB_STUCK_MINUTES: parseInt(process.env.JOB_STUCK_THRESHOLD_MINUTES || '30'),
-  ERROR_RATE_PERCENT: parseFloat(process.env.ERROR_RATE_THRESHOLD || '0.10') * 100, // Convert to percentage
-  WORKER_HEARTBEAT_MINUTES: parseInt(process.env.WORKER_HEARTBEAT_THRESHOLD_MINUTES || '5'),
-} as const
+  JOB_STUCK_MINUTES: parseInt(process.env.JOB_STUCK_THRESHOLD_MINUTES || "30"),
+  ERROR_RATE_PERCENT:
+    parseFloat(process.env.ERROR_RATE_THRESHOLD || "0.10") * 100, // Convert to percentage
+  WORKER_HEARTBEAT_MINUTES: parseInt(
+    process.env.WORKER_HEARTBEAT_THRESHOLD_MINUTES || "5",
+  ),
+} as const;
 
 export class JobAlertManager {
-  private supabase: ReturnType<typeof createClient<Database>>
+  private supabase: ReturnType<typeof createClient<Database>>;
 
   constructor(supabaseUrl: string, supabaseServiceKey: string) {
     this.supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
@@ -71,7 +74,7 @@ export class JobAlertManager {
         autoRefreshToken: false,
         persistSession: false,
       },
-    })
+    });
   }
 
   /**
@@ -82,10 +85,10 @@ export class JobAlertManager {
     alertType: AlertType,
     severity: AlertSeverity,
     message: string,
-    details?: Record<string, any>
+    details?: Record<string, any>,
   ): Promise<JobAlert> {
     const { data: alert, error } = await this.supabase
-      .from('job_alerts')
+      .from("job_alerts")
       .insert({
         job_id: jobId,
         alert_type: alertType,
@@ -94,14 +97,14 @@ export class JobAlertManager {
         details: details || {},
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
-      logger.error('Failed to create alert', error as Error)
-      throw new Error(`Failed to create alert: ${error.message}`)
+      logger.error("Failed to create alert", error as Error);
+      throw new Error(`Failed to create alert: ${error.message}`);
     }
 
-    return alert
+    return alert;
   }
 
   /**
@@ -109,18 +112,20 @@ export class JobAlertManager {
    */
   private async markAlertNotified(
     alertId: string,
-    channels: NotificationChannel[]
+    channels: NotificationChannel[],
   ): Promise<void> {
     const { error } = await this.supabase
-      .from('job_alerts')
+      .from("job_alerts")
       .update({
         notified_at: new Date().toISOString(),
         notification_channels: channels,
       })
-      .eq('id', alertId)
+      .eq("id", alertId);
 
     if (error) {
-      logger.error('Failed to mark alert as notified', error as Error, { alertId })
+      logger.error("Failed to mark alert as notified", error as Error, {
+        alertId,
+      });
     }
   }
 
@@ -131,17 +136,23 @@ export class JobAlertManager {
    * Severity: ERROR
    * Channels: Email + Slack
    */
-  async sendJobFailedAlert(job: AnalysisJob, error: Error | string): Promise<void> {
-    const alertLogger = logger.child({ jobId: job.id, alertType: 'job_failed' })
+  async sendJobFailedAlert(
+    job: AnalysisJob,
+    error: Error | string,
+  ): Promise<void> {
+    const alertLogger = logger.child({
+      jobId: job.id,
+      alertType: "job_failed",
+    });
 
-    const errorMessage = typeof error === 'string' ? error : error.message
-    const totalAttempts = job.retry_count + 1
+    const errorMessage = typeof error === "string" ? error : error.message;
+    const totalAttempts = (job.retry_count ?? 0) + 1;
 
-    alertLogger.info('Sending job failed alert', {
+    alertLogger.info("Sending job failed alert", {
       errorMessage,
       totalAttempts,
       jobType: job.job_type,
-    })
+    });
 
     // Create alert record
     const alert = await this.createAlert(
@@ -156,33 +167,36 @@ export class JobAlertManager {
         errorMessage,
         totalAttempts,
         errorHistory: job.retry_error_log,
-      }
-    )
+      },
+    );
 
     // Send notifications
-    const channels: NotificationChannel[] = []
+    const channels: NotificationChannel[] = [];
 
     try {
       // Send email if configured
       if (process.env.RESEND_API_KEY && process.env.ADMIN_EMAIL) {
-        await this.sendEmailAlert(alert, job)
-        channels.push(NotificationChannel.EMAIL)
+        await this.sendEmailAlert(alert, job);
+        channels.push(NotificationChannel.EMAIL);
       }
 
       // Send Slack if configured
       if (process.env.SLACK_WEBHOOK_URL) {
-        await this.sendSlackAlert(alert, job)
-        channels.push(NotificationChannel.SLACK)
+        await this.sendSlackAlert(alert, job);
+        channels.push(NotificationChannel.SLACK);
       }
 
       // Mark alert as notified
-      await this.markAlertNotified(alert.id, channels)
+      await this.markAlertNotified(alert.id, channels);
 
-      alertLogger.info('Job failed alert sent successfully', {
+      alertLogger.info("Job failed alert sent successfully", {
         channels,
-      })
+      });
     } catch (notifyError) {
-      alertLogger.error('Failed to send job failed alert', notifyError as Error)
+      alertLogger.error(
+        "Failed to send job failed alert",
+        notifyError as Error,
+      );
     }
   }
 
@@ -194,20 +208,22 @@ export class JobAlertManager {
    * Channels: Email
    */
   async sendJobStuckAlert(job: AnalysisJob): Promise<void> {
-    const alertLogger = logger.child({ jobId: job.id, alertType: 'job_stuck' })
+    const alertLogger = logger.child({ jobId: job.id, alertType: "job_stuck" });
 
     if (!job.started_at) {
-      alertLogger.warn('Cannot send stuck alert - job has no start time')
-      return
+      alertLogger.warn("Cannot send stuck alert - job has no start time");
+      return;
     }
 
-    const startTime = new Date(job.started_at)
-    const durationMinutes = Math.floor((Date.now() - startTime.getTime()) / 1000 / 60)
+    const startTime = new Date(job.started_at);
+    const durationMinutes = Math.floor(
+      (Date.now() - startTime.getTime()) / 1000 / 60,
+    );
 
-    alertLogger.info('Sending job stuck alert', {
+    alertLogger.info("Sending job stuck alert", {
       durationMinutes,
       threshold: ALERT_THRESHOLDS.JOB_STUCK_MINUTES,
-    })
+    });
 
     // Create alert record
     const alert = await this.createAlert(
@@ -223,25 +239,25 @@ export class JobAlertManager {
         threshold: ALERT_THRESHOLDS.JOB_STUCK_MINUTES,
         currentStep: job.current_step,
         progressPercent: job.progress_percent,
-      }
-    )
+      },
+    );
 
     // Send email notification
-    const channels: NotificationChannel[] = []
+    const channels: NotificationChannel[] = [];
 
     try {
       if (process.env.RESEND_API_KEY && process.env.ADMIN_EMAIL) {
-        await this.sendEmailAlert(alert, job)
-        channels.push(NotificationChannel.EMAIL)
+        await this.sendEmailAlert(alert, job);
+        channels.push(NotificationChannel.EMAIL);
       }
 
-      await this.markAlertNotified(alert.id, channels)
+      await this.markAlertNotified(alert.id, channels);
 
-      alertLogger.info('Job stuck alert sent successfully', {
+      alertLogger.info("Job stuck alert sent successfully", {
         channels,
-      })
+      });
     } catch (notifyError) {
-      alertLogger.error('Failed to send job stuck alert', notifyError as Error)
+      alertLogger.error("Failed to send job stuck alert", notifyError as Error);
     }
   }
 
@@ -252,14 +268,17 @@ export class JobAlertManager {
    * Severity: CRITICAL
    * Channels: Email + Slack + PagerDuty
    */
-  async sendHighErrorRateAlert(errorRate: number, timeWindow: string): Promise<void> {
-    const alertLogger = logger.child({ alertType: 'high_error_rate' })
+  async sendHighErrorRateAlert(
+    errorRate: number,
+    timeWindow: string,
+  ): Promise<void> {
+    const alertLogger = logger.child({ alertType: "high_error_rate" });
 
-    alertLogger.warn('Sending high error rate alert', {
+    alertLogger.warn("Sending high error rate alert", {
       errorRate,
       threshold: ALERT_THRESHOLDS.ERROR_RATE_PERCENT,
       timeWindow,
-    })
+    });
 
     // Create alert record (no specific job)
     const alert = await this.createAlert(
@@ -271,88 +290,98 @@ export class JobAlertManager {
         errorRate,
         threshold: ALERT_THRESHOLDS.ERROR_RATE_PERCENT,
         timeWindow,
-      }
-    )
+      },
+    );
 
     // Send notifications (all channels for critical alerts)
-    const channels: NotificationChannel[] = []
+    const channels: NotificationChannel[] = [];
 
     try {
       if (process.env.RESEND_API_KEY && process.env.ADMIN_EMAIL) {
-        await this.sendEmailAlert(alert)
-        channels.push(NotificationChannel.EMAIL)
+        await this.sendEmailAlert(alert);
+        channels.push(NotificationChannel.EMAIL);
       }
 
       if (process.env.SLACK_WEBHOOK_URL) {
-        await this.sendSlackAlert(alert)
-        channels.push(NotificationChannel.SLACK)
+        await this.sendSlackAlert(alert);
+        channels.push(NotificationChannel.SLACK);
       }
 
       if (process.env.PAGERDUTY_KEY) {
-        await this.sendPagerDutyAlert(alert)
-        channels.push(NotificationChannel.PAGERDUTY)
+        await this.sendPagerDutyAlert(alert);
+        channels.push(NotificationChannel.PAGERDUTY);
       }
 
-      await this.markAlertNotified(alert.id, channels)
+      await this.markAlertNotified(alert.id, channels);
 
-      alertLogger.warn('High error rate alert sent successfully', {
+      alertLogger.warn("High error rate alert sent successfully", {
         channels,
-      })
+      });
     } catch (notifyError) {
-      alertLogger.error('Failed to send high error rate alert', notifyError as Error)
+      alertLogger.error(
+        "Failed to send high error rate alert",
+        notifyError as Error,
+      );
     }
   }
 
   /**
    * Send email alert via Resend
    */
-  private async sendEmailAlert(alert: JobAlert, job?: AnalysisJob): Promise<void> {
-    await sendEmailNotification(alert, job)
+  private async sendEmailAlert(
+    alert: JobAlert,
+    job?: AnalysisJob,
+  ): Promise<void> {
+    await sendEmailNotification(alert, job);
   }
 
   /**
    * Send Slack alert via webhook
    */
-  private async sendSlackAlert(alert: JobAlert, job?: AnalysisJob): Promise<void> {
-    await sendSlackNotification(alert, job)
+  private async sendSlackAlert(
+    alert: JobAlert,
+    job?: AnalysisJob,
+  ): Promise<void> {
+    await sendSlackNotification(alert, job);
   }
 
   /**
    * Send PagerDuty alert
    */
   private async sendPagerDutyAlert(alert: JobAlert): Promise<void> {
-    await sendPagerDutyNotification(alert)
+    await sendPagerDutyNotification(alert);
   }
 
   /**
    * Check for stuck jobs and send alerts
    */
   async checkStuckJobs(): Promise<void> {
-    const { data: stuckJobs, error } = await this.supabase.rpc('detect_stuck_jobs')
+    const { data: stuckJobs, error } =
+      await this.supabase.rpc("detect_stuck_jobs");
 
     if (error) {
-      logger.error('Failed to detect stuck jobs', error as Error)
-      return
+      logger.error("Failed to detect stuck jobs", error as Error);
+      return;
     }
 
     if (!stuckJobs || stuckJobs.length === 0) {
-      logger.debug('No stuck jobs detected')
-      return
+      logger.debug("No stuck jobs detected");
+      return;
     }
 
-    logger.warn('Stuck jobs detected', { count: stuckJobs.length })
+    logger.warn("Stuck jobs detected", { count: stuckJobs.length });
 
     // Send alert for each stuck job
     for (const stuckJob of stuckJobs) {
       // Fetch full job details
       const { data: job } = await this.supabase
-        .from('analysis_jobs')
-        .select('*')
-        .eq('id', stuckJob.job_id)
-        .single()
+        .from("analysis_jobs")
+        .select("*")
+        .eq("id", stuckJob.job_id)
+        .single();
 
       if (job) {
-        await this.sendJobStuckAlert(job)
+        await this.sendJobStuckAlert(job);
       }
     }
   }
@@ -360,26 +389,29 @@ export class JobAlertManager {
   /**
    * Check error rate and send alert if threshold exceeded
    */
-  async checkErrorRate(timeWindow: string = '1 hour'): Promise<void> {
-    const { data: errorRate, error } = await this.supabase.rpc('calculate_error_rate', {
-      time_window: timeWindow,
-    })
+  async checkErrorRate(timeWindow: string = "1 hour"): Promise<void> {
+    const { data: errorRate, error } = await this.supabase.rpc(
+      "calculate_error_rate",
+      {
+        time_window: timeWindow,
+      },
+    );
 
     if (error) {
-      logger.error('Failed to calculate error rate', error as Error)
-      return
+      logger.error("Failed to calculate error rate", error as Error);
+      return;
     }
 
     if (errorRate === null || errorRate === undefined) {
-      logger.debug('No error rate data available')
-      return
+      logger.debug("No error rate data available");
+      return;
     }
 
-    logger.debug('Error rate calculated', { errorRate, timeWindow })
+    logger.debug("Error rate calculated", { errorRate, timeWindow });
 
     // Check if error rate exceeds threshold
     if (errorRate > ALERT_THRESHOLDS.ERROR_RATE_PERCENT) {
-      await this.sendHighErrorRateAlert(errorRate, timeWindow)
+      await this.sendHighErrorRateAlert(errorRate, timeWindow);
     }
   }
 
@@ -388,17 +420,17 @@ export class JobAlertManager {
    */
   async getRecentAlerts(limit: number = 50): Promise<JobAlert[]> {
     const { data: alerts, error } = await this.supabase
-      .from('job_alerts')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit)
+      .from("job_alerts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
     if (error) {
-      logger.error('Failed to fetch recent alerts', error as Error)
-      return []
+      logger.error("Failed to fetch recent alerts", error as Error);
+      return [];
     }
 
-    return alerts || []
+    return alerts || [];
   }
 
   /**
@@ -406,17 +438,17 @@ export class JobAlertManager {
    */
   async getUnacknowledgedAlerts(): Promise<JobAlert[]> {
     const { data: alerts, error } = await this.supabase
-      .from('job_alerts')
-      .select('*')
-      .is('acknowledged_at', null)
-      .order('created_at', { ascending: false })
+      .from("job_alerts")
+      .select("*")
+      .is("acknowledged_at", null)
+      .order("created_at", { ascending: false });
 
     if (error) {
-      logger.error('Failed to fetch unacknowledged alerts', error as Error)
-      return []
+      logger.error("Failed to fetch unacknowledged alerts", error as Error);
+      return [];
     }
 
-    return alerts || []
+    return alerts || [];
   }
 
   /**
@@ -424,18 +456,18 @@ export class JobAlertManager {
    */
   async acknowledgeAlert(alertId: string, userId: string): Promise<void> {
     const { error } = await this.supabase
-      .from('job_alerts')
+      .from("job_alerts")
       .update({
         acknowledged_at: new Date().toISOString(),
         acknowledged_by: userId,
       })
-      .eq('id', alertId)
+      .eq("id", alertId);
 
     if (error) {
-      logger.error('Failed to acknowledge alert', error as Error, { alertId })
-      throw new Error(`Failed to acknowledge alert: ${error.message}`)
+      logger.error("Failed to acknowledge alert", error as Error, { alertId });
+      throw new Error(`Failed to acknowledge alert: ${error.message}`);
     }
 
-    logger.info('Alert acknowledged', { alertId, userId })
+    logger.info("Alert acknowledged", { alertId, userId });
   }
 }

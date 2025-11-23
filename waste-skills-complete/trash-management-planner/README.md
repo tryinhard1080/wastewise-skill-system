@@ -11,9 +11,10 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 ### What It Generates
 
 **Complete 14-section professional reports** including:
+
 - Executive summary with ROI analysis
 - Regulatory compliance (with automatic hauler research)
-- Volume projections and calculations  
+- Volume projections and calculations
 - Cost comparison: loose vs compacted service
 - Equipment specifications with pricing
 - Service schedules and implementation plans
@@ -30,12 +31,14 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 ## Key Features
 
 ### 🔍 Automatic Research
+
 - Uses `web_search` to find franchise haulers automatically
 - Researches state and local waste regulations
 - Identifies compliance requirements
 - No manual lookup needed
 
 ### 📊 Comprehensive Calculations
+
 - Waste, recycling, and compost volume projections
 - Loose vs compacted service cost comparison
 - Staff labor cost analysis
@@ -44,6 +47,7 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 - Cost per unit per month metrics
 
 ### 🏗️ Professional System Design
+
 - Chute system specifications (NFPA 82 compliant)
 - Compactor sizing and selection
 - Ground floor unit solutions
@@ -52,6 +56,7 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 - ADA compliance guidance
 
 ### 💰 Financial Analysis
+
 - Detailed cost breakdowns
 - Monthly and annual projections
 - Capital equipment costs (amortized)
@@ -60,6 +65,7 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 - Recommendation logic based on ROI
 
 ### 📋 Stakeholder-Ready Output
+
 - Professional formatting
 - Clear section organization
 - Tables and comparisons
@@ -72,24 +78,28 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 ## Who Should Use This
 
 ### Property Developers
+
 - New construction planning
 - Development cost estimation
 - Contractor bidding packages
 - Regulatory approval documentation
 
 ### Waste Management Consultants
+
 - Client project analysis
 - Professional deliverables
 - Technical expertise demonstration
 - Scalable service delivery
 
 ### Multifamily Operators
+
 - Portfolio property analysis
 - Cost optimization studies
 - Equipment upgrade decisions
 - Regulatory compliance planning
 
 ### Advantage Waste Team (Greystar)
+
 - Development/Construction Initiative support
 - Regional property assessments
 - Professional client reports
@@ -100,15 +110,19 @@ This skill automates the creation of detailed, stakeholder-ready trash managemen
 ## How It Works
 
 ### Input (Simple)
+
 Just describe the property:
+
 ```
-"Generate a trash management plan for Lincoln Towers at 
-456 Oak St, Dallas, TX - 300 units, 7 stories, 
+"Generate a trash management plan for Lincoln Towers at
+456 Oak St, Dallas, TX - 300 units, 7 stories,
 12 ground floor units, 18ft loading height"
 ```
 
 ### Processing (Automatic)
+
 Claude will:
+
 1. ✅ Use `web_search` to find Dallas franchise hauler
 2. ✅ Research Texas waste regulations
 3. ✅ Calculate volumes for 300 units
@@ -118,7 +132,9 @@ Claude will:
 7. ✅ Generate complete 14-section report
 
 ### Output (Professional)
+
 15-20 page comprehensive report with:
+
 - All calculations shown with formulas
 - Equipment specifications with costs
 - Service schedules by day
@@ -131,6 +147,7 @@ Claude will:
 ## Technical Capabilities
 
 ### Calculations
+
 - **Volume projections:** Industry-standard 0.16 CY/unit/week baseline
 - **Recycling:** 30% of waste stream
 - **Composting:** 25% of waste stream (where mandated)
@@ -138,6 +155,7 @@ Claude will:
 - **Container sizing:** Automatic based on pickup frequency
 
 ### Equipment Knowledge
+
 - **Compactors:** Wastequip A-Series 500 specifications
 - **Chutes:** NFPA 82 compliant, ADA requirements
 - **Containers:** 3-6 CY toters, 8-30 CY open-tops
@@ -145,6 +163,7 @@ Claude will:
 - **Maintenance:** Annual service contract estimates
 
 ### Regulatory Compliance
+
 - **State laws:** AB341, AB1826, AB1383 (California) and equivalents
 - **Local ordinances:** City-specific requirements
 - **Franchise areas:** Exclusive hauler territories
@@ -152,6 +171,7 @@ Claude will:
 - **ADA compliance:** Equipment accessibility standards
 
 ### Cost Analysis
+
 - **Hauler fees:** Realistic rate ranges by service type
 - **Staff labor:** Time estimates and hourly costs
 - **Capital equipment:** One-time costs amortized over lifespan
@@ -257,6 +277,7 @@ Claude will:
 ## Best Practices
 
 ### For Best Results, Include:
+
 - ✅ **Full property address** (street, city, state, zip)
   - Enables hauler and regulatory research
 - ✅ **Total unit count** (all residential units)
@@ -266,6 +287,7 @@ Claude will:
 - ✅ **Project goals** (cost/sustainability/balanced)
 
 ### Optional Enhancements:
+
 - Multiple building details (list separately)
 - Site constraints (access, turning, aesthetic)
 - Special requirements (LEED, HOA rules)
@@ -273,6 +295,7 @@ Claude will:
 - Timeline pressures
 
 ### After Generation:
+
 - Review all 14 sections for completeness
 - Verify web research results (hauler, regulations)
 - Customize recommendations for local knowledge
@@ -285,9 +308,10 @@ Claude will:
 ## Integration Examples
 
 ### Advantage Waste Development Initiative
+
 ```
 Use Case: Development/Construction planning for new Greystar properties
-Process: 
+Process:
 1. Receive new development details from regional team
 2. Run through trash-management-planner skill
 3. Generate professional report
@@ -299,6 +323,7 @@ Benefit: Professional technical capability, faster turnaround, consistent qualit
 ```
 
 ### Waste Management Consulting
+
 ```
 Use Case: Generate reports for multiple client properties
 Process:
@@ -312,6 +337,7 @@ Benefit: Scalable service delivery, technical depth, professional quality
 ```
 
 ### Property Development
+
 ```
 Use Case: Development project waste planning
 Process:
@@ -329,11 +355,13 @@ Benefit: Accurate cost estimation, regulatory compliance, stakeholder confidence
 ## Technical Requirements
 
 ### To Use This Skill:
+
 - Access to Claude.ai (browser, desktop, or API)
 - Ability to upload files to Claude Projects
 - Internet connection (for web research features)
 
 ### Skill Requirements:
+
 - Uses `web_search` tool (for hauler and regulatory research)
 - Generates text output (no file creation needed)
 - Processes natural language input
@@ -344,6 +372,7 @@ Benefit: Accurate cost estimation, regulatory compliance, stakeholder confidence
 ## Limitations & Considerations
 
 ### What This Skill Does:
+
 ✅ Generate comprehensive professional plans
 ✅ Research franchise haulers automatically
 ✅ Calculate volumes using industry standards
@@ -352,6 +381,7 @@ Benefit: Accurate cost estimation, regulatory compliance, stakeholder confidence
 ✅ Provide implementation guidance
 
 ### What This Skill Doesn't Do:
+
 ❌ Replace site visits or physical assessments
 ❌ Guarantee specific hauler pricing
 ❌ Make final design decisions
@@ -359,6 +389,7 @@ Benefit: Accurate cost estimation, regulatory compliance, stakeholder confidence
 ❌ Replace professional engineering review
 
 ### Best Used As:
+
 - Starting point for professional analysis
 - Template for stakeholder reports
 - Tool for rapid cost estimation
@@ -374,12 +405,14 @@ Benefit: Accurate cost estimation, regulatory compliance, stakeholder confidence
 Track your ROI from using this skill:
 
 ### Efficiency Gains:
+
 - **Time per report:** 30 min vs 2-3 days (90% reduction)
 - **Reports per day:** 10+ vs 1 (10× increase)
 - **Team training:** 30 min vs 2 days
 - **Consistency:** 100% complete every time
 
 ### Quality Improvements:
+
 - All 14 sections included automatically
 - No missed calculations
 - Professional formatting every time
@@ -387,6 +420,7 @@ Track your ROI from using this skill:
 - Stakeholder-ready output
 
 ### Business Impact:
+
 - Faster proposal turnaround
 - More comprehensive analysis
 - Reduced labor costs
@@ -398,12 +432,15 @@ Track your ROI from using this skill:
 ## Support & Customization
 
 ### Questions?
+
 - Review `SETUP.md` for installation help
 - Check `demo-prompt.txt` for usage examples
 - Try `sample-property-input.txt` for test cases
 
 ### Need Modifications?
+
 The skill can be customized to:
+
 - Add your company branding
 - Include specific vendor partnerships
 - Update regional cost assumptions

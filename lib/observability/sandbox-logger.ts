@@ -7,48 +7,48 @@
  * Integrates with existing WasteWise observability infrastructure.
  */
 
-import { logger } from './logger'
+import { logger } from "./logger";
 
 /**
  * Types of sandbox boundary violations
  */
 export type SandboxViolationType =
-  | 'filesystem_read'      // Attempted read of denied file
-  | 'filesystem_write'     // Attempted write outside allowed paths
-  | 'filesystem_delete'    // Attempted deletion of protected file
-  | 'network_request'      // Request to unapproved domain
-  | 'command_execution'    // Execution of excluded command
-  | 'permission_escalation' // Attempt to bypass sandbox
+  | "filesystem_read" // Attempted read of denied file
+  | "filesystem_write" // Attempted write outside allowed paths
+  | "filesystem_delete" // Attempted deletion of protected file
+  | "network_request" // Request to unapproved domain
+  | "command_execution" // Execution of excluded command
+  | "permission_escalation"; // Attempt to bypass sandbox
 
 /**
  * Severity levels for sandbox violations
  */
-export type ViolationSeverity = 'low' | 'medium' | 'high' | 'critical'
+export type ViolationSeverity = "low" | "medium" | "high" | "critical";
 
 /**
  * Sandbox violation event data
  */
 export interface SandboxViolationEvent {
-  type: SandboxViolationType
-  resource: string           // File path, domain, or command
-  action: string             // Specific action attempted
-  approved: boolean          // Whether user approved the violation
-  severity: ViolationSeverity
-  agent?: string             // Agent type if applicable
-  context?: Record<string, unknown>
-  timestamp: string
+  type: SandboxViolationType;
+  resource: string; // File path, domain, or command
+  action: string; // Specific action attempted
+  approved: boolean; // Whether user approved the violation
+  severity: ViolationSeverity;
+  agent?: string; // Agent type if applicable
+  context?: Record<string, unknown>;
+  timestamp: string;
 }
 
 /**
  * Sandbox statistics for monitoring
  */
 export interface SandboxStats {
-  total_violations: number
-  approved_violations: number
-  denied_violations: number
-  violations_by_type: Record<SandboxViolationType, number>
-  violations_by_severity: Record<ViolationSeverity, number>
-  most_common_resources: Array<{ resource: string; count: number }>
+  total_violations: number;
+  approved_violations: number;
+  denied_violations: number;
+  violations_by_type: Record<SandboxViolationType, number>;
+  violations_by_severity: Record<ViolationSeverity, number>;
+  most_common_resources: Array<{ resource: string; count: number }>;
 }
 
 /**
@@ -56,18 +56,18 @@ export interface SandboxStats {
  * TODO Phase 4: Replace with persistent storage (Sentry, database, log aggregation)
  */
 class SandboxViolationTracker {
-  private violations: SandboxViolationEvent[] = []
-  private maxViolations = 1000 // Prevent memory overflow
+  private violations: SandboxViolationEvent[] = [];
+  private maxViolations = 1000; // Prevent memory overflow
 
   /**
    * Add a violation event to the tracker
    */
   add(event: SandboxViolationEvent): void {
-    this.violations.push(event)
+    this.violations.push(event);
 
     // Trim old violations if limit exceeded
     if (this.violations.length > this.maxViolations) {
-      this.violations = this.violations.slice(-this.maxViolations)
+      this.violations = this.violations.slice(-this.maxViolations);
     }
   }
 
@@ -75,28 +75,28 @@ class SandboxViolationTracker {
    * Get all violations
    */
   getAll(): SandboxViolationEvent[] {
-    return [...this.violations]
+    return [...this.violations];
   }
 
   /**
    * Get violations by type
    */
   getByType(type: SandboxViolationType): SandboxViolationEvent[] {
-    return this.violations.filter(v => v.type === type)
+    return this.violations.filter((v) => v.type === type);
   }
 
   /**
    * Get violations by severity
    */
   getBySeverity(severity: ViolationSeverity): SandboxViolationEvent[] {
-    return this.violations.filter(v => v.severity === severity)
+    return this.violations.filter((v) => v.severity === severity);
   }
 
   /**
    * Get recent violations
    */
   getRecent(count: number = 10): SandboxViolationEvent[] {
-    return this.violations.slice(-count).reverse()
+    return this.violations.slice(-count).reverse();
   }
 
   /**
@@ -105,8 +105,8 @@ class SandboxViolationTracker {
   getStats(): SandboxStats {
     const stats: SandboxStats = {
       total_violations: this.violations.length,
-      approved_violations: this.violations.filter(v => v.approved).length,
-      denied_violations: this.violations.filter(v => !v.approved).length,
+      approved_violations: this.violations.filter((v) => v.approved).length,
+      denied_violations: this.violations.filter((v) => !v.approved).length,
       violations_by_type: {
         filesystem_read: 0,
         filesystem_write: 0,
@@ -122,76 +122,73 @@ class SandboxViolationTracker {
         critical: 0,
       },
       most_common_resources: [],
-    }
+    };
 
     // Count violations by type and severity
     for (const violation of this.violations) {
-      stats.violations_by_type[violation.type]++
-      stats.violations_by_severity[violation.severity]++
+      stats.violations_by_type[violation.type]++;
+      stats.violations_by_severity[violation.severity]++;
     }
 
     // Find most common resources
-    const resourceCounts = new Map<string, number>()
+    const resourceCounts = new Map<string, number>();
     for (const violation of this.violations) {
       resourceCounts.set(
         violation.resource,
-        (resourceCounts.get(violation.resource) || 0) + 1
-      )
+        (resourceCounts.get(violation.resource) || 0) + 1,
+      );
     }
 
     stats.most_common_resources = Array.from(resourceCounts.entries())
       .map(([resource, count]) => ({ resource, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 10)
+      .slice(0, 10);
 
-    return stats
+    return stats;
   }
 
   /**
    * Clear all violations (for testing)
    */
   clear(): void {
-    this.violations = []
+    this.violations = [];
   }
 }
 
 // Singleton tracker instance
-const tracker = new SandboxViolationTracker()
+const tracker = new SandboxViolationTracker();
 
 /**
  * Determine severity based on violation type and resource
  */
 function determineSeverity(
   type: SandboxViolationType,
-  resource: string
+  resource: string,
 ): ViolationSeverity {
   // Critical: Attempts to access credentials or secrets
   if (
-    resource.includes('.env') ||
-    resource.includes('credentials') ||
-    resource.includes('secret') ||
-    resource.includes('password') ||
-    resource.includes('api_key') ||
-    resource.includes('token')
+    resource.includes(".env") ||
+    resource.includes("credentials") ||
+    resource.includes("secret") ||
+    resource.includes("password") ||
+    resource.includes("api_key") ||
+    resource.includes("token")
   ) {
-    return 'critical'
+    return "critical";
   }
 
   // High: Permission escalation or deletion attempts
-  if (
-    type === 'permission_escalation' ||
-    type === 'filesystem_delete'
-  ) {
-    return 'high'
+  if (type === "permission_escalation" || type === "filesystem_delete") {
+    return "high";
   }
 
   // Medium: Write attempts outside allowed paths
-  if (type === 'filesystem_write') {
-    return 'medium'
+  if (type === "filesystem_write") {
+    return "medium";
   }
 
   // Low: Read attempts or unapproved network requests
-  return 'low'
+  return "low";
 }
 
 /**
@@ -210,9 +207,9 @@ export function logSandboxViolation(
   action: string,
   approved: boolean,
   agent?: string,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): void {
-  const severity = determineSeverity(type, resource)
+  const severity = determineSeverity(type, resource);
 
   const event: SandboxViolationEvent = {
     type,
@@ -223,25 +220,53 @@ export function logSandboxViolation(
     agent,
     context,
     timestamp: new Date().toISOString(),
-  }
+  };
 
   // Add to tracker
-  tracker.add(event)
+  tracker.add(event);
 
   // Log to standard logger with appropriate level
-  const logLevel = approved ? 'info' : severity === 'critical' ? 'error' : 'warn'
-  const logMessage = `Sandbox ${approved ? 'permission granted' : 'violation'}: ${action}`
+  const logLevel = approved
+    ? "info"
+    : severity === "critical"
+      ? "error"
+      : "warn";
+  const logMessage = `Sandbox ${approved ? "permission granted" : "violation"}: ${action}`;
 
-  logger[logLevel](logMessage, {
-    sandboxViolation: {
-      type,
-      resource,
-      approved,
-      severity,
-      agent,
-      ...context,
-    },
-  })
+  if (logLevel === "error") {
+    logger.error(logMessage, undefined, {
+      sandboxViolation: {
+        type,
+        resource,
+        approved,
+        severity,
+        agent,
+        ...context,
+      },
+    });
+  } else if (logLevel === "warn") {
+    logger.warn(logMessage, {
+      sandboxViolation: {
+        type,
+        resource,
+        approved,
+        severity,
+        agent,
+        ...context,
+      },
+    });
+  } else {
+    logger.info(logMessage, {
+      sandboxViolation: {
+        type,
+        resource,
+        approved,
+        severity,
+        agent,
+        ...context,
+      },
+    });
+  }
 
   // TODO Phase 4: Send to external monitoring (Sentry, log aggregation service)
   // if (severity === 'critical' || severity === 'high') {
@@ -253,16 +278,16 @@ export function logSandboxViolation(
  * Log filesystem boundary violations
  */
 export function logFilesystemViolation(
-  operation: 'read' | 'write' | 'delete',
+  operation: "read" | "write" | "delete",
   filePath: string,
   approved: boolean,
-  agent?: string
+  agent?: string,
 ): void {
   const typeMap = {
-    read: 'filesystem_read' as const,
-    write: 'filesystem_write' as const,
-    delete: 'filesystem_delete' as const,
-  }
+    read: "filesystem_read" as const,
+    write: "filesystem_write" as const,
+    delete: "filesystem_delete" as const,
+  };
 
   logSandboxViolation(
     typeMap[operation],
@@ -270,8 +295,8 @@ export function logFilesystemViolation(
     `Attempted ${operation} of ${filePath}`,
     approved,
     agent,
-    { operation, filePath }
-  )
+    { operation, filePath },
+  );
 }
 
 /**
@@ -281,16 +306,16 @@ export function logNetworkViolation(
   domain: string,
   url: string,
   approved: boolean,
-  agent?: string
+  agent?: string,
 ): void {
   logSandboxViolation(
-    'network_request',
+    "network_request",
     domain,
     `Attempted request to ${url}`,
     approved,
     agent,
-    { domain, url }
-  )
+    { domain, url },
+  );
 }
 
 /**
@@ -300,64 +325,74 @@ export function logCommandViolation(
   command: string,
   args: string[],
   approved: boolean,
-  agent?: string
+  agent?: string,
 ): void {
-  const fullCommand = [command, ...args].join(' ')
+  const fullCommand = [command, ...args].join(" ");
 
   logSandboxViolation(
-    'command_execution',
+    "command_execution",
     command,
     `Attempted execution: ${fullCommand}`,
     approved,
     agent,
-    { command, args, fullCommand }
-  )
+    { command, args, fullCommand },
+  );
 }
 
 /**
  * Get sandbox violation statistics
  */
 export function getSandboxStats(): SandboxStats {
-  return tracker.getStats()
+  return tracker.getStats();
 }
 
 /**
  * Get recent sandbox violations
  */
-export function getRecentViolations(count: number = 10): SandboxViolationEvent[] {
-  return tracker.getRecent(count)
+export function getRecentViolations(
+  count: number = 10,
+): SandboxViolationEvent[] {
+  return tracker.getRecent(count);
 }
 
 /**
  * Get all violations of a specific type
  */
-export function getViolationsByType(type: SandboxViolationType): SandboxViolationEvent[] {
-  return tracker.getByType(type)
+export function getViolationsByType(
+  type: SandboxViolationType,
+): SandboxViolationEvent[] {
+  return tracker.getByType(type);
 }
 
 /**
  * Get all violations of a specific severity
  */
-export function getViolationsBySeverity(severity: ViolationSeverity): SandboxViolationEvent[] {
-  return tracker.getBySeverity(severity)
+export function getViolationsBySeverity(
+  severity: ViolationSeverity,
+): SandboxViolationEvent[] {
+  return tracker.getBySeverity(severity);
 }
 
 /**
  * Clear violation history (for testing)
  */
 export function clearViolationHistory(): void {
-  tracker.clear()
+  tracker.clear();
 }
 
 /**
  * Export violation data for analysis (JSON format)
  */
 export function exportViolations(): string {
-  return JSON.stringify({
-    stats: getSandboxStats(),
-    violations: tracker.getAll(),
-    exported_at: new Date().toISOString(),
-  }, null, 2)
+  return JSON.stringify(
+    {
+      stats: getSandboxStats(),
+      violations: tracker.getAll(),
+      exported_at: new Date().toISOString(),
+    },
+    null,
+    2,
+  );
 }
 
 /**
@@ -365,43 +400,53 @@ export function exportViolations(): string {
  * Returns true if patterns suggest a security concern
  */
 export function detectSuspiciousPatterns(): {
-  suspicious: boolean
-  reasons: string[]
-  recommendations: string[]
+  suspicious: boolean;
+  reasons: string[];
+  recommendations: string[];
 } {
-  const stats = getSandboxStats()
-  const reasons: string[] = []
-  const recommendations: string[] = []
+  const stats = getSandboxStats();
+  const reasons: string[] = [];
+  const recommendations: string[] = [];
 
   // Multiple critical violations
   if (stats.violations_by_severity.critical > 3) {
-    reasons.push(`${stats.violations_by_severity.critical} critical violations detected`)
-    recommendations.push('Review access to sensitive files (.env, credentials)')
+    reasons.push(
+      `${stats.violations_by_severity.critical} critical violations detected`,
+    );
+    recommendations.push(
+      "Review access to sensitive files (.env, credentials)",
+    );
   }
 
   // High denial rate (>50%)
   if (stats.denied_violations > stats.approved_violations) {
-    reasons.push('High denial rate suggests misconfigured sandbox boundaries')
-    recommendations.push('Review sandbox.json configuration to align with actual needs')
+    reasons.push("High denial rate suggests misconfigured sandbox boundaries");
+    recommendations.push(
+      "Review sandbox.json configuration to align with actual needs",
+    );
   }
 
   // Repeated access to same denied resource
   for (const { resource, count } of stats.most_common_resources.slice(0, 3)) {
     if (count > 5) {
-      reasons.push(`Repeated access attempts to ${resource} (${count} times)`)
-      recommendations.push(`Consider adding ${resource} to allowed paths if legitimate`)
+      reasons.push(`Repeated access attempts to ${resource} (${count} times)`);
+      recommendations.push(
+        `Consider adding ${resource} to allowed paths if legitimate`,
+      );
     }
   }
 
   // Permission escalation attempts
   if (stats.violations_by_type.permission_escalation > 0) {
-    reasons.push('Permission escalation attempts detected')
-    recommendations.push('Review agent behavior and update sandbox exclusions if needed')
+    reasons.push("Permission escalation attempts detected");
+    recommendations.push(
+      "Review agent behavior and update sandbox exclusions if needed",
+    );
   }
 
   return {
     suspicious: reasons.length > 0,
     reasons,
     recommendations,
-  }
+  };
 }

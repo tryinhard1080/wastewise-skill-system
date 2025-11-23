@@ -45,23 +45,27 @@ waste-contract-extractor-v2.1/
 ### Install & Run
 
 **1. Download & Install**
+
 ```
 Settings → Capabilities → Upload Skill → waste-contract-extractor-v2.1.zip
 ```
 
 **2. Upload Your Documents**
+
 - Waste service contract (PDF)
 - 6-12 months of invoices (PDFs)
 - Name files: PropertyName_Vendor_Type_Date.pdf
 
 **3. Run Analysis**
+
 ```
-"Hey Claude, I uploaded our waste contract and 7 months of invoices. 
-I need granular expense tracking so I can investigate variances and 
+"Hey Claude, I uploaded our waste contract and 7 months of invoices.
+I need granular expense tracking so I can investigate variances and
 explain optimization savings to my CFO with transparent calculations."
 ```
 
 **4. Review Output**
+
 - Open "Historical Expense Detail" → Check flagged variances
 - Open "Optimization Analysis" → Review 4-section calculations
 - Open "Implementation Roadmap" → See quarterly budget impacts
@@ -71,6 +75,7 @@ explain optimization savings to my CFO with transparent calculations."
 ## 📊 Excel Output (12 Sheets)
 
 ### For Operational Users (Property Managers, Regional Directors)
+
 1. **Historical Expense Detail** 🔥
    - Month/Account/Category breakdown
    - Haul counts and variance tracking
@@ -98,6 +103,7 @@ explain optimization savings to my CFO with transparent calculations."
    - Critical warnings with severity levels
 
 ### Contract Intelligence
+
 6. **Contract Summary** - Key terms at a glance
 7. **Service Schedule** - Recurring services and pricing
 8. **On-Call Services** - Extra pickup rates
@@ -105,7 +111,8 @@ explain optimization savings to my CFO with transparent calculations."
 10. **Recommended Vendors** - Advantage Waste preferred partners
 
 ### For Executive Users (C-Suite, VPs)
-11. **Executive Overview** 
+
+11. **Executive Overview**
     - Clearly labeled "For Leadership Briefings"
     - High-level summary only
     - Key findings and action required dates
@@ -115,9 +122,11 @@ explain optimization savings to my CFO with transparent calculations."
 ## 🎯 Real-World Use Cases
 
 ### Use Case 1: Investigate Expense Spike
+
 **Scenario**: Boss asks "Why did Pickup Service jump from $1,176 to $2,756 in March?"
 
 **Solution**:
+
 1. Open "Historical Expense Detail"
 2. See flag: "🚩 INVESTIGATE - 134% increase"
 3. Find Invoice #0615-002318893
@@ -130,9 +139,11 @@ explain optimization savings to my CFO with transparent calculations."
 ---
 
 ### Use Case 2: Defend Optimization Savings
+
 **Scenario**: CFO challenges "$3,174 in estimated savings from compactor monitors"
 
 **Solution**:
+
 1. Open "Optimization Analysis"
 2. Section 1: "We're doing 36 hauls/year currently"
 3. Section 2: "Monitors reduce to 18 hauls/year"
@@ -145,9 +156,11 @@ explain optimization savings to my CFO with transparent calculations."
 ---
 
 ### Use Case 3: Build Asset Business Plan
+
 **Scenario**: Finance needs quarterly budget impacts for 2026 planning
 
 **Solution**:
+
 1. Open "Implementation Roadmap"
 2. Q1 2025: $525 savings (partial month, monitors start)
 3. Q2 2025: $6,800 savings (full quarter optimized schedule)
@@ -161,9 +174,11 @@ explain optimization savings to my CFO with transparent calculations."
 ## 📋 Sheet-by-Sheet Guide
 
 ### Priority 1: Historical Expense Detail
+
 **Who uses it**: Property Managers, Accounting, Operations
 
 **What it shows**:
+
 - Month (Jan 2025, Feb 2025, etc.)
 - Account Number (0156898, 0165447)
 - Expense Category (Pickup Service, Disposal, Rental, Fuel, etc.)
@@ -174,6 +189,7 @@ explain optimization savings to my CFO with transparent calculations."
 - Flag Column (🚩 INVESTIGATE if >20% variance)
 
 **Investigation Tracker Section**:
+
 ```
 Month | Account | Question | Status | Resolution
 Mar 2025 | 0165447 | Why 7 hauls vs avg 4? | Open | [To site team]
@@ -184,11 +200,13 @@ Mar 2025 | 0165447 | Why 7 hauls vs avg 4? | Open | [To site team]
 ---
 
 ### Priority 2: Optimization Analysis
+
 **Who uses it**: Property Managers, Procurement, Finance
 
 **Structure**:
 
 **Section 1: Current State**
+
 ```
 Current Annual Hauls: 36 hauls/year (extrapolated from 7 months)
 Current Cost Per Haul: $343 (pickup fee)
@@ -196,6 +214,7 @@ Current Annual Pickup Cost: $12,348 (36 hauls × $343)
 ```
 
 **Section 2: With Monitors - Target State**
+
 ```
 Target Annual Hauls: 18 hauls/year (50% reduction)
 Cost Per Haul: $343 (same rate)
@@ -203,6 +222,7 @@ Projected Annual Pickup Cost: $6,174 (18 hauls × $343)
 ```
 
 **Section 3: Savings Calculation**
+
 ```
 Annual Pickup Savings: $6,174
 Monitor Annual Cost: -$3,000
@@ -210,6 +230,7 @@ NET ANNUAL SAVINGS: $3,174
 ```
 
 **Section 4: Visual Formula**
+
 ```
 18 fewer hauls × $343 per haul = $6,174 avoided fees
 $6,174 pickup savings - $3,000 monitor cost = $3,174 net
@@ -220,9 +241,11 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net
 ---
 
 ### Priority 3: Implementation Roadmap
+
 **Who uses it**: Operations, Finance, Asset Planning
 
 **Format**:
+
 ```
 IMMEDIATE (0-30 DAYS) - Budget Impact: Q1 2025
 ☐ Install monitors ($250/mo start Feb 2025)
@@ -251,6 +274,7 @@ LONG-TERM (180-365 DAYS) - Budget Impact: Q4 2025 & 2026
 ## 🔧 Installation
 
 ### For Claude.ai (Browser)
+
 1. Download `waste-contract-extractor-v2.1.zip`
 2. Go to **Settings → Capabilities**
 3. Click **"Upload Skill"**
@@ -258,6 +282,7 @@ LONG-TERM (180-365 DAYS) - Budget Impact: Q4 2025 & 2026
 5. Start analyzing! ✅
 
 ### For Claude Code (CLI)
+
 ```bash
 unzip waste-contract-extractor-v2.1.zip
 cp -r waste-contract-extractor-v2.1 ~/.claude/skills/
@@ -269,13 +294,13 @@ cp -r waste-contract-extractor-v2.1 ~/.claude/skills/
 
 **Start here if you're**:
 
-| You Want To... | Read This |
-|----------------|-----------|
+| You Want To...                  | Read This                                |
+| ------------------------------- | ---------------------------------------- |
 | Understand what changed in v2.1 | [TREVOR_FEEDBACK.md](TREVOR_FEEDBACK.md) |
-| Learn installation steps | [SETUP.md](SETUP.md) |
-| See usage examples | [demo-prompt.txt](demo-prompt.txt) |
-| Review technical details | [SKILL.md](SKILL.md) |
-| Get quick overview | [README.md](README.md) (this file) |
+| Learn installation steps        | [SETUP.md](SETUP.md)                     |
+| See usage examples              | [demo-prompt.txt](demo-prompt.txt)       |
+| Review technical details        | [SKILL.md](SKILL.md)                     |
+| Get quick overview              | [README.md](README.md) (this file)       |
 
 ---
 
@@ -294,11 +319,13 @@ After running the skill, verify:
 ## 🎓 Design Philosophy
 
 ### v2.0: Executive-First
+
 - Summary → Detail
 - High-level overviews
 - General recommendations
 
 ### v2.1: Operational-First
+
 - Detail → Summary (if needed)
 - Granular, traceable data
 - Specific, verifiable calculations
@@ -309,22 +336,23 @@ After running the skill, verify:
 
 ## 📊 v2.0 vs v2.1 Comparison
 
-| Feature | v2.0 | v2.1 |
-|---------|------|------|
-| Expense Tracking | Property-level | Month/account/category |
-| Variance Detection | Manual | Auto-flagged (>20%) |
-| Investigation Tools | None | Built-in tracker |
-| Optimization Math | Opaque | 4-section transparent |
-| Budget Alignment | Generic | Quarterly (Q1-Q4) |
-| Vendor Metrics | None | Performance scorecard |
-| Summary Tabs | 3 overlapping | 1 clear "Executive" |
-| Target Audience | Mixed | Operations-focused |
+| Feature             | v2.0           | v2.1                   |
+| ------------------- | -------------- | ---------------------- |
+| Expense Tracking    | Property-level | Month/account/category |
+| Variance Detection  | Manual         | Auto-flagged (>20%)    |
+| Investigation Tools | None           | Built-in tracker       |
+| Optimization Math   | Opaque         | 4-section transparent  |
+| Budget Alignment    | Generic        | Quarterly (Q1-Q4)      |
+| Vendor Metrics      | None           | Performance scorecard  |
+| Summary Tabs        | 3 overlapping  | 1 clear "Executive"    |
+| Target Audience     | Mixed          | Operations-focused     |
 
 ---
 
 ## 🔮 What's Next?
 
 Future v2.2 enhancements based on field use:
+
 - Benchmark comparison across multiple properties
 - Historical rate increase tracking (year-over-year)
 - Automated RFP generation from analysis
@@ -336,16 +364,19 @@ Future v2.2 enhancements based on field use:
 ## 💡 Pro Tips
 
 ### For Property Managers
+
 1. Start with Historical Expense Detail → Review flagged items
 2. Use Investigation Tracker to document follow-ups
 3. Cite specific Invoice # when asking vendors questions
 
 ### For Procurement Teams
+
 1. Use Vendor Performance tab during contract negotiations
 2. Reference Optimization Analysis Section 1-4 for leverage
 3. Share Implementation Roadmap for stakeholder buy-in
 
 ### For Finance Teams
+
 1. Use Implementation Roadmap quarterly impacts for budget planning
 2. Verify Optimization Analysis Section 3 calculations
 3. Share Executive Overview with C-Suite
@@ -355,11 +386,13 @@ Future v2.2 enhancements based on field use:
 ## 📞 Support
 
 **For Issues**:
+
 - Check [SETUP.md](SETUP.md) troubleshooting section
 - Review [TREVOR_FEEDBACK.md](TREVOR_FEEDBACK.md) for design rationale
 - Validate against [demo-prompt.txt](demo-prompt.txt) examples
 
 **For Enhancements**:
+
 - Document specific operational pain points
 - Provide example use cases (like Trevor did)
 - Explain current workarounds
@@ -369,6 +402,7 @@ Future v2.2 enhancements based on field use:
 ## 🙏 Acknowledgments
 
 **v2.1 was driven entirely by operational user feedback.** Thanks to "Trevor" (property management client) for:
+
 - Identifying that high-level summaries don't help investigate variances
 - Requesting transparent optimization calculations
 - Emphasizing the need for traceable, account-level data
@@ -387,6 +421,6 @@ Future v2.2 enhancements based on field use:
 
 ---
 
-*Version: 2.1 - Operational Focus*
-*Last Updated: October 2025*
-*Status: Production Ready - Field-Tested Design*
+_Version: 2.1 - Operational Focus_
+_Last Updated: October 2025_
+_Status: Production Ready - Field-Tested Design_

@@ -79,6 +79,7 @@ curl http://localhost:3000/api/debug/sentry
 ```
 
 This should:
+
 - Throw an error in the console
 - **NOT** send to Sentry (development errors are filtered)
 
@@ -99,6 +100,7 @@ WasteWise provides two health check endpoints for monitoring system status.
 **Purpose**: Verify core application services (database, storage)
 
 **Response** (healthy):
+
 ```json
 {
   "status": "healthy",
@@ -113,6 +115,7 @@ WasteWise provides two health check endpoints for monitoring system status.
 ```
 
 **Response** (degraded):
+
 ```json
 {
   "status": "degraded",
@@ -128,10 +131,12 @@ WasteWise provides two health check endpoints for monitoring system status.
 ```
 
 **HTTP Status Codes**:
+
 - `200`: Healthy or degraded (partial functionality)
 - `503`: Unhealthy (critical failure)
 
 **Usage**:
+
 ```bash
 # Check application health
 curl http://localhost:3000/api/health
@@ -146,6 +151,7 @@ curl http://localhost:3000/api/health
 **Purpose**: Monitor background job queue performance
 
 **Response** (healthy):
+
 ```json
 {
   "status": "healthy",
@@ -161,6 +167,7 @@ curl http://localhost:3000/api/health
 ```
 
 **Response** (warning):
+
 ```json
 {
   "status": "warning",
@@ -180,11 +187,13 @@ curl http://localhost:3000/api/health
 ```
 
 **Health Thresholds**:
+
 - **Healthy**: <10 pending, <5 processing, <5 failures/hour, <10min avg time
 - **Warning**: 10-20 pending, 5-10 processing, 5-10 failures/hour, 10-15min avg time
 - **Critical**: >20 pending, >10 processing, >10 failures/hour, >15min avg time
 
 **Usage**:
+
 ```bash
 # Check worker health
 curl http://localhost:3000/api/health/worker
@@ -200,46 +209,48 @@ watch -n 10 'curl -s http://localhost:3000/api/health/worker | jq'
 ### Using the Logger
 
 ```typescript
-import { logger } from '@/lib/observability/logger'
+import { logger } from "@/lib/observability/logger";
 
 // Basic logging
-logger.info('User logged in', { userId: '123' })
-logger.error('Failed to process job', error, { jobId: 'abc' })
+logger.info("User logged in", { userId: "123" });
+logger.error("Failed to process job", error, { jobId: "abc" });
 
 // With structured data
-logger.info('API request completed',
-  { userId: '123', requestId: 'req-456' },
-  { method: 'POST', path: '/api/analyze', duration_ms: 234 }
-)
+logger.info(
+  "API request completed",
+  { userId: "123", requestId: "req-456" },
+  { method: "POST", path: "/api/analyze", duration_ms: 234 },
+);
 
 // Child logger for consistent context
 const jobLogger = logger.child({
-  jobId: 'job-123',
-  skillName: 'compactor-optimization'
-})
+  jobId: "job-123",
+  skillName: "compactor-optimization",
+});
 
-jobLogger.info('Job started')
-jobLogger.info('Processing haul data', undefined, { haulCount: 25 })
-jobLogger.info('Job completed')
+jobLogger.info("Job started");
+jobLogger.info("Processing haul data", undefined, { haulCount: 25 });
+jobLogger.info("Job completed");
 
 // Performance timing
-const endTimer = logger.startTimer('Database query', { userId: '123' })
+const endTimer = logger.startTimer("Database query", { userId: "123" });
 // ... perform query ...
-endTimer() // Logs: "Timer: Database query" with duration_ms
+endTimer(); // Logs: "Timer: Database query" with duration_ms
 ```
 
 ### Log Levels
 
-| Level | When to Use | Sentry Behavior |
-|-------|-------------|-----------------|
-| `debug` | Development debugging, verbose info | Not sent |
-| `info` | Normal operations, important events | Not sent |
-| `warn` | Recoverable errors, degraded performance | Breadcrumb only |
-| `error` | Exceptions, failures, critical issues | Full exception capture |
+| Level   | When to Use                              | Sentry Behavior        |
+| ------- | ---------------------------------------- | ---------------------- |
+| `debug` | Development debugging, verbose info      | Not sent               |
+| `info`  | Normal operations, important events      | Not sent               |
+| `warn`  | Recoverable errors, degraded performance | Breadcrumb only        |
+| `error` | Exceptions, failures, critical issues    | Full exception capture |
 
 ### What to Log
 
 **DO Log**:
+
 - User actions (login, create project, start analysis)
 - Job lifecycle (started, progress, completed, failed)
 - External API calls (Anthropic, Supabase)
@@ -247,6 +258,7 @@ endTimer() // Logs: "Timer: Database query" with duration_ms
 - Business-critical errors
 
 **DON'T Log**:
+
 - Sensitive data (passwords, API keys, PII)
 - Full file contents (just metadata)
 - Noisy low-level operations (every database query)
@@ -257,15 +269,15 @@ Always include context:
 
 ```typescript
 // ❌ BAD - No context
-logger.error('Job failed', error)
+logger.error("Job failed", error);
 
 // ✅ GOOD - With context
-logger.error('Job failed', error, {
+logger.error("Job failed", error, {
   jobId: job.id,
   userId: job.user_id,
   projectId: job.project_id,
-  skillName: job.job_type
-})
+  skillName: job.job_type,
+});
 ```
 
 ---
@@ -278,16 +290,19 @@ logger.error('Job failed', error, {
 2. Recommended rules:
 
 **Critical Errors**:
+
 - Trigger: **An event is seen**
 - Conditions: `level:error` AND `environment:production`
 - Action: Email team immediately
 
 **High Error Rate**:
+
 - Trigger: **Error count** is above **10 in 1 hour**
 - Conditions: `environment:production`
 - Action: Email + Slack notification
 
 **Slow Jobs**:
+
 - Trigger: **Custom metric** (if using performance monitoring)
 - Conditions: `transaction.duration > 600000` (10 minutes)
 - Action: Email team
@@ -297,16 +312,19 @@ logger.error('Job failed', error, {
 Use external monitoring services to poll health endpoints:
 
 **UptimeRobot** (free tier):
+
 1. Add monitor: `https://your-domain.com/api/health`
 2. Check interval: **5 minutes**
 3. Alert contacts: Email, Slack, SMS
 
 **Pingdom**:
+
 1. Add check: `https://your-domain.com/api/health`
 2. Expected: **200 status code**
 3. Alert when: Down for **5 minutes**
 
 **Custom Script** (cron job):
+
 ```bash
 #!/bin/bash
 # Check health and alert on failure
@@ -336,12 +354,14 @@ fi
 ### Sentry Not Capturing Errors
 
 **Check 1**: Verify environment variables are set:
+
 ```bash
 echo $NEXT_PUBLIC_SENTRY_DSN
 echo $SENTRY_DSN
 ```
 
 **Check 2**: Verify environment is production:
+
 ```bash
 echo $NODE_ENV  # Should be "production"
 ```
@@ -349,19 +369,22 @@ echo $NODE_ENV  # Should be "production"
 Development errors are intentionally filtered to avoid noise.
 
 **Check 3**: Check Sentry quota:
+
 - Go to **Settings** → **Subscription**
 - Verify you haven't hit the event limit
 
 **Check 4**: Test manually:
-```typescript
-import * as Sentry from '@sentry/nextjs'
 
-Sentry.captureException(new Error('Manual test error'))
+```typescript
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.captureException(new Error("Manual test error"));
 ```
 
 ### Health Checks Failing
 
 **Database Connection Issues**:
+
 ```bash
 # Check Supabase credentials
 echo $NEXT_PUBLIC_SUPABASE_URL
@@ -373,6 +396,7 @@ curl $NEXT_PUBLIC_SUPABASE_URL/rest/v1/projects?select=id&limit=1 \
 ```
 
 **Storage Issues**:
+
 - Verify storage bucket exists: `project-files`
 - Check bucket permissions (public or authenticated)
 - Verify service role key has storage access
@@ -380,10 +404,12 @@ curl $NEXT_PUBLIC_SUPABASE_URL/rest/v1/projects?select=id&limit=1 \
 ### Worker Queue Backlog
 
 **Symptoms**:
+
 - High pending count (>20)
 - Slow processing time (>10 minutes)
 
 **Diagnosis**:
+
 ```bash
 # Check worker status
 curl http://localhost:3000/api/health/worker
@@ -394,6 +420,7 @@ journalctl -u wastewise-worker  # If using systemd
 ```
 
 **Solutions**:
+
 1. **Scale workers**: Run multiple worker instances
 2. **Check AI API limits**: Verify Anthropic rate limits
 3. **Optimize skills**: Profile slow operations

@@ -4,43 +4,43 @@
  * Monitor and manage background jobs
  */
 
-'use client'
+"use client";
 
-import { JobQueue } from '@/components/admin/JobQueue'
-import { StatsCard } from '@/components/admin/StatsCard'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useJobs, useJobStats, retryJob, deleteJob } from '@/lib/hooks/useAdminData'
-import { toast } from 'sonner'
+import { JobQueue } from "@/components/admin/JobQueue";
+import { StatsCard } from "@/components/admin/StatsCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Briefcase,
-  CheckCircle,
-  XCircle,
-  Clock,
-} from 'lucide-react'
+  useJobs,
+  useJobStats,
+  retryJob,
+  deleteJob,
+} from "@/lib/hooks/useAdminData";
+import { toast } from "sonner";
+import { Briefcase, CheckCircle, XCircle, Clock } from "lucide-react";
 
 export default function JobsPage() {
-  const { data: jobsData, isLoading, mutate } = useJobs()
-  const { data: stats, isLoading: statsLoading } = useJobStats()
+  const { data: jobsData, isLoading, mutate } = useJobs();
+  const { data: stats, isLoading: statsLoading } = useJobStats();
 
   const handleRetry = async (jobId: string) => {
     try {
-      await retryJob(jobId)
-      toast.success('Job retry initiated')
-      mutate()
+      await retryJob(jobId);
+      toast.success("Job retry initiated");
+      mutate();
     } catch (error) {
-      toast.error('Failed to retry job')
+      toast.error("Failed to retry job");
     }
-  }
+  };
 
   const handleDelete = async (jobId: string) => {
     try {
-      await deleteJob(jobId)
-      toast.success('Job deleted successfully')
-      mutate()
+      await deleteJob(jobId);
+      toast.success("Job deleted successfully");
+      mutate();
     } catch (error) {
-      toast.error('Failed to delete job')
+      toast.error("Failed to delete job");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -85,7 +85,7 @@ export default function JobsPage() {
               title="Failed"
               value={stats?.by_status?.failed || 0}
               icon={XCircle}
-              variant={stats?.by_status?.failed > 0 ? 'danger' : 'default'}
+              variant={stats?.by_status?.failed > 0 ? "danger" : "default"}
             />
           </>
         )}
@@ -104,5 +104,5 @@ export default function JobsPage() {
         />
       )}
     </div>
-  )
+  );
 }

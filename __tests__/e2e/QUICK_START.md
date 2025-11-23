@@ -63,15 +63,19 @@ playwright-report/
 ## Common Issues
 
 ### "Missing environment variables"
+
 → Check `.env.local` has all required vars
 
 ### "Connection refused"
+
 → Ensure Supabase is running (`pnpm supabase start`)
 
 ### "Job timeout"
+
 → Check worker is running (`pnpm worker`)
 
 ### Browser install fails (Windows)
+
 → Tests work in CI/CD (Linux) - not critical for local dev
 
 ## Test Structure
@@ -90,20 +94,20 @@ __tests__/e2e/
 
 ```typescript
 // Auto-login
-test('name', async ({ authenticatedPage }) => {
+test("name", async ({ authenticatedPage }) => {
   // User already logged in
-})
+});
 
 // Auto-create project
-test('name', async ({ testProject }) => {
-  const { page, projectId } = testProject
-})
+test("name", async ({ testProject }) => {
+  const { page, projectId } = testProject;
+});
 
 // Project with data
-test('name', async ({ seededProject }) => {
-  const { page, projectId } = seededProject
+test("name", async ({ seededProject }) => {
+  const { page, projectId } = seededProject;
   // 6 months of data pre-loaded
-})
+});
 ```
 
 ## Full Documentation

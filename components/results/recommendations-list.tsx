@@ -1,109 +1,114 @@
-'use client'
+"use client";
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from "@/components/ui/accordion";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertCircle,
   CheckCircle2,
   TrendingUp,
   Clock,
   Shield,
-} from 'lucide-react'
-import type { WasteWiseAnalyticsCompleteResult } from '@/lib/skills/types'
+} from "lucide-react";
+import type { WasteWiseAnalyticsCompleteResult } from "@/lib/skills/types";
 
 interface RecommendationsListProps {
-  recommendations: WasteWiseAnalyticsCompleteResult['recommendations']
+  recommendations: WasteWiseAnalyticsCompleteResult["recommendations"];
 }
 
 export function RecommendationsList({
   recommendations,
 }: RecommendationsListProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
   const getPriorityConfig = (priority: number) => {
     switch (priority) {
       case 1:
         return {
-          label: 'Critical',
-          variant: 'destructive' as const,
+          label: "Critical",
+          variant: "destructive" as const,
           icon: AlertCircle,
-        }
+        };
       case 2:
         return {
-          label: 'High',
-          variant: 'default' as const,
+          label: "High",
+          variant: "default" as const,
           icon: TrendingUp,
-        }
+        };
       case 3:
         return {
-          label: 'Medium',
-          variant: 'secondary' as const,
+          label: "Medium",
+          variant: "secondary" as const,
           icon: Clock,
-        }
+        };
       case 4:
       case 5:
         return {
-          label: 'Low',
-          variant: 'outline' as const,
+          label: "Low",
+          variant: "outline" as const,
           icon: CheckCircle2,
-        }
+        };
       default:
         return {
-          label: 'Unknown',
-          variant: 'outline' as const,
+          label: "Unknown",
+          variant: "outline" as const,
           icon: Shield,
-        }
+        };
     }
-  }
+  };
 
   const getConfidenceConfig = (confidence?: string) => {
     switch (confidence) {
-      case 'HIGH':
+      case "HIGH":
         return {
-          label: 'High Confidence',
-          className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-        }
-      case 'MEDIUM':
+          label: "High Confidence",
+          className:
+            "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+        };
+      case "MEDIUM":
         return {
-          label: 'Medium Confidence',
-          className: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
-        }
-      case 'LOW':
+          label: "Medium Confidence",
+          className:
+            "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+        };
+      case "LOW":
         return {
-          label: 'Low Confidence',
-          className: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-        }
+          label: "Low Confidence",
+          className:
+            "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+        };
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   // Sort recommendations by priority (lower number = higher priority)
   const sortedRecommendations = [...recommendations].sort(
-    (a, b) => a.priority - b.priority
-  )
+    (a, b) => a.priority - b.priority,
+  );
 
   // Filter only recommended actions
-  const recommendedActions = sortedRecommendations.filter((rec) => rec.recommend)
+  const recommendedActions = sortedRecommendations.filter(
+    (rec) => rec.recommend,
+  );
 
   if (recommendedActions.length === 0) {
     return (
@@ -124,7 +129,7 @@ export function RecommendationsList({
           </CardContent>
         </Card>
       </section>
-    )
+    );
   }
 
   return (
@@ -134,9 +139,11 @@ export function RecommendationsList({
       </h2>
       <Accordion type="multiple" className="space-y-4">
         {recommendedActions.map((recommendation, index) => {
-          const priorityConfig = getPriorityConfig(recommendation.priority)
-          const confidenceConfig = getConfidenceConfig(recommendation.confidence)
-          const PriorityIcon = priorityConfig.icon
+          const priorityConfig = getPriorityConfig(recommendation.priority);
+          const confidenceConfig = getConfidenceConfig(
+            recommendation.confidence,
+          );
+          const PriorityIcon = priorityConfig.icon;
 
           return (
             <AccordionItem
@@ -208,9 +215,9 @@ export function RecommendationsList({
                 </AccordionContent>
               </Card>
             </AccordionItem>
-          )
+          );
         })}
       </Accordion>
     </section>
-  )
+  );
 }

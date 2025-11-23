@@ -1,35 +1,41 @@
 # Testing Agent
 
 ## Role
+
 Specialized agent for comprehensive testing and validation of WasteWise. Ensures calculation accuracy, functional correctness, performance, and security through unit tests, integration tests, E2E tests, and custom evals framework.
 
 ## Core Responsibilities
 
 ### 1. Evals Framework (Calculation Validation)
+
 - Build custom evaluation system for TypeScript vs Python comparison
 - Run evals on every calculation before merge
 - Track accuracy metrics and deviations
 - Report any calculations that exceed 0.01% tolerance
 
 ### 2. Unit Testing
+
 - Test all calculation functions
 - Test utility functions
 - Test data transformations
 - Target: 100% coverage for calculations
 
 ### 3. Integration Testing
+
 - Test API routes end-to-end
 - Test database operations
 - Test AI integrations (with mocks)
 - Test report generation
 
 ### 4. E2E Testing
+
 - Test complete user workflows
 - Test UI interactions
 - Test data flow from upload to results
 - Test edge cases and error scenarios
 
 ### 5. Performance Testing
+
 - Measure page load times
 - Profile API response times
 - Test database query performance
@@ -38,6 +44,7 @@ Specialized agent for comprehensive testing and validation of WasteWise. Ensures
 ## Tools & Technologies
 
 ### Testing Stack
+
 - **Unit Tests**: Vitest
 - **Integration Tests**: Vitest + Supertest
 - **E2E Tests**: Playwright
@@ -50,6 +57,7 @@ Specialized agent for comprehensive testing and validation of WasteWise. Ensures
 **Pattern**: `testing/[test-type]`
 
 Examples:
+
 - `testing/framework-setup` - Initial test configuration
 - `testing/calculation-evals` - Evals framework
 - `testing/compactor-optimization-tests` - Compactor calculation tests
@@ -59,9 +67,11 @@ Examples:
 ## Evals Framework Architecture
 
 ### Purpose
+
 Validate that TypeScript calculations produce identical results to Python reference implementations within a tolerance of 0.01%.
 
 ### Directory Structure
+
 ```
 lib/evals/
 ├── framework.ts              // Core eval runner
@@ -103,7 +113,8 @@ export class EvalRunner {
   private tolerance: number;
   private results: EvalResult[] = [];
 
-  constructor(tolerance: number = 0.0001) { // 0.01%
+  constructor(tolerance: number = 0.0001) {
+    // 0.01%
     this.tolerance = tolerance;
   }
 
@@ -125,7 +136,7 @@ export class EvalRunner {
       pythonValue,
       difference,
       percentDifference,
-      withinTolerance
+      withinTolerance,
     };
 
     this.results.push(result);
@@ -137,18 +148,18 @@ export class EvalRunner {
   }
 
   allPassed(): boolean {
-    return this.results.every(r => r.pass);
+    return this.results.every((r) => r.pass);
   }
 
   generateReport(): string {
-    const passed = this.results.filter(r => r.pass).length;
+    const passed = this.results.filter((r) => r.pass).length;
     const total = this.results.length;
 
     let report = `\n=== EVAL RESULTS ===\n`;
     report += `Total: ${total} | Passed: ${passed} | Failed: ${total - passed}\n\n`;
 
     for (const result of this.results) {
-      const status = result.pass ? '✅' : '❌';
+      const status = result.pass ? "✅" : "❌";
       report += `${status} ${result.testName}\n`;
       report += `   TS: ${result.tsValue}\n`;
       report += `   Python: ${result.pythonValue}\n`;
@@ -165,22 +176,26 @@ export class EvalRunner {
 ```typescript
 // lib/evals/compactor-optimization-eval.ts
 
-import { EvalRunner } from './framework';
-import { calculateYardsPerDoor, shouldRecommendMonitors, calculateCompactorROI } from '../calculations/compactor-optimization';
-import testData from './test-data/compactor-samples.json';
-import pythonOutputs from './test-data/python-outputs.json';
+import { EvalRunner } from "./framework";
+import {
+  calculateYardsPerDoor,
+  shouldRecommendMonitors,
+  calculateCompactorROI,
+} from "../calculations/compactor-optimization";
+import testData from "./test-data/compactor-samples.json";
+import pythonOutputs from "./test-data/python-outputs.json";
 
-describe('Compactor Optimization Evals', () => {
+describe("Compactor Optimization Evals", () => {
   const runner = new EvalRunner(0.0001); // 0.01% tolerance
 
-  test('Eval: Yards Per Door calculation', async () => {
+  test("Eval: Yards Per Door calculation", async () => {
     for (const sample of testData.yardsPerDoor) {
       const result = await runner.runEval(
         `YPD: ${sample.name}`,
         calculateYardsPerDoor,
         pythonOutputs.yardsPerDoor[sample.name],
         sample.totalTons,
-        sample.units
+        sample.units,
       );
 
       expect(result.pass).toBe(true);
@@ -188,7 +203,7 @@ describe('Compactor Optimization Evals', () => {
     }
   });
 
-  test('Eval: Monitor recommendation threshold', async () => {
+  test("Eval: Monitor recommendation threshold", async () => {
     // Test case 1: Below 6.0 tons (should recommend) - per WASTE_FORMULAS_REFERENCE.md v2.0
     expect(shouldRecommendMonitors(5.8, 12)).toBe(true);
 
@@ -205,7 +220,7 @@ describe('Compactor Optimization Evals', () => {
     expect(shouldRecommendMonitors(5.999, 14)).toBe(true);
   });
 
-  test('Eval: ROI calculation matches Python', async () => {
+  test("Eval: ROI calculation matches Python", async () => {
     for (const sample of testData.roiCalculations) {
       const tsResult = await calculateCompactorROI(sample.input);
       const pyResult = pythonOutputs.roiCalculations[sample.name];
@@ -214,19 +229,19 @@ describe('Compactor Optimization Evals', () => {
       const result1 = await runner.runEval(
         `ROI-GrossSavings: ${sample.name}`,
         async () => tsResult.grossAnnualSavings,
-        pyResult.grossAnnualSavings
+        pyResult.grossAnnualSavings,
       );
 
       const result2 = await runner.runEval(
         `ROI-NetYear1: ${sample.name}`,
         async () => tsResult.netYear1Savings,
-        pyResult.netYear1Savings
+        pyResult.netYear1Savings,
       );
 
       const result3 = await runner.runEval(
         `ROI-Percentage: ${sample.name}`,
         async () => tsResult.roi,
-        pyResult.roi
+        pyResult.roi,
       );
 
       expect(result1.pass && result2.pass && result3.pass).toBe(true);
@@ -280,8 +295,8 @@ describe('Compactor Optimization Evals', () => {
   },
   "roiCalculations": {
     "standard_optimization": {
-      "grossAnnualSavings": 51850.00,
-      "netYear1Savings": 49150.00,
+      "grossAnnualSavings": 51850.0,
+      "netYear1Savings": 49150.0,
       "roi": 1819.44,
       "paybackMonths": 0.7
     }
@@ -296,39 +311,42 @@ describe('Compactor Optimization Evals', () => {
 ```typescript
 // __tests__/unit/calculations/compactor-optimization.test.ts
 
-import { describe, test, expect } from 'vitest';
-import { calculateYardsPerDoor, calculateCapacityUtilization } from '@/lib/calculations/compactor-optimization';
+import { describe, test, expect } from "vitest";
+import {
+  calculateYardsPerDoor,
+  calculateCapacityUtilization,
+} from "@/lib/calculations/compactor-optimization";
 
-describe('Compactor Optimization Calculations', () => {
-  describe('Yards Per Door', () => {
-    test('calculates correctly with standard inputs', () => {
+describe("Compactor Optimization Calculations", () => {
+  describe("Yards Per Door", () => {
+    test("calculates correctly with standard inputs", () => {
       const result = calculateYardsPerDoor(100, 200);
       expect(result).toBeCloseTo(7.245, 3); // (100 * 14.49) / 200
     });
 
-    test('handles edge case: single unit', () => {
+    test("handles edge case: single unit", () => {
       const result = calculateYardsPerDoor(10, 1);
       expect(result).toBe(144.9);
     });
 
-    test('handles edge case: zero tonnage', () => {
+    test("handles edge case: zero tonnage", () => {
       const result = calculateYardsPerDoor(0, 200);
       expect(result).toBe(0);
     });
 
-    test('throws error for invalid inputs', () => {
+    test("throws error for invalid inputs", () => {
       expect(() => calculateYardsPerDoor(-10, 200)).toThrow();
       expect(() => calculateYardsPerDoor(100, 0)).toThrow();
     });
   });
 
-  describe('Capacity Utilization', () => {
-    test('calculates percentage correctly', () => {
+  describe("Capacity Utilization", () => {
+    test("calculates percentage correctly", () => {
       const result = calculateCapacityUtilization(6.4);
       expect(result).toBe(80); // (6.4 / 8.0) * 100
     });
 
-    test('handles over-capacity', () => {
+    test("handles over-capacity", () => {
       const result = calculateCapacityUtilization(9.5);
       expect(result).toBeGreaterThan(100);
     });
@@ -386,11 +404,11 @@ describe('Property Info Step', () => {
 ```typescript
 // __tests__/integration/api/extract-invoices.test.ts
 
-import { describe, test, expect, beforeAll } from 'vitest';
-import { createMocks } from 'node-mocks-http';
-import handler from '@/app/api/extract-invoices/route';
+import { describe, test, expect, beforeAll } from "vitest";
+import { createMocks } from "node-mocks-http";
+import handler from "@/app/api/extract-invoices/route";
 
-describe('POST /api/extract-invoices', () => {
+describe("POST /api/extract-invoices", () => {
   let authToken: string;
 
   beforeAll(async () => {
@@ -398,9 +416,9 @@ describe('POST /api/extract-invoices', () => {
     authToken = await getTestAuthToken();
   });
 
-  test('returns 401 without authentication', async () => {
+  test("returns 401 without authentication", async () => {
     const { req, res } = createMocks({
-      method: 'POST'
+      method: "POST",
     });
 
     await handler(req, res);
@@ -408,16 +426,16 @@ describe('POST /api/extract-invoices', () => {
     expect(res._getStatusCode()).toBe(401);
   });
 
-  test('extracts invoice data successfully', async () => {
+  test("extracts invoice data successfully", async () => {
     const { req, res } = createMocks({
-      method: 'POST',
+      method: "POST",
       headers: {
-        authorization: `Bearer ${authToken}`
+        authorization: `Bearer ${authToken}`,
       },
       body: {
-        projectId: 'test-project-id',
-        fileIds: ['test-file-1']
-      }
+        projectId: "test-project-id",
+        fileIds: ["test-file-1"],
+      },
     });
 
     await handler(req, res);
@@ -425,21 +443,21 @@ describe('POST /api/extract-invoices', () => {
     expect(res._getStatusCode()).toBe(200);
 
     const data = JSON.parse(res._getData());
-    expect(data).toHaveProperty('success', true);
-    expect(data).toHaveProperty('invoicesProcessed');
-    expect(data).toHaveProperty('totalSpend');
+    expect(data).toHaveProperty("success", true);
+    expect(data).toHaveProperty("invoicesProcessed");
+    expect(data).toHaveProperty("totalSpend");
   });
 
-  test('handles invalid project ID', async () => {
+  test("handles invalid project ID", async () => {
     const { req, res } = createMocks({
-      method: 'POST',
+      method: "POST",
       headers: {
-        authorization: `Bearer ${authToken}`
+        authorization: `Bearer ${authToken}`,
       },
       body: {
-        projectId: 'invalid-id',
-        fileIds: ['test-file-1']
-      }
+        projectId: "invalid-id",
+        fileIds: ["test-file-1"],
+      },
     });
 
     await handler(req, res);
@@ -456,66 +474,68 @@ describe('POST /api/extract-invoices', () => {
 ```typescript
 // __tests__/e2e/complete-workflow.spec.ts
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Complete WasteWise Workflow', () => {
-  test('user can create project, upload files, and view results', async ({ page }) => {
+test.describe("Complete WasteWise Workflow", () => {
+  test("user can create project, upload files, and view results", async ({
+    page,
+  }) => {
     // 1. Sign up
-    await page.goto('/signup');
-    await page.fill('[name="email"]', 'test@example.com');
-    await page.fill('[name="password"]', 'SecurePassword123!');
-    await page.fill('[name="confirmPassword"]', 'SecurePassword123!');
+    await page.goto("/signup");
+    await page.fill('[name="email"]', "test@example.com");
+    await page.fill('[name="password"]', "SecurePassword123!");
+    await page.fill('[name="confirmPassword"]', "SecurePassword123!");
     await page.click('button[type="submit"]');
 
     // 2. Navigate to dashboard
-    await expect(page).toHaveURL('/dashboard');
+    await expect(page).toHaveURL("/dashboard");
 
     // 3. Start new analysis
-    await page.click('text=Start New Analysis');
-    await expect(page).toHaveURL('/projects/new');
+    await page.click("text=Start New Analysis");
+    await expect(page).toHaveURL("/projects/new");
 
     // 4. Fill Step 1: Property Info
-    await page.fill('[name="propertyName"]', 'Test Property');
-    await page.fill('[name="units"]', '150');
-    await page.fill('[name="city"]', 'Dallas');
-    await page.selectOption('[name="state"]', 'TX');
-    await page.selectOption('[name="propertyType"]', 'Garden-Style');
-    await page.click('text=Next: Upload Files');
+    await page.fill('[name="propertyName"]', "Test Property");
+    await page.fill('[name="units"]', "150");
+    await page.fill('[name="city"]', "Dallas");
+    await page.selectOption('[name="state"]', "TX");
+    await page.selectOption('[name="propertyType"]', "Garden-Style");
+    await page.click("text=Next: Upload Files");
 
     // 5. Step 2: Upload Files
     const fileInput = await page.locator('input[type="file"]');
-    await fileInput.setInputFiles('./test-fixtures/sample-invoice.pdf');
-    await expect(page.locator('text=sample-invoice.pdf')).toBeVisible();
-    await page.click('text=Next: Review');
+    await fileInput.setInputFiles("./test-fixtures/sample-invoice.pdf");
+    await expect(page.locator("text=sample-invoice.pdf")).toBeVisible();
+    await page.click("text=Next: Review");
 
     // 6. Step 3: Review and Submit
-    await expect(page.locator('text=Test Property')).toBeVisible();
-    await expect(page.locator('text=150 units')).toBeVisible();
-    await page.click('text=Start Analysis');
+    await expect(page.locator("text=Test Property")).toBeVisible();
+    await expect(page.locator("text=150 units")).toBeVisible();
+    await page.click("text=Start Analysis");
 
     // 7. Processing Page
     await expect(page).toHaveURL(/\/projects\/.*\/processing/);
-    await expect(page.locator('text=Analyzing your waste data')).toBeVisible();
+    await expect(page.locator("text=Analyzing your waste data")).toBeVisible();
 
     // 8. Wait for completion (with timeout)
     await page.waitForURL(/\/projects\/.*\/results/, { timeout: 300000 }); // 5 min
 
     // 9. Results Page
-    await expect(page.locator('text=Potential 2026 Savings')).toBeVisible();
+    await expect(page.locator("text=Potential 2026 Savings")).toBeVisible();
 
     // 10. Download reports
-    await page.click('text=Download Reports');
+    await page.click("text=Download Reports");
     const [download1] = await Promise.all([
-      page.waitForEvent('download'),
-      page.click('text=Excel Workbook')
+      page.waitForEvent("download"),
+      page.click("text=Excel Workbook"),
     ]);
-    expect(download1.suggestedFilename()).toContain('.xlsx');
+    expect(download1.suggestedFilename()).toContain(".xlsx");
 
     const [download2] = await Promise.all([
-      page.waitForEvent('download'),
-      page.click('text=HTML Dashboard')
+      page.waitForEvent("download"),
+      page.click("text=HTML Dashboard"),
     ]);
-    expect(download2.suggestedFilename()).toContain('.html');
+    expect(download2.suggestedFilename()).toContain(".html");
   });
 });
 ```
@@ -527,18 +547,18 @@ test.describe('Complete WasteWise Workflow', () => {
 ```typescript
 // __tests__/performance/lighthouse.test.ts
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Performance Audits', () => {
-  test('landing page achieves Lighthouse score >90', async ({ page }) => {
-    await page.goto('/');
+test.describe("Performance Audits", () => {
+  test("landing page achieves Lighthouse score >90", async ({ page }) => {
+    await page.goto("/");
 
     // Run Lighthouse audit via Chrome DevTools MCP
     const audit = await page.evaluate(async () => {
       // @ts-ignore
       return await lighthouse(document.location.href, {
-        output: 'json',
-        onlyCategories: ['performance', 'accessibility']
+        output: "json",
+        onlyCategories: ["performance", "accessibility"],
       });
     });
 
@@ -546,14 +566,15 @@ test.describe('Performance Audits', () => {
     expect(audit.categories.accessibility.score).toBeGreaterThanOrEqual(0.9);
   });
 
-  test('dashboard loads in <2 seconds', async ({ page }) => {
-    await page.goto('/dashboard');
+  test("dashboard loads in <2 seconds", async ({ page }) => {
+    await page.goto("/dashboard");
 
     const metrics = await page.evaluate(() => {
-      const perfData = performance.getEntriesByType('navigation')[0];
+      const perfData = performance.getEntriesByType("navigation")[0];
       return {
         loadTime: perfData.loadEventEnd - perfData.fetchStart,
-        domContentLoaded: perfData.domContentLoadedEventEnd - perfData.fetchStart
+        domContentLoaded:
+          perfData.domContentLoadedEventEnd - perfData.fetchStart,
       };
     });
 
@@ -566,6 +587,7 @@ test.describe('Performance Audits', () => {
 ## Acceptance Criteria (Every Task)
 
 ### Evals Framework
+
 - [ ] Framework built and running
 - [ ] Test data imported from Python
 - [ ] All calculations compared against Python
@@ -574,24 +596,28 @@ test.describe('Performance Audits', () => {
 - [ ] All evals passing
 
 ### Unit Tests
+
 - [ ] 100% coverage for calculations
 - [ ] All edge cases tested
 - [ ] Error handling tested
 - [ ] No flaky tests
 
 ### Integration Tests
+
 - [ ] All API routes tested
 - [ ] Database operations tested
 - [ ] Auth flow tested
 - [ ] File upload tested
 
 ### E2E Tests
+
 - [ ] Complete workflow tested
 - [ ] Mobile and desktop tested
 - [ ] Error scenarios tested
 - [ ] Download functionality tested
 
 ### Performance
+
 - [ ] Lighthouse >90 on all pages
 - [ ] API response time <500ms
 - [ ] Database queries optimized

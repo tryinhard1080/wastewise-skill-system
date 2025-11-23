@@ -7,6 +7,7 @@ Use this checklist to ensure safe and successful deployments.
 ## Pre-Deployment Checklist
 
 ### Code Quality
+
 - [ ] All tests passing (`pnpm test`)
 - [ ] TypeScript compiles with no errors (`pnpm tsc --noEmit`)
 - [ ] Linting passes (`pnpm lint`)
@@ -14,12 +15,14 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Code reviewed and approved (if team deployment)
 
 ### Git Status
+
 - [ ] All changes committed
 - [ ] On master/main branch
 - [ ] Branch up to date with remote (`git pull origin master`)
 - [ ] No uncommitted changes (`git status`)
 
 ### Environment Configuration
+
 - [ ] Environment variables validated (`pnpm validate:env --strict`)
 - [ ] `.env.template` updated with any new variables
 - [ ] Railway environment variables configured
@@ -28,6 +31,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Sentry DSN configured (production)
 
 ### Database
+
 - [ ] Migrations tested locally
 - [ ] Migrations applied to staging
 - [ ] Migrations applied to production (if needed)
@@ -35,11 +39,13 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Row-Level Security (RLS) policies verified
 
 ### Dependencies
+
 - [ ] `package.json` dependencies up to date
 - [ ] No critical security vulnerabilities (`pnpm audit`)
 - [ ] Lock file (`pnpm-lock.yaml`) committed
 
 ### Documentation
+
 - [ ] README updated (if needed)
 - [ ] Deployment documentation reviewed
 - [ ] Changelog updated with changes
@@ -49,17 +55,20 @@ Use this checklist to ensure safe and successful deployments.
 ## Staging Deployment Checklist
 
 ### Pre-Staging
+
 - [ ] Staging environment configured in Railway
 - [ ] Staging environment variables set
 - [ ] Staging database populated with test data
 
 ### Deployment
+
 - [ ] Run deployment script (`pnpm deploy:staging`)
 - [ ] Deployment completes without errors
 - [ ] Health checks pass
 - [ ] No errors in Railway logs
 
 ### Verification
+
 - [ ] Landing page loads correctly
 - [ ] Sign up/login works
 - [ ] Create project works
@@ -71,6 +80,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Mobile responsive (test on phone)
 
 ### Performance
+
 - [ ] Page load time <2 seconds
 - [ ] API responses <500ms
 - [ ] No memory leaks (check Railway metrics)
@@ -81,18 +91,21 @@ Use this checklist to ensure safe and successful deployments.
 ## Production Deployment Checklist
 
 ### Pre-Production
+
 - [ ] Staging deployment verified and tested
 - [ ] All stakeholders notified of deployment
 - [ ] Deployment window scheduled (if needed)
 - [ ] Rollback plan reviewed
 
 ### Final Safety Checks
+
 - [ ] Production environment variables verified
 - [ ] Database backup completed
 - [ ] Monitoring tools active (Sentry, UptimeRobot)
 - [ ] Team available for support (if needed)
 
 ### Deployment
+
 - [ ] Run production deployment script (`pnpm deploy:production`)
 - [ ] Review deployment summary
 - [ ] Confirm deployment when prompted
@@ -101,6 +114,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Health checks pass
 
 ### Post-Deployment Verification (Immediate)
+
 - [ ] Landing page loads (`https://wastewise.com`)
 - [ ] Health endpoint responds (`/api/health`)
 - [ ] API routes accessible (401 on protected routes = good)
@@ -109,6 +123,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] No errors in Railway logs (first 5 minutes)
 
 ### Post-Deployment Verification (30 Minutes)
+
 - [ ] Error rate <0.1% (Sentry)
 - [ ] Response time <500ms (Railway metrics)
 - [ ] Worker processing jobs successfully
@@ -117,6 +132,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Complete user flow works (end-to-end test)
 
 ### Post-Deployment Tasks
+
 - [ ] Update internal documentation (if needed)
 - [ ] Notify team of successful deployment
 - [ ] Monitor for next 2 hours (passive monitoring)
@@ -127,6 +143,7 @@ Use this checklist to ensure safe and successful deployments.
 ## Rollback Checklist
 
 ### When to Rollback
+
 - [ ] Health checks failing
 - [ ] Error rate >5%
 - [ ] Critical functionality broken
@@ -134,6 +151,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Security vulnerability discovered
 
 ### Rollback Process
+
 - [ ] Identify last known good deployment
 - [ ] Run rollback script (`pnpm rollback`)
 - [ ] Or redeploy via Railway dashboard
@@ -142,6 +160,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Notify team of rollback
 
 ### Post-Rollback
+
 - [ ] Document issue that caused rollback
 - [ ] Create bug report/issue
 - [ ] Fix issue in new branch
@@ -153,6 +172,7 @@ Use this checklist to ensure safe and successful deployments.
 ## Weekly Maintenance Checklist
 
 ### Every Monday
+
 - [ ] Review error rates (Sentry)
 - [ ] Check Railway usage/costs
 - [ ] Verify database backup success
@@ -160,6 +180,7 @@ Use this checklist to ensure safe and successful deployments.
 - [ ] Review system logs for warnings
 
 ### Every Month
+
 - [ ] Review and rotate API keys (90-day rotation)
 - [ ] Update dependencies (`pnpm update`)
 - [ ] Run security audit (`pnpm audit`)
@@ -171,6 +192,7 @@ Use this checklist to ensure safe and successful deployments.
 ## Emergency Procedures
 
 ### Complete Service Outage
+
 1. Check Railway status page
 2. Check Supabase status page
 3. Verify DNS settings
@@ -180,6 +202,7 @@ Use this checklist to ensure safe and successful deployments.
 7. Notify users via status page (if available)
 
 ### Database Issues
+
 1. Check connection pool usage
 2. Verify Supabase is online
 3. Check for long-running queries
@@ -187,6 +210,7 @@ Use this checklist to ensure safe and successful deployments.
 5. If connection limit: Upgrade tier or optimize
 
 ### High API Costs
+
 1. Check Anthropic usage dashboard
 2. Identify which jobs using most tokens
 3. Review prompt efficiency

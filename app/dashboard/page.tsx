@@ -4,25 +4,25 @@
  * Main dashboard view with project overview and quick actions
  */
 
-import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
+import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Plus, FileText, TrendingUp, DollarSign, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+} from "@/components/ui/card";
+import { Plus, FileText, TrendingUp, DollarSign, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   // Get user's projects count
   const { count: projectsCount } = await supabase
-    .from('projects')
-    .select('*', { count: 'exact', head: true })
+    .from("projects")
+    .select("*", { count: "exact", head: true });
 
   return (
     <div className="space-y-8">
@@ -98,9 +98,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">
-              Total properties
-            </p>
+            <p className="text-xs text-muted-foreground">Total properties</p>
           </CardContent>
         </Card>
       </div>
@@ -111,17 +109,15 @@ export default async function DashboardPage() {
           <CardTitle>Getting Started</CardTitle>
           <CardDescription>
             {projectsCount && projectsCount > 0
-              ? 'Your recent projects'
-              : 'Start your first waste analysis'}
+              ? "Your recent projects"
+              : "Start your first waste analysis"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!projectsCount || projectsCount === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Trash2 className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
-                No projects yet
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
               <p className="text-sm text-muted-foreground mb-6 max-w-md">
                 Create your first waste analysis project to start identifying
                 optimization opportunities and cost savings.
@@ -188,5 +184,5 @@ export default async function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

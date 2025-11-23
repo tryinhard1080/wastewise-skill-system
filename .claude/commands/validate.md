@@ -9,12 +9,14 @@
 ## Prerequisites
 
 **Required**:
+
 - Local Supabase running (`supabase start`)
 - Environment variables configured (`.env.local`)
 - Dependencies installed (`pnpm install`)
 - Worker process NOT running during tests (to avoid conflicts)
 
 **Optional for Full E2E**:
+
 - Anthropic API key (for AI integration tests)
 - Test data seeded (`pnpm run seed:test`)
 
@@ -29,6 +31,7 @@ pnpm lint
 ```
 
 **What it checks**:
+
 - ESLint rules for TypeScript/JavaScript
 - React hooks usage
 - Import/export correctness
@@ -47,6 +50,7 @@ pnpm tsc --noEmit
 ```
 
 **What it checks**:
+
 - Type mismatches
 - Missing type annotations (strict mode)
 - Invalid property access
@@ -67,6 +71,7 @@ pnpm prettier --check .
 ```
 
 **What it checks**:
+
 - Code formatting consistency
 - Indentation
 - Line length
@@ -87,6 +92,7 @@ pnpm test:unit
 ```
 
 **What it tests**:
+
 - Calculation formulas (yards per door, cost per door, etc.)
 - Skills business logic
 - Utility functions
@@ -96,6 +102,7 @@ pnpm test:unit
 **Expected**: All unit tests pass
 
 **Critical Tests**:
+
 - `lib/evals/` - Calculation accuracy (< 0.01% tolerance)
 - `__tests__/skills/` - Skills logic
 - `__tests__/security/` - Security hardening (XSS, file upload, RLS)
@@ -257,6 +264,7 @@ pnpm test:e2e
    - Verify error messages user-friendly
 
 **Specific Test Files**:
+
 ```bash
 # Complete workflow (most important)
 playwright test __tests__/e2e/complete-workflow.test.ts
@@ -278,6 +286,7 @@ pnpm eval
 ```
 
 **What it validates**:
+
 - TypeScript calculations match Python reference (< 0.01% tolerance)
 - Compactor optimization formula accuracy
 - Yards per door calculations
@@ -285,6 +294,7 @@ pnpm eval
 - Conversion rates consistency (14.49, 4.33, 8.5, 6.0)
 
 **Test Scenarios**:
+
 - Compactor data with various tons per haul (< 6.0, 6.0-8.5, > 8.5)
 - Dumpster data with various frequencies
 - Lease-up properties (> 40% below benchmark)
@@ -302,6 +312,7 @@ pnpm test __tests__/security/
 ```
 
 **What it validates**:
+
 - XSS prevention (DOMPurify sanitization)
 - File upload security (magic bytes, size limits)
 - RLS policies (cross-user access prevention)
@@ -322,15 +333,17 @@ pnpm test __tests__/security/
 ✅ **Phase 3 (Style)**: All files properly formatted
 ✅ **Phase 4 (Unit Tests)**: All tests pass
 ✅ **Phase 5 (E2E)**:
-  - All API tests return expected results
-  - All database queries verify correct state
-  - All Playwright workflows complete successfully
-  - All calculation evals within 0.01% tolerance
-  - All security tests pass
+
+- All API tests return expected results
+- All database queries verify correct state
+- All Playwright workflows complete successfully
+- All calculation evals within 0.01% tolerance
+- All security tests pass
 
 ### Production Readiness Indicators
 
 **If ALL phases pass**:
+
 - ✅ WasteWise is production-ready
 - ✅ All critical user workflows tested
 - ✅ All calculations verified accurate
@@ -338,6 +351,7 @@ pnpm test __tests__/security/
 - ✅ Safe to deploy
 
 **If ANY phase fails**:
+
 - ❌ Do NOT deploy to production
 - ❌ Fix failing tests first
 - ❌ Re-run `/validate` until all pass
@@ -349,6 +363,7 @@ pnpm test __tests__/security/
 ### Common Issues
 
 **Supabase Not Running**:
+
 ```bash
 # Start Supabase
 supabase start
@@ -358,6 +373,7 @@ supabase status
 ```
 
 **Database Migration Issues**:
+
 ```bash
 # Reset database
 supabase db reset
@@ -367,12 +383,14 @@ supabase migration up
 ```
 
 **E2E Tests Timing Out**:
+
 ```bash
 # Increase timeout in playwright.config.ts
 timeout: 60000  # 60 seconds per test
 ```
 
 **Calculation Evals Failing**:
+
 ```bash
 # Verify Python reference implementation
 cd waste-skills-complete
@@ -383,6 +401,7 @@ grep -r "14.49\|4.33\|8.5\|6.0" lib/constants/formulas.ts
 ```
 
 **Rate Limiting Tests Failing**:
+
 ```bash
 # Verify Upstash Redis configured
 echo $UPSTASH_REDIS_REST_URL
@@ -437,7 +456,7 @@ jobs:
       - uses: supabase/setup-cli@v1
       - run: supabase start
       - run: pnpm install
-      - run: pnpm validate  # Runs all 5 phases
+      - run: pnpm validate # Runs all 5 phases
 ```
 
 **Pre-commit Hook** (planned):

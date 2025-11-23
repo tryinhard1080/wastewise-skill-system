@@ -38,6 +38,7 @@ __tests__/e2e/
 ### Local Development
 
 1. **Environment Variables**: Ensure `.env.local` has all required variables:
+
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -46,17 +47,20 @@ __tests__/e2e/
    ```
 
 2. **Supabase Local Instance**: Start Supabase before running tests:
+
    ```bash
    pnpm supabase start
    pnpm supabase db push
    ```
 
 3. **Background Worker**: Start the worker process:
+
    ```bash
    pnpm worker
    ```
 
 4. **Playwright Browsers**: Install browsers (one-time setup):
+
    ```bash
    pnpm exec playwright install chromium
    ```
@@ -69,6 +73,7 @@ __tests__/e2e/
 ### CI/CD
 
 All required setup is automated in `.github/workflows/e2e-tests.yml`. Tests run automatically on:
+
 - Pull requests to `master`
 - Pushes to `master`
 - Manual workflow dispatch
@@ -76,7 +81,9 @@ All required setup is automated in `.github/workflows/e2e-tests.yml`. Tests run 
 ## Test Suites Overview
 
 ### 1. Authentication Flows (`auth-flows.spec.ts`) - 9 tests
+
 Tests user authentication and session management:
+
 - User signup with validation
 - Login/logout flows
 - Password reset functionality
@@ -84,7 +91,9 @@ Tests user authentication and session management:
 - Protected route access control
 
 ### 2. Project Management (`project-management.spec.ts`) - 9 tests
+
 Tests project CRUD operations and data isolation:
+
 - Project creation with required fields
 - Form validation errors
 - Project listing and details viewing
@@ -94,7 +103,9 @@ Tests project CRUD operations and data isolation:
 - Multiple project support
 
 ### 3. File Upload & Validation (`file-upload.spec.ts`) - 9 tests
+
 Tests file upload functionality and validation:
+
 - PDF, Excel (.xlsx), and CSV uploads
 - Multiple file uploads
 - File size validation (10MB limit)
@@ -104,7 +115,9 @@ Tests file upload functionality and validation:
 - File list display with names and sizes
 
 ### 4. Analysis Workflows (`analysis-workflows.spec.ts`) - 9 tests
+
 Tests all analysis job types and states:
+
 - Complete analysis jobs
 - Invoice extraction jobs
 - Regulatory research jobs
@@ -115,7 +128,9 @@ Tests all analysis job types and states:
 - Job cancellation (if supported)
 
 ### 5. Results & Reports (`results-reports.spec.ts`) - 9 tests
+
 Tests results page rendering and downloads:
+
 - Analysis summary display
 - Optimization recommendations
 - Expense breakdown visualization
@@ -126,7 +141,9 @@ Tests results page rendering and downloads:
 - Graceful handling of missing data
 
 ### 6. Error Handling & Edge Cases (`error-handling.spec.ts`) - 9 tests
+
 Tests application resilience and error states:
+
 - API unavailability (503 errors)
 - File upload failures
 - Analysis job failures
@@ -138,7 +155,9 @@ Tests application resilience and error states:
 - Validation errors with field-specific messages
 
 ### 7. Performance & Load Testing (`performance.spec.ts`) - 7 tests
+
 Tests application performance and scalability:
+
 - Dashboard load time (<2s)
 - Project list load time (<2s)
 - Results page load time (<2s)
@@ -148,7 +167,9 @@ Tests application performance and scalability:
 - Large dataset handling (250 units, 6 months data)
 
 ### 8. Complete Analysis Flow (`complete-analysis-flow.spec.ts`) - 5 tests
+
 Original comprehensive workflow tests:
+
 - Full user journey from login to download
 - Analysis with seeded data
 - Multiple project creation
@@ -211,11 +232,11 @@ Fixtures provide reusable test contexts with automatic setup/cleanup.
 Creates a test user, logs in, and provides an authenticated page.
 
 ```typescript
-test('my test', async ({ authenticatedPage }) => {
+test("my test", async ({ authenticatedPage }) => {
   // Page is already logged in
-  await authenticatedPage.goto('/dashboard')
+  await authenticatedPage.goto("/dashboard");
   // ... test code ...
-})
+});
 // User automatically deleted after test
 ```
 
@@ -224,11 +245,11 @@ test('my test', async ({ authenticatedPage }) => {
 Creates a test user, logs in, and creates a test project.
 
 ```typescript
-test('my test', async ({ testProject }) => {
-  const { page, projectId, userId } = testProject
-  await page.goto(`/projects/${projectId}`)
+test("my test", async ({ testProject }) => {
+  const { page, projectId, userId } = testProject;
+  await page.goto(`/projects/${projectId}`);
   // ... test code ...
-})
+});
 // Project and user automatically deleted after test
 ```
 
@@ -237,12 +258,12 @@ test('my test', async ({ testProject }) => {
 Creates a test project with pre-seeded invoice and haul log data.
 
 ```typescript
-test('analyze seeded project', async ({ seededProject }) => {
-  const { page, projectId } = seededProject
+test("analyze seeded project", async ({ seededProject }) => {
+  const { page, projectId } = seededProject;
   // Project already has 6 months of invoice data and 22 haul logs
-  await page.goto(`/projects/${projectId}/analyze`)
+  await page.goto(`/projects/${projectId}/analyze`);
   // ... test code ...
-})
+});
 // All data automatically cleaned up after test
 ```
 
@@ -254,13 +275,13 @@ Located in `utils/test-helpers.ts`:
 
 ```typescript
 // Create test user
-const userId = await createTestUser('test@example.com', 'password123')
+const userId = await createTestUser("test@example.com", "password123");
 
 // Delete test user (also deletes associated data)
-await deleteTestUser(userId)
+await deleteTestUser(userId);
 
 // Login to application
-await loginUser(page, 'test@example.com', 'password123')
+await loginUser(page, "test@example.com", "password123");
 ```
 
 ### Project Management
@@ -268,37 +289,40 @@ await loginUser(page, 'test@example.com', 'password123')
 ```typescript
 // Create test project
 const projectId = await createTestProject(userId, {
-  property_name: 'Test Property',
+  property_name: "Test Property",
   units: 250,
-  property_type: 'Garden-Style',
-  equipment_type: 'COMPACTOR'
-})
+  property_type: "Garden-Style",
+  equipment_type: "COMPACTOR",
+});
 
 // Delete test project
-await deleteTestProject(projectId)
+await deleteTestProject(projectId);
 ```
 
 ### Job Monitoring
 
 ```typescript
 // Wait for analysis job to complete
-const result = await waitForJobCompletion(page, jobId, 300000) // 5 min timeout
+const result = await waitForJobCompletion(page, jobId, 300000); // 5 min timeout
 
 // Get current job progress
-const progress = await getCurrentJobProgress(page)
+const progress = await getCurrentJobProgress(page);
 
 // Wait for specific progress milestone
-await waitForProgress(page, 50) // Wait until 50% complete
+await waitForProgress(page, 50); // Wait until 50% complete
 ```
 
 ### File Operations
 
 ```typescript
 // Upload file via UI
-await uploadFileViaUI(page, '/path/to/file.xlsx')
+await uploadFileViaUI(page, "/path/to/file.xlsx");
 
 // Download file and verify
-const { filename, path } = await downloadFile(page, 'button:has-text("Download")')
+const { filename, path } = await downloadFile(
+  page,
+  'button:has-text("Download")',
+);
 ```
 
 ### Data Seeding
@@ -324,41 +348,43 @@ await seedHaulLogData(projectId, [
 ### Basic Structure
 
 ```typescript
-import { test, expect } from './utils/fixtures'
+import { test, expect } from "./utils/fixtures";
 
-test.describe('My Feature', () => {
-  test('should do something', async ({ authenticatedPage }) => {
+test.describe("My Feature", () => {
+  test("should do something", async ({ authenticatedPage }) => {
     // Arrange
-    await authenticatedPage.goto('/some-page')
+    await authenticatedPage.goto("/some-page");
 
     // Act
-    await authenticatedPage.click('button:has-text("Click Me")')
+    await authenticatedPage.click('button:has-text("Click Me")');
 
     // Assert
-    await expect(authenticatedPage.locator('h1')).toContainText('Expected Text')
-  })
-})
+    await expect(authenticatedPage.locator("h1")).toContainText(
+      "Expected Text",
+    );
+  });
+});
 ```
 
 ### Using Fixtures
 
 ```typescript
 // Use authenticated page (auto-login)
-test('test with auth', async ({ authenticatedPage }) => {
+test("test with auth", async ({ authenticatedPage }) => {
   // User is already logged in
-})
+});
 
 // Use test project (auto-created)
-test('test with project', async ({ testProject }) => {
-  const { page, projectId } = testProject
+test("test with project", async ({ testProject }) => {
+  const { page, projectId } = testProject;
   // Project already exists, user logged in
-})
+});
 
 // Use seeded project (data pre-loaded)
-test('test with data', async ({ seededProject }) => {
-  const { page, projectId } = seededProject
+test("test with data", async ({ seededProject }) => {
+  const { page, projectId } = seededProject;
   // Project has invoice and haul log data
-})
+});
 ```
 
 ### Test Timeouts
@@ -366,13 +392,13 @@ test('test with data', async ({ seededProject }) => {
 E2E tests involving AI processing can take several minutes:
 
 ```typescript
-test.describe('Long-running tests', () => {
-  test.setTimeout(15 * 60 * 1000) // 15 minutes
+test.describe("Long-running tests", () => {
+  test.setTimeout(15 * 60 * 1000); // 15 minutes
 
-  test('analysis workflow', async ({ seededProject }) => {
+  test("analysis workflow", async ({ seededProject }) => {
     // Test that may take 5-10 minutes
-  })
-})
+  });
+});
 ```
 
 ## Debugging Tests
@@ -386,6 +412,7 @@ pnpm test:e2e:debug
 ```
 
 This opens Playwright Inspector where you can:
+
 - Step through test actions
 - Inspect page elements
 - Pause and resume execution
@@ -402,11 +429,13 @@ pnpm test:e2e:headed
 ### Screenshots and Videos
 
 Tests automatically capture:
+
 - **Screenshots**: On failure only
 - **Videos**: On failure only
 - **Traces**: On failure only (includes network, console, etc.)
 
 Find artifacts in:
+
 - `test-results/` - Raw test output
 - `playwright-report/` - HTML report with screenshots/videos
 
@@ -415,13 +444,13 @@ Find artifacts in:
 Add debug logs in tests:
 
 ```typescript
-test('debug test', async ({ page }) => {
-  console.log('Step 1: Navigating to page')
-  await page.goto('/dashboard')
+test("debug test", async ({ page }) => {
+  console.log("Step 1: Navigating to page");
+  await page.goto("/dashboard");
 
-  console.log('Step 2: Clicking button')
-  await page.click('button')
-})
+  console.log("Step 2: Clicking button");
+  await page.click("button");
+});
 ```
 
 ## Troubleshooting
@@ -431,14 +460,17 @@ test('debug test', async ({ page }) => {
 **Problem**: `winldd.exe` errors when installing Chromium
 
 **Solution 1 - Use CI/CD**:
+
 - Tests run perfectly in CI/CD (Linux)
 - Develop locally, validate in PR checks
 
 **Solution 2 - Use Puppeteer**:
+
 - Puppeteer is already installed
 - Configure Playwright to use Puppeteer's Chromium
 
 **Solution 3 - Manual Install**:
+
 ```bash
 # Download Chromium manually
 # Configure playwright.config.ts to use custom executable path
@@ -449,11 +481,13 @@ test('debug test', async ({ page }) => {
 **Problem**: Tests fail with "Timeout" errors
 
 **Causes**:
+
 1. Worker not running (analysis jobs never complete)
 2. Supabase not started (database errors)
 3. Network issues (slow AI responses)
 
 **Solutions**:
+
 ```bash
 # Ensure worker is running
 pnpm worker
@@ -472,6 +506,7 @@ test.setTimeout(20 * 60 * 1000) // 20 minutes
 **Cause**: Previous test didn't clean up properly
 
 **Solution**:
+
 ```bash
 # Reset Supabase database
 pnpm supabase db reset
@@ -487,6 +522,7 @@ pnpm supabase db push
 **Problem**: Analysis jobs stay in "pending" status forever
 
 **Checklist**:
+
 1. Worker process is running (`pnpm worker`)
 2. `ANTHROPIC_API_KEY` is set in `.env.local`
 3. Worker logs show job pickup (check `worker.log`)
@@ -497,17 +533,19 @@ pnpm supabase db push
 **Problem**: File uploads don't work in tests
 
 **Causes**:
+
 1. Invalid file path (use absolute paths)
 2. File doesn't exist
 3. File type not supported
 
 **Solution**:
+
 ```typescript
-import path from 'path'
+import path from "path";
 
 // Use path.join for cross-platform compatibility
-const filePath = path.join(__dirname, 'seeds/test-files/sample-invoice.xlsx')
-await uploadFileViaUI(page, filePath)
+const filePath = path.join(__dirname, "seeds/test-files/sample-invoice.xlsx");
+await uploadFileViaUI(page, filePath);
 ```
 
 ## Best Practices
@@ -537,13 +575,13 @@ Each test should be independent:
 
 ```typescript
 // ✅ Good - No dependencies
-test('test 1', async ({ testProject }) => {
+test("test 1", async ({ testProject }) => {
   // Uses own project
-})
+});
 
-test('test 2', async ({ testProject }) => {
+test("test 2", async ({ testProject }) => {
   // Uses separate project
-})
+});
 ```
 
 ### 3. Clean Selectors
@@ -552,10 +590,10 @@ Use data-testid attributes for stable selectors:
 
 ```typescript
 // ❌ Fragile - Text can change
-await page.click('button:has-text("Submit")')
+await page.click('button:has-text("Submit")');
 
 // ✅ Stable - Uses test ID
-await page.click('[data-testid="submit-button"]')
+await page.click('[data-testid="submit-button"]');
 ```
 
 ### 4. Explicit Waits
@@ -564,11 +602,11 @@ Wait for elements before interacting:
 
 ```typescript
 // ❌ May fail if element not yet visible
-await page.click('button')
+await page.click("button");
 
 // ✅ Waits for element to be ready
-await expect(page.locator('button')).toBeVisible()
-await page.click('button')
+await expect(page.locator("button")).toBeVisible();
+await page.click("button");
 ```
 
 ### 5. Meaningful Assertions
@@ -577,10 +615,10 @@ Assert on user-visible behavior:
 
 ```typescript
 // ❌ Tests implementation details
-expect(await page.locator('#result').getAttribute('data-value')).toBe('123')
+expect(await page.locator("#result").getAttribute("data-value")).toBe("123");
 
 // ✅ Tests user-visible output
-await expect(page.locator('h1')).toContainText('Analysis Complete')
+await expect(page.locator("h1")).toContainText("Analysis Complete");
 ```
 
 ## Performance Optimization
@@ -590,10 +628,11 @@ await expect(page.locator('h1')).toContainText('Analysis Complete')
 By default, tests run sequentially (workers: 1) to avoid database conflicts.
 
 To enable parallel execution:
+
 1. Use isolated database instances per worker
 2. Update `playwright.config.ts`:
    ```typescript
-   workers: process.env.CI ? 2 : 1
+   workers: process.env.CI ? 2 : 1;
    ```
 
 ### Seeded Data
@@ -602,15 +641,15 @@ Use `seededProject` fixture instead of uploading files:
 
 ```typescript
 // ❌ Slower - Uploads and processes files
-test('slow test', async ({ testProject }) => {
-  await uploadFileViaUI(page, 'invoice.xlsx')
-  await page.click('button:has-text("Analyze")')
-})
+test("slow test", async ({ testProject }) => {
+  await uploadFileViaUI(page, "invoice.xlsx");
+  await page.click('button:has-text("Analyze")');
+});
 
 // ✅ Faster - Data already in database
-test('fast test', async ({ seededProject }) => {
-  await page.click('button:has-text("Analyze")')
-})
+test("fast test", async ({ seededProject }) => {
+  await page.click('button:has-text("Analyze")');
+});
 ```
 
 ## CI/CD Integration

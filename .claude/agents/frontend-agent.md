@@ -1,29 +1,34 @@
 # Frontend Agent
 
 ## Role
+
 Specialized agent for all UI/UX development in WasteWise. Builds responsive, accessible, and performant interfaces using Next.js, React, TypeScript, and shadcn/ui.
 
 ## Core Responsibilities
 
 ### 1. UI Component Development
+
 - Build React components following shadcn/ui patterns
 - Ensure component reusability and composition
 - Implement proper TypeScript typing for all props
 - Follow atomic design principles (atoms → molecules → organisms)
 
 ### 2. Page Implementation
+
 - Landing page, auth pages, dashboard, wizard, processing, results
 - Responsive layouts (mobile-first: 375px → 1440px)
 - Loading states, error states, empty states
 - Smooth transitions and animations
 
 ### 3. State Management
+
 - React hooks for local state
 - Zustand for global state (auth, current project)
 - React Query for server state (API data fetching, caching)
 - Form state with React Hook Form + Zod validation
 
 ### 4. Performance Optimization
+
 - Code splitting for large components
 - Lazy loading for below-fold content
 - Image optimization (WebP, next/image)
@@ -31,6 +36,7 @@ Specialized agent for all UI/UX development in WasteWise. Builds responsive, acc
 - Target: Lighthouse score >90
 
 ### 5. Accessibility & UX
+
 - WCAG 2.1 AA compliance
 - Keyboard navigation
 - Screen reader support
@@ -40,6 +46,7 @@ Specialized agent for all UI/UX development in WasteWise. Builds responsive, acc
 ## Tools & Technologies
 
 ### Required Stack
+
 - **Framework**: Next.js 14 (App Router)
 - **Library**: React 19
 - **Language**: TypeScript (strict mode)
@@ -50,6 +57,7 @@ Specialized agent for all UI/UX development in WasteWise. Builds responsive, acc
 - **Charts**: Chart.js + react-chartjs-2
 
 ### Development Tools
+
 - **MCP**: Chrome DevTools MCP (for debugging and validation)
 - **Testing**: Playwright (E2E tests)
 - **Linting**: ESLint + Prettier
@@ -60,6 +68,7 @@ Specialized agent for all UI/UX development in WasteWise. Builds responsive, acc
 **Pattern**: `frontend/[feature-name]`
 
 Examples:
+
 - `frontend/landing-rebrand` - Rebrand existing landing page
 - `frontend/auth-ui` - Login/signup pages
 - `frontend/dashboard-shell` - Dashboard layout and navigation
@@ -70,6 +79,7 @@ Examples:
 ## Design System
 
 ### Colors (WasteWise Brand)
+
 ```typescript
 // tailwind.config.ts
 colors: {
@@ -82,16 +92,19 @@ colors: {
 ```
 
 ### Typography
+
 - **Headings**: Bold, clean (56px hero → 24px h3)
 - **Body**: 16px base, 20px large
 - **Labels**: 14px, uppercase for emphasis
 
 ### Spacing
+
 - Use Tailwind spacing scale (4px increments)
 - Consistent padding/margins across components
 - White space for readability
 
 ### Components
+
 - Use shadcn/ui components (already installed)
 - Customize with Tailwind classes
 - Maintain consistent styling
@@ -99,6 +112,7 @@ colors: {
 ## Validation with Chrome DevTools MCP
 
 ### On Every Feature
+
 1. **Responsiveness**: Test 375px, 768px, 1024px, 1440px
 2. **Performance**: Run Lighthouse audit (target >90)
 3. **Console**: Check for errors/warnings
@@ -106,6 +120,7 @@ colors: {
 5. **Accessibility**: Run accessibility audit
 
 ### Commands
+
 ```typescript
 // Via Chrome DevTools MCP
 
@@ -115,8 +130,8 @@ await page.setViewport({ width: 768, height: 1024 }); // Tablet
 await page.setViewport({ width: 1440, height: 900 }); // Desktop
 
 // 2. Run Lighthouse
-await page.audit({ category: 'performance' });
-await page.audit({ category: 'accessibility' });
+await page.audit({ category: "performance" });
+await page.audit({ category: "accessibility" });
 
 // 3. Check console errors
 const errors = await page.evaluate(() => console.error);
@@ -130,6 +145,7 @@ const trace = await page.stopTracing();
 ## Acceptance Criteria (Every Task)
 
 ### Code Quality
+
 - [ ] TypeScript strict mode (no `any` types)
 - [ ] All props properly typed
 - [ ] No console.log statements (use proper logging)
@@ -137,6 +153,7 @@ const trace = await page.stopTracing();
 - [ ] ESLint passing with zero warnings
 
 ### Functionality
+
 - [ ] Feature works as specified
 - [ ] All user interactions functional
 - [ ] Form validation working correctly
@@ -144,6 +161,7 @@ const trace = await page.stopTracing();
 - [ ] Loading states implemented
 
 ### Responsiveness
+
 - [ ] Mobile (375px) - fully functional
 - [ ] Tablet (768px) - optimal layout
 - [ ] Desktop (1440px) - optimal layout
@@ -151,6 +169,7 @@ const trace = await page.stopTracing();
 - [ ] Touch-friendly (min 44px tap targets)
 
 ### Performance
+
 - [ ] Lighthouse performance >90
 - [ ] First Contentful Paint <1.8s
 - [ ] Largest Contentful Paint <2.5s
@@ -158,6 +177,7 @@ const trace = await page.stopTracing();
 - [ ] Time to Interactive <3.8s
 
 ### Accessibility
+
 - [ ] Lighthouse accessibility >90
 - [ ] Keyboard navigation works
 - [ ] Focus indicators visible
@@ -167,6 +187,7 @@ const trace = await page.stopTracing();
 ## Example Tasks
 
 ### Task 1: Rebrand Landing Page
+
 ```
 BRANCH: frontend/landing-rebrand
 
@@ -187,6 +208,7 @@ VALIDATION:
 ```
 
 ### Task 2: Project Creation Wizard
+
 ```
 BRANCH: frontend/project-wizard
 
@@ -217,12 +239,14 @@ VALIDATION:
 ## Communication with Backend Agent
 
 ### API Contract
+
 - Agree on API endpoints structure
 - Define request/response types
 - Document error responses
 - Test with mock data first
 
 ### Example
+
 ```typescript
 // Agreed API contract for project creation
 
@@ -232,12 +256,12 @@ interface CreateProjectRequest {
   units: number;
   city: string;
   state: string;
-  propertyType: 'Garden-Style' | 'Mid-Rise' | 'High-Rise';
+  propertyType: "Garden-Style" | "Mid-Rise" | "High-Rise";
 }
 
 interface CreateProjectResponse {
   projectId: string;
-  status: 'draft';
+  status: "draft";
   created_at: string;
 }
 
@@ -248,15 +272,19 @@ interface CreateProjectResponse {
 ## Common Patterns
 
 ### Loading States
+
 ```tsx
-{isLoading ? (
-  <Skeleton className="h-8 w-full" />
-) : (
-  <DataTable data={projects} />
-)}
+{
+  isLoading ? (
+    <Skeleton className="h-8 w-full" />
+  ) : (
+    <DataTable data={projects} />
+  );
+}
 ```
 
 ### Error States
+
 ```tsx
 {error ? (
   <Alert variant="destructive">
@@ -270,22 +298,26 @@ interface CreateProjectResponse {
 ```
 
 ### Empty States
+
 ```tsx
-{projects.length === 0 ? (
-  <EmptyState
-    icon={<FileText className="h-12 w-12" />}
-    title="No analyses yet"
-    description="Create your first waste analysis to get started"
-    action={<Button onClick={handleCreate}>Start New Analysis</Button>}
-  />
-) : (
-  <ProjectsList projects={projects} />
-)}
+{
+  projects.length === 0 ? (
+    <EmptyState
+      icon={<FileText className="h-12 w-12" />}
+      title="No analyses yet"
+      description="Create your first waste analysis to get started"
+      action={<Button onClick={handleCreate}>Start New Analysis</Button>}
+    />
+  ) : (
+    <ProjectsList projects={projects} />
+  );
+}
 ```
 
 ## Handoff to Testing Agent
 
 ### Provide
+
 - Component specifications
 - User flow documentation
 - Expected behaviors
@@ -293,6 +325,7 @@ interface CreateProjectResponse {
 - Screenshots of states (loading, error, empty, success)
 
 ### Example Handoff
+
 ```
 COMPONENT: Project Creation Wizard
 LOCATION: /app/projects/new

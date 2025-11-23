@@ -17,6 +17,7 @@ pnpm audit:responsive
 Review the report: `responsive-audit-report.json`
 
 **Priority Order**:
+
 1. High-traffic pages (landing, login, dashboard)
 2. User-facing forms (project creation, settings)
 3. Data display pages (results, reports)
@@ -38,42 +39,47 @@ mv __tests__/e2e/screenshots __tests__/e2e/screenshots-before
 #### Pattern 1: Replace Fixed Widths
 
 **Before**:
+
 ```tsx
-<div className="w-[1200px] px-8">
-  Content
-</div>
+<div className="w-[1200px] px-8">Content</div>
 ```
 
 **After**:
-```tsx
-import { ResponsiveContainer } from '@/components/responsive/responsive-container'
 
-<ResponsiveContainer maxWidth="xl">
-  Content
-</ResponsiveContainer>
+```tsx
+import { ResponsiveContainer } from "@/components/responsive/responsive-container";
+
+<ResponsiveContainer maxWidth="xl">Content</ResponsiveContainer>;
 ```
 
 #### Pattern 2: Responsive Grid Layouts
 
 **Before**:
+
 ```tsx
 <div className="grid grid-cols-4 gap-4">
-  {stats.map(stat => <StatCard {...stat} />)}
+  {stats.map((stat) => (
+    <StatCard {...stat} />
+  ))}
 </div>
 ```
 
 **After**:
+
 ```tsx
-import { ResponsiveGrid } from '@/components/responsive/responsive-grid'
+import { ResponsiveGrid } from "@/components/responsive/responsive-grid";
 
 <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 4 }} gap="md">
-  {stats.map(stat => <StatCard {...stat} />)}
-</ResponsiveGrid>
+  {stats.map((stat) => (
+    <StatCard {...stat} />
+  ))}
+</ResponsiveGrid>;
 ```
 
 #### Pattern 3: Table Wrappers
 
 **Before**:
+
 ```tsx
 <table className="w-full">
   <thead>...</thead>
@@ -82,20 +88,22 @@ import { ResponsiveGrid } from '@/components/responsive/responsive-grid'
 ```
 
 **After**:
+
 ```tsx
-import { ResponsiveTable } from '@/components/responsive/responsive-table'
+import { ResponsiveTable } from "@/components/responsive/responsive-table";
 
 <ResponsiveTable>
   <table className="min-w-full">
     <thead>...</thead>
     <tbody>...</tbody>
   </table>
-</ResponsiveTable>
+</ResponsiveTable>;
 ```
 
 #### Pattern 4: Forms
 
 **Before**:
+
 ```tsx
 <div className="flex gap-4">
   <Input name="city" />
@@ -104,6 +112,7 @@ import { ResponsiveTable } from '@/components/responsive/responsive-table'
 ```
 
 **After**:
+
 ```tsx
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
   <Input name="city" />
@@ -114,11 +123,13 @@ import { ResponsiveTable } from '@/components/responsive/responsive-table'
 #### Pattern 5: Buttons
 
 **Before**:
+
 ```tsx
 <Button type="submit">Submit</Button>
 ```
 
 **After**:
+
 ```tsx
 <Button type="submit" className="w-full md:w-auto">
   Submit
@@ -128,13 +139,15 @@ import { ResponsiveTable } from '@/components/responsive/responsive-table'
 #### Pattern 6: Images
 
 **Before**:
+
 ```tsx
 <img src="/hero.jpg" alt="Hero" className="w-full" />
 ```
 
 **After**:
+
 ```tsx
-import Image from 'next/image'
+import Image from "next/image";
 
 <Image
   src="/hero.jpg"
@@ -144,7 +157,7 @@ import Image from 'next/image'
   className="w-full h-auto"
   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1440px"
   priority
-/>
+/>;
 ```
 
 ### 4. Test Your Changes
@@ -164,11 +177,13 @@ ls __tests__/e2e/screenshots/
 ### 5. Validate on Real Devices
 
 **Minimum Testing**:
+
 - [ ] iPhone Safari (375px)
 - [ ] iPad Safari (768px)
 - [ ] Chrome Desktop (1024px+)
 
 **Use DevTools**:
+
 ```
 1. Open Chrome DevTools (F12)
 2. Toggle device toolbar (Cmd+Shift+M)
@@ -187,6 +202,7 @@ ls __tests__/e2e/screenshots/
 **Symptom**: Horizontal scrollbar appears
 
 **Fix**:
+
 ```tsx
 // Find the overflowing element
 // Replace fixed width with max-width
@@ -203,6 +219,7 @@ ls __tests__/e2e/screenshots/
 **Symptom**: Text hard to read on 375px
 
 **Fix**:
+
 ```tsx
 // Use responsive text sizing
 
@@ -218,6 +235,7 @@ ls __tests__/e2e/screenshots/
 **Symptom**: Hard to tap accurately
 
 **Fix**:
+
 ```tsx
 // Ensure minimum 44x44px touch target
 
@@ -233,6 +251,7 @@ ls __tests__/e2e/screenshots/
 **Symptom**: Columns too narrow on small screens
 
 **Fix**:
+
 ```tsx
 // Stack on mobile, grid on desktop
 
@@ -308,14 +327,14 @@ git push origin fix/responsive-migration
 
 ## Testing Matrix
 
-| Page | 375px | 414px | 768px | 1024px | 1440px | Status |
-|------|-------|-------|-------|--------|--------|--------|
-| Landing | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| Login | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| Signup | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| Dashboard | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| Projects | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| New Project | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| Page        | 375px | 414px | 768px | 1024px | 1440px | Status  |
+| ----------- | ----- | ----- | ----- | ------ | ------ | ------- |
+| Landing     | ⏳    | ⏳    | ⏳    | ⏳     | ⏳     | Pending |
+| Login       | ⏳    | ⏳    | ⏳    | ⏳     | ⏳     | Pending |
+| Signup      | ⏳    | ⏳    | ⏳    | ⏳     | ⏳     | Pending |
+| Dashboard   | ⏳    | ⏳    | ⏳    | ⏳     | ⏳     | Pending |
+| Projects    | ⏳    | ⏳    | ⏳    | ⏳     | ⏳     | Pending |
+| New Project | ⏳    | ⏳    | ⏳    | ⏳     | ⏳     | Pending |
 
 **Legend**: ⏳ Pending | ✅ Pass | ❌ Fail
 
@@ -339,16 +358,19 @@ pnpm audit:responsive
 ### Expected Improvements
 
 **Image Optimization**:
+
 - Before: 2-3 MB images
 - After: 200-500 KB (WebP/AVIF)
 - Improvement: 80-90% reduction
 
 **CSS Bundle**:
+
 - Before: Custom media queries (~5 KB)
 - After: Tailwind utilities (JIT, ~2 KB)
 - Improvement: 60% smaller
 
 **Layout Shift**:
+
 - Before: CLS 0.15-0.25
 - After: CLS <0.1 (with width/height)
 - Improvement: Better UX, higher Lighthouse score
@@ -371,11 +393,13 @@ pnpm deploy:staging
 ## Support
 
 **Questions?**
+
 - Check [RESPONSIVE_DESIGN.md](./RESPONSIVE_DESIGN.md) for patterns
 - Review [RESPONSIVE_AUDIT_CHECKLIST.md](./RESPONSIVE_AUDIT_CHECKLIST.md) for validation
 - See [RESPONSIVE_README.md](../RESPONSIVE_README.md) for quick commands
 
 **Found a bug?**
+
 - Run `pnpm audit:responsive` to identify
 - Create issue with screenshots
 - Tag mobile development team

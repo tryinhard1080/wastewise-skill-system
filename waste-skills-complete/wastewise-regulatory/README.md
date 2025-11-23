@@ -155,6 +155,7 @@ The updated skill is in `SKILL.md`. To use it:
 ### 3. Prepare Test Data
 
 Gather for your test property:
+
 - 3-6 months of waste invoices (PDF or CSV)
 - Service contract (PDF) - optional
 - Property documents with location info
@@ -162,14 +163,15 @@ Gather for your test property:
 ### 4. Run Analysis with Regulatory Research
 
 ```
-User: "I've uploaded 6 months of invoices and the waste contract for 
-Orion Prosper Lakes (560 units, Prosper, Texas 75078). Run the validated 
+User: "I've uploaded 6 months of invoices and the waste contract for
+Orion Prosper Lakes (560 units, Prosper, Texas 75078). Run the validated
 analysis WITH regulatory compliance research."
 ```
 
 ### 5. Review Judge Evaluation
 
 Claude will:
+
 1. Extract location data (Prosper, Collin County, Texas)
 2. Research applicable ordinances
 3. **Submit to LLM Judge for evaluation**
@@ -203,6 +205,7 @@ Human Review Required: YES
 ## Understanding Judge Confidence Levels
 
 ### HIGH Confidence (85-100 points)
+
 - **Criteria:**
   - All 3 waste streams fully researched
   - 3+ official .gov sources consulted
@@ -215,6 +218,7 @@ Human Review Required: YES
 - **Output:** Generate all sheets including REGULATORY_COMPLIANCE
 
 ### MEDIUM Confidence (70-84 points)
+
 - **Criteria:**
   - Core requirements researched but some details missing
   - 2+ official sources OR 3+ sources with 1 non-official
@@ -226,6 +230,7 @@ Human Review Required: YES
 - **Output:** Generate all sheets, add warnings to QUALITY_CHECK
 
 ### LOW Confidence (50-69 points)
+
 - **Criteria:**
   - Significant gaps in research
   - Limited official sources
@@ -237,6 +242,7 @@ Human Review Required: YES
 - **Output:** Judge report only, no workbook generated
 
 ### FAILED (<50 points OR 3+ critical errors)
+
 - **Criteria:**
   - Major research deficiencies
   - No official sources OR no ordinance citations
@@ -505,19 +511,20 @@ Regulatory compliance research is **opt-in** and only activates when:
 
 ### Output Differences
 
-| Feature | Without Regulatory Research | With Regulatory Research |
-|---------|----------------------------|-------------------------|
-| Sheet Count | 6-7 sheets | 7-8 sheets |
-| REGULATORY_COMPLIANCE sheet | ❌ Not generated | ✅ Generated |
-| QUALITY_CHECK sheet | Standard validation only | Includes judge evaluation |
-| Validation time | ~30 seconds | ~2-3 minutes (due to web research) |
-| Human review | Only if standard validations fail | May require for LOW confidence |
+| Feature                     | Without Regulatory Research       | With Regulatory Research           |
+| --------------------------- | --------------------------------- | ---------------------------------- |
+| Sheet Count                 | 6-7 sheets                        | 7-8 sheets                         |
+| REGULATORY_COMPLIANCE sheet | ❌ Not generated                  | ✅ Generated                       |
+| QUALITY_CHECK sheet         | Standard validation only          | Includes judge evaluation          |
+| Validation time             | ~30 seconds                       | ~2-3 minutes (due to web research) |
+| Human review                | Only if standard validations fail | May require for LOW confidence     |
 
 ## Best Practices
 
 ### 1. Always Provide Complete Location Data
 
 **DO:**
+
 ```
 Property: Orion Prosper Lakes
 Units: 560
@@ -525,6 +532,7 @@ Location: Prosper, Collin County, Texas 75078
 ```
 
 **DON'T:**
+
 ```
 Property: Orion
 Location: Texas
@@ -533,6 +541,7 @@ Location: Texas
 ### 2. Review Judge Recommendations Carefully
 
 When judge recommends human review:
+
 - **Read the specific review areas** - not just confidence level
 - **Follow the recommended actions** - they're targeted
 - **Contact the regulatory agencies** - direct verification is best
@@ -541,6 +550,7 @@ When judge recommends human review:
 ### 3. Trust LOW Confidence Determinations
 
 The judge is calibrated to be **conservative**:
+
 - Better to require unnecessary review than miss critical issues
 - LOW confidence means real problems exist
 - Don't override without thorough manual verification
@@ -548,6 +558,7 @@ The judge is calibrated to be **conservative**:
 ### 4. Use Test Suite Before Production
 
 Before deploying to Greystar properties:
+
 ```bash
 # Run full test suite
 python run_tests.py --all
@@ -559,12 +570,14 @@ python run_tests.py --all
 ### 5. Archive Judge Evaluations
 
 Keep records of:
+
 - All judge evaluations
 - Human reviewer feedback
 - Corrections made
 - Final confidence determinations
 
 Use these to:
+
 - Improve judge criteria
 - Train new team members
 - Audit system performance
@@ -578,6 +591,7 @@ Use these to:
 **Cause:** Judge prompt may be too conservative or lenient
 
 **Fix:**
+
 1. Review judge scoring in LLM_JUDGE.md
 2. Adjust point thresholds if needed:
    - HIGH: 85-100 (current)
@@ -593,6 +607,7 @@ Use these to:
 **Cause:** Judge too strict on criteria that may have legitimate alternatives
 
 **Fix:**
+
 1. Review the specific criteria causing failure
 2. Add exceptions to judge for legitimate alternatives:
    - Example: San Francisco's waste characterization study approach
@@ -607,6 +622,7 @@ Use these to:
 **Cause:** Too many sources, rate limiting, or site blocking
 
 **Fix:**
+
 1. Implement retry logic with exponential backoff
 2. Add timeout parameter (default: 30 seconds per source)
 3. Cache results from common municipalities
@@ -619,6 +635,7 @@ Use these to:
 **Cause:** Recent ordinance changes, outdated websites, or jurisdictional overlap
 
 **Fix:**
+
 1. Judge should flag as MEDIUM confidence with specific note
 2. Recommend direct agency contact
 3. Document conflicting sources in research output
@@ -696,30 +713,33 @@ export_to_optimize(
 
 Expected performance metrics:
 
-| Metric | Target | Typical |
-|--------|--------|---------|
-| Research time per property | <3 min | 2-2.5 min |
-| Judge evaluation time | <30 sec | 15-20 sec |
-| Complete analysis time | <5 min | 3-4 min |
-| Judge accuracy rate | ≥95% | 96-98% |
-| False negative rate | ≤2% | <1% |
-| False positive rate | ≤10% | 5-7% |
+| Metric                     | Target  | Typical   |
+| -------------------------- | ------- | --------- |
+| Research time per property | <3 min  | 2-2.5 min |
+| Judge evaluation time      | <30 sec | 15-20 sec |
+| Complete analysis time     | <5 min  | 3-4 min   |
+| Judge accuracy rate        | ≥95%    | 96-98%    |
+| False negative rate        | ≤2%     | <1%       |
+| False positive rate        | ≤10%    | 5-7%      |
 
 ## Roadmap
 
 ### Planned Enhancements
 
 **Q1 2026:**
+
 - Multi-jurisdiction support (properties spanning multiple cities)
 - Automated ordinance change monitoring
 - Integration with Greystar property database
 
 **Q2 2026:**
+
 - Historical compliance tracking
 - Regulatory risk scoring
 - Predictive ordinance change alerts
 
 **Q3 2026:**
+
 - Mobile app for on-site compliance verification
 - Photo documentation integration
 - Automated inspection report generation
@@ -733,6 +753,7 @@ For questions, issues, or enhancements:
 **Team:** Advantage Waste, Greystar Real Estate Partners
 
 **Documentation:**
+
 - Full skill spec: `SKILL.md`
 - Judge system: `LLM_JUDGE.md`
 - Test suite: `TEST_SUITE.md`
@@ -741,6 +762,7 @@ For questions, issues, or enhancements:
 ## Version History
 
 **v2.0.0** (Current) - November 2025
+
 - Added regulatory compliance research module
 - Implemented LLM Judge evaluation system
 - Expanded validation framework (7 categories)
@@ -748,6 +770,7 @@ For questions, issues, or enhancements:
 - Enhanced QUALITY_CHECK sheet with judge results
 
 **v1.0.0** - October 2025
+
 - Initial validated edition
 - 6 validation categories
 - CONTRACT_TERMS sheet generation
@@ -759,22 +782,26 @@ For questions, issues, or enhancements:
 ## Quick Reference Commands
 
 ### Run Complete Analysis
+
 ```
-"Analyze invoices and contract for [Property Name] ([units] units, [Location]). 
+"Analyze invoices and contract for [Property Name] ([units] units, [Location]).
 Include regulatory compliance research."
 ```
 
 ### Judge-Only Evaluation
+
 ```
 "Evaluate this regulatory research for quality: [paste research output]"
 ```
 
 ### Test Suite Execution
+
 ```
 "Run the full WasteWise test suite and generate the report."
 ```
 
 ### Batch Processing
+
 ```
 "Process these 5 properties with regulatory compliance for all: [list properties]"
 ```

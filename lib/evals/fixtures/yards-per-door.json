@@ -63,7 +63,7 @@
         "units": 100
       },
       "expectedOutput": {
-        "yardsPerDoor": 1.30
+        "yardsPerDoor": 1.3
       }
     },
     {

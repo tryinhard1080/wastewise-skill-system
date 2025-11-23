@@ -49,8 +49,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -145,8 +145,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -194,7 +194,6 @@ jobs:
           slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
           title: "Nightly E2E Tests Failed"
           message: "E2E tests failed on master branch. Check artifacts for details."
-
 # Uncomment to enable nightly tests
 # on:
 #   schedule:

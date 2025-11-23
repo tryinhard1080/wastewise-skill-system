@@ -12,11 +12,11 @@
  * ```
  */
 
-export { SearchManager, getSearchManager } from './search-manager'
-export { SearchCache } from './search-cache'
-export { ExaProvider } from './providers/exa-provider'
-export { TavilyProvider } from './providers/tavily-provider'
-export { BraveProvider } from './providers/brave-provider'
+export { SearchManager, getSearchManager } from "./search-manager";
+export { SearchCache } from "./search-cache";
+export { ExaProvider } from "./providers/exa-provider";
+export { TavilyProvider } from "./providers/tavily-provider";
+export { BraveProvider } from "./providers/brave-provider";
 
 export type {
   SearchResult,
@@ -25,4 +25,4 @@ export type {
   SearchProvider,
   ProviderHealth,
   CacheStats,
-} from './types'
+} from "./types";

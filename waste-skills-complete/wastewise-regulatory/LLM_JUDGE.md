@@ -14,16 +14,18 @@ This is an LLM-based evaluation system that acts as an independent judge to asse
 The judge operates in two modes:
 
 ### Mode 1: Step Completion Verification
+
 Verifies that ALL required research steps were executed
 
 ### Mode 2: Quality Assessment
+
 Evaluates the quality of each completed step and assigns confidence scores
 
 ## Judge Prompt Template
 
 ```
-You are an expert regulatory compliance auditor evaluating waste management 
-research quality. Your role is to act as an independent judge assessing whether 
+You are an expert regulatory compliance auditor evaluating waste management
+research quality. Your role is to act as an independent judge assessing whether
 the regulatory compliance research meets professional standards.
 
 EVALUATION CRITERIA:
@@ -32,19 +34,19 @@ EVALUATION CRITERIA:
    - All 6 research phases completed
    - All 3 waste streams addressed (waste, recycling, composting)
    - Minimum information requirements met for each stream
-   
+
 2. SOURCE QUALITY (25 points)
    - Minimum 3 sources consulted
    - At least 1 official .gov source
    - Sources are authoritative and current
    - Ordinance citations properly formatted
-   
+
 3. SPECIFICITY (20 points)
    - Capacity requirements are numerical
    - Service frequencies are specific (not "regular" or "as needed")
    - Penalty amounts include $ figures
    - Property thresholds are explicit numbers
-   
+
 4. VERIFICATION (15 points)
    - Licensed hauler information complete (3+ haulers)
    - Regulatory contact information provided
@@ -155,7 +157,7 @@ Critical Errors Found: [Number]
 **Confidence Level: [HIGH / MEDIUM / LOW / FAILED]**
 
 **Rationale:**
-[2-3 sentences explaining the confidence level determination, referencing 
+[2-3 sentences explaining the confidence level determination, referencing
 specific strengths and weaknesses found during evaluation]
 
 ## HUMAN REVIEW RECOMMENDATION
@@ -253,17 +255,17 @@ Phase 5: Licensed Haulers ✅
    Phone: (512) 891-2700
    Website: wm.com
    Services: Waste, recycling, composting, compactor hauls
-   
+
 2. Texas Disposal Systems
    Phone: (512) 246-0010
    Website: texasdisposal.com
    Services: Waste, recycling, composting, zero-sort
-   
+
 3. Recology Texas
    Phone: (512) 291-3000
    Website: recology.com/texas
    Services: Waste, recycling, composting
-   
+
 4. AmeriWaste Services
    Phone: (512) 323-5050
    Website: ameriwaste.net
@@ -333,7 +335,7 @@ Phase 5: Licensed Haulers ⚠️
 1. Waste Management
    Phone: Not found
    Website: wm.com
-   
+
 2. Republic Services
    Phone: Not found
    Website: republicservices.com
@@ -446,10 +448,10 @@ def evaluate_regulatory_research(research_output: Dict, property_info: Dict) -> 
     Send research output to LLM Judge for evaluation
     Returns evaluation report with confidence level and review recommendations
     """
-    
+
     # Prepare evaluation prompt
     judge_prompt = f"""
-You are the WasteWise Regulatory Compliance Research Judge. Evaluate the 
+You are the WasteWise Regulatory Compliance Research Judge. Evaluate the
 following regulatory compliance research for quality and completeness.
 
 PROPERTY INFORMATION:
@@ -477,10 +479,10 @@ Focus on:
             "content": judge_prompt
         }]
     )
-    
+
     # Parse judge evaluation
     evaluation = parse_judge_response(judge_response.content[0].text)
-    
+
     return evaluation
 
 
@@ -488,7 +490,7 @@ def parse_judge_response(judge_output: str) -> Dict:
     """
     Parse judge evaluation into structured format
     """
-    
+
     evaluation = {
         'step_completion': {},
         'quality_scores': {},
@@ -502,10 +504,10 @@ def parse_judge_response(judge_output: str) -> Dict:
         'improvement_opportunities': {},
         'raw_evaluation': judge_output
     }
-    
+
     # Extract key metrics using regex
     # (Implementation would parse the judge's structured output)
-    
+
     return evaluation
 
 
@@ -514,24 +516,24 @@ def apply_judge_decision(evaluation: Dict) -> Tuple[bool, str]:
     Apply judge's decision to workflow
     Returns: (proceed_with_output: bool, reason: str)
     """
-    
+
     confidence = evaluation['confidence_level']
     critical_errors = len(evaluation['critical_errors'])
-    
+
     # Automatic decisions
     if confidence == 'FAILED' or critical_errors >= 3:
         return False, "CRITICAL: Research quality unacceptable - complete redo required"
-    
+
     if confidence == 'LOW' or critical_errors >= 1:
         return False, f"Research quality below threshold - human review required: {evaluation['review_areas']}"
-    
+
     if confidence == 'MEDIUM' and evaluation['human_review_required']:
         # Allow output but flag for review
         return True, f"Output generated but flagged for review: {evaluation['review_areas']}"
-    
+
     if confidence == 'HIGH':
         return True, "Research quality meets all standards - no review needed"
-    
+
     # Default to caution
     return False, "Unable to assess research quality - human review required"
 ```
@@ -547,27 +549,27 @@ def run_validated_wastewise_analysis(
     """
     Complete validated WasteWise analysis with LLM Judge oversight
     """
-    
+
     # Step 1: Process documents
     invoice_data = process_invoices(invoice_files)
     contract_data = process_contract(contract_file) if contract_file else None
     property_info = extract_property_info(property_docs)
-    
+
     # Step 2: Conduct regulatory research
     regulatory_research = conduct_regulatory_compliance_research(property_info)
-    
+
     # Step 3: JUDGE EVALUATION - First Gate
     print("🔍 Sending regulatory research to LLM Judge for evaluation...")
     judge_evaluation = evaluate_regulatory_research(regulatory_research, property_info)
-    
+
     print(f"\n📊 JUDGE EVALUATION RESULTS:")
     print(f"   Total Score: {judge_evaluation['total_score']}/100")
     print(f"   Confidence Level: {judge_evaluation['confidence_level']}")
     print(f"   Critical Errors: {len(judge_evaluation['critical_errors'])}")
-    
+
     # Step 4: Apply judge decision
     proceed, reason = apply_judge_decision(judge_evaluation)
-    
+
     if not proceed:
         print(f"\n❌ ANALYSIS HALTED: {reason}")
         print("\n🚨 HUMAN REVIEW REQUIRED 🚨")
@@ -578,17 +580,17 @@ def run_validated_wastewise_analysis(
         print("\nRecommended Actions:")
         for action in judge_evaluation['recommended_actions']:
             print(f"  - {action}")
-        
+
         return {
             'status': 'FAILED_VALIDATION',
             'judge_evaluation': judge_evaluation,
             'requires_human_review': True
         }
-    
+
     # Step 5: Run remaining validations
     print("\n✅ Regulatory research passed judge evaluation")
     print("🔐 Running remaining validation checks...")
-    
+
     validator = WasteWiseValidator()
     validation_passed, validation_report = validator.validate_all(
         invoice_data=invoice_data,
@@ -597,18 +599,18 @@ def run_validated_wastewise_analysis(
         optimization_results=calculate_optimizations(invoice_data, property_info),
         regulatory_data=regulatory_research
     )
-    
+
     if not validation_passed:
         print("\n❌ VALIDATION FAILED")
         return {
             'status': 'FAILED_VALIDATION',
             'validation_report': validation_report
         }
-    
+
     # Step 6: Generate output
     print("\n✅ ALL VALIDATIONS PASSED")
     print("📊 Generating workbook...")
-    
+
     workbook = generate_wastewise_workbook(
         invoice_data=invoice_data,
         contract_data=contract_data,
@@ -617,7 +619,7 @@ def run_validated_wastewise_analysis(
         validation_report=validation_report,
         judge_evaluation=judge_evaluation  # Include in QUALITY_CHECK sheet
     )
-    
+
     return {
         'status': 'SUCCESS',
         'workbook': workbook,
@@ -694,6 +696,7 @@ Target: 95%+ judge accuracy, <5% false negatives (critical)
 ## Continuous Improvement
 
 The judge system learns from:
+
 1. Human reviewer feedback on judge assessments
 2. Pattern analysis of common research gaps
 3. Evolution of regulatory landscapes

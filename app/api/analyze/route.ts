@@ -137,120 +137,117 @@
  *         $ref: '#/components/responses/InternalServerError'
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { z } from 'zod'
-import { rateLimiters } from '@/lib/api/rate-limit'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+import { rateLimiters } from "@/lib/api/rate-limit";
 
 const createJobSchema = z.object({
   projectId: z.string().uuid(),
   jobType: z.enum([
-    'invoice_extraction',
-    'regulatory_research',
-    'complete_analysis',
-    'report_generation',
+    "invoice_extraction",
+    "regulatory_research",
+    "complete_analysis",
+    "report_generation",
   ]),
   inputData: z.record(z.any()).optional(),
   priority: z.number().int().min(1).max(10).optional(), // 1=highest, 10=lowest
-})
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Check authentication
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check rate limit (10 requests per minute per user)
-    const rateLimit = rateLimiters.jobCreation(user.id)
+    const rateLimit = rateLimiters.jobCreation(user.id);
     if (rateLimit.isLimited) {
       return NextResponse.json(
         {
-          error: 'Rate limit exceeded. Please try again later.',
+          error: "Rate limit exceeded. Please try again later.",
           retryAfter: rateLimit.retryAfter,
         },
         {
           status: 429,
           headers: {
-            'Retry-After': String(rateLimit.retryAfter || 60),
-            'X-RateLimit-Limit': '10',
-            'X-RateLimit-Remaining': String(rateLimit.remaining),
-            'X-RateLimit-Reset': String(rateLimit.resetTime),
+            "Retry-After": String(rateLimit.retryAfter || 60),
+            "X-RateLimit-Limit": "10",
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(rateLimit.resetTime),
           },
-        }
-      )
+        },
+      );
     }
 
     // Validate request body
-    const body = await request.json()
-    const validatedData = createJobSchema.parse(body)
+    const body = await request.json();
+    const validatedData = createJobSchema.parse(body);
 
     // Verify project belongs to user
     const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .select('id')
-      .eq('id', validatedData.projectId)
-      .eq('user_id', user.id)
-      .single()
+      .from("projects")
+      .select("id")
+      .eq("id", validatedData.projectId)
+      .eq("user_id", user.id)
+      .single();
 
     if (projectError || !project) {
       return NextResponse.json(
-        { error: 'Project not found or access denied' },
-        { status: 404 }
-      )
+        { error: "Project not found or access denied" },
+        { status: 404 },
+      );
     }
 
     // Assign priority based on context or use provided priority
-    let priority = validatedData.priority
+    let priority = validatedData.priority;
 
     if (!priority) {
       // Auto-assign priority based on job type and user history
       const { data: priorityValue, error: priorityError } = await supabase.rpc(
-        'assign_job_priority',
+        "assign_job_priority",
         {
           user_id: user.id,
           job_type: validatedData.jobType,
-        }
-      )
+        },
+      );
 
       if (priorityError) {
         // Fallback to default priority if function fails
-        priority = 5 // Normal priority
+        priority = 5; // Normal priority
       } else {
-        priority = priorityValue || 5
+        priority = priorityValue || 5;
       }
     }
 
     // Create analysis job
     const { data: job, error: jobError } = await supabase
-      .from('analysis_jobs')
+      .from("analysis_jobs")
       .insert({
         user_id: user.id,
         project_id: validatedData.projectId,
         job_type: validatedData.jobType,
-        status: 'pending',
+        status: "pending",
         input_data: validatedData.inputData || {},
         progress_percent: 0,
         priority,
         priority_reason: validatedData.priority
-          ? 'User specified'
-          : 'Auto-assigned based on user history',
+          ? "User specified"
+          : "Auto-assigned based on user history",
       })
       .select()
-      .single()
+      .single();
 
     if (jobError) {
-      throw jobError
+      throw jobError;
     }
 
     // Return job ID for polling
@@ -258,22 +255,25 @@ export async function POST(request: NextRequest) {
       {
         jobId: job.id,
         status: job.status,
-        message: 'Analysis job created. Poll /api/jobs/' + job.id + ' for status updates.',
+        message:
+          "Analysis job created. Poll /api/jobs/" +
+          job.id +
+          " for status updates.",
       },
-      { status: 201 }
-    )
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
-      )
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
 
-    console.error('Error creating analysis job:', error)
+    console.error("Error creating analysis job:", error);
     return NextResponse.json(
-      { error: 'Failed to create analysis job' },
-      { status: 500 }
-    )
+      { error: "Failed to create analysis job" },
+      { status: 500 },
+    );
   }
 }

@@ -9,10 +9,12 @@
 ## 📦 What's Been Prepared
 
 ### 1. Pre-Deployment Validation Script
+
 **File**: `scripts/pre-deployment-checks.ts`
 **Purpose**: Automated validation before deployment
 
 **Checks**:
+
 - ✅ TypeScript compilation (0 errors)
 - ✅ ESLint passing (0 warnings)
 - ✅ Unit tests passing
@@ -32,10 +34,12 @@
 ---
 
 ### 2. Smoke Test Suite
+
 **File**: `scripts/smoke-tests.ts`
 **Purpose**: Post-deployment validation
 
 **Tests**:
+
 - 🏥 Health check endpoints
 - 🔐 Authentication flow
 - 🌐 API endpoints
@@ -48,10 +52,12 @@
 ---
 
 ### 3. Comprehensive Deployment Checklist
+
 **File**: `docs/deployment/STAGING_DEPLOYMENT_CHECKLIST.md`
 **Purpose**: Step-by-step deployment guide with 8 phases
 
 **Phases**:
+
 1. Pre-Deployment Preparation (code quality, tests, environment)
 2. Supabase Setup (project creation, migrations, storage)
 3. Frontend Deployment (Vercel/Netlify with env vars)
@@ -66,9 +72,11 @@
 ---
 
 ### 4. Updated Package Scripts
+
 **File**: `package.json`
 
 **New Commands**:
+
 ```bash
 # Pre-deployment validation
 pnpm run pre-deploy:checks
@@ -88,12 +96,14 @@ pnpm run rollback             # Rollback deployment
 ---
 
 ### 5. ESLint Configuration
+
 **File**: `.eslintrc.json`
 **Purpose**: Code quality enforcement
 
 **Rules**:
+
 - Strict TypeScript checking
-- No unused variables (with _ prefix exception)
+- No unused variables (with \_ prefix exception)
 - Exhaustive dependency arrays in hooks
 - No console.log (allows console.warn/error/info)
 
@@ -102,6 +112,7 @@ pnpm run rollback             # Rollback deployment
 ## 🎯 Deployment Workflow
 
 ### Quick Start (3 Commands)
+
 ```bash
 # 1. Run pre-deployment checks
 pnpm run pre-deploy:checks
@@ -118,12 +129,14 @@ STAGING_URL=https://staging.wastewise.io pnpm smoke-tests
 ### Detailed Workflow (Follow Checklist)
 
 #### Step 1: Pre-Deployment Validation (Local)
+
 ```bash
 # Run comprehensive checks
 pnpm run pre-deploy:checks
 ```
 
 **Expected Output**:
+
 ```
 🚀 Running Pre-Deployment Validation...
 
@@ -179,6 +192,7 @@ Total Duration: 62.3s
 #### Step 2: Supabase Project Setup (Manual)
 
 **Create Staging Project**:
+
 1. Go to https://supabase.com/dashboard
 2. Click "New Project"
 3. Project name: `wastewise-staging`
@@ -187,22 +201,26 @@ Total Duration: 62.3s
 6. Click "Create Project"
 
 **Link Local to Staging**:
+
 ```bash
 npx supabase login
 npx supabase link --project-ref <your-project-ref>
 ```
 
 **Push Migrations**:
+
 ```bash
 npx supabase db push
 ```
 
 **Verify**:
+
 - Check Supabase Studio → Table Editor
 - Confirm 12 tables created
 - Verify RPC functions exist
 
 **Create Storage Buckets**:
+
 1. Supabase Studio → Storage
 2. Create `invoices` bucket (public: false, 10MB limit)
 3. Create `contracts` bucket (public: false, 10MB limit)
@@ -226,6 +244,7 @@ npx supabase db push
    - Install command: `pnpm install`
 
 3. **Set Environment Variables**:
+
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
@@ -299,11 +318,13 @@ sudo journalctl -u wastewise-worker -f
 #### Step 5: Verify Deployment
 
 **Automated Smoke Tests**:
+
 ```bash
 STAGING_URL=https://staging.wastewise.io pnpm smoke-tests
 ```
 
 **Expected Output**:
+
 ```
 🔥 Running Smoke Tests against https://staging.wastewise.io
 
@@ -383,6 +404,7 @@ Total Tests: 11
 ## 🎉 What's Ready
 
 ### ✅ Complete and Tested
+
 - Pre-deployment validation script
 - Smoke test suite
 - Comprehensive deployment checklist
@@ -392,6 +414,7 @@ Total Tests: 11
 - API documentation (OpenAPI/Swagger)
 
 ### ✅ Deployment Infrastructure
+
 - Dockerfile for worker
 - Docker Compose configuration
 - Systemd service template
@@ -399,6 +422,7 @@ Total Tests: 11
 - Deployment scripts (staging, production, rollback)
 
 ### ✅ Code Quality
+
 - 259+ unit tests passing
 - 69 E2E tests passing
 - Calculation evals validated
@@ -406,6 +430,7 @@ Total Tests: 11
 - Security hardened
 
 ### ✅ Documentation
+
 - Root README.md (project overview)
 - Getting Started guide (users)
 - Local Setup guide (developers)
@@ -418,9 +443,11 @@ Total Tests: 11
 ## 🚧 Manual Steps Required
 
 ### 1. Create Supabase Project
+
 **Why Manual**: Requires account, billing, project settings
 
 **Steps**:
+
 1. Go to Supabase dashboard
 2. Create new project
 3. Note credentials
@@ -431,9 +458,11 @@ Total Tests: 11
 ---
 
 ### 2. Configure Hosting Platform
+
 **Why Manual**: Requires account, repository connection
 
 **Steps**:
+
 1. Connect Git repository
 2. Configure build settings
 3. Set environment variables
@@ -444,9 +473,11 @@ Total Tests: 11
 ---
 
 ### 3. Deploy Worker
+
 **Why Manual**: Requires infrastructure setup
 
 **Options**:
+
 - Docker container (AWS ECS, Google Cloud Run, etc.)
 - Long-running server (VPS, dedicated server)
 
@@ -455,9 +486,11 @@ Total Tests: 11
 ---
 
 ### 4. Run Manual E2E Test
+
 **Why Manual**: Human verification of UX
 
 **Steps**:
+
 1. Complete full workflow (login → download)
 2. Verify all features work
 3. Check for errors
@@ -467,9 +500,11 @@ Total Tests: 11
 ---
 
 ### 5. Invite Beta Users
+
 **Why Manual**: User coordination
 
 **Steps**:
+
 1. Identify 3-5 testers
 2. Send credentials
 3. Provide user guide
@@ -517,6 +552,7 @@ Total Tests: 11
 ## 🔧 Useful Commands
 
 ### Pre-Deployment
+
 ```bash
 # Full validation
 pnpm run pre-deploy:checks
@@ -531,6 +567,7 @@ pnpm build                # Production build
 ```
 
 ### Deployment
+
 ```bash
 # Frontend
 vercel deploy --prod      # Deploy to Vercel
@@ -542,6 +579,7 @@ docker push <registry>/wastewise-worker:staging
 ```
 
 ### Post-Deployment
+
 ```bash
 # Automated tests
 pnpm run smoke-tests
@@ -561,12 +599,14 @@ docker logs wastewise-worker -f               # Worker logs (Docker)
 ## 🎯 Success Criteria
 
 ### Automated Checks ✅
+
 - [ ] All pre-deployment checks pass
 - [ ] All smoke tests pass
 - [ ] Health endpoints return 200
 - [ ] Worker processing jobs
 
 ### Manual Verification ✅
+
 - [ ] Can create account and login
 - [ ] Can create project
 - [ ] Can upload files
@@ -575,11 +615,13 @@ docker logs wastewise-worker -f               # Worker logs (Docker)
 - [ ] Reports contain correct data
 
 ### Performance ✅
+
 - [ ] Page load time <2 seconds
 - [ ] Mobile responsive (375px-1440px)
 - [ ] No console errors
 
 ### Monitoring ✅
+
 - [ ] Health checks configured
 - [ ] Error tracking active (Sentry)
 - [ ] Alert notifications working
@@ -619,11 +661,13 @@ docker logs wastewise-worker -f               # Worker logs (Docker)
 ## 📞 Support
 
 ### During Deployment
+
 - **Deployment Checklist**: `docs/deployment/STAGING_DEPLOYMENT_CHECKLIST.md`
 - **Deployment Runbook**: `docs/deployment/staging-deployment.md`
 - **Troubleshooting**: Monitor worker logs, check health endpoints
 
 ### After Deployment
+
 - **User Guide**: `docs/user/getting-started.md`
 - **API Docs**: https://staging.wastewise.io/api-docs
 - **Admin Dashboard**: https://staging.wastewise.io/admin
@@ -635,6 +679,7 @@ docker logs wastewise-worker -f               # Worker logs (Docker)
 **Phase 8 Task 17 - Preparation Complete!**
 
 You now have:
+
 - ✅ Comprehensive deployment scripts and automation
 - ✅ 150+ item deployment checklist
 - ✅ Automated pre-deployment validation

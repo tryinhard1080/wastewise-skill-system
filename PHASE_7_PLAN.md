@@ -11,6 +11,7 @@
 Phase 6 completed all code implementation for the complete analytics workflow. Phase 7 focuses on **validating the entire system** through integration testing and preparing for production deployment.
 
 **Goals**:
+
 1. ✅ Verify end-to-end workflow with real data
 2. ✅ Test all API endpoints and worker functionality
 3. ✅ Validate error handling and edge cases
@@ -22,12 +23,14 @@ Phase 6 completed all code implementation for the complete analytics workflow. P
 ## Prerequisites
 
 ### Required Environment
+
 - ✅ Supabase database with all tables and RPC functions
 - ✅ Environment variables configured (.env.local)
 - ✅ Background worker running (`pnpm worker`)
 - ✅ Development server running (`pnpm dev`)
 
 ### Test Data Requirements
+
 - **Project**: At least 1 complete project with:
   - Property details (name, type, units, equipment)
   - Invoice data (minimum 3 months)
@@ -43,6 +46,7 @@ Phase 6 completed all code implementation for the complete analytics workflow. P
 ### Test Cases
 
 #### 1.1: Worker Startup
+
 - [ ] Worker starts with valid environment variables
 - [ ] Worker exits with clear error if `NEXT_PUBLIC_SUPABASE_URL` missing
 - [ ] Worker exits with clear error if `SUPABASE_SERVICE_KEY` missing
@@ -50,6 +54,7 @@ Phase 6 completed all code implementation for the complete analytics workflow. P
 - [ ] Worker accepts custom concurrency (`--concurrent=2`)
 
 **Expected Output**:
+
 ```
 ╔═══════════════════════════════════════════════════════╗
 ║   WasteWise Analytics Worker                          ║
@@ -69,6 +74,7 @@ Polling for pending jobs every 2 seconds...
 ```
 
 #### 1.2: Job Polling
+
 - [ ] Worker queries database every 2 seconds (poll interval)
 - [ ] Worker picks up jobs with `status='pending'`
 - [ ] Worker processes oldest jobs first (`created_at ASC`)
@@ -77,6 +83,7 @@ Polling for pending jobs every 2 seconds...
 **Test Method**: Monitor worker console output while creating test jobs
 
 #### 1.3: Job Processing
+
 - [ ] Job status changes to `'processing'` when worker starts
 - [ ] `started_at` timestamp is set
 - [ ] Progress updates appear in database during execution
@@ -86,6 +93,7 @@ Polling for pending jobs every 2 seconds...
 - [ ] AI usage metrics are saved
 
 **Test Method**:
+
 ```sql
 -- Monitor job progression
 SELECT id, status, progress_percent, current_step, started_at, completed_at
@@ -95,6 +103,7 @@ ORDER BY updated_at DESC;
 ```
 
 #### 1.4: Error Handling
+
 - [ ] Job marked as `'failed'` if skill execution throws error
 - [ ] Error message saved to `error_message` field
 - [ ] Error code saved to `error_code` field
@@ -104,6 +113,7 @@ ORDER BY updated_at DESC;
 **Test Method**: Create intentionally failing job (e.g., invalid project ID)
 
 #### 1.5: Graceful Shutdown
+
 - [ ] Worker stops cleanly on `Ctrl+C` (SIGINT)
 - [ ] Worker stops cleanly on `SIGTERM`
 - [ ] In-progress jobs are not abandoned (marked as failed or retried)
@@ -122,12 +132,14 @@ ORDER BY updated_at DESC;
 **POST /api/projects/[id]/analyze**
 
 #### Success Cases
+
 - [ ] Returns `{ jobId, status, message }` when analysis starts
 - [ ] Creates job record with `status='pending'`
 - [ ] Sets `total_steps=5` and `progress_percent=0`
 - [ ] Validates user owns the project (RLS enforcement)
 
 **Test Method**:
+
 ```bash
 curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -135,6 +147,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 ```
 
 #### Error Cases
+
 - [ ] Returns `401 Unauthorized` if not authenticated
 - [ ] Returns `404 Not Found` if project doesn't exist
 - [ ] Returns `404 Not Found` if user doesn't own project
@@ -150,6 +163,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 **GET /api/jobs/[id]**
 
 #### Success Cases
+
 - [ ] Returns job details for pending job
 - [ ] Returns real-time progress for processing job
 - [ ] Returns complete result for completed job
@@ -157,6 +171,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 - [ ] Progress updates reflect database changes (poll every 2s)
 
 **Response Structure Validation**:
+
 ```typescript
 {
   id: string
@@ -186,6 +201,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 ```
 
 #### Error Cases
+
 - [ ] Returns `401 Unauthorized` if not authenticated
 - [ ] Returns `404 Not Found` if job doesn't exist
 - [ ] Returns `404 Not Found` if user doesn't own job (RLS)
@@ -197,11 +213,13 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 **DELETE /api/jobs/[id]**
 
 #### Success Cases
+
 - [ ] Cancels job with `status='pending'`
 - [ ] Cancels job with `status='processing'`
 - [ ] Sets `status='cancelled'` and `cancelled_at` timestamp
 
 #### Error Cases
+
 - [ ] Returns `400 Bad Request` if job already completed
 - [ ] Returns `400 Bad Request` if job already failed
 - [ ] Returns `400 Bad Request` if job already cancelled
@@ -217,6 +235,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 ### 3.1: Complete Analysis Workflow
 
 **Steps**:
+
 1. Navigate to project detail page `/projects/[id]`
 2. Click "Start Analysis" button
 3. Verify redirect to processing page (or loading state)
@@ -235,6 +254,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 **URL**: `/projects/[id]/results`
 
 #### Data Display Tests
+
 - [ ] Property header shows project name
 - [ ] Analysis completion date displays correctly
 - [ ] Summary section shows 4 metric cards:
@@ -255,6 +275,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 - [ ] Empty state shows if no recommendations
 
 #### Download Tests
+
 - [ ] "Download Excel Report" button is enabled
 - [ ] Click downloads `.xlsx` file
 - [ ] Downloaded file opens in Excel/Numbers
@@ -263,12 +284,14 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 - [ ] HTML dashboard is interactive (filters, charts work)
 
 #### Responsive Design Tests
+
 - [ ] Mobile (375px): Cards stack vertically, buttons stack
 - [ ] Tablet (768px): 2 columns for cards
 - [ ] Desktop (1024px): 4 columns for cards
 - [ ] Large desktop (1440px): Layout scales correctly
 
 #### Dark Mode Tests
+
 - [ ] Toggle dark mode: Colors invert correctly
 - [ ] Cards have proper dark backgrounds
 - [ ] Text has proper dark mode contrast
@@ -279,10 +302,12 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 ### 3.3: Error Handling Tests
 
 #### No Completed Analysis
+
 - [ ] Visiting `/projects/[id]/results` without completed job redirects to `/projects/[id]`
 - [ ] User sees message: "No analysis results available yet"
 
 #### Report Generation Failures
+
 - [ ] If reports fail to generate, warning message appears:
   - "Reports Not Available"
   - "Report generation failed during analysis..."
@@ -291,6 +316,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 - [ ] Recommendations still visible
 
 #### Network Errors
+
 - [ ] Lost connection during analysis shows error
 - [ ] User can retry analysis
 - [ ] No duplicate jobs created
@@ -302,13 +328,14 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 ### 4.1: Single Job Performance
 
 **Metrics to Track**:
-- [ ] Time to complete analysis: _____ seconds (target: <180s)
-- [ ] Database queries: _____ queries (check N+1 issues)
-- [ ] AI API calls: _____ requests (verify not excessive)
-- [ ] Memory usage: _____ MB peak
+
+- [ ] Time to complete analysis: **\_** seconds (target: <180s)
+- [ ] Database queries: **\_** queries (check N+1 issues)
+- [ ] AI API calls: **\_** requests (verify not excessive)
+- [ ] Memory usage: **\_** MB peak
 - [ ] Report file sizes:
-  - Excel: _____ KB (target: <500KB)
-  - HTML: _____ KB (target: <200KB)
+  - Excel: **\_** KB (target: <500KB)
+  - HTML: **\_** KB (target: <200KB)
 
 ### 4.2: Concurrent Jobs
 
@@ -323,6 +350,7 @@ curl -X POST http://localhost:3000/api/projects/YOUR_PROJECT_ID/analyze \
 ### 4.3: Large Project Testing
 
 **Test**: Analyze project with:
+
 - 500+ invoices
 - 1,000+ haul log entries
 - 3+ years of data
@@ -386,17 +414,20 @@ SELECT fail_analysis_job(
 ## Task 6: Security Validation
 
 ### 6.1: Authentication
+
 - [ ] All API routes require authentication
 - [ ] Expired tokens are rejected
 - [ ] Invalid tokens return 401
 - [ ] Missing auth header returns 401
 
 ### 6.2: Authorization
+
 - [ ] Users cannot access other users' projects
 - [ ] Users cannot access other users' jobs
 - [ ] Users cannot start analysis on projects they don't own
 
 ### 6.3: Input Validation
+
 - [ ] Invalid project IDs return 404
 - [ ] Invalid job IDs return 404
 - [ ] Malformed UUIDs return 400
@@ -409,6 +440,7 @@ SELECT fail_analysis_job(
 ### 7.1: Environment Configuration
 
 **Production Environment Variables**:
+
 ```bash
 # Supabase (Production instance)
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
@@ -432,6 +464,7 @@ WORKER_MAX_CONCURRENT=2
 #### Option 1: Vercel (Frontend) + Railway (Worker)
 
 **Frontend (Vercel)**:
+
 ```bash
 # Deploy Next.js app
 vercel --prod
@@ -440,6 +473,7 @@ vercel --prod
 ```
 
 **Worker (Railway)**:
+
 ```bash
 # Create railway.json
 {
@@ -459,6 +493,7 @@ railway up
 #### Option 2: Single Server (VPS)
 
 **Using PM2**:
+
 ```bash
 # Install PM2
 npm install -g pm2
@@ -480,7 +515,7 @@ pm2 startup
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -508,45 +543,51 @@ services:
 ### 7.3: Monitoring Setup
 
 **Worker Health Check**:
+
 ```typescript
 // app/api/worker/health/route.ts
 export async function GET() {
-  const supabase = createClient()
+  const supabase = createClient();
 
   // Check for stuck jobs (processing >10 minutes)
   const { data: stuckJobs } = await supabase
-    .from('analysis_jobs')
-    .select('id, started_at')
-    .eq('status', 'processing')
-    .lt('started_at', new Date(Date.now() - 10 * 60 * 1000).toISOString())
+    .from("analysis_jobs")
+    .select("id, started_at")
+    .eq("status", "processing")
+    .lt("started_at", new Date(Date.now() - 10 * 60 * 1000).toISOString());
 
   if (stuckJobs && stuckJobs.length > 0) {
-    return Response.json({
-      status: 'unhealthy',
-      reason: `${stuckJobs.length} jobs stuck in processing`,
-      stuckJobs: stuckJobs.map(j => j.id),
-    }, { status: 503 })
+    return Response.json(
+      {
+        status: "unhealthy",
+        reason: `${stuckJobs.length} jobs stuck in processing`,
+        stuckJobs: stuckJobs.map((j) => j.id),
+      },
+      { status: 503 },
+    );
   }
 
-  return Response.json({ status: 'healthy' })
+  return Response.json({ status: "healthy" });
 }
 ```
 
 **Sentry Integration** (optional):
+
 ```typescript
 // lib/observability/sentry.ts
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.NODE_ENV,
   tracesSampleRate: 0.1,
-})
+});
 ```
 
 ### 7.4: Database Migrations
 
 **Pre-deployment Checklist**:
+
 - [ ] All migrations applied to production database
 - [ ] RPC functions created in production
 - [ ] Storage buckets created (`analysis-reports`)
@@ -561,6 +602,7 @@ Sentry.init({
 ### 7.5: Performance Optimization
 
 **Before Production**:
+
 - [ ] Enable Next.js production build optimizations
 - [ ] Enable database connection pooling
 - [ ] Set up CDN for static assets (Vercel Edge Network)
@@ -575,6 +617,7 @@ Sentry.init({
 ### 8.1: README.md
 
 Update with:
+
 - [ ] Production deployment instructions
 - [ ] Environment variable reference
 - [ ] Worker deployment guide
@@ -583,6 +626,7 @@ Update with:
 ### 8.2: API Documentation
 
 Create `docs/API.md`:
+
 - [ ] All endpoint descriptions
 - [ ] Request/response examples
 - [ ] Error codes reference
@@ -591,6 +635,7 @@ Create `docs/API.md`:
 ### 8.3: Deployment Guide
 
 Create `docs/DEPLOYMENT.md`:
+
 - [ ] Step-by-step deployment instructions
 - [ ] Environment setup
 - [ ] Database migration guide
@@ -602,6 +647,7 @@ Create `docs/DEPLOYMENT.md`:
 ## Success Criteria
 
 ### Phase 7 Complete When:
+
 - ✅ All worker system tests pass
 - ✅ All API endpoint tests pass
 - ✅ Complete end-to-end workflow verified
@@ -614,6 +660,7 @@ Create `docs/DEPLOYMENT.md`:
 - ✅ Health monitoring in place
 
 ### Production Readiness Checklist:
+
 - [ ] All integration tests passing
 - [ ] No TypeScript errors
 - [ ] No console errors in browser
@@ -640,12 +687,14 @@ Create `docs/DEPLOYMENT.md`:
 ## Next Steps After Phase 7
 
 **Phase 8: Production Launch**
+
 1. Deploy to production environment
 2. Monitor first 10 real user analyses
 3. Collect user feedback
 4. Fix any production-specific issues
 
 **Phase 9: Feature Enhancements**
+
 1. Processing page with live progress bar
 2. Email notifications on completion
 3. Regulatory research skill integration

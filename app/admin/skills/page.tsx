@@ -4,35 +4,37 @@
  * View and edit skill configurations and formula constants
  */
 
-'use client'
+"use client";
 
-import { SkillConfigEditor } from '@/components/admin/SkillConfigEditor'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import { useSkillsConfig, updateSkillConfig } from '@/lib/hooks/useAdminData'
-import { toast } from 'sonner'
-import { formatDistanceToNow } from 'date-fns'
+import { SkillConfigEditor } from "@/components/admin/SkillConfigEditor";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { useSkillsConfig, updateSkillConfig } from "@/lib/hooks/useAdminData";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
 export default function SkillsPage() {
-  const { data, isLoading, mutate } = useSkillsConfig()
+  const { data, isLoading, mutate } = useSkillsConfig();
 
   const handleSaveConfig = async (skillId: string, config: any) => {
     try {
-      await updateSkillConfig(skillId, config)
-      toast.success('Skill configuration updated successfully')
-      toast.warning('Run evaluation suite to validate changes')
-      mutate()
+      await updateSkillConfig(skillId, config);
+      toast.success("Skill configuration updated successfully");
+      toast.warning("Run evaluation suite to validate changes");
+      mutate();
     } catch (error) {
-      toast.error('Failed to update skill configuration')
+      toast.error("Failed to update skill configuration");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Skills Configuration</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Skills Configuration
+        </h1>
         <p className="text-gray-500 mt-2">
           Manage skill settings and formula constants
         </p>
@@ -61,12 +63,12 @@ export default function SkillsPage() {
                     <div className="font-medium">{skill.skill_name}</div>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="outline">v{skill.skill_version}</Badge>
-                      <Badge variant={skill.enabled ? 'default' : 'outline'}>
-                        {skill.enabled ? 'Enabled' : 'Disabled'}
+                      <Badge variant={skill.enabled ? "default" : "outline"}>
+                        {skill.enabled ? "Enabled" : "Disabled"}
                       </Badge>
                       {skill.last_validated && (
                         <span className="text-xs text-gray-500">
-                          Validated{' '}
+                          Validated{" "}
                           {formatDistanceToNow(new Date(skill.last_validated), {
                             addSuffix: true,
                           })}
@@ -136,5 +138,5 @@ export default function SkillsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

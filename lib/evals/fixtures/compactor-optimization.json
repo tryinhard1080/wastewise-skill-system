@@ -15,7 +15,7 @@
       },
       "expectedOutput": {
         "yardsPerDoor": 3.51,
-        "costPerDoor": 11.20,
+        "costPerDoor": 11.2,
         "avgTonsPerHaul": 5.04,
         "capacityUtilization": 59.29,
         "needsOptimization": true
@@ -35,7 +35,7 @@
       "expectedOutput": {
         "yardsPerDoor": 2.32,
         "costPerDoor": 10.67,
-        "avgTonsPerHaul": 4.80,
+        "avgTonsPerHaul": 4.8,
         "capacityUtilization": 56.47,
         "needsOptimization": true
       }
@@ -53,9 +53,9 @@
       },
       "expectedOutput": {
         "yardsPerDoor": 6.16,
-        "costPerDoor": 12.50,
-        "avgTonsPerHaul": 8.50,
-        "capacityUtilization": 100.00,
+        "costPerDoor": 12.5,
+        "avgTonsPerHaul": 8.5,
+        "capacityUtilization": 100.0,
         "needsOptimization": false
       }
     },
@@ -72,8 +72,8 @@
       },
       "expectedOutput": {
         "yardsPerDoor": 1.45,
-        "costPerDoor": 10.00,
-        "avgTonsPerHaul": 6.00,
+        "costPerDoor": 10.0,
+        "avgTonsPerHaul": 6.0,
         "capacityUtilization": 70.59,
         "needsOptimization": false
       }
@@ -91,7 +91,7 @@
       },
       "expectedOutput": {
         "yardsPerDoor": 1.74,
-        "costPerDoor": 10.00,
+        "costPerDoor": 10.0,
         "avgTonsPerHaul": 5.99,
         "capacityUtilization": 70.47,
         "needsOptimization": true
@@ -110,8 +110,8 @@
       },
       "expectedOutput": {
         "yardsPerDoor": 3.26,
-        "costPerDoor": 10.00,
-        "avgTonsPerHaul": 9.00,
+        "costPerDoor": 10.0,
+        "avgTonsPerHaul": 9.0,
         "capacityUtilization": 105.88,
         "needsOptimization": false
       }
@@ -128,9 +128,9 @@
         "maxDaysBetween": 15
       },
       "expectedOutput": {
-        "yardsPerDoor": 1.20,
-        "costPerDoor": 9.00,
-        "avgTonsPerHaul": 5.50,
+        "yardsPerDoor": 1.2,
+        "costPerDoor": 9.0,
+        "avgTonsPerHaul": 5.5,
         "capacityUtilization": 64.71,
         "needsOptimization": false
       }
@@ -148,8 +148,8 @@
       },
       "expectedOutput": {
         "yardsPerDoor": 3.58,
-        "costPerDoor": 10.00,
-        "avgTonsPerHaul": 7.20,
+        "costPerDoor": 10.0,
+        "avgTonsPerHaul": 7.2,
         "capacityUtilization": 84.71,
         "needsOptimization": false
       }

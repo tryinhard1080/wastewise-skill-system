@@ -17,17 +17,17 @@
 
 ## Skill Comparison Matrix
 
-| Skill Name | Primary Use Case | Processing Time | Output Format | Validation Level |
-|-----------|-----------------|----------------|---------------|-----------------|
-| **wastewise-regulatory-lite** | Fast invoice analysis | <2 min | Excel (8-10 sheets) | Standard |
-| **wastewise-regulatory** | Complete analysis + compliance | 3-5 min | Excel (12-14 sheets) | Enhanced + Regulatory |
-| **wastewise-analytics-validated** | Maximum quality assurance | 4-6 min | Excel + Quality Report | Enterprise-grade (40+ checks) |
-| **waste-contract-extractor** | Contract parsing | 2-3 min | Excel + Confidence Scores | Extraction Validation |
-| **waste-batch-extractor** | Multi-location processing | 5-10 min | Excel (location tabs) | Batch Validation |
-| **compactor-optimization** | Compactor ROI analysis | 1-2 min | Excel + ROI Calculator | Equipment-Specific |
-| **waste-visual-reporter** | Interactive dashboards | 2-3 min | HTML (5 tabs, Chart.js) | Visual QA |
-| **waste-dev-report-visualizer** | Development projects | 3-4 min | HTML (dashboard + spec) | Development Standards |
-| **trash-management-planner** | Comprehensive planning | 5-8 min | 14-Section Document | Industry Standards |
+| Skill Name                        | Primary Use Case               | Processing Time | Output Format             | Validation Level              |
+| --------------------------------- | ------------------------------ | --------------- | ------------------------- | ----------------------------- |
+| **wastewise-regulatory-lite**     | Fast invoice analysis          | <2 min          | Excel (8-10 sheets)       | Standard                      |
+| **wastewise-regulatory**          | Complete analysis + compliance | 3-5 min         | Excel (12-14 sheets)      | Enhanced + Regulatory         |
+| **wastewise-analytics-validated** | Maximum quality assurance      | 4-6 min         | Excel + Quality Report    | Enterprise-grade (40+ checks) |
+| **waste-contract-extractor**      | Contract parsing               | 2-3 min         | Excel + Confidence Scores | Extraction Validation         |
+| **waste-batch-extractor**         | Multi-location processing      | 5-10 min        | Excel (location tabs)     | Batch Validation              |
+| **compactor-optimization**        | Compactor ROI analysis         | 1-2 min         | Excel + ROI Calculator    | Equipment-Specific            |
+| **waste-visual-reporter**         | Interactive dashboards         | 2-3 min         | HTML (5 tabs, Chart.js)   | Visual QA                     |
+| **waste-dev-report-visualizer**   | Development projects           | 3-4 min         | HTML (dashboard + spec)   | Development Standards         |
+| **trash-management-planner**      | Comprehensive planning         | 5-8 min         | 14-Section Document       | Industry Standards            |
 
 ---
 
@@ -115,35 +115,39 @@ What type of service?
 **Time Required:** 15-20 minutes
 
 **Steps:**
+
 1. **Gather Documents** (5 min)
    - Collect 6+ months of invoices (PDF/Excel/CSV)
    - Find service contract (if available)
    - Note property details (name, units, location)
 
 2. **Extract Contract** (2 min)
+
    ```
-   Prompt: "Extract terms from this Waste Management contract. 
+   Prompt: "Extract terms from this Waste Management contract.
    Focus on rate increases, termination clauses, and renewal dates."
-   
+
    Skill: waste-contract-extractor
    Output: Contract_Terms_Extracted.xlsx
    ```
 
 3. **Run Complete Analysis** (4 min)
+
    ```
-   Prompt: "Analyze Columbia Square Living invoices with regulatory 
+   Prompt: "Analyze Columbia Square Living invoices with regulatory
    compliance for Portland, Oregon. Include the extracted contract terms."
-   
+
    Skill: wastewise-analytics-validated
    Output: ColumbiaSquare_WasteAnalysis_Validated.xlsx
    ```
 
 4. **Generate Visual Dashboard** (3 min)
+
    ```
-   Prompt: "Create an interactive HTML dashboard from this analysis. 
-   I need 5 tabs: Dashboard, Expense Analysis, Haul Log, Optimization, 
+   Prompt: "Create an interactive HTML dashboard from this analysis.
+   I need 5 tabs: Dashboard, Expense Analysis, Haul Log, Optimization,
    and Contract Terms."
-   
+
    Skill: waste-visual-reporter
    Output: ColumbiaSquare_Dashboard.html
    ```
@@ -155,6 +159,7 @@ What type of service?
    - Share both files with stakeholders
 
 **Deliverables:**
+
 - Validated Excel workbook (12 sheets, 40+ checks passed)
 - Interactive HTML dashboard (5 tabs, Chart.js visualizations)
 - Executive summary with 2026 savings projection
@@ -169,20 +174,22 @@ What type of service?
 **Time Required:** 30-45 minutes
 
 **Steps:**
+
 1. **Organize Documents by Location** (10 min)
    - Create folders: Property1/, Property2/, etc.
    - Place all invoices in respective folders
    - Note: Contracts optional but recommended
 
 2. **Run Batch Extractor** (8 min)
+
    ```
-   Prompt: "I have invoices for 12 properties across Texas and California. 
+   Prompt: "I have invoices for 12 properties across Texas and California.
    Extract all data, organize by location, create validation reports."
-   
+
    Skill: waste-batch-extractor
    Output: Portfolio_Waste_Analysis_Batch.xlsx
-   
-   Result: 
+
+   Result:
    - Tab 1: Summary Dashboard
    - Tabs 2-13: Individual property data
    - Tab 14: Validation Report
@@ -200,16 +207,18 @@ What type of service?
    - Generate detailed optimization recommendations
 
 5. **Create Portfolio Report** (5 min)
+
    ```
-   Prompt: "Create a portfolio-level HTML dashboard showing all 12 
-   properties with cost comparisons, optimization opportunities, and 
+   Prompt: "Create a portfolio-level HTML dashboard showing all 12
+   properties with cost comparisons, optimization opportunities, and
    ranking by cost per door."
-   
+
    Skill: waste-visual-reporter (portfolio mode)
    Output: Regional_Portfolio_Dashboard.html
    ```
 
 **Deliverables:**
+
 - Master Excel with all locations (15+ tabs)
 - Individual property analyses (top 3 properties)
 - Portfolio-wide HTML dashboard
@@ -224,6 +233,7 @@ What type of service?
 **Time Required:** 25-30 minutes
 
 **Steps:**
+
 1. **Gather Project Details** (5 min)
    - Building names, unit counts, square footage
    - Number of stories, ground floor units
@@ -231,34 +241,37 @@ What type of service?
    - Developer priorities (cost vs sustainability)
 
 2. **Generate Comprehensive Plan** (8 min)
+
    ```
-   Prompt: "Create a trash management plan for Bundy Blocks Development 
-   in Los Angeles. 3 buildings: Building A (220 units, 8 stories), 
-   Building B (180 units, 6 stories), Building C (220 units, 8 stories). 
-   Ground floor has 15,000 SF restaurant space. Project goal: balanced 
+   Prompt: "Create a trash management plan for Bundy Blocks Development
+   in Los Angeles. 3 buildings: Building A (220 units, 8 stories),
+   Building B (180 units, 6 stories), Building C (220 units, 8 stories).
+   Ground floor has 15,000 SF restaurant space. Project goal: balanced
    cost-effectiveness and sustainability."
-   
+
    Skill: trash-management-planner
    Output: BundyBlocks_Trash_Plan.docx (14 sections)
    ```
 
 3. **Create Visual Dashboard** (7 min)
+
    ```
-   Prompt: "Generate interactive dashboard and spec sheet for this 
-   development project. Show volume calculations, cost comparisons 
+   Prompt: "Generate interactive dashboard and spec sheet for this
+   development project. Show volume calculations, cost comparisons
    (loose vs compacted), ROI analysis, and equipment specs."
-   
+
    Skill: waste-dev-report-visualizer
-   Output: 
+   Output:
    - BundyBlocks_Dashboard.html (6 charts, building selector)
    - BundyBlocks_Spec_Sheet.html (20+ pages, print-ready)
    ```
 
 4. **Calculate Compactor ROI** (5 min)
+
    ```
-   Prompt: "Analyze compactor ROI for Buildings A and C. Compare 
+   Prompt: "Analyze compactor ROI for Buildings A and C. Compare
    scenarios: loose service, single compactor each, dual compactors."
-   
+
    Skill: compactor-optimization
    Output: BundyBlocks_Compactor_Analysis.xlsx
    ```
@@ -270,6 +283,7 @@ What type of service?
    - ROI Analysis (for financial review)
 
 **Deliverables:**
+
 - 14-section trash management plan (25+ pages)
 - Interactive HTML dashboard with building selector
 - Comprehensive spec sheet (print-ready PDF)
@@ -285,22 +299,25 @@ What type of service?
 **Time Required:** 20-25 minutes
 
 **Steps:**
+
 1. **Extract Current Contract Terms** (3 min)
+
    ```
-   Prompt: "Extract all terms from this Republic Services contract. 
-   Focus on: term length, rate increases, termination clauses, 
+   Prompt: "Extract all terms from this Republic Services contract.
+   Focus on: term length, rate increases, termination clauses,
    liability, and indemnification."
-   
+
    Skill: waste-contract-extractor
    Output: RepublicServices_Contract_Extract.xlsx
    ```
 
 2. **Analyze Current Performance** (6 min)
+
    ```
-   Prompt: "Analyze 12 months of invoices under this Republic Services 
-   contract. Calculate actual cost per door, identify any rate increases 
+   Prompt: "Analyze 12 months of invoices under this Republic Services
+   contract. Calculate actual cost per door, identify any rate increases
    that occurred, and compare to contract terms."
-   
+
    Skill: wastewise-regulatory
    Output: CurrentPerformance_Analysis.xlsx
    ```
@@ -311,11 +328,12 @@ What type of service?
    - Identify optimization opportunities from analysis
 
 4. **Calculate Leverage Points** (6 min)
+
    ```
-   Prompt: "Based on this analysis, what are our negotiation leverage 
-   points? Consider: payment history, contract length, multi-property 
+   Prompt: "Based on this analysis, what are our negotiation leverage
+   points? Consider: payment history, contract length, multi-property
    opportunities, and optimization potential."
-   
+
    Use: wastewise-analytics-validated (OPTIMIZATION sheet)
    Review: Savings opportunities that could reduce costs
    ```
@@ -327,6 +345,7 @@ What type of service?
    - Set calendar reminders (90/60/30 days before expiration)
 
 **Deliverables:**
+
 - Contract terms extraction with risk scoring
 - 12-month performance analysis
 - Market benchmark comparison
@@ -352,6 +371,7 @@ waste-visual-reporter
 ```
 
 **Example:**
+
 ```bash
 # Step 1
 "Extract contract terms from WM_Contract.pdf"
@@ -380,6 +400,7 @@ waste-visual-reporter
 ```
 
 **Example:**
+
 ```bash
 # Step 1
 "Batch process these 15 properties"
@@ -410,6 +431,7 @@ compactor-optimization
 ```
 
 **Example:**
+
 ```bash
 # Step 1
 "Create trash plan for this development in Austin, TX"
@@ -428,6 +450,7 @@ compactor-optimization
 ### Data Quality
 
 **Invoice Preparation:**
+
 - ✅ Scan at 300 DPI minimum for PDF invoices
 - ✅ Use original files when possible (not photocopies)
 - ✅ Include all pages (summary, detail, backup)
@@ -436,6 +459,7 @@ compactor-optimization
 - ❌ Don't redact key data (vendor, amounts, dates)
 
 **Contract Preparation:**
+
 - ✅ Upload complete contract (all exhibits, addendums)
 - ✅ Ensure text is searchable (not scanned images)
 - ✅ Include rate schedules and service level agreements
@@ -446,18 +470,21 @@ compactor-optimization
 ### Skill Selection
 
 **When to use wastewise-regulatory-lite:**
+
 - Single property, straightforward analysis
 - Time-sensitive requests (<5 minutes needed)
 - No complex regulatory requirements
 - Property manager needs operational detail
 
 **When to use wastewise-regulatory:**
+
 - Need regulatory compliance research
 - Multiple waste streams (trash, recycling, compost)
 - Executive stakeholders need comprehensive report
 - Contract terms need to be integrated
 
 **When to use wastewise-analytics-validated:**
+
 - Enterprise-grade quality control required
 - Financial audit or compliance review
 - Complex multi-building properties
@@ -466,18 +493,20 @@ compactor-optimization
 ### Prompt Engineering
 
 **Good Prompts:**
+
 ```
-"Analyze Columbia Square Living invoices (200 units, Portland OR) 
+"Analyze Columbia Square Living invoices (200 units, Portland OR)
 with regulatory compliance. Focus on compactor optimization."
 
-"Batch process 8 properties in California. Flag any that exceed 
+"Batch process 8 properties in California. Flag any that exceed
 $35/unit/month or have contamination charges >5% of spend."
 
-"Create a trash plan for this Austin development with emphasis on 
+"Create a trash plan for this Austin development with emphasis on
 AB 341 recycling compliance and cost optimization."
 ```
 
 **Poor Prompts:**
+
 ```
 "Analyze these invoices" (missing property details)
 
@@ -489,12 +518,14 @@ AB 341 recycling compliance and cost optimization."
 ### Output Review
 
 **Always Check:**
+
 1. **QUALITY_CHECK tab** - Verify all validations passed
 2. **SUMMARY_FULL tab** - Confirm 2026 savings projection makes sense
 3. **OPTIMIZATION tab** - Review recommendations against criteria
 4. **REGULATORY_COMPLIANCE tab** - Check confidence level (HIGH/MEDIUM/LOW)
 
 **Red Flags:**
+
 - ⚠️ Confidence level: LOW (requires manual review)
 - ⚠️ Validation failures in QUALITY_CHECK
 - ⚠️ Cost per door >$50/month (unusual for most properties)
@@ -507,11 +538,13 @@ AB 341 recycling compliance and cost optimization."
 ### Issue: Skill not triggering correctly
 
 **Symptoms:**
+
 - Claude doesn't invoke the skill
 - Wrong skill is invoked
 - Generic response instead of skill execution
 
 **Solutions:**
+
 1. Use specific trigger keywords from skill descriptions
 2. Mention the skill name explicitly: "Use the wastewise-regulatory skill"
 3. Upload files before prompting (skills need context)
@@ -520,11 +553,13 @@ AB 341 recycling compliance and cost optimization."
 ### Issue: Data extraction errors
 
 **Symptoms:**
+
 - Missing invoices in output
 - Incorrect amounts or dates
 - "Unable to extract" warnings
 
 **Solutions:**
+
 1. Verify PDFs are searchable (not scanned images)
 2. Check file names don't have special characters
 3. Ensure invoice format is recognizable (standard layouts work best)
@@ -534,11 +569,13 @@ AB 341 recycling compliance and cost optimization."
 ### Issue: Validation failures
 
 **Symptoms:**
+
 - "VALIDATION FAILED" message
 - Missing required sheets in output
 - Inconsistent data across sheets
 
 **Solutions:**
+
 1. Review which specific validation failed
 2. Check input data completeness (units, dates, amounts)
 3. Ensure contract is uploaded if CONTRACT_TERMS expected
@@ -548,11 +585,13 @@ AB 341 recycling compliance and cost optimization."
 ### Issue: Low regulatory confidence
 
 **Symptoms:**
+
 - "MANUAL REVIEW REQUIRED" warning
 - Confidence level: LOW in REGULATORY_COMPLIANCE tab
 - Missing ordinance citations
 
 **Solutions:**
+
 1. Verify property address is complete and accurate
 2. Search manually for city waste ordinances
 3. Check if municipality has recent regulation changes
@@ -562,11 +601,13 @@ AB 341 recycling compliance and cost optimization."
 ### Issue: Optimization recommendations don't apply
 
 **Symptoms:**
+
 - Compactor monitoring recommended but already installed
 - Contamination reduction suggested but charges are minimal
 - Recommendations don't match property type
 
 **Solutions:**
+
 1. Review OPTIMIZATION tab criteria
 2. Verify data extraction captured all service types
 3. Check if custom rates differ from standard assumptions
@@ -580,6 +621,7 @@ AB 341 recycling compliance and cost optimization."
 ### Chaining Skills Efficiently
 
 **Tip:** Use consistent file naming between skill outputs
+
 ```bash
 # Step 1: Contract extraction
 Output: Property_Contract.xlsx
@@ -591,14 +633,16 @@ Output: Property_Contract.xlsx
 ### Customizing Outputs
 
 **Tip:** Request specific formatting in your prompts
+
 ```
-"Generate dashboard with Greystar purple branding (#6B46C1) and 
+"Generate dashboard with Greystar purple branding (#6B46C1) and
 include only expense analysis and optimization tabs."
 ```
 
 ### Batch Processing at Scale
 
 **Tip:** Process in groups of 5-10 properties for optimal performance
+
 ```
 "Batch process properties 1-10 first, then I'll provide 11-20."
 ```
@@ -606,6 +650,7 @@ include only expense analysis and optimization tabs."
 ### Exporting for Different Audiences
 
 **Tip:** Generate multiple formats from one analysis
+
 ```
 "From this analysis, create:
 1. Excel for property managers (detailed)

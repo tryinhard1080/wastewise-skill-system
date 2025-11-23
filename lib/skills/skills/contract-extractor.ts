@@ -20,34 +20,39 @@
  * - AI usage tracking
  */
 
-import { BaseSkill } from '../base-skill'
+import { BaseSkill } from "../base-skill";
 import type {
   SkillContext,
   ValidationResult,
   ContractExtractorResult,
   ContractData,
   ProcessingDetail,
-} from '../types'
+} from "../types";
 import {
   extractContractData,
   calculateAnthropicCost,
-} from '@/lib/ai/vision-extractor'
-import { createClient } from '@/lib/supabase/server'
-import { logger } from '@/lib/observability/logger'
-import { metrics } from '@/lib/observability/metrics'
-import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
-import { ContractRepository, type ContractRecord } from '@/lib/db'
+} from "@/lib/ai/vision-extractor";
+import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/observability/logger";
+import { metrics } from "@/lib/observability/metrics";
+import { SkillExecutionError, ValidationError } from "@/lib/types/errors";
+import { ContractRepository, type ContractRecord } from "@/lib/db";
 
 /**
  * Container type validation
  */
-const VALID_CONTAINER_TYPES = ['COMPACTOR', 'DUMPSTER', 'OPEN_TOP', 'OTHER'] as const
+const VALID_CONTAINER_TYPES = [
+  "COMPACTOR",
+  "DUMPSTER",
+  "OPEN_TOP",
+  "OTHER",
+] as const;
 
 export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
-  readonly name = 'contract-extractor'
-  readonly version = '1.0.0'
+  readonly name = "contract-extractor";
+  readonly version = "1.0.0";
   readonly description =
-    'Extracts structured data from waste management service agreements using Claude Vision API'
+    "Extracts structured data from waste management service agreements using Claude Vision API";
 
   /**
    * Validate that we have contract files to process
@@ -56,142 +61,147 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
     const validationLogger = logger.child({
       skillName: this.name,
       projectId: context.projectId,
-    })
+    });
 
-    validationLogger.debug('Starting validation')
+    validationLogger.debug("Starting validation");
 
-    const errors: Array<{ field: string; message: string; code: string }> = []
+    const errors: Array<{ field: string; message: string; code: string }> = [];
 
     // Get contract files from database
-    const supabase = await createClient()
+    const supabase = await createClient();
     const { data: files, error: filesError } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', context.projectId)
-      .eq('file_type', 'contract')
+      .from("project_files")
+      .select("*")
+      .eq("project_id", context.projectId)
+      .eq("file_type", "contract");
 
     if (filesError) {
       errors.push({
-        field: 'project_files',
+        field: "project_files",
         message: `Failed to fetch contract files: ${filesError.message}`,
-        code: 'DATABASE_ERROR',
-      })
+        code: "DATABASE_ERROR",
+      });
     } else if (!files || files.length === 0) {
       errors.push({
-        field: 'project_files',
-        message: 'No contract files found for this project. Upload contract files before running extraction.',
-        code: 'NO_CONTRACT_FILES',
-      })
+        field: "project_files",
+        message:
+          "No contract files found for this project. Upload contract files before running extraction.",
+        code: "NO_CONTRACT_FILES",
+      });
     }
 
     // Check API key
     if (!process.env.ANTHROPIC_API_KEY) {
       errors.push({
-        field: 'anthropic_api_key',
-        message: 'ANTHROPIC_API_KEY environment variable is not set',
-        code: 'MISSING_API_KEY',
-      })
+        field: "anthropic_api_key",
+        message: "ANTHROPIC_API_KEY environment variable is not set",
+        code: "MISSING_API_KEY",
+      });
     }
 
     if (errors.length > 0) {
-      validationLogger.warn('Validation failed', { errors })
-      return { valid: false, errors }
+      validationLogger.warn("Validation failed", { errors });
+      return { valid: false, errors };
     }
 
-    validationLogger.debug('Validation passed', { fileCount: files?.length })
-    return { valid: true }
+    validationLogger.debug("Validation passed", { fileCount: files?.length });
+    return { valid: true };
   }
 
   /**
    * Execute contract extraction
    */
-  protected async executeInternal(context: SkillContext): Promise<ContractExtractorResult> {
+  protected async executeInternal(
+    context: SkillContext,
+  ): Promise<ContractExtractorResult> {
     const executionLogger = logger.child({
       skillName: this.name,
       projectId: context.projectId,
-    })
+    });
 
-    executionLogger.info('Starting contract extraction')
+    executionLogger.info("Starting contract extraction");
 
     // Initialize result containers
-    const contracts: ContractData[] = []
-    const processingDetails: ProcessingDetail[] = []
-    let totalRequests = 0
-    let totalTokensInput = 0
-    let totalTokensOutput = 0
+    const contracts: ContractData[] = [];
+    const processingDetails: ProcessingDetail[] = [];
+    let totalRequests = 0;
+    let totalTokensInput = 0;
+    let totalTokensOutput = 0;
 
     // Get contract files from database
     await this.updateProgress(context, {
       percent: 5,
-      step: 'Fetching contract files',
-    })
+      step: "Fetching contract files",
+    });
 
-    const supabase = await createClient()
+    const supabase = await createClient();
     const { data: files, error: filesError } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', context.projectId)
-      .eq('file_type', 'contract')
+      .from("project_files")
+      .select("*")
+      .eq("project_id", context.projectId)
+      .eq("file_type", "contract");
 
     if (filesError || !files || files.length === 0) {
       throw new SkillExecutionError(
         this.name,
-        'NO_CONTRACT_FILES',
-        'No contract files found to process'
-      )
+        "NO_CONTRACT_FILES",
+        "No contract files found to process",
+      );
     }
 
-    executionLogger.info('Contract files retrieved', { fileCount: files.length })
+    executionLogger.info("Contract files retrieved", {
+      fileCount: files.length,
+    });
 
     // Process each contract file
     for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const percentComplete = Math.round(((i + 1) / files.length) * 85) + 10 // 10-95%
+      const file = files[i];
+      const percentComplete = Math.round(((i + 1) / files.length) * 85) + 10; // 10-95%
 
-      this.checkCancellation(context)
+      this.checkCancellation(context);
 
       await this.updateProgress(context, {
         percent: percentComplete,
         step: `Extracting contract ${i + 1}/${files.length}: ${file.file_name}`,
         stepNumber: i + 1,
         totalSteps: files.length,
-      })
+      });
 
       try {
-        executionLogger.debug('Processing contract file', {
+        executionLogger.debug("Processing contract file", {
           fileId: file.id,
           fileName: file.file_name,
           mimeType: file.mime_type,
-        })
+        });
 
         // Download file from Supabase Storage
         const { data: fileData, error: downloadError } = await supabase.storage
-          .from('project-files')
-          .download(file.storage_path)
+          .from("project-files")
+          .download(file.storage_path);
 
         if (downloadError || !fileData) {
-          throw new Error(`Failed to download file: ${downloadError?.message}`)
+          throw new Error(`Failed to download file: ${downloadError?.message}`);
         }
 
         // Convert Blob to Buffer
-        const arrayBuffer = await fileData.arrayBuffer()
-        const fileBuffer = Buffer.from(arrayBuffer)
+        const arrayBuffer = await fileData.arrayBuffer();
+        const fileBuffer = Buffer.from(arrayBuffer);
 
         // Extract contract data with Vision API
         const processedData = await this.processContract(
           file,
           fileBuffer,
-          executionLogger
-        )
+          executionLogger,
+        );
 
         // Add to results
-        contracts.push(processedData.contract)
+        contracts.push(processedData.contract);
 
         // Track AI usage
         if (processedData.usage) {
-          totalRequests++
-          totalTokensInput += processedData.usage.input_tokens
-          totalTokensOutput += processedData.usage.output_tokens
+          totalRequests++;
+          totalTokensInput += processedData.usage.input_tokens;
+          totalTokensOutput += processedData.usage.output_tokens;
         }
 
         // Record success
@@ -199,37 +209,40 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
           fileId: file.id,
           fileName: file.file_name,
           fileType: file.file_type,
-          status: 'success',
+          status: "success",
           extractedRecords: 1,
-        })
+        });
 
-        metrics.increment('contract_extractor.file.success', 1, {
+        metrics.increment("contract_extractor.file.success", 1, {
           projectId: context.projectId,
-        })
+        });
 
-        executionLogger.info('Contract file processed successfully', {
+        executionLogger.info("Contract file processed successfully", {
           fileId: file.id,
           contractName: processedData.contract.property.name,
           vendorName: processedData.contract.vendor.name,
-        })
+        });
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : "Unknown error";
 
-        executionLogger.error(`Failed to process contract: ${file.file_name}`, error as Error)
+        executionLogger.error(
+          `Failed to process contract: ${file.file_name}`,
+          error as Error,
+        );
 
         processingDetails.push({
           fileId: file.id,
           fileName: file.file_name,
           fileType: file.file_type,
-          status: 'failed',
+          status: "failed",
           extractedRecords: 0,
           error: errorMessage,
-        })
+        });
 
-        metrics.increment('contract_extractor.file.failed', 1, {
+        metrics.increment("contract_extractor.file.failed", 1, {
           projectId: context.projectId,
-        })
+        });
 
         // Continue processing other files
       }
@@ -238,66 +251,70 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
     // Validate all extracted data
     await this.updateProgress(context, {
       percent: 95,
-      step: 'Validating extracted contract data',
-    })
+      step: "Validating extracted contract data",
+    });
 
-    executionLogger.debug('Validating extracted contract data')
+    executionLogger.debug("Validating extracted contract data");
 
     const validatedContracts = contracts
       .map((contract) => this.validateContractData(contract, executionLogger))
-      .filter((contract): contract is ContractData => contract !== null)
+      .filter((contract): contract is ContractData => contract !== null);
 
     // Calculate total cost
     const totalCostUsd = calculateAnthropicCost({
       input_tokens: totalTokensInput,
       output_tokens: totalTokensOutput,
-    })
+    });
 
     // Count total terms extracted
     const termsExtracted = validatedContracts.reduce((count, contract) => {
       // Count various contract components
-      const serviceCount = contract.services.length
-      const pricingCount = contract.pricing.monthlyBase ? 1 : 0
-      const termsCount = 1 // Always have at least basic terms
-      return count + serviceCount + pricingCount + termsCount
-    }, 0)
+      const serviceCount = contract.services.length;
+      const pricingCount = contract.pricing.monthlyBase ? 1 : 0;
+      const termsCount = 1; // Always have at least basic terms
+      return count + serviceCount + pricingCount + termsCount;
+    }, 0);
 
-    executionLogger.info('Contract extraction complete', {
+    executionLogger.info("Contract extraction complete", {
       totalFiles: files.length,
-      successfulFiles: processingDetails.filter((d) => d.status === 'success').length,
-      failedFiles: processingDetails.filter((d) => d.status === 'failed').length,
+      successfulFiles: processingDetails.filter((d) => d.status === "success")
+        .length,
+      failedFiles: processingDetails.filter((d) => d.status === "failed")
+        .length,
       contractsExtracted: validatedContracts.length,
       termsExtracted,
       totalCostUsd,
-    })
+    });
 
-    metrics.record('contract_extractor.ai_cost_usd', totalCostUsd, 'usd', {
+    metrics.record("contract_extractor.ai_cost_usd", totalCostUsd, "usd", {
       projectId: context.projectId,
-    })
+    });
 
     // Save extracted contracts to database
     await this.updateProgress(context, {
       percent: 96,
-      step: 'Saving contract data to database',
-    })
+      step: "Saving contract data to database",
+    });
 
     await this.saveToDatabase(
       context.projectId,
       validatedContracts,
       supabase,
-      executionLogger
-    )
+      executionLogger,
+    );
 
     await this.updateProgress(context, {
       percent: 100,
-      step: 'Contract extraction complete',
-    })
+      step: "Contract extraction complete",
+    });
 
     return {
       summary: {
         contractsProcessed: files.length,
         termsExtracted,
-        failedExtractions: processingDetails.filter((d) => d.status === 'failed').length,
+        failedExtractions: processingDetails.filter(
+          (d) => d.status === "failed",
+        ).length,
       },
       contracts: validatedContracts,
       processingDetails,
@@ -307,7 +324,7 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
         totalTokensOutput,
         totalCostUsd,
       },
-    }
+    };
   }
 
   /**
@@ -316,36 +333,35 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
   private async processContract(
     file: any,
     fileBuffer: Buffer,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<{
-    contract: ContractData
-    usage?: { input_tokens: number; output_tokens: number }
+    contract: ContractData;
+    usage?: { input_tokens: number; output_tokens: number };
   }> {
-    const mimeType = file.mime_type || 'application/octet-stream'
+    const mimeType = file.mime_type || "application/octet-stream";
 
     // Handle image/PDF files with Vision API
-    if (
-      mimeType.startsWith('image/') ||
-      mimeType === 'application/pdf'
-    ) {
-      executionLogger.debug('Processing contract with Vision API', {
+    if (mimeType.startsWith("image/") || mimeType === "application/pdf") {
+      executionLogger.debug("Processing contract with Vision API", {
         fileName: file.file_name,
         mimeType,
-      })
+      });
 
       const result = await extractContractData(
         fileBuffer,
         mimeType,
-        file.file_name
-      )
+        file.file_name,
+      );
 
       return {
         contract: result.contract,
         usage: result.usage,
-      }
+      };
     }
 
-    throw new Error(`Unsupported file type for contract extraction: ${mimeType}`)
+    throw new Error(
+      `Unsupported file type for contract extraction: ${mimeType}`,
+    );
   }
 
   /**
@@ -353,86 +369,96 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
    */
   private validateContractData(
     contract: ContractData,
-    executionLogger: any
+    executionLogger: any,
   ): ContractData | null {
     try {
       // Required fields
       if (!contract.property?.name) {
-        throw new Error('Missing property name')
+        throw new Error("Missing property name");
       }
 
       if (!contract.vendor?.name) {
-        throw new Error('Missing vendor name')
+        throw new Error("Missing vendor name");
       }
 
       if (!contract.contractDates?.effectiveDate) {
-        throw new Error('Missing contract effective date')
+        throw new Error("Missing contract effective date");
       }
 
       if (!contract.contractDates?.expirationDate) {
-        throw new Error('Missing contract expiration date')
+        throw new Error("Missing contract expiration date");
       }
 
       // Validate dates
-      const effectiveDate = new Date(contract.contractDates.effectiveDate)
-      const expirationDate = new Date(contract.contractDates.expirationDate)
+      const effectiveDate = new Date(contract.contractDates.effectiveDate);
+      const expirationDate = new Date(contract.contractDates.expirationDate);
 
       if (isNaN(effectiveDate.getTime())) {
-        throw new Error('Invalid contract effective date')
+        throw new Error("Invalid contract effective date");
       }
 
       if (isNaN(expirationDate.getTime())) {
-        throw new Error('Invalid contract expiration date')
+        throw new Error("Invalid contract expiration date");
       }
 
       if (expirationDate <= effectiveDate) {
-        executionLogger.warn('Contract expiration date is before or equal to effective date', {
-          fileName: contract.sourceFile,
-          effectiveDate: contract.contractDates.effectiveDate,
-          expirationDate: contract.contractDates.expirationDate,
-        })
+        executionLogger.warn(
+          "Contract expiration date is before or equal to effective date",
+          {
+            fileName: contract.sourceFile,
+            effectiveDate: contract.contractDates.effectiveDate,
+            expirationDate: contract.contractDates.expirationDate,
+          },
+        );
       }
 
       // Validate container types
       for (const service of contract.services) {
         if (!VALID_CONTAINER_TYPES.includes(service.containerType)) {
-          executionLogger.warn('Invalid container type, defaulting to OTHER', {
+          executionLogger.warn("Invalid container type, defaulting to OTHER", {
             original: service.containerType,
             fileName: contract.sourceFile,
-          })
-          service.containerType = 'OTHER'
+          });
+          service.containerType = "OTHER";
         }
       }
 
       // Validate pricing (warn if missing, don't fail)
-      if (!contract.pricing.monthlyBase && !contract.pricing.perPickup && !contract.pricing.perTon) {
-        executionLogger.warn('No pricing information found in contract', {
+      if (
+        !contract.pricing.monthlyBase &&
+        !contract.pricing.perPickup &&
+        !contract.pricing.perTon
+      ) {
+        executionLogger.warn("No pricing information found in contract", {
           fileName: contract.sourceFile,
-        })
+        });
       }
 
       // Ensure required term defaults
       if (!contract.terms.terminationNoticeDays) {
-        executionLogger.warn('Missing termination notice period, defaulting to 30 days', {
-          fileName: contract.sourceFile,
-        })
-        contract.terms.terminationNoticeDays = 30
+        executionLogger.warn(
+          "Missing termination notice period, defaulting to 30 days",
+          {
+            fileName: contract.sourceFile,
+          },
+        );
+        contract.terms.terminationNoticeDays = 30;
       }
 
       if (!contract.terms.paymentTerms) {
-        executionLogger.warn('Missing payment terms, defaulting to Net 30', {
+        executionLogger.warn("Missing payment terms, defaulting to Net 30", {
           fileName: contract.sourceFile,
-        })
-        contract.terms.paymentTerms = 'Net 30'
+        });
+        contract.terms.paymentTerms = "Net 30";
       }
 
-      return contract
+      return contract;
     } catch (error) {
       executionLogger.error(
         `Contract validation failed: ${contract.sourceFile}`,
-        error as Error
-      )
-      return null
+        error as Error,
+      );
+      return null;
     }
   }
 
@@ -446,14 +472,14 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
     projectId: string,
     contracts: ContractData[],
     supabase: any,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<void> {
-    executionLogger.info('Saving contract data to database', {
+    executionLogger.info("Saving contract data to database", {
       contractCount: contracts.length,
-    })
+    });
 
     try {
-      const contractRepo = new ContractRepository(supabase)
+      const contractRepo = new ContractRepository(supabase);
 
       // Save contracts (typically just one, but handle multiple)
       for (const contract of contracts) {
@@ -463,27 +489,40 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
           contract_end_date: contract.contractDates.expirationDate,
           term_length_years: contract.contractDates.termMonths / 12,
           clauses: {
-            'Term & Renewal': contract.contractDates.autoRenew
-              ? [`Auto-renewal: Yes`, `Term: ${contract.contractDates.termMonths} months`]
+            "Term & Renewal": contract.contractDates.autoRenew
+              ? [
+                  `Auto-renewal: Yes`,
+                  `Term: ${contract.contractDates.termMonths} months`,
+                ]
               : [`Term: ${contract.contractDates.termMonths} months`],
-            'Termination': [
+            Termination: [
               `Notice period: ${contract.terms.terminationNoticeDays} days`,
               contract.terms.earlyTerminationPenalty
                 ? `Early termination penalty: ${contract.terms.earlyTerminationPenalty}`
-                : 'No early termination penalty specified',
+                : "No early termination penalty specified",
             ],
-            'Pricing': [
-              contract.pricing.monthlyBase ? `Monthly base: $${contract.pricing.monthlyBase}` : '',
-              contract.pricing.perPickup ? `Per pickup: $${contract.pricing.perPickup}` : '',
-              contract.pricing.perTon ? `Per ton: $${contract.pricing.perTon}` : '',
-              contract.pricing.escalationClause || '',
-              contract.pricing.cpiAdjustment ? 'CPI adjustment: Yes' : '',
+            Pricing: [
+              contract.pricing.monthlyBase
+                ? `Monthly base: $${contract.pricing.monthlyBase}`
+                : "",
+              contract.pricing.perPickup
+                ? `Per pickup: $${contract.pricing.perPickup}`
+                : "",
+              contract.pricing.perTon
+                ? `Per ton: $${contract.pricing.perTon}`
+                : "",
+              contract.pricing.escalationClause || "",
+              contract.pricing.cpiAdjustment ? "CPI adjustment: Yes" : "",
             ].filter(Boolean),
-            'Payment Terms': [
+            "Payment Terms": [
               contract.terms.paymentTerms,
-              contract.terms.latePenalty ? `Late penalty: ${contract.terms.latePenalty}` : '',
+              contract.terms.latePenalty
+                ? `Late penalty: ${contract.terms.latePenalty}`
+                : "",
             ].filter(Boolean),
-            'Insurance': contract.terms.insuranceRequired ? ['Insurance required'] : [],
+            Insurance: contract.terms.insuranceRequired
+              ? ["Insurance required"]
+              : [],
           },
           calendar_reminders: contractRepo.generateCalendarReminders({
             project_id: projectId,
@@ -492,35 +531,39 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
             term_length_years: contract.contractDates.termMonths / 12,
             clauses: {},
           }),
-        }
+        };
 
-        const result = await contractRepo.upsert(contractRecord)
+        const result = await contractRepo.upsert(contractRecord);
 
         if (result.error) {
-          executionLogger.warn('Failed to save contract', {
+          executionLogger.warn("Failed to save contract", {
             error: result.error,
             contractFile: contract.sourceFile,
-          })
+          });
         } else {
-          executionLogger.info('Contract saved to database', {
+          executionLogger.info("Contract saved to database", {
             contractId: result.data?.id,
-          })
-          metrics.increment('contract_extractor.db.contracts_saved', 1, {
+          });
+          metrics.increment("contract_extractor.db.contracts_saved", 1, {
             projectId,
-          })
+          });
         }
       }
 
-      executionLogger.info('Database save completed successfully')
+      executionLogger.info("Database save completed successfully");
     } catch (error) {
-      executionLogger.error('Failed to save contracts to database', error as Error, {
-        projectId,
-        contractCount: contracts.length,
-      })
+      executionLogger.error(
+        "Failed to save contracts to database",
+        error as Error,
+        {
+          projectId,
+          contractCount: contracts.length,
+        },
+      );
 
-      metrics.increment('contract_extractor.db.save_failed', 1, {
+      metrics.increment("contract_extractor.db.save_failed", 1, {
         projectId,
-      })
+      });
     }
   }
 }

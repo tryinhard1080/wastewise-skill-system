@@ -21,12 +21,12 @@ Regular backup testing is CRITICAL to ensure recovery procedures work when neede
 
 ## Quarterly Testing Schedule
 
-| Quarter | Test Type | Focus Area | Due Date |
-|---------|-----------|------------|----------|
-| Q1 (Jan-Mar) | Full Restore | Complete database recovery | Jan 15 |
-| Q2 (Apr-Jun) | Table-Level | Partial recovery scenarios | Apr 15 |
-| Q3 (Jul-Sep) | PITR Testing | Point-in-time recovery | Jul 15 |
-| Q4 (Oct-Dec) | Disaster Drill | Simulated ransomware attack | Oct 15 |
+| Quarter      | Test Type      | Focus Area                  | Due Date |
+| ------------ | -------------- | --------------------------- | -------- |
+| Q1 (Jan-Mar) | Full Restore   | Complete database recovery  | Jan 15   |
+| Q2 (Apr-Jun) | Table-Level    | Partial recovery scenarios  | Apr 15   |
+| Q3 (Jul-Sep) | PITR Testing   | Point-in-time recovery      | Jul 15   |
+| Q4 (Oct-Dec) | Disaster Drill | Simulated ransomware attack | Oct 15   |
 
 ## Test 1: Backup Integrity Validation
 
@@ -35,6 +35,7 @@ Regular backup testing is CRITICAL to ensure recovery procedures work when neede
 **Environment**: Backup server
 
 ### Purpose
+
 Verify backup file is valid and can be read by pg_restore.
 
 ### Procedure
@@ -106,6 +107,7 @@ echo "=== All Tests Passed ✅ ==="
 ```
 
 ### Success Criteria
+
 - All 5 tests pass
 - No errors in output
 - Logged in monitoring system
@@ -119,6 +121,7 @@ echo "=== All Tests Passed ✅ ==="
 **Environment**: Staging database
 
 ### Purpose
+
 Verify complete database can be restored and application functions correctly.
 
 ### Prerequisites
@@ -383,11 +386,13 @@ echo "Test report saved: $REPORT_NAME"
 ### Follow-up Actions
 
 **If test passes**:
+
 - Archive test report to S3
 - Update next test due date in this document
 - Email summary to team
 
 **If test fails**:
+
 - Create incident ticket
 - Document failure in test report
 - Investigate root cause immediately
@@ -403,6 +408,7 @@ echo "Test report saved: $REPORT_NAME"
 **Environment**: Staging database
 
 ### Purpose
+
 Verify partial recovery scenarios work correctly.
 
 ### Procedure
@@ -450,6 +456,7 @@ echo "=== Test Passed ✅ ==="
 ```
 
 ### Success Criteria
+
 - Table drops successfully
 - Table restores successfully
 - Row count matches expected
@@ -465,11 +472,13 @@ echo "=== Test Passed ✅ ==="
 **Environment**: Supabase Pro tier required
 
 ### Purpose
+
 Verify PITR functionality for precise recovery.
 
 ### Procedure
 
 1. **Create test data** in staging:
+
 ```sql
 -- Insert test record with known timestamp
 INSERT INTO projects (id, user_id, property_name, units, created_at)
@@ -487,6 +496,7 @@ SELECT id, created_at FROM projects WHERE property_name = 'PITR Test Property';
 ```
 
 2. **Simulate data corruption** (2 minutes later):
+
 ```sql
 -- Delete the test record
 DELETE FROM projects WHERE property_name = 'PITR Test Property';
@@ -497,12 +507,14 @@ SELECT COUNT(*) FROM projects WHERE property_name = 'PITR Test Property';
 ```
 
 3. **Initiate PITR via Supabase Dashboard**:
+
 - Navigate to: **Database → Point in Time Recovery**
 - Select timestamp: `2025-01-21 14:31:00` (after insert, before delete)
 - Create new project (non-destructive test)
 - Wait for recovery (~10 minutes)
 
 4. **Verify recovery**:
+
 ```bash
 # Connect to recovered database
 RECOVERED_DB_URL="postgresql://...new-url..."
@@ -519,10 +531,12 @@ echo "✅ PITR Test Passed - Record recovered"
 ```
 
 5. **Cleanup**:
+
 - Pause or delete the temporary recovered project
 - Document test results
 
 ### Success Criteria
+
 - Test record created successfully
 - Test record deleted successfully (simulating loss)
 - PITR initiated successfully
@@ -538,11 +552,13 @@ echo "✅ PITR Test Passed - Record recovered"
 **Environment**: Full staging environment
 
 ### Purpose
+
 Simulate complete disaster scenario to test end-to-end recovery.
 
 ### Scenario: Simulated Ransomware Attack
 
 **Timeline**:
+
 - **T+0:00** - Attack detected, database encrypted
 - **T+0:05** - Incident declared, recovery initiated
 - **T+0:10** - Backup downloaded and verified
@@ -557,6 +573,7 @@ Simulate complete disaster scenario to test end-to-end recovery.
 See `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 for full procedure.
 
 **Additional Test Requirements**:
+
 - [ ] Test communication procedures (Slack notifications)
 - [ ] Test escalation (notify on-call engineer)
 - [ ] Test security response (isolate systems)
@@ -566,6 +583,7 @@ See `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 for full procedure.
 - [ ] Measure actual RTO vs target (1 hour)
 
 ### Success Criteria
+
 - Complete recovery achieved within 2 hours
 - All stakeholders notified
 - Security procedures followed
@@ -585,6 +603,7 @@ See `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 for full procedure.
 **Environment**: [Staging | Production-like]
 
 ## Summary
+
 - **Status**: [PASSED | FAILED | PARTIAL]
 - **Duration**: [XX minutes]
 - **Issues Found**: [None | List issues]
@@ -592,25 +611,29 @@ See `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 for full procedure.
 ## Test Details
 
 ### Backup Information
+
 - Backup File: wastewise_backup_YYYYMMDD_HHMMSS.dump
 - Backup Date: YYYY-MM-DD
 - Backup Size: X GB
 - Checksum: [Verified ✅ | Failed ❌]
 
 ### Restore Process
+
 - Start Time: HH:MM:SS
 - End Time: HH:MM:SS
 - Duration: XX seconds
 - Errors: [Count]
 
 ### Data Validation
-| Table | Expected Rows | Actual Rows | Status |
-|-------|---------------|-------------|--------|
-| users | XX | XX | ✅ |
-| projects | XX | XX | ✅ |
-| invoices | XX | XX | ✅ |
+
+| Table    | Expected Rows | Actual Rows | Status |
+| -------- | ------------- | ----------- | ------ |
+| users    | XX            | XX          | ✅     |
+| projects | XX            | XX          | ✅     |
+| invoices | XX            | XX          | ✅     |
 
 ### Application Tests
+
 - [ ] Health check passed
 - [ ] Database connection successful
 - [ ] API endpoints functional
@@ -618,15 +641,19 @@ See `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 for full procedure.
 - [ ] Query performance acceptable
 
 ## Issues Found
+
 [List any issues discovered]
 
 ## Recommendations
+
 [List any improvements or actions needed]
 
 ## Next Test Due
+
 [Date of next quarterly test]
 
 ## Attachments
+
 - Full restore log: restore-output.log
 - Test output: test-report.txt
 ```
@@ -669,14 +696,14 @@ done
 
 ## Test Metrics to Track
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Backup Integrity Test Pass Rate | 100% | Automated monthly tests |
-| Full Restore Duration | <60 minutes | Quarterly drill |
-| Table Restore Duration | <15 minutes | Quarterly drill |
-| PITR Availability | 100% uptime | Monitor Supabase dashboard |
-| Disaster Drill RTO | <2 hours | Annual drill |
-| Test Documentation Completion | 100% | Quarterly review |
+| Metric                          | Target      | Measurement                |
+| ------------------------------- | ----------- | -------------------------- |
+| Backup Integrity Test Pass Rate | 100%        | Automated monthly tests    |
+| Full Restore Duration           | <60 minutes | Quarterly drill            |
+| Table Restore Duration          | <15 minutes | Quarterly drill            |
+| PITR Availability               | 100% uptime | Monitor Supabase dashboard |
+| Disaster Drill RTO              | <2 hours    | Annual drill               |
+| Test Documentation Completion   | 100%        | Quarterly review           |
 
 ---
 

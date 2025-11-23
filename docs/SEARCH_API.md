@@ -67,45 +67,48 @@ The system automatically tries providers in order until one succeeds.
 ### Basic Search
 
 ```typescript
-import { getSearchManager } from '@/lib/search'
+import { getSearchManager } from "@/lib/search";
 
-const searchManager = getSearchManager()
+const searchManager = getSearchManager();
 
-const response = await searchManager.search('Austin, TX waste management ordinances', {
-  maxResults: 10,
-  domains: ['municode.com', '.gov']
-})
+const response = await searchManager.search(
+  "Austin, TX waste management ordinances",
+  {
+    maxResults: 10,
+    domains: ["municode.com", ".gov"],
+  },
+);
 
-console.log(response.provider) // 'exa'
-console.log(response.cached)   // false (first call)
-console.log(response.results)  // Array of search results
+console.log(response.provider); // 'exa'
+console.log(response.cached); // false (first call)
+console.log(response.results); // Array of search results
 ```
 
 ### Search Options
 
 ```typescript
 interface SearchOptions {
-  maxResults?: number          // Default: 10
-  dateFilter?: 'day' | 'week' | 'month' | 'year'
-  domains?: string[]           // Filter by specific domains
-  excludeDomains?: string[]    // Exclude specific domains
+  maxResults?: number; // Default: 10
+  dateFilter?: "day" | "week" | "month" | "year";
+  domains?: string[]; // Filter by specific domains
+  excludeDomains?: string[]; // Exclude specific domains
 }
 
 // Example with all options
-const response = await searchManager.search('waste ordinances', {
+const response = await searchManager.search("waste ordinances", {
   maxResults: 5,
-  dateFilter: 'year',          // Only results from last year
-  domains: ['municode.com'],   // Only from municode.com
-  excludeDomains: ['spam.com'] // Exclude spam.com
-})
+  dateFilter: "year", // Only results from last year
+  domains: ["municode.com"], // Only from municode.com
+  excludeDomains: ["spam.com"], // Exclude spam.com
+});
 ```
 
 ### Health Checks
 
 ```typescript
-const health = await searchManager.healthCheck()
+const health = await searchManager.healthCheck();
 
-console.log(health)
+console.log(health);
 // {
 //   exa: true,
 //   tavily: true,
@@ -117,8 +120,8 @@ console.log(health)
 
 ```typescript
 // Get cache statistics
-const stats = await searchManager.getCacheStats()
-console.log(stats)
+const stats = await searchManager.getCacheStats();
+console.log(stats);
 // {
 //   size: 42,
 //   maxSize: 1000,
@@ -127,11 +130,11 @@ console.log(stats)
 // }
 
 // Clear cache manually
-await searchManager.clearCache()
+await searchManager.clearCache();
 
 // Cleanup expired entries
-const removed = await searchManager.cleanupCache()
-console.log(`Removed ${removed} expired entries`)
+const removed = await searchManager.cleanupCache();
+console.log(`Removed ${removed} expired entries`);
 ```
 
 ## Response Format
@@ -140,11 +143,11 @@ console.log(`Removed ${removed} expired entries`)
 
 ```typescript
 interface SearchResponse {
-  query: string              // The search query
-  results: SearchResult[]    // Array of results
-  provider: string          // Which provider was used ('exa', 'tavily', 'brave')
-  cached: boolean           // Whether results came from cache
-  executionTime: number     // Time in milliseconds
+  query: string; // The search query
+  results: SearchResult[]; // Array of results
+  provider: string; // Which provider was used ('exa', 'tavily', 'brave')
+  cached: boolean; // Whether results came from cache
+  executionTime: number; // Time in milliseconds
 }
 ```
 
@@ -152,11 +155,11 @@ interface SearchResponse {
 
 ```typescript
 interface SearchResult {
-  title: string             // Page title
-  url: string              // Page URL
-  snippet: string          // Text snippet/summary
-  publishedDate?: string   // Publication date (if available)
-  score?: number           // Relevance score (if available)
+  title: string; // Page title
+  url: string; // Page URL
+  snippet: string; // Text snippet/summary
+  publishedDate?: string; // Publication date (if available)
+  score?: number; // Relevance score (if available)
 }
 ```
 
@@ -171,6 +174,7 @@ interface SearchResult {
 ### Cache Key Generation
 
 Cache keys are generated from:
+
 - Query text (normalized, lowercase, trimmed)
 - Search options (maxResults, domains, etc.)
 
@@ -178,12 +182,12 @@ Identical queries with identical options will hit the cache.
 
 ```typescript
 // These will use the same cache entry
-await searchManager.search('test', { maxResults: 10 })
-await searchManager.search('test', { maxResults: 10 })
+await searchManager.search("test", { maxResults: 10 });
+await searchManager.search("test", { maxResults: 10 });
 
 // These will use different cache entries
-await searchManager.search('test', { maxResults: 5 })
-await searchManager.search('test', { maxResults: 10 })
+await searchManager.search("test", { maxResults: 5 });
+await searchManager.search("test", { maxResults: 10 });
 ```
 
 ### Cache Expiration
@@ -191,13 +195,13 @@ await searchManager.search('test', { maxResults: 10 })
 Entries are automatically expired after 24 hours. You can customize this:
 
 ```typescript
-import { SearchCache } from '@/lib/search'
+import { SearchCache } from "@/lib/search";
 
 // Create cache with 1 hour TTL and max 500 entries
 const cache = new SearchCache(
-  60 * 60 * 1000,  // 1 hour
-  500              // max entries
-)
+  60 * 60 * 1000, // 1 hour
+  500, // max entries
+);
 ```
 
 ### Cost Optimization Tips
@@ -216,40 +220,43 @@ To add a new search provider:
 
 ```typescript
 // lib/search/providers/my-provider.ts
-import type { SearchProvider, SearchResult, SearchOptions } from '../types'
+import type { SearchProvider, SearchResult, SearchOptions } from "../types";
 
 export class MyProvider implements SearchProvider {
-  name = 'my-provider'
-  private apiKey: string
+  name = "my-provider";
+  private apiKey: string;
 
   constructor(apiKey: string) {
     if (!apiKey) {
-      throw new Error('My Provider API key is required')
+      throw new Error("My Provider API key is required");
     }
-    this.apiKey = apiKey
+    this.apiKey = apiKey;
   }
 
-  async search(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
+  async search(
+    query: string,
+    options: SearchOptions = {},
+  ): Promise<SearchResult[]> {
     // Implement search logic
-    const response = await fetch(/* ... */)
-    const data = await response.json()
+    const response = await fetch(/* ... */);
+    const data = await response.json();
 
-    return data.results.map(result => ({
+    return data.results.map((result) => ({
       title: result.title,
       url: result.url,
       snippet: result.description,
       publishedDate: result.date,
-      score: result.relevance
-    }))
+      score: result.relevance,
+    }));
   }
 
   async isAvailable(): Promise<boolean> {
     try {
       // Test API availability
-      await this.search('test', { maxResults: 1 })
-      return true
+      await this.search("test", { maxResults: 1 });
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 }
@@ -293,23 +300,23 @@ When a provider fails, the system automatically tries the next provider:
 
 ```typescript
 try {
-  const response = await searchManager.search('query')
-  console.log(`Used provider: ${response.provider}`)
+  const response = await searchManager.search("query");
+  console.log(`Used provider: ${response.provider}`);
 } catch (error) {
   // Only throws if ALL providers fail
-  console.error('All search providers failed:', error)
+  console.error("All search providers failed:", error);
 }
 ```
 
 ### Handling No Results
 
 ```typescript
-const response = await searchManager.search('obscure query')
+const response = await searchManager.search("obscure query");
 
 if (response.results.length === 0) {
-  console.log('No results found')
+  console.log("No results found");
 } else {
-  console.log(`Found ${response.results.length} results`)
+  console.log(`Found ${response.results.length} results`);
 }
 ```
 
@@ -349,18 +356,15 @@ TAVILY_API_KEY=...     # Fallback
 ### 2. Use Domain Filtering for Ordinances
 
 ```typescript
-const response = await searchManager.search(
-  'Austin TX waste ordinances',
-  {
-    domains: [
-      'municode.com',
-      '.gov',
-      'municipal.codes',
-      'qcode.us',
-      'amlegal.com'
-    ]
-  }
-)
+const response = await searchManager.search("Austin TX waste ordinances", {
+  domains: [
+    "municode.com",
+    ".gov",
+    "municipal.codes",
+    "qcode.us",
+    "amlegal.com",
+  ],
+});
 ```
 
 ### 3. Respect Rate Limits
@@ -377,24 +381,27 @@ Periodically check provider health:
 
 ```typescript
 // Run every 5 minutes
-setInterval(async () => {
-  const health = await searchManager.healthCheck()
-  if (Object.values(health).every(h => !h)) {
-    // Alert: All providers are down!
-  }
-}, 5 * 60 * 1000)
+setInterval(
+  async () => {
+    const health = await searchManager.healthCheck();
+    if (Object.values(health).every((h) => !h)) {
+      // Alert: All providers are down!
+    }
+  },
+  5 * 60 * 1000,
+);
 ```
 
 ### 5. Handle Graceful Degradation
 
 ```typescript
 try {
-  const response = await searchManager.search('query')
-  return processResults(response.results)
+  const response = await searchManager.search("query");
+  return processResults(response.results);
 } catch (error) {
   // All providers failed - return cached/default data
-  logger.error('Search failed, using fallback', error)
-  return getFallbackResults()
+  logger.error("Search failed, using fallback", error);
+  return getFallbackResults();
 }
 ```
 
@@ -430,11 +437,13 @@ EXA_API_KEY=your-key-here
 ### Issue: All providers failing
 
 **Causes**:
+
 - Invalid API keys
 - Rate limits exceeded
 - Network connectivity issues
 
 **Solution**:
+
 1. Check API key validity
 2. Check provider health: `await searchManager.healthCheck()`
 3. Review logs for specific errors
@@ -443,11 +452,13 @@ EXA_API_KEY=your-key-here
 ### Issue: Low cache hit rate
 
 **Causes**:
+
 - Different search options
 - Short cache TTL
 - High query variation
 
 **Solution**:
+
 1. Check cache stats: `await searchManager.getCacheStats()`
 2. Normalize queries before searching
 3. Increase cache size/TTL if needed
@@ -455,11 +466,13 @@ EXA_API_KEY=your-key-here
 ### Issue: Slow search performance
 
 **Causes**:
+
 - Primary provider slow/failing
 - Network latency
 - No caching
 
 **Solution**:
+
 1. Check which provider is being used
 2. Verify cache is enabled and working
 3. Configure faster fallback providers
@@ -472,34 +485,35 @@ If you're migrating from direct Exa client usage:
 ### Before
 
 ```typescript
-import { getExaClient } from '@/lib/api/exa-client'
+import { getExaClient } from "@/lib/api/exa-client";
 
-const exaClient = getExaClient()
-const results = await exaClient.searchOrdinances(city, state)
+const exaClient = getExaClient();
+const results = await exaClient.searchOrdinances(city, state);
 ```
 
 ### After
 
 ```typescript
-import { getSearchManager } from '@/lib/search'
+import { getSearchManager } from "@/lib/search";
 
-const searchManager = getSearchManager()
+const searchManager = getSearchManager();
 const response = await searchManager.search(
   `${city}, ${state} municipal waste ordinances`,
   {
     maxResults: 10,
-    domains: ['municode.com', '.gov']
-  }
-)
+    domains: ["municode.com", ".gov"],
+  },
+);
 
-const ordinances = response.results.map(result => ({
+const ordinances = response.results.map((result) => ({
   title: result.title,
   url: result.url,
-  summary: result.snippet
-}))
+  summary: result.snippet,
+}));
 ```
 
 **Benefits**:
+
 - Automatic fallback if Exa fails
 - Response caching (reduced costs)
 - Performance monitoring

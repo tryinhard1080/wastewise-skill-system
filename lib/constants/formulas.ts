@@ -206,7 +206,7 @@ export const BENCHMARK_YARDS_PER_DOOR = 2.2; // Industry average yards per door
  */
 export function calculateCompactorYardsPerDoor(
   totalTons: number,
-  unitCount: number
+  unitCount: number,
 ): number {
   return (totalTons * TONS_TO_YARDS) / unitCount;
 }
@@ -227,9 +227,11 @@ export function calculateDumpsterYardsPerDoor(
   containerQty: number,
   containerSize: number,
   frequency: number,
-  unitCount: number
+  unitCount: number,
 ): number {
-  return (containerQty * containerSize * frequency * WEEKS_PER_MONTH) / unitCount;
+  return (
+    (containerQty * containerSize * frequency * WEEKS_PER_MONTH) / unitCount
+  );
 }
 
 /**
@@ -244,7 +246,7 @@ export function calculateDumpsterYardsPerDoor(
  */
 export function calculateCostPerDoor(
   totalMonthlyCost: number,
-  unitCount: number
+  unitCount: number,
 ): number {
   return totalMonthlyCost / unitCount;
 }
@@ -261,7 +263,7 @@ export function calculateCostPerDoor(
  */
 export function calculateTonsPerHaul(
   totalTons: number,
-  totalHauls: number
+  totalHauls: number,
 ): number {
   return totalTons / totalHauls;
 }
@@ -297,7 +299,7 @@ export function calculateCapacityUtilization(tonsPerHaul: number): number {
 export function shouldRecommendMonitoring(
   avgTonsPerHaul: number,
   maxDaysBetween: number,
-  hasCompactor: boolean
+  hasCompactor: boolean,
 ): boolean {
   return (
     avgTonsPerHaul < COMPACTOR_OPTIMIZATION_THRESHOLD &&
@@ -323,14 +325,14 @@ export function validateFormulaConstants(): void {
   if (Math.abs(TONS_TO_YARDS - calculatedTonsToYards) > tolerance) {
     throw new Error(
       `Formula constant mismatch: TONS_TO_YARDS (${TONS_TO_YARDS}) ` +
-      `does not match calculated value (${calculatedTonsToYards})`
+        `does not match calculated value (${calculatedTonsToYards})`,
     );
   }
 
   // Verify weeks per month matches industry standard
   if (WEEKS_PER_MONTH !== 4.33) {
     throw new Error(
-      `Formula constant mismatch: WEEKS_PER_MONTH must be 4.33, got ${WEEKS_PER_MONTH}`
+      `Formula constant mismatch: WEEKS_PER_MONTH must be 4.33, got ${WEEKS_PER_MONTH}`,
     );
   }
 
@@ -338,7 +340,7 @@ export function validateFormulaConstants(): void {
   if (COMPACTOR_OPTIMIZATION_THRESHOLD !== 6.0) {
     throw new Error(
       `Formula constant mismatch: COMPACTOR_OPTIMIZATION_THRESHOLD must be 6.0 ` +
-      `(per WASTE_FORMULAS_REFERENCE.md v2.0), got ${COMPACTOR_OPTIMIZATION_THRESHOLD}`
+        `(per WASTE_FORMULAS_REFERENCE.md v2.0), got ${COMPACTOR_OPTIMIZATION_THRESHOLD}`,
     );
   }
 }
@@ -350,19 +352,23 @@ export function validateFormulaConstants(): void {
 /**
  * Property type classifications with associated benchmarks
  */
-export type PropertyType = 'Garden-Style' | 'Mid-Rise' | 'High-Rise';
+export type PropertyType = "Garden-Style" | "Mid-Rise" | "High-Rise";
 
 /**
  * Service type classifications
  */
-export type ServiceType = 'compactor' | 'dumpster' | 'toter';
+export type ServiceType = "compactor" | "dumpster" | "toter";
 
 /**
  * Recommendation strength levels
  */
-export type RecommendationStrength = 'STRONGLY RECOMMEND' | 'RECOMMEND' | 'CONSIDER' | 'NOT RECOMMENDED';
+export type RecommendationStrength =
+  | "STRONGLY RECOMMEND"
+  | "RECOMMEND"
+  | "CONSIDER"
+  | "NOT RECOMMENDED";
 
 /**
  * Utilization level classifications
  */
-export type UtilizationLevel = 'excellent' | 'good' | 'fair' | 'poor';
+export type UtilizationLevel = "excellent" | "good" | "fair" | "poor";

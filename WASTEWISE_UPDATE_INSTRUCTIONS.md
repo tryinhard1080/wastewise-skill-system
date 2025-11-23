@@ -1,6 +1,6 @@
 # WasteWise SKILL File Update - Complete Instructions
 
-**Purpose:** Update SKILL__2_.md and wastewise_expense_format_template.md to standardized formats  
+**Purpose:** Update SKILL\__2_.md and wastewise_expense_format_template.md to standardized formats  
 **Date:** November 13, 2025  
 **Context:** Context window constraints require manual update approach
 
@@ -8,17 +8,20 @@
 
 ## SUMMARY OF CHANGES
 
-### File 1: SKILL__2_.md
+### File 1: SKILL\__2_.md
+
 **Current:** 2,503 lines  
 **Updated:** ~3,200 lines  
 **Changes:**
+
 1. Update workbook structure (line ~852) - Change from 8 to 9 tabs
 2. REPLACE EXPENSE_ANALYSIS function (lines 1019-1114) - Column → Row format
 3. REPLACE REGULATORY_COMPLIANCE function (lines 1119-1400) - Basic → Orlando format
 4. ADD 3 new tab functions after regulatory (line ~1401)
 5. ADD helper functions
 
-### File 2: wastewise_expense_format_template.md  
+### File 2: wastewise_expense_format_template.md
+
 **Action:** REPLACE entire file with row-based format
 
 ---
@@ -28,20 +31,22 @@
 ### STEP 1: Update Workbook Structure (Line ~852)
 
 **Find this code (around line 852):**
+
 ```python
-def create_wastewise_workbook(property_data, invoice_data, contract_data, 
+def create_wastewise_workbook(property_data, invoice_data, contract_data,
                                regulatory_data, optimization_results):
     """
     Generate complete Excel workbook with 8 tabs
 ```
 
 **REPLACE the docstring with:**
+
 ```python
-def create_wastewise_workbook(property_data, invoice_data, contract_data, 
+def create_wastewise_workbook(property_data, invoice_data, contract_data,
                                regulatory_data, optimization_results):
     """
     Generate complete Excel workbook with 9 tabs
-    
+
     Tab structure:
     1. SUMMARY_FULL - Detailed findings (starts with 2026 savings)
     2. EXPENSE_ANALYSIS - Each invoice as row (ROW-BASED format)
@@ -58,10 +63,11 @@ def create_wastewise_workbook(property_data, invoice_data, contract_data,
 **Then update the function body to add new tabs (find the section after `create_regulatory_compliance_sheet` call):**
 
 Add these lines BEFORE the `return wb` statement:
+
 ```python
     # New tabs - check if lease-up
     equipment_type = 'COMPACTOR' if has_compactor(invoice_data) else 'DUMPSTER'
-    
+
     if equipment_type == 'COMPACTOR':
         haul_log = generate_haul_log(invoice_data)
         total_tons = sum([h['tonnage'] for h in haul_log])
@@ -69,17 +75,17 @@ Add these lines BEFORE the `return wb` statement:
     else:
         qty, size, freq = extract_dumpster_info(invoice_data)
         yards_per_door = (qty * size * freq * 4.33) / property_data['units']
-    
+
     prop_type_key = property_data['property_type'].lower().replace('-', '_')
     benchmark_min = BENCHMARKS.get(prop_type_key, {}).get('yards_per_door', (2.0, 2.5))[0]
     variance = ((yards_per_door - benchmark_min) / benchmark_min) * 100
-    
+
     if variance < -40:
         create_lease_up_notes_sheet(wb, property_data, invoice_data)
-    
+
     create_documentation_notes_sheet(wb, property_data, invoice_data, contract_data)
     create_quality_check_sheet(wb, validation_results)
-    
+
     return wb
 ```
 
@@ -88,6 +94,7 @@ Add these lines BEFORE the `return wb` statement:
 ### STEP 2: REPLACE EXPENSE_ANALYSIS Function (Lines 1019-1114)
 
 **Find this function:**
+
 ```python
 def create_expense_analysis_sheet(wb, invoice_data, property_data):
     """
@@ -96,14 +103,15 @@ def create_expense_analysis_sheet(wb, invoice_data, property_data):
 
 **REPLACE entire function (from `def create_expense_analysis_sheet` to the closing of its code block, ending before the next `###` or `def`) with the code from:**
 
-`/mnt/user-data/outputs/EXPENSE_ANALYSIS_ROW_FORMAT.md` 
+`/mnt/user-data/outputs/EXPENSE_ANALYSIS_ROW_FORMAT.md`
 
 **The replacement function starts with:**
+
 ```python
 def create_expense_analysis_sheet(wb, invoice_data, property_data):
     """
     CRITICAL FORMAT: Each INVOICE as a ROW (NOT column-based)
-    
+
     Columns: Month | Vendor | Service Type | Invoice Number | Amount | Cost/Door | Notes
 ```
 
@@ -114,11 +122,12 @@ def create_expense_analysis_sheet(wb, invoice_data, property_data):
 ### STEP 3: REPLACE REGULATORY_COMPLIANCE Function (Lines 1119-1400)
 
 **Find this function:**
+
 ```python
 def create_regulatory_compliance_sheet(wb, regulatory_data, property_data):
     """
     Create comprehensive regulatory compliance documentation
-    
+
     8 required sections:
 ```
 
@@ -127,12 +136,13 @@ def create_regulatory_compliance_sheet(wb, regulatory_data, property_data):
 `/mnt/user-data/outputs/REGULATORY_COMPLIANCE_CORRECT_FORMAT.md`
 
 **The replacement function starts with:**
+
 ```python
 def create_regulatory_compliance_sheet(wb, regulatory_data, property_data):
     """
     Create comprehensive regulatory compliance documentation
     Format matches Orlando ordinance compliance example
-    
+
     Sections:
     1. Header with property info and ordinance status
     2. Ordinance Overview
@@ -152,6 +162,7 @@ def create_regulatory_compliance_sheet(wb, regulatory_data, property_data):
 `/mnt/user-data/outputs/NEW_TAB_FUNCTIONS.md`
 
 The functions to add are:
+
 1. `create_lease_up_notes_sheet(wb, property_data, invoice_data)`
 2. `create_documentation_notes_sheet(wb, property_data, invoice_data, contract_data)`
 3. `create_quality_check_sheet(wb, validation_results)`
@@ -159,7 +170,7 @@ The functions to add are:
 
 **Insert Point:** Right after the closing of `create_regulatory_compliance_sheet` function, add:
 
-```python
+````python
 ---
 
 ### LEASE-UP_NOTES Sheet
@@ -169,9 +180,9 @@ def create_lease_up_notes_sheet(wb, property_data, invoice_data):
     """
     Create dedicated lease-up phase assessment tab
     ...
-```
+````
 
-*(Then paste the complete function code from NEW_TAB_FUNCTIONS.md)*
+_(Then paste the complete function code from NEW_TAB_FUNCTIONS.md)_
 
 ---
 
@@ -185,6 +196,7 @@ def create_lease_up_notes_sheet(wb, property_data, invoice_data):
 **Source:** `/mnt/user-data/outputs/EXPENSE_ANALYSIS_ROW_FORMAT.md`
 
 **Look for the section titled:**
+
 ```markdown
 ## Updated EXPENSE FORMAT TEMPLATE
 
@@ -199,7 +211,8 @@ def create_lease_up_notes_sheet(wb, property_data, invoice_data):
 
 After making all updates, verify:
 
-### SKILL__2_.md:
+### SKILL\__2_.md:
+
 - [ ] Workbook structure updated to 9 tabs
 - [ ] EXPENSE_ANALYSIS function uses row-based format (each invoice = row)
 - [ ] REGULATORY_COMPLIANCE function uses Orlando-style format (tables)
@@ -208,6 +221,7 @@ After making all updates, verify:
 - [ ] File compiles/renders correctly
 
 ### wastewise_expense_format_template.md:
+
 - [ ] Shows row-based format (Month | Vendor | Service Type | Invoice# | Amount | Cost/Door | Notes)
 - [ ] Has monthly subtotals with budget calculations
 - [ ] Has grand total at bottom
@@ -271,6 +285,7 @@ Create complete updated versions of both files.
 ## QUESTIONS?
 
 If anything is unclear:
+
 1. Check the source files listed above - they have complete working code
 2. The COMPLETE_ACTION_PLAN.md has additional context
 3. Start a new chat with Claude using the alternative approach above

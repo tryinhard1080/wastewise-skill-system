@@ -39,13 +39,13 @@ This document defines the comprehensive backup strategy for WasteWise production
 
 ## Recovery Objectives
 
-| Metric | Target | Rationale |
-|--------|--------|-----------|
-| **Recovery Time Objective (RTO)** | 1 hour | Maximum acceptable downtime |
-| **Recovery Point Objective (RPO)** | 24 hours | Maximum acceptable data loss |
-| **Backup Frequency** | Daily | Meets RPO with buffer |
-| **Backup Retention** | 90 days | Compliance + operational needs |
-| **Test Frequency** | Quarterly | Validate recovery procedures |
+| Metric                             | Target    | Rationale                      |
+| ---------------------------------- | --------- | ------------------------------ |
+| **Recovery Time Objective (RTO)**  | 1 hour    | Maximum acceptable downtime    |
+| **Recovery Point Objective (RPO)** | 24 hours  | Maximum acceptable data loss   |
+| **Backup Frequency**               | Daily     | Meets RPO with buffer          |
+| **Backup Retention**               | 90 days   | Compliance + operational needs |
+| **Test Frequency**                 | Quarterly | Validate recovery procedures   |
 
 ## Backup Types
 
@@ -53,22 +53,26 @@ This document defines the comprehensive backup strategy for WasteWise production
 
 **Schedule**: Daily at 2:00 AM UTC
 **Retention**: Tier-dependent
+
 - Free tier: 7 days
 - Pro tier: 30 days
 - Team/Enterprise: Configurable
 
 **What's Included**:
+
 - Full database dump (schema + data)
 - All tables, indexes, constraints
 - Row-level security policies
 - Database functions and triggers
 
 **Access Method**:
+
 ```
 Supabase Dashboard → Project Settings → Database → Backups
 ```
 
 **Limitations**:
+
 - Cannot customize schedule
 - Limited retention on lower tiers
 - No cross-region replication
@@ -80,18 +84,21 @@ Supabase Dashboard → Project Settings → Database → Backups
 **Storage**: AWS S3 with encryption
 
 **What's Included**:
+
 - Complete database dump
 - Custom format (compressed)
 - All schemas and data
 - Metadata and ownership
 
 **Benefits**:
+
 - Full control over retention
 - Cross-region storage
 - Compliance-ready archival
 - Independent of Supabase tier
 
 **Storage Structure**:
+
 ```
 s3://wastewise-backups/
 ├── 2025/
@@ -110,11 +117,13 @@ s3://wastewise-backups/
 **Storage**: Local + S3
 
 **Purpose**:
+
 - Enable instant rollback
 - Isolate deployment-related issues
 - Minimize risk during updates
 
 **Automation**:
+
 ```bash
 # Triggered automatically by deploy-production.sh
 ./scripts/backup-database.sh --tag="pre-deploy-$(date +%Y%m%d-%H%M%S)"
@@ -127,17 +136,20 @@ s3://wastewise-backups/
 **Granularity**: Down to the second
 
 **Use Cases**:
+
 - Accidental data deletion
 - Bad migration rollback
 - Logical corruption recovery
 - Precise timestamp restoration
 
 **Access Method**:
+
 ```
 Supabase Dashboard → Database → Point in Time Recovery
 ```
 
 **Limitations**:
+
 - Requires Pro tier ($25/month minimum)
 - 7-day maximum retention
 - Restores to new database instance
@@ -150,11 +162,13 @@ Supabase Dashboard → Database → Point in Time Recovery
 **Region**: `us-east-1` (same as Supabase)
 **Encryption**: AES-256 (SSE-S3)
 **Lifecycle Policies**:
+
 - Transition to Glacier after 30 days
 - Delete after 90 days
 - Versioning enabled
 
 **Access Control**:
+
 - IAM policy restricted to backup service account
 - MFA required for deletion operations
 - CloudTrail logging enabled
@@ -181,6 +195,7 @@ Every backup must pass:
 **Schedule**: First Sunday of every month
 **Environment**: Staging database
 **Process**:
+
 1. Download latest weekly backup
 2. Restore to staging environment
 3. Run data validation queries
@@ -188,6 +203,7 @@ Every backup must pass:
 5. Document results
 
 **Success Criteria**:
+
 - All tables restored
 - Row counts match
 - Application connects successfully
@@ -198,26 +214,31 @@ Every backup must pass:
 ### Encryption
 
 **At Rest**:
+
 - S3 server-side encryption (AES-256)
 - Supabase automatic encryption
 
 **In Transit**:
+
 - TLS 1.3 for all transfers
 - SSH tunnels for database connections
 
 ### Access Control
 
 **Backup Creation**:
+
 - Service account with minimal permissions
 - Restricted to backup operations only
 - No interactive login allowed
 
 **Backup Restoration**:
+
 - Requires multi-factor authentication
 - Admin role required
 - Audit logged
 
 **Backup Deletion**:
+
 - Requires MFA and approval
 - 30-day soft delete period
 - Permanent deletion logged
@@ -227,16 +248,19 @@ Every backup must pass:
 ### GDPR (General Data Protection Regulation)
 
 **Data Retention**:
+
 - Financial records: 7 years
 - User account data: Active + 30 days after deletion
 - Project data: Active + 90 days after deletion
 
 **Right to Erasure**:
+
 - Backup purging procedures documented
 - Manual scrubbing for deleted user data
 - 90-day complete removal timeline
 
 **Data Portability**:
+
 - User data export procedures
 - Standard format (JSON/CSV)
 - Automated on request
@@ -244,12 +268,14 @@ Every backup must pass:
 ### SOC 2 Type II
 
 **Backup Requirements**:
+
 - Daily automated backups
 - Quarterly restore testing
 - Documented procedures
 - Access audit logging
 
 **Evidence Collection**:
+
 - Backup success logs
 - Restore test results
 - Access audit trails
@@ -260,36 +286,40 @@ Every backup must pass:
 ### Success Metrics
 
 **Daily Backups**:
+
 - Email notification on completion
 - Slack alert on failure
 - Metrics: Duration, size, compression ratio
 
 **Weekly Backups**:
+
 - Email summary report
 - S3 upload confirmation
 - Size trend analysis
 
 ### Alert Thresholds
 
-| Condition | Severity | Action |
-|-----------|----------|--------|
-| Backup failed | Critical | Page on-call engineer |
-| Backup >2x normal size | Warning | Investigate next business day |
-| Backup <50% normal size | Critical | Investigate immediately |
-| Storage >90% full | Warning | Increase capacity |
-| Backup >4 hours old | Warning | Check automation |
+| Condition               | Severity | Action                        |
+| ----------------------- | -------- | ----------------------------- |
+| Backup failed           | Critical | Page on-call engineer         |
+| Backup >2x normal size  | Warning  | Investigate next business day |
+| Backup <50% normal size | Critical | Investigate immediately       |
+| Storage >90% full       | Warning  | Increase capacity             |
+| Backup >4 hours old     | Warning  | Check automation              |
 
 ## Cost Estimation
 
 ### AWS S3 Storage Costs
 
 **Assumptions**:
+
 - Database size: 5 GB (production estimate)
 - Weekly backups: 52/year
 - Compression ratio: 5:1
 - Growth rate: 20% annually
 
 **Monthly Costs**:
+
 ```
 Standard Storage (30 days): 5 GB × 4 weeks × $0.023/GB = $0.46
 Glacier Storage (60 days): 5 GB × 8 weeks × $0.004/GB = $0.16
@@ -348,17 +378,18 @@ Before declaring a backup successful, verify:
 
 ## Roles and Responsibilities
 
-| Role | Responsibilities |
-|------|------------------|
-| **DevOps Engineer** | Configure backup automation, monitor alerts |
+| Role                       | Responsibilities                                         |
+| -------------------------- | -------------------------------------------------------- |
+| **DevOps Engineer**        | Configure backup automation, monitor alerts              |
 | **Database Administrator** | Validate backups, perform restores, optimize performance |
-| **Security Officer** | Audit access logs, enforce encryption policies |
-| **Compliance Manager** | Ensure GDPR/SOC 2 requirements met |
-| **On-call Engineer** | Respond to backup failures, execute emergency restores |
+| **Security Officer**       | Audit access logs, enforce encryption policies           |
+| **Compliance Manager**     | Ensure GDPR/SOC 2 requirements met                       |
+| **On-call Engineer**       | Respond to backup failures, execute emergency restores   |
 
 ## Review and Maintenance
 
 **Quarterly Reviews**:
+
 - Validate backup strategy meets business needs
 - Review RTO/RPO targets
 - Update disaster recovery procedures
@@ -366,6 +397,7 @@ Before declaring a backup successful, verify:
 - Audit access controls
 
 **Annual Reviews**:
+
 - Comprehensive disaster recovery drill
 - Update compliance documentation
 - Review and renew storage contracts
@@ -421,9 +453,9 @@ Examples:
 
 ## Version History
 
-| Version | Date | Changes | Author |
-|---------|------|---------|--------|
-| 1.0.0 | 2025-11-21 | Initial strategy document | Infrastructure Team |
+| Version | Date       | Changes                   | Author              |
+| ------- | ---------- | ------------------------- | ------------------- |
+| 1.0.0   | 2025-11-21 | Initial strategy document | Infrastructure Team |
 
 ---
 

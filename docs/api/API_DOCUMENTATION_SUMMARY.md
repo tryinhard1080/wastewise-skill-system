@@ -144,6 +144,7 @@ Complete OpenAPI 3.0/Swagger documentation has been implemented for the WasteWis
 ## Statistics
 
 ### Coverage
+
 - **Total API Routes**: 20 route files
 - **Documented Endpoints**: 19 paths
 - **Total Operations**: 20 operations
@@ -154,6 +155,7 @@ Complete OpenAPI 3.0/Swagger documentation has been implemented for the WasteWis
 - **Reusable Parameters**: 4 common params
 
 ### Endpoint Categories
+
 1. **Authentication** - Login, signup, logout, refresh
 2. **Projects** - CRUD operations for projects
 3. **Files** - Upload and manage documents
@@ -164,6 +166,7 @@ Complete OpenAPI 3.0/Swagger documentation has been implemented for the WasteWis
 8. **Health** - System and worker health checks
 
 ### File Sizes
+
 - Total configuration code: ~900 lines
 - Total documentation: ~1,900 lines
 - Total scripts: ~365 lines
@@ -258,18 +261,21 @@ export async function POST(request: NextRequest) {
 ## Accessing the Documentation
 
 ### Interactive Swagger UI
+
 1. Start dev server: `pnpm dev`
 2. Navigate to: http://localhost:3000/api-docs
 3. Click "Authorize" and enter JWT token
 4. Explore and test endpoints
 
 ### OpenAPI Spec Endpoint
+
 - JSON: http://localhost:3000/api/openapi.json
 - Auto-generated from JSDoc annotations
 - Cached for 5 minutes
 - CORS enabled for testing tools
 
 ### Exported Files
+
 - `docs/api/openapi.json` - JSON specification
 - `docs/api/openapi.yaml` - YAML specification
 - Generated via `pnpm export:openapi`
@@ -277,6 +283,7 @@ export async function POST(request: NextRequest) {
 ## Key Features Documented
 
 ### 1. Async Job Pattern
+
 - Complete workflow documentation
 - Polling interval recommendations
 - Progress tracking
@@ -284,24 +291,28 @@ export async function POST(request: NextRequest) {
 - Result retrieval
 
 ### 2. Authentication
+
 - JWT Bearer token flow
 - Token refresh mechanism
 - Authorization header format
 - Common auth errors
 
 ### 3. Rate Limiting
+
 - User limits: 100 req/min
 - Admin limits: 500 req/min
 - Rate limit headers documented
 - Error response format
 
 ### 4. Error Handling
+
 - Consistent error format
 - Machine-readable error codes
 - Detailed validation errors
 - HTTP status codes
 
 ### 5. Pagination
+
 - Query parameters documented
 - Response format standardized
 - Examples provided
@@ -311,16 +322,19 @@ export async function POST(request: NextRequest) {
 ### For Developers
 
 **Validate spec**:
+
 ```bash
 pnpm validate:openapi
 ```
 
 **Export spec**:
+
 ```bash
 pnpm export:openapi
 ```
 
 **Full workflow**:
+
 ```bash
 pnpm docs:api
 ```
@@ -328,11 +342,13 @@ pnpm docs:api
 ### For API Consumers
 
 **Import into Postman**:
+
 1. File → Import
 2. URL: `http://localhost:3000/api/openapi.json`
 3. Configure Bearer token
 
 **Generate client SDK**:
+
 ```bash
 npx openapi-generator-cli generate \
   -i docs/api/openapi.json \
@@ -345,6 +361,7 @@ npx openapi-generator-cli generate \
 To document remaining endpoints (if any):
 
 1. **Identify undocumented routes**:
+
 ```bash
 find app/api -name "route.ts" -type f
 ```
@@ -352,11 +369,13 @@ find app/api -name "route.ts" -type f
 2. **Add JSDoc annotations** to each route file
 
 3. **Validate**:
+
 ```bash
 pnpm validate:openapi
 ```
 
 4. **Export updated spec**:
+
 ```bash
 pnpm export:openapi
 ```
@@ -364,18 +383,21 @@ pnpm export:openapi
 ## Critical Notes
 
 ### Security
+
 - All endpoints require authentication except `/api/health`
 - JWT tokens must be included in `Authorization: Bearer <token>` header
 - Tokens expire after 1 hour
 - Admin endpoints require `role: admin`
 
 ### Async Operations
+
 - Analysis jobs take 30s - 5 minutes
 - Client must poll `/api/jobs/{id}` every 2 seconds
 - Jobs progress through: `pending` → `processing` → `completed`/`failed`
 - Results available in `result_data` when completed
 
 ### Rate Limits
+
 - Users: 100 requests/minute
 - Admins: 500 requests/minute
 - Rate limit headers returned in all responses
@@ -400,6 +422,7 @@ pnpm export:openapi
 ### Version Updates
 
 When incrementing API version:
+
 1. Update `info.version` in `openapi-config.ts`
 2. Document breaking changes
 3. Update README.md

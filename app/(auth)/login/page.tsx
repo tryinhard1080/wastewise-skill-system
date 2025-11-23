@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Login Page
@@ -7,14 +7,14 @@
  * Redirects to dashboard on success or to specified redirectTo URL
  */
 
-import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,7 +22,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -30,59 +30,59 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-})
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 function LoginForm() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo') || '/dashboard'
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
-  })
+  });
 
   async function onSubmit(values: LoginFormValues) {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const supabase = createClient()
+      const supabase = createClient();
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
-      })
+      });
 
       if (error) {
-        setError(error.message)
-        return
+        setError(error.message);
+        return;
       }
 
       // Success - redirect to dashboard or specified URL
-      router.push(redirectTo)
-      router.refresh()
+      router.push(redirectTo);
+      router.refresh();
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
-      console.error('Login error:', err)
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Login error:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -151,11 +151,7 @@ function LoginForm() {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign in
             </Button>
@@ -164,7 +160,7 @@ function LoginForm() {
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-muted-foreground text-center">
-          Don&apos;t have an account?{' '}
+          Don&apos;t have an account?{" "}
           <Link
             href="/signup"
             className="text-primary font-medium hover:underline"
@@ -174,13 +170,19 @@ function LoginForm() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          Loading...
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
-  )
+  );
 }

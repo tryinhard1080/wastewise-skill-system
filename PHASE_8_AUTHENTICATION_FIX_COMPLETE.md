@@ -10,6 +10,7 @@
 **Worker Authentication Failure**: Background worker couldn't process jobs because it tried to get authenticated user via `supabase.auth.getUser()`, which requires an active session that doesn't exist in worker context.
 
 **Error**:
+
 ```
 NotFoundError: User not found
   at executeSkillWithProgress (lib/skills/executor.ts:229:11)
@@ -22,42 +23,57 @@ NotFoundError: User not found
 ### 1. Updated Executor (`lib/skills/executor.ts`)
 
 **Added optional `userId` parameter**:
+
 ```typescript
 export async function executeSkillWithProgress(
   projectId: string,
   jobType: string,
   onProgress: (percent: number, step: string) => Promise<void>,
-  userId?: string  // NEW: Optional user ID for worker context
-): Promise<SkillResult>
+  userId?: string, // NEW: Optional user ID for worker context
+): Promise<SkillResult>;
 ```
 
 **Conditional authentication logic**:
+
 ```typescript
 // Get user ID: use provided userId (worker context) or get from auth session (web context)
-let currentUserId: string
+let currentUserId: string;
 if (userId) {
   // Worker context: use provided user ID
-  currentUserId = userId
-  executionLogger.info('Using provided user ID (worker context)', { userId: currentUserId })
+  currentUserId = userId;
+  executionLogger.info("Using provided user ID (worker context)", {
+    userId: currentUserId,
+  });
 } else {
   // Web context: get from authenticated session
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    throw new NotFoundError('User')
+    throw new NotFoundError("User");
   }
-  currentUserId = user.id
-  executionLogger.info('Using authenticated user ID (web context)', { userId: currentUserId })
+  currentUserId = user.id;
+  executionLogger.info("Using authenticated user ID (web context)", {
+    userId: currentUserId,
+  });
 }
 
 // Build context with user ID
-const context = await buildSkillContext(projectId, currentUserId, skillName, onProgress)
+const context = await buildSkillContext(
+  projectId,
+  currentUserId,
+  skillName,
+  onProgress,
+);
 ```
 
 ### 2. Updated Job Processor (`lib/workers/job-processor.ts`)
 
 **Pass `user_id` from job record**:
+
 ```typescript
 const result = await executeSkillWithProgress(
   projectId,
@@ -65,8 +81,8 @@ const result = await executeSkillWithProgress(
   async (percent, step) => {
     // Progress callback...
   },
-  job.user_id // Pass user_id from job record for worker context
-)
+  job.user_id, // Pass user_id from job record for worker context
+);
 ```
 
 ---
@@ -74,12 +90,14 @@ const result = await executeSkillWithProgress(
 ## ✅ Validation
 
 ### TypeScript Compilation
+
 ```bash
 $ npx tsc --noEmit
 ✓ No errors (0.8s)
 ```
 
 ### Worker Startup
+
 ```
 ✓ Environment variables validated successfully
 ✓ Worker configuration loaded
@@ -94,6 +112,7 @@ $ npx tsc --noEmit
 ## 🎯 Impact
 
 ### Before Fix
+
 - ❌ Jobs created successfully (API with user session works)
 - ❌ Worker picks up pending jobs
 - ❌ Worker immediately fails with "User not found"
@@ -101,6 +120,7 @@ $ npx tsc --noEmit
 - ❌ Users never see analysis results
 
 ### After Fix
+
 - ✅ Jobs created successfully
 - ✅ Worker picks up pending jobs
 - ✅ Worker passes user_id from job record
@@ -126,11 +146,13 @@ $ npx tsc --noEmit
 ## 🧪 Testing Status
 
 ### Unit Tests
+
 - ✅ All existing tests passing
 - ✅ TypeScript compilation successful
 - ✅ No breaking changes to API
 
 ### Integration Tests
+
 - ✅ Worker starts without errors
 - ✅ No "User not found" failures in logs
 - ⚠️ E2E Test #2 (Login Flow) failing - separate issue unrelated to auth fix
@@ -140,6 +162,7 @@ $ npx tsc --noEmit
   - **Does NOT affect production** - real users can log in successfully
 
 ### E2E Test Results
+
 ```
 ✅ Test 1: Landing Page Branding (8271ms) - PASS
 ❌ Test 2: Login Flow (18891ms) - FAIL (separate issue)
@@ -153,11 +176,13 @@ $ npx tsc --noEmit
 ## 🚀 Production Readiness
 
 ### Worker Authentication
+
 - ✅ **FIXED** - Worker can now process jobs successfully
 - ✅ **SECURE** - User IDs verified from job records created by authenticated users
 - ✅ **LOGGED** - Clear logging distinguishes web vs worker context
 
 ### Remaining E2E Issue (Non-blocking)
+
 - ⚠️ Test user login needs investigation
 - ✅ Real user authentication working correctly
 - ✅ Production users unaffected
@@ -177,14 +202,14 @@ $ npx tsc --noEmit
 
 ## 🎉 Success Criteria Met
 
-| Criterion | Status |
-|-----------|--------|
-| Worker starts without auth errors | ✅ PASS |
+| Criterion                             | Status  |
+| ------------------------------------- | ------- |
+| Worker starts without auth errors     | ✅ PASS |
 | Jobs process without "User not found" | ✅ PASS |
-| TypeScript validation passes | ✅ PASS |
-| No breaking changes to existing code | ✅ PASS |
-| Proper logging for debugging | ✅ PASS |
-| Documentation updated | ✅ PASS |
+| TypeScript validation passes          | ✅ PASS |
+| No breaking changes to existing code  | ✅ PASS |
+| Proper logging for debugging          | ✅ PASS |
+| Documentation updated                 | ✅ PASS |
 
 ---
 

@@ -7,7 +7,7 @@
 Enhanced version of WasteWise Complete Analysis that includes a **mandatory validation gate** ensuring:
 
 - ✅ **Contract tabs are generated** when contracts are provided
-- ✅ **All contract clauses extracted** and categorized properly  
+- ✅ **All contract clauses extracted** and categorized properly
 - ✅ **Optimization recommendations meet strict criteria** (no invalid suggestions)
 - ✅ **All formulas calculated correctly** based on equipment type
 - ✅ **Data completeness** across all sheets
@@ -32,11 +32,13 @@ wastewise-analytics-validated/
 ### 1. Install the Skill
 
 **Claude.ai (Browser):**
+
 ```
 Settings → Capabilities → Skills → Upload wastewise-analytics-validated.zip
 ```
 
 **Claude Code (CLI):**
+
 ```bash
 cp -r wastewise-analytics-validated ~/.claude/skills/
 ```
@@ -44,6 +46,7 @@ cp -r wastewise-analytics-validated ~/.claude/skills/
 ### 2. Prepare Your Data
 
 You need:
+
 - **Waste invoices** (PDF/scanned) - 3-6 months minimum recommended
 - **Waste service contract** (optional but recommended)
 - **Property details**: Name and unit count
@@ -51,13 +54,14 @@ You need:
 ### 3. Run the Analysis
 
 ```
-"I uploaded 6 months of invoices and a contract for The Club at Millenia 
+"I uploaded 6 months of invoices and a contract for The Club at Millenia
 (560 units). Run the validated WasteWise analysis."
 ```
 
 ### 4. Review Results
 
 The skill will:
+
 1. Run 30+ validation checks across 6 categories
 2. Show you exactly what passed/failed
 3. Generate workbook ONLY if all validations pass
@@ -67,18 +71,19 @@ The skill will:
 
 ### 6 Validation Categories
 
-| Category | What It Checks | Critical? |
-|----------|---------------|-----------|
-| **Contract Validation** | CONTRACT_TERMS sheet created when contract provided, minimum 3 clauses extracted, verbatim text present, calendar reminders | ✅ CRITICAL |
-| **Optimization Validation** | Recommendations meet strict criteria (compactor < 6 tons/haul, contamination > 3%, bulk > $500/mo, 14-day constraint) | ✅ CRITICAL |
-| **Formula Validation** | Correct formulas for yards/door (tonnage-based for compactors), cost per door, capacity utilization | ✅ CRITICAL |
-| **Sheet Structure Validation** | 5-7 sheets based on data, HAUL_LOG if compactor, CONTRACT_TERMS if contract | ✅ CRITICAL |
-| **Data Completeness Validation** | Property info present, invoices have required fields, tonnage for compactors | ✅ CRITICAL |
-| **Cross-Validation** | Data consistency across sheets, totals match, calculations align | ✅ CRITICAL |
+| Category                         | What It Checks                                                                                                              | Critical?   |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **Contract Validation**          | CONTRACT_TERMS sheet created when contract provided, minimum 3 clauses extracted, verbatim text present, calendar reminders | ✅ CRITICAL |
+| **Optimization Validation**      | Recommendations meet strict criteria (compactor < 6 tons/haul, contamination > 3%, bulk > $500/mo, 14-day constraint)       | ✅ CRITICAL |
+| **Formula Validation**           | Correct formulas for yards/door (tonnage-based for compactors), cost per door, capacity utilization                         | ✅ CRITICAL |
+| **Sheet Structure Validation**   | 5-7 sheets based on data, HAUL_LOG if compactor, CONTRACT_TERMS if contract                                                 | ✅ CRITICAL |
+| **Data Completeness Validation** | Property info present, invoices have required fields, tonnage for compactors                                                | ✅ CRITICAL |
+| **Cross-Validation**             | Data consistency across sheets, totals match, calculations align                                                            | ✅ CRITICAL |
 
 ### Example Validation Report
 
 **Success:**
+
 ```
 📊 VALIDATION RESULTS:
    ✅ Contract Validation: PASSED (7 clauses, 2 reminders)
@@ -92,6 +97,7 @@ The skill will:
 ```
 
 **Failure:**
+
 ```
 📊 VALIDATION RESULTS:
    ❌ Contract Validation: FAILED
@@ -102,9 +108,9 @@ The skill will:
    ✅ Cross Validation: PASSED
 
 ❌ ERRORS FOUND:
-   ❌ CONTRACT EXTRACTION FAILED: Only 2 clauses found. 
-      Expected at least 3 of: Term & Renewal, Rate Increases, 
-      Termination, Liability, Service Level, Force Majeure, 
+   ❌ CONTRACT EXTRACTION FAILED: Only 2 clauses found.
+      Expected at least 3 of: Term & Renewal, Rate Increases,
+      Termination, Liability, Service Level, Force Majeure,
       Indemnification
 
 🛑 VALIDATION FAILED - Cannot proceed to output generation
@@ -113,6 +119,7 @@ The skill will:
 ## 📊 Output Structure
 
 ### With Contract + Compactor (7 sheets):
+
 1. **SUMMARY_FULL** - Executive overview with 2026 savings projection
 2. **EXPENSE_ANALYSIS** - Month-by-month breakdown (dashboard column format)
 3. **OPTIMIZATION** - Validated opportunities with detailed breakdowns
@@ -126,14 +133,16 @@ The skill will:
 When a contract is provided, you get:
 
 #### 📅 Calendar Reminders Section
+
 - Critical dates with countdown timers
 - Action items (e.g., "Submit termination notice")
 - Criticality levels (HIGH/MEDIUM/LOW)
 - Color-coded urgency (red < 90 days, yellow < 180 days)
 
 #### 📄 Contract Clauses Section (7 Categories)
+
 1. **Term & Renewal** - Contract length, auto-renewal conditions
-2. **Rate Increases** - Price adjustment provisions  
+2. **Rate Increases** - Price adjustment provisions
 3. **Termination** - Exit conditions, notice requirements
 4. **Liability** - Limitation of liability clauses
 5. **Service Level** - Performance standards
@@ -141,6 +150,7 @@ When a contract is provided, you get:
 7. **Indemnification** - Hold harmless provisions
 
 Each clause includes:
+
 - **Verbatim Contract Language** (exact text, not paraphrased)
 - **Risk Level** (HIGH/MEDIUM/LOW with color coding)
 - **Business Impact** (what this means for your property)
@@ -149,6 +159,7 @@ Each clause includes:
 ## 🛡️ Key Validation Features
 
 ### 1. Contract Tab Enforcement
+
 ```
 IF contract uploaded:
     → Extract minimum 3 clauses
@@ -160,6 +171,7 @@ ELSE:
 ```
 
 ### 2. Optimization Criteria Enforcement
+
 ```
 Compactor Monitoring:
 ✅ ONLY if avg < 6 tons/haul
@@ -174,6 +186,7 @@ Bulk Subscription:
 ```
 
 ### 3. Formula Accuracy Enforcement
+
 ```
 Compactors MUST use:
   Yards per door = (Tons × 14.49) / Units
@@ -185,6 +198,7 @@ Standard Dumpsters MUST use:
 ```
 
 ### 4. Sheet Structure Enforcement
+
 ```
 Compactor present → HAUL_LOG required
 Contract provided → CONTRACT_TERMS required
@@ -201,6 +215,7 @@ Missing required sheet → validation FAILS
 ## 🔍 Use Cases
 
 ### Perfect For:
+
 - ✅ Property managers who need **reliable, validated analysis**
 - ✅ Regional directors requiring **contract risk management**
 - ✅ Finance teams needing **accurate budget projections**
@@ -208,6 +223,7 @@ Missing required sheet → validation FAILS
 - ✅ Compliance teams tracking **contract terms and deadlines**
 
 ### Key Benefits:
+
 1. **No Invalid Recommendations** - Only suggests what's actually implementable
 2. **Contract Visibility** - See exact contract language with risk levels
 3. **Calendar Management** - Never miss critical termination windows
@@ -217,6 +233,7 @@ Missing required sheet → validation FAILS
 ## ⚠️ Important Notes
 
 ### This Skill Will HALT If:
+
 - ❌ Contract provided but only 1-2 clauses extracted
 - ❌ Optimization recommendations violate criteria
 - ❌ Formula calculations are incorrect
@@ -224,6 +241,7 @@ Missing required sheet → validation FAILS
 - ❌ Data is incomplete (missing property details)
 
 ### This Ensures:
+
 - ✅ You never get a workbook with missing contract analysis
 - ✅ All recommendations are actually implementable
 - ✅ Calculations are mathematically correct
@@ -233,6 +251,7 @@ Missing required sheet → validation FAILS
 ## 🎓 Examples
 
 ### Example 1: Full Analysis with Contract
+
 ```
 Input:
 - 12 months of invoices
@@ -252,6 +271,7 @@ Output:
 ```
 
 ### Example 2: Analysis Halted - Invalid Contract
+
 ```
 Input:
 - 6 months of invoices
@@ -269,16 +289,16 @@ Output:
 
 ## 🆚 Standard vs. Validated Edition
 
-| Feature | Standard WasteWise | Validated Edition |
-|---------|-------------------|-------------------|
-| Invoice processing | ✅ | ✅ |
-| Optimization recommendations | ✅ | ✅ + Validation |
-| Contract extraction | ✅ | ✅ + Mandatory checks |
-| Formula calculations | ✅ | ✅ + Validation |
-| CONTRACT_TERMS tab | Sometimes | **Guaranteed if contract** |
-| Quality checks | Basic | **Comprehensive (30+ checks)** |
-| Validation report | No | **Yes (QUALITY_CHECK sheet)** |
-| Halt on errors | No | **Yes (prevents bad output)** |
+| Feature                      | Standard WasteWise | Validated Edition              |
+| ---------------------------- | ------------------ | ------------------------------ |
+| Invoice processing           | ✅                 | ✅                             |
+| Optimization recommendations | ✅                 | ✅ + Validation                |
+| Contract extraction          | ✅                 | ✅ + Mandatory checks          |
+| Formula calculations         | ✅                 | ✅ + Validation                |
+| CONTRACT_TERMS tab           | Sometimes          | **Guaranteed if contract**     |
+| Quality checks               | Basic              | **Comprehensive (30+ checks)** |
+| Validation report            | No                 | **Yes (QUALITY_CHECK sheet)**  |
+| Halt on errors               | No                 | **Yes (prevents bad output)**  |
 
 ## 💡 Tips for Best Results
 
@@ -291,14 +311,17 @@ Output:
 ## 🔧 Troubleshooting
 
 **Issue**: "CONTRACT EXTRACTION FAILED: Only X clauses found"
+
 - **Solution**: Ensure contract PDF is readable, has clear section headers
 - **Alternative**: Re-scan contract at higher quality
 
 **Issue**: "COMPACTOR OPTIMIZATION INVALID"
+
 - **Solution**: This is working correctly - optimization only when needed
 - **Explanation**: Validates recommendations are actually beneficial
 
 **Issue**: "Days between pickups exceeds 14-day maximum"
+
 - **Solution**: Validation correctly blocked invalid optimization
 - **Explanation**: 14-day constraint is odor management requirement
 
@@ -307,6 +330,7 @@ See **SETUP.md** for complete troubleshooting guide.
 ## 📞 Support
 
 For questions about validation results:
+
 1. Review the **QUALITY_CHECK** sheet in your workbook
 2. Check **VALIDATION_CHECKLIST.md** for detailed criteria
 3. Verify your input files match expected formats
@@ -314,6 +338,7 @@ For questions about validation results:
 ## 🔄 Version History
 
 **v1.0** (2025-11-02)
+
 - Initial validated edition
 - 6-category validation framework
 - 30+ individual validation checks
@@ -329,6 +354,7 @@ For internal use by authorized Greystar personnel
 ---
 
 **Need Help?** Check the full documentation:
+
 - Installation: `SETUP.md`
 - Validation Details: `VALIDATION_CHECKLIST.md`
 - Implementation: `SKILL.md`

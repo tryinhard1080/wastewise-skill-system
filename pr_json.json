@@ -1,1 +1,104 @@
-[{"number":11,"statusCheckRollup":[{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"FAILURE","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822969627","name":"Setup & Cache Dependencies","startedAt":"2025-11-19T13:42:55Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990076","name":"TypeScript Compilation","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989934","name":"ESLint","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989858","name":"Unit Tests","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989996","name":"Integration Tests","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989965","name":"Formula & Calculation Validation","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:04Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990067","name":"Security Scan","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:05Z","conclusion":"SKIPPED","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990754","name":"Build Test","startedAt":"2025-11-19T13:43:05Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"CheckRun","completedAt":"2025-11-19T13:43:14Z","conclusion":"FAILURE","detailsUrl":"https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990562","name":"All Checks Passed","startedAt":"2025-11-19T13:43:09Z","status":"COMPLETED","workflowName":"PR Quality Checks"},{"__typename":"StatusContext","context":"CodeRabbit","startedAt":"2025-11-19T13:47:21Z","state":"SUCCESS","targetUrl":""}]}]
+[
+  {
+    "number": 11,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "FAILURE",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822969627",
+        "name": "Setup & Cache Dependencies",
+        "startedAt": "2025-11-19T13:42:55Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990076",
+        "name": "TypeScript Compilation",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989934",
+        "name": "ESLint",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989858",
+        "name": "Unit Tests",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989996",
+        "name": "Integration Tests",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822989965",
+        "name": "Formula & Calculation Validation",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:04Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990067",
+        "name": "Security Scan",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:05Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990754",
+        "name": "Build Test",
+        "startedAt": "2025-11-19T13:43:05Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2025-11-19T13:43:14Z",
+        "conclusion": "FAILURE",
+        "detailsUrl": "https://github.com/tryinhard1080/wastewise-skill-system/actions/runs/19503384590/job/55822990562",
+        "name": "All Checks Passed",
+        "startedAt": "2025-11-19T13:43:09Z",
+        "status": "COMPLETED",
+        "workflowName": "PR Quality Checks"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2025-11-19T13:47:21Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  }
+]

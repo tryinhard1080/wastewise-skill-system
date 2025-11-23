@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * User Table Component
@@ -7,8 +7,8 @@
  * Supports sorting, filtering, and bulk operations
  */
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState } from "react";
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -16,17 +16,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,24 +34,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Search, Eye, Ban, UserCog, Trash2 } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+} from "@/components/ui/dropdown-menu";
+import {
+  MoreHorizontal,
+  Search,
+  Eye,
+  Ban,
+  UserCog,
+  Trash2,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface User {
-  id: string
-  email: string
-  role: string
-  is_active: boolean
-  created_at: string
-  project_count?: number
+  id: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+  project_count?: number;
 }
 
 interface UserTableProps {
-  users: User[]
-  onDisableUser?: (userId: string) => void
-  onChangeRole?: (userId: string, role: string) => void
-  onDeleteUser?: (userId: string) => void
+  users: User[];
+  onDisableUser?: (userId: string) => void;
+  onChangeRole?: (userId: string, role: string) => void;
+  onDeleteUser?: (userId: string) => void;
 }
 
 export function UserTable({
@@ -60,20 +67,22 @@ export function UserTable({
   onChangeRole,
   onDeleteUser,
 }: UserTableProps) {
-  const [search, setSearch] = useState('')
-  const [roleFilter, setRoleFilter] = useState<string>('all')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.email.toLowerCase().includes(search.toLowerCase())
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter
+    const matchesSearch = user.email
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
     const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'active' && user.is_active) ||
-      (statusFilter === 'disabled' && !user.is_active)
+      statusFilter === "all" ||
+      (statusFilter === "active" && user.is_active) ||
+      (statusFilter === "disabled" && !user.is_active);
 
-    return matchesSearch && matchesRole && matchesStatus
-  })
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
   return (
     <div className="space-y-4">
@@ -126,7 +135,10 @@ export function UserTable({
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-gray-500"
+                >
                   No users found
                 </TableCell>
               </TableRow>
@@ -135,13 +147,17 @@ export function UserTable({
                 <TableRow key={user.id} className="hover:bg-gray-50">
                   <TableCell className="font-medium">{user.email}</TableCell>
                   <TableCell>
-                    <Badge variant={user.role === 'admin' ? 'destructive' : 'secondary'}>
+                    <Badge
+                      variant={
+                        user.role === "admin" ? "destructive" : "secondary"
+                      }
+                    >
                       {user.role}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.is_active ? 'default' : 'outline'}>
-                      {user.is_active ? 'Active' : 'Disabled'}
+                    <Badge variant={user.is_active ? "default" : "outline"}>
+                      {user.is_active ? "Active" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-gray-500">
@@ -166,11 +182,15 @@ export function UserTable({
                             View Details
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDisableUser?.(user.id)}>
+                        <DropdownMenuItem
+                          onClick={() => onDisableUser?.(user.id)}
+                        >
                           <Ban className="h-4 w-4 mr-2" />
-                          {user.is_active ? 'Disable' : 'Enable'}
+                          {user.is_active ? "Disable" : "Enable"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onChangeRole?.(user.id, user.role)}>
+                        <DropdownMenuItem
+                          onClick={() => onChangeRole?.(user.id, user.role)}
+                        >
                           <UserCog className="h-4 w-4 mr-2" />
                           Change Role
                         </DropdownMenuItem>
@@ -197,5 +217,5 @@ export function UserTable({
         Showing {filteredUsers.length} of {users.length} users
       </div>
     </div>
-  )
+  );
 }

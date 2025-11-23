@@ -1,4 +1,5 @@
 # WasteWise Quick-Start Guide
+
 ## Build Your MVP in One Day
 
 ---
@@ -12,6 +13,7 @@ This guide gets you from zero to a working demo **TODAY**. Follow these steps in
 ## Hour 1: Setup (60 minutes)
 
 ### Task 1: Create Accounts (20 min)
+
 ```
 ✓ Lovable.dev account
 ✓ Supabase account (free tier)
@@ -19,11 +21,13 @@ This guide gets you from zero to a working demo **TODAY**. Follow these steps in
 ```
 
 ### Task 2: Start Lovable Project (10 min)
+
 1. Click "New Project"
 2. Name it "WasteWise"
 3. Select "Start from Scratch"
 
 ### Task 3: Upload Reference (10 min)
+
 1. Download landing-template.zip from Claude
 2. Extract locally
 3. In Lovable, click "Add Knowledge"
@@ -31,7 +35,9 @@ This guide gets you from zero to a working demo **TODAY**. Follow these steps in
 5. Label: "Design reference - use this aesthetic"
 
 ### Task 4: Set Environment (20 min)
+
 In Lovable Settings → Environment Variables:
+
 ```
 OPENAI_API_KEY=your_key_here
 SUPABASE_URL=your_project_url
@@ -43,8 +49,9 @@ SUPABASE_ANON_KEY=your_anon_key
 ## Hour 2-3: Landing Page (120 minutes)
 
 ### Prompt 1: Basic Structure
+
 ```
-Create a modern SaaS landing page for "WasteWise by THE Trash Hub" using the 
+Create a modern SaaS landing page for "WasteWise by THE Trash Hub" using the
 uploaded design reference for styling.
 
 MUST HAVE:
@@ -66,6 +73,7 @@ DESIGN:
 ```
 
 ### Prompt 2: Add Sections
+
 ```
 Add these sections to the landing page AFTER the features:
 
@@ -88,6 +96,7 @@ Make it scroll smoothly with fade-in animations.
 ## Hour 4: Authentication (60 minutes)
 
 ### Prompt 3: Auth Setup
+
 ```
 Add Supabase authentication:
 
@@ -121,15 +130,16 @@ Use Supabase Auth, match landing page design.
 ## Hour 5: Dashboard Shell (60 minutes)
 
 ### Prompt 4: Dashboard Layout
+
 ```
 Create main dashboard at /dashboard (protected route):
 
 LAYOUT:
 - Header: Logo, user menu, "New Analysis" button
-- Main content: 
+- Main content:
   - Empty state: "No projects yet. Start your first analysis!"
   - Large "Create New Analysis" card with upload icon
-  
+
 - Sidebar (collapsible):
   - Dashboard (home icon)
   - Projects (folder icon)
@@ -144,6 +154,7 @@ Make it responsive, clean, professional.
 ## Hour 6: Project Creation (60 minutes)
 
 ### Prompt 5: Multi-Step Form
+
 ```
 Create project creation wizard at /projects/new:
 
@@ -172,7 +183,8 @@ Use shadcn/ui Form components, match design system.
 ```
 
 ### Prompt 6: Database Setup
-```
+
+````
 Create Supabase tables:
 
 ```sql
@@ -207,9 +219,10 @@ create policy "Users view own projects" on projects
 
 create policy "Users create own projects" on projects
   for insert with check (auth.uid() = user_id);
-```
+````
 
 Create these tables in Supabase SQL editor.
+
 ```
 
 ---
@@ -218,9 +231,11 @@ Create these tables in Supabase SQL editor.
 
 ### Prompt 7: Processing UI
 ```
+
 Create processing page at /projects/[id]/processing:
 
 Show:
+
 1. Progress bar (0-100%)
 2. Current step indicator:
    ✓ Files Uploaded
@@ -236,6 +251,7 @@ Show:
    - "Download Report" button (placeholder)
 
 Use loading animations, update progress every few seconds (mock for now).
+
 ```
 
 ---
@@ -244,35 +260,40 @@ Use loading animations, update progress every few seconds (mock for now).
 
 ### Prompt 8: Simple Results Dashboard
 ```
+
 Create results page at /projects/[id]/results with 3 tabs:
 
 TAB 1 - Overview:
+
 - Property name and details
 - Key metrics (3 cards):
-  * Avg Monthly Cost
-  * Cost Per Door
-  * Potential Savings (mock: $15,000)
+  - Avg Monthly Cost
+  - Cost Per Door
+  - Potential Savings (mock: $15,000)
 - Simple bar chart showing monthly costs
 
 TAB 2 - Invoice Data:
+
 - Table with columns:
-  * Month
-  * Vendor
-  * Invoice #
-  * Amount
-  * Cost/Door
+  - Month
+  - Vendor
+  - Invoice #
+  - Amount
+  - Cost/Door
 - Sample data for demo
 
 TAB 3 - Recommendations:
+
 - Card: "Install Compactor Monitors"
-  * Description
-  * Estimated savings: $12,000/year
-  * Contact info button
+  - Description
+  - Estimated savings: $12,000/year
+  - Contact info button
 - Card: "Reduce Contamination"
-  * Description
-  * Estimated savings: $3,000/year
+  - Description
+  - Estimated savings: $3,000/year
 
 Use Chart.js for visualizations, shadcn/ui for layout.
+
 ```
 
 ---
@@ -307,29 +328,38 @@ Use Chart.js for visualizations, shadcn/ui for layout.
 
 ### Week 2: Real Data Processing
 ```
+
 Add Supabase Edge Functions:
+
 1. PDF parsing with pdf-parse
 2. OpenAI API integration
 3. Store extracted data
 4. Calculate basic metrics
+
 ```
 
 ### Week 3: Analysis Engine
 ```
+
 Implement:
+
 1. Yards per door calculations
 2. Cost per door analysis
 3. Basic optimization logic
 4. Store results in database
+
 ```
 
 ### Week 4: Report Generation
 ```
+
 Add:
+
 1. ExcelJS for workbook generation
 2. HTML dashboard export
 3. Download functionality
 4. Email delivery
+
 ```
 
 ---
@@ -437,7 +467,8 @@ Then come back tomorrow and build Phase 2...
 
 ---
 
-*Quick-Start Guide v1.0*  
-*For: WasteWise Complete Suite*  
-*Build Time: 8 hours*  
+*Quick-Start Guide v1.0*
+*For: WasteWise Complete Suite*
+*Build Time: 8 hours*
 *Skill Level: Beginner-friendly*
+```

@@ -4,33 +4,27 @@
  * Monitor system health, metrics, and performance
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { SystemHealthCard } from '@/components/admin/SystemHealthCard'
-import { MetricsChart } from '@/components/admin/MetricsChart'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useState } from "react";
+import { SystemHealthCard } from "@/components/admin/SystemHealthCard";
+import { MetricsChart } from "@/components/admin/MetricsChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useSystemHealth, useSystemMetrics } from '@/lib/hooks/useAdminData'
-import {
-  Database,
-  HardDrive,
-  Zap,
-  Cog,
-  Search,
-} from 'lucide-react'
+} from "@/components/ui/select";
+import { useSystemHealth, useSystemMetrics } from "@/lib/hooks/useAdminData";
+import { Database, HardDrive, Zap, Cog, Search } from "lucide-react";
 
 export default function SystemPage() {
-  const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('24h')
-  const { data: health, isLoading: healthLoading } = useSystemHealth()
-  const { data: metrics, isLoading: metricsLoading } = useSystemMetrics(period)
+  const [period, setPeriod] = useState<"24h" | "7d" | "30d">("24h");
+  const { data: health, isLoading: healthLoading } = useSystemHealth();
+  const { data: metrics, isLoading: metricsLoading } = useSystemMetrics(period);
 
   return (
     <div className="space-y-6">
@@ -58,35 +52,35 @@ export default function SystemPage() {
             <>
               <SystemHealthCard
                 serviceName="Database"
-                status={health?.services?.database || 'healthy'}
+                status={health?.services?.database || "healthy"}
                 icon={Database}
                 responseTime={health?.response_times?.database}
                 lastCheck={health?.last_check}
               />
               <SystemHealthCard
                 serviceName="Storage"
-                status={health?.services?.storage || 'healthy'}
+                status={health?.services?.storage || "healthy"}
                 icon={HardDrive}
                 responseTime={health?.response_times?.storage}
                 lastCheck={health?.last_check}
               />
               <SystemHealthCard
                 serviceName="API"
-                status={health?.services?.api || 'healthy'}
+                status={health?.services?.api || "healthy"}
                 icon={Zap}
                 responseTime={health?.response_times?.api}
                 lastCheck={health?.last_check}
               />
               <SystemHealthCard
                 serviceName="Workers"
-                status={health?.services?.workers || 'healthy'}
+                status={health?.services?.workers || "healthy"}
                 icon={Cog}
                 details={`${health?.worker_count || 0} active`}
                 lastCheck={health?.last_check}
               />
               <SystemHealthCard
                 serviceName="Search"
-                status={health?.services?.search || 'healthy'}
+                status={health?.services?.search || "healthy"}
                 icon={Search}
                 responseTime={health?.response_times?.search}
                 lastCheck={health?.last_check}
@@ -176,5 +170,5 @@ export default function SystemPage() {
         </Card>
       )}
     </div>
-  )
+  );
 }

@@ -14,6 +14,7 @@ This document provides a comprehensive, step-by-step plan to rebuild your modern
 ## 🎯 What the Landing Page Does
 
 ### Core Functionality
+
 The landing template is a **modern SaaS product landing page** featuring:
 
 1. **Hero Section** with rotating animated dashboard previews
@@ -28,6 +29,7 @@ The landing template is a **modern SaaS product landing page** featuring:
 10. **Footer** with links and branding
 
 ### Key Visual Features
+
 - Smooth scroll animations
 - Auto-rotating dashboard previews with progress indicators
 - Gradient overlays and mask patterns
@@ -36,6 +38,7 @@ The landing template is a **modern SaaS product landing page** featuring:
 - Clean, professional typography (serif headings, sans-serif body)
 
 ### Technical Stack (Original)
+
 - **Framework:** Next.js 14 with App Router
 - **UI:** React 19 + TypeScript
 - **Styling:** Tailwind CSS 4.1.9
@@ -48,6 +51,7 @@ The landing template is a **modern SaaS product landing page** featuring:
 ## 🔍 Lovable Platform Capabilities (2025)
 
 ### What Lovable Excels At
+
 ✅ **Full-Stack Generation:** React + Vite frontend with Supabase backend  
 ✅ **Natural Language Prompts:** Build by describing what you want  
 ✅ **Visual Editor:** Click elements to modify directly  
@@ -60,6 +64,7 @@ The landing template is a **modern SaaS product landing page** featuring:
 ✅ **One-Click Deploy:** Publish to production immediately
 
 ### Platform Specifications
+
 - **Tech Stack:** React 19, Vite, Tailwind CSS, TypeScript
 - **Components:** Full shadcn/ui library available
 - **Icons:** Lucide React icons library
@@ -69,6 +74,7 @@ The landing template is a **modern SaaS product landing page** featuring:
 - **API Integration:** OpenAPI backends, Supabase, Stripe, etc.
 
 ### Important Limitations
+
 ⚠️ **No localStorage/sessionStorage** in artifacts (use React state)  
 ⚠️ **Credit-based pricing:** Free tier = 5 messages/day  
 ⚠️ **Token limits per message:** Keep prompts focused  
@@ -105,6 +111,7 @@ The landing page consists of **11 major components** + 1 layout wrapper:
 ```
 
 ### File Structure (Lovable)
+
 ```
 /components
 ├── Header.tsx
@@ -136,56 +143,41 @@ The landing page consists of **11 major components** + 1 layout wrapper:
 ## 🎨 Design System Guidelines
 
 ### Color Palette
+
 ```css
 /* Primary Colors */
---background: #F7F5F3 (warm off-white)
---foreground: #37322F (dark charcoal)
---accent: #2F3037 (almost black)
-
-/* Text Colors */
---text-primary: #37322F
---text-secondary: rgba(55, 50, 47, 0.80)
---text-tertiary: rgba(55, 50, 47, 0.60)
-
-/* UI Elements */
---border: rgba(55, 50, 47, 0.12)
---shadow-light: rgba(55, 50, 47, 0.05)
---shadow-medium: rgba(55, 50, 47, 0.12)
+--background: #f7f5f3 (warm off-white) --foreground: #37322f (dark charcoal)
+  --accent: #2f3037 (almost black) /* Text Colors */ --text-primary: #37322f
+  --text-secondary: rgba(55, 50, 47, 0.8) --text-tertiary: rgba(55, 50, 47, 0.6)
+  /* UI Elements */ --border: rgba(55, 50, 47, 0.12)
+  --shadow-light: rgba(55, 50, 47, 0.05) --shadow-medium: rgba(55, 50, 47, 0.12);
 ```
 
 ### Typography
+
 ```css
 /* Font Families */
---font-serif: Georgia, 'Times New Roman', serif
---font-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif
-
-/* Heading Sizes */
---text-hero: 80px / 96px line-height (desktop)
---text-h2: 52px / 62px
---text-h3: 36px / 43px
---text-body: 18px / 28px
---text-small: 13px / 14px
+--font-serif:
+  Georgia, "Times New Roman", serif --font-sans: Inter, -apple-system,
+  BlinkMacSystemFont,
+  sans-serif /* Heading Sizes */ --text-hero: 80px / 96px line-height (desktop)
+    --text-h2: 52px / 62px --text-h3: 36px / 43px --text-body: 18px / 28px
+    --text-small: 13px / 14px;
 ```
 
 ### Spacing System
+
 ```css
 /* Consistent spacing scale */
---space-1: 8px
---space-2: 16px
---space-3: 24px
---space-4: 32px
---space-5: 48px
---space-6: 64px
---space-8: 96px
---space-12: 144px
+--space-1: 8px --space-2: 16px --space-3: 24px --space-4: 32px --space-5: 48px
+  --space-6: 64px --space-8: 96px --space-12: 144px;
 ```
 
 ### Border Radius
+
 ```css
---radius-sm: 3px
---radius-md: 6px
---radius-lg: 9px
---radius-pill: 50px (90px for badges)
+--radius-sm: 3px --radius-md: 6px --radius-lg: 9px --radius-pill: 50px
+  (90px for badges);
 ```
 
 ---
@@ -195,7 +187,9 @@ The landing page consists of **11 major components** + 1 layout wrapper:
 ### Phase 1: Project Setup & Design Foundation (30 min)
 
 #### Step 1.1: Initialize Project
+
 **Lovable Prompt:**
+
 ```
 Create a modern SaaS landing page with a warm, professional design system.
 
@@ -218,13 +212,16 @@ Include:
 ```
 
 #### Step 1.2: Setup Knowledge File
+
 **Action:** Create project knowledge file in Lovable settings
 
 **Knowledge File Content:**
+
 ```markdown
 # Brillance Landing Page - Design System
 
 ## Global Styles
+
 - Always use warm off-white background: #F7F5F3
 - Primary text color: #37322F
 - Borders: rgba(55, 50, 47, 0.12) with white shadow
@@ -232,25 +229,30 @@ Include:
 - All containers: Max width 1060px, centered
 
 ## Typography Rules
+
 - Headings: Serif font (Georgia)
 - Body: Sans-serif (Inter)
 - Hero: 80px/96px line-height
 - Body: 18px/28px line-height
 
 ## Component Patterns
+
 - Cards: White background, subtle shadow, 6-9px border radius
 - Badges: Rounded pill shape (90px), light background
 - Buttons: Dark (#37322F), white text, 50px border radius
 - Sections: 64-96px vertical spacing between major sections
 
 ## Animation Guidelines
+
 - Transitions: 500ms ease-in-out
 - Hover states: Subtle scale (1.02) or opacity (0.9)
 - Progress bars: Smooth linear progression
 ```
 
 #### Step 1.3: Add Custom CSS (if needed)
+
 **Lovable Prompt:**
+
 ```
 Add custom CSS for vertical border lines on page edges:
 
@@ -267,7 +269,9 @@ Also add gradient overlay CSS for background patterns with blur and multiply ble
 ### Phase 2: Hero Section (45 min)
 
 #### Step 2.1: Create Hero Structure
+
 **Lovable Prompt:**
+
 ```
 Create a hero section with the following structure:
 
@@ -294,7 +298,9 @@ Spacing:
 ```
 
 #### Step 2.2: Add Background Pattern
+
 **Lovable Prompt:**
+
 ```
 Add a decorative SVG pattern behind the hero section:
 
@@ -309,7 +315,9 @@ Add a decorative SVG pattern behind the hero section:
 ```
 
 #### Step 2.3: Create Dashboard Preview Component
+
 **Lovable Prompt:**
+
 ```
 Create an animated dashboard preview component with 3 rotating images:
 
@@ -336,12 +344,15 @@ Card Indicators (below preview):
 **Implementation Note:** This requires useState and useEffect hooks for animation control.
 
 #### Step 2.4: Upload Images
+
 **Action Steps:**
+
 1. Prepare 3 dashboard images (compressed JPG/PNG)
 2. Upload via Lovable image attachment
 3. Reference in component code
 
 **Lovable Prompt:**
+
 ```
 I've uploaded 3 dashboard images. Use them in the dashboard preview component:
 - Image 1: Customer subscription dashboard
@@ -356,7 +367,9 @@ Apply object-fit: cover and ensure responsive scaling.
 ### Phase 3: Feature Sections (90 min)
 
 #### Step 3.1: "Smart, Simple, Brilliant" Section
+
 **Lovable Prompt:**
+
 ```
 Create a feature showcase section with 3 columns:
 
@@ -393,7 +406,9 @@ Layout:
 ```
 
 #### Step 3.2: "Your Work in Sync" Section
+
 **Lovable Prompt:**
+
 ```
 Create an alternating image-text section:
 
@@ -424,7 +439,9 @@ Layout:
 ```
 
 #### Step 3.3: Integration Section
+
 **Lovable Prompt:**
+
 ```
 Create an "Effortless Integration" section showcasing partner tools:
 
@@ -460,7 +477,9 @@ Optional: Constellation background pattern with connecting lines between logos
 ### Phase 4: Statistics & Social Proof (60 min)
 
 #### Step 4.1: Numbers Section
+
 **Lovable Prompt:**
+
 ```
 Create a statistics section with 4 key metrics:
 
@@ -498,7 +517,9 @@ Style:
 ```
 
 #### Step 4.2: Testimonials Section
+
 **Lovable Prompt:**
+
 ```
 Create a testimonials carousel with 3 customer reviews:
 
@@ -533,7 +554,9 @@ Layout:
 ### Phase 5: Pricing & FAQ (60 min)
 
 #### Step 5.1: Pricing Section
+
 **Lovable Prompt:**
+
 ```
 Create a pricing comparison table with 3 plans:
 
@@ -583,7 +606,9 @@ Style:
 ```
 
 #### Step 5.2: FAQ Section
+
 **Lovable Prompt:**
+
 ```
 Create an FAQ accordion with 6-8 common questions:
 
@@ -622,7 +647,9 @@ Style:
 ### Phase 6: Documentation & CTA (45 min)
 
 #### Step 6.1: Documentation Section
+
 **Lovable Prompt:**
+
 ```
 Create a documentation preview section:
 
@@ -660,7 +687,9 @@ Style:
 ```
 
 #### Step 6.2: Final CTA Section
+
 **Lovable Prompt:**
+
 ```
 Create a prominent call-to-action section before the footer:
 
@@ -691,6 +720,7 @@ Background:
 ### Phase 7: Footer (30 min)
 
 **Lovable Prompt:**
+
 ```
 Create a comprehensive footer with multiple columns:
 
@@ -748,6 +778,7 @@ Style:
 ### Auto-Rotating Dashboard Component
 
 **Lovable Prompt for Animation Logic:**
+
 ```
 Implement the dashboard rotation animation with this logic:
 
@@ -783,6 +814,7 @@ Cleanup:
 ### Scroll Animations (Optional)
 
 **Lovable Prompt:**
+
 ```
 Add scroll-triggered animations for sections:
 
@@ -807,6 +839,7 @@ Apply to:
 ### Breakpoint System
 
 **Lovable Prompt:**
+
 ```
 Implement responsive breakpoints using Tailwind:
 
@@ -837,6 +870,7 @@ Specific Adjustments:
 ### Mobile-First Approach
 
 **Lovable Prompt:**
+
 ```
 Apply mobile-first responsive design:
 
@@ -893,6 +927,7 @@ Test on:
 ### Image Optimization
 
 **Pre-Upload Checklist:**
+
 ```
 ✓ Compress images using TinyPNG or similar
 ✓ Use WebP format for better compression
@@ -908,6 +943,7 @@ Test on:
 ### Email Capture Form
 
 **Lovable Prompt:**
+
 ```
 Add an email capture form to the hero section:
 
@@ -934,6 +970,7 @@ Styling:
 ### Contact Form Modal
 
 **Lovable Prompt:**
+
 ```
 Create a contact form modal triggered from "Contact sales" button:
 
@@ -962,6 +999,7 @@ Form Submission:
 ### Analytics Integration
 
 **Lovable Prompt:**
+
 ```
 Add analytics tracking for key user actions:
 
@@ -992,6 +1030,7 @@ Privacy:
 
 ```markdown
 ## Visual Testing
+
 - [ ] Test on Chrome, Safari, Firefox
 - [ ] Test on iPhone (iOS Safari)
 - [ ] Test on Android (Chrome)
@@ -1002,6 +1041,7 @@ Privacy:
 - [ ] Test dark mode (if implemented)
 
 ## Functional Testing
+
 - [ ] All links navigate correctly
 - [ ] Forms validate properly
 - [ ] Email capture works
@@ -1012,6 +1052,7 @@ Privacy:
 - [ ] Mobile menu toggles correctly
 
 ## Performance
+
 - [ ] Lighthouse score > 90
 - [ ] Images are optimized
 - [ ] No console errors
@@ -1019,6 +1060,7 @@ Privacy:
 - [ ] Smooth scrolling
 
 ## Accessibility
+
 - [ ] All images have alt text
 - [ ] Proper heading hierarchy (H1 → H2 → H3)
 - [ ] Keyboard navigation works
@@ -1027,6 +1069,7 @@ Privacy:
 - [ ] Focus indicators visible
 
 ## Content
+
 - [ ] All copy is proofread
 - [ ] Brand name is correct
 - [ ] Contact information is accurate
@@ -1041,6 +1084,7 @@ Privacy:
 ### Lovable One-Click Deploy
 
 **Steps:**
+
 1. Click "Publish" button in top-right corner
 2. Choose deployment name (e.g., "brillance-landing")
 3. Lovable generates URL: `https://brillance-landing.lovable.app`
@@ -1049,6 +1093,7 @@ Privacy:
 ### Custom Domain Setup
 
 **Lovable Prompt:**
+
 ```
 Help me configure a custom domain for this app:
 
@@ -1064,6 +1109,7 @@ Steps needed:
 ### GitHub Integration & Export
 
 **Steps:**
+
 1. Go to Settings → Integrations
 2. Connect GitHub account
 3. Create new repository: `brillance-landing`
@@ -1071,6 +1117,7 @@ Steps needed:
 5. Enable GitHub Actions for CI/CD (optional)
 
 **Benefits:**
+
 - Version control
 - Code backup
 - Collaborative development
@@ -1083,16 +1130,18 @@ Steps needed:
 ### The 5 Keys to Great Prompts
 
 1. **Be Specific with Details**
+
    ```
    ❌ Bad: "Create a hero section"
-   ✅ Good: "Create a hero section with a serif heading (80px, Georgia font), 
-           centered layout, max-width 750px, warm background (#F7F5F3), 
+   ✅ Good: "Create a hero section with a serif heading (80px, Georgia font),
+           centered layout, max-width 750px, warm background (#F7F5F3),
            and a dark CTA button with rounded corners"
    ```
 
 2. **Reference Visual Examples**
+
    ```
-   "I've uploaded an image showing the desired layout. 
+   "I've uploaded an image showing the desired layout.
    Create a section matching this design, with:
    - Similar spacing
    - Matching color scheme
@@ -1100,9 +1149,10 @@ Steps needed:
    ```
 
 3. **Break Complex Tasks into Steps**
+
    ```
    Instead of: "Build the entire landing page"
-   
+
    Do this:
    Step 1: "Create header with logo and navigation"
    Step 2: "Add hero section with heading and CTA"
@@ -1111,22 +1161,24 @@ Steps needed:
    ```
 
 4. **Provide Context in Follow-Ups**
+
    ```
-   "In the hero section we just created, change the CTA button 
-   from 'Get Started' to 'Start Free Trial' and add a secondary 
+   "In the hero section we just created, change the CTA button
+   from 'Get Started' to 'Start Free Trial' and add a secondary
    button 'Watch Demo' next to it"
    ```
 
 5. **Use System Prompt for Consistency**
    ```
    Add to Knowledge file:
-   "Always use #F7F5F3 for backgrounds, #37322F for text, 
+   "Always use #F7F5F3 for backgrounds, #37322F for text,
    serif fonts for headings, and 50px border radius for buttons"
    ```
 
 ### Lovable Prompt Templates
 
 #### Component Creation Template
+
 ```
 Create a [COMPONENT_NAME] with the following:
 
@@ -1156,6 +1208,7 @@ Interactions:
 ```
 
 #### Section Creation Template
+
 ```
 Create a [SECTION_NAME] section:
 
@@ -1188,6 +1241,7 @@ Spacing:
 ### Session 1: Foundation (Messages 1-5)
 
 **Message 1: Project Initialization**
+
 ```
 Create a modern SaaS landing page project with these base requirements:
 
@@ -1205,6 +1259,7 @@ Set up the basic page structure with proper semantic HTML.
 ```
 
 **Message 2: Design System**
+
 ```
 Set up the design system in the project's globals.css or knowledge file:
 
@@ -1228,6 +1283,7 @@ Apply these globally and add utility classes.
 ```
 
 **Message 3: Header Component**
+
 ```
 Create a sticky header component:
 
@@ -1235,7 +1291,7 @@ Logo: "Brillance" (text logo, serif font, 20px, dark color)
 
 Navigation Items (right side, 13px):
 - Products
-- Pricing  
+- Pricing
 - Docs
 
 Right Actions:
@@ -1253,6 +1309,7 @@ Mobile: Hamburger menu icon, collapsible navigation
 ```
 
 **Message 4: Hero Section**
+
 ```
 Create the hero section with:
 
@@ -1261,7 +1318,7 @@ Heading (centered, serif, 80px):
 billing by Brillance"
 
 Subheading (18px, centered, max-width 506px, line-height 28px):
-"Streamline your billing process with seamless automation for every 
+"Streamline your billing process with seamless automation for every
 custom contract, tailored by Brillance."
 
 CTA Button:
@@ -1279,6 +1336,7 @@ Spacing:
 ```
 
 **Message 5: Background Pattern**
+
 ```
 Add a decorative background pattern behind the hero:
 
@@ -1298,6 +1356,7 @@ This creates visual interest without overpowering the content.
 ### Session 2: Dashboard Preview (Messages 1-5)
 
 **Message 1: Dashboard Container**
+
 ```
 Below the hero CTA, create a dashboard preview container:
 
@@ -1313,24 +1372,26 @@ This will hold the rotating dashboard images.
 ```
 
 **Message 2: Upload Images**
+
 ```
-I'm uploading 3 dashboard preview images. Display them in the container 
-we just created. For now, show the first image and prepare slots for 
+I'm uploading 3 dashboard preview images. Display them in the container
+we just created. For now, show the first image and prepare slots for
 rotation animation in the next step.
 
 Images:
 1. Customer subscription dashboard
-2. Analytics dashboard  
+2. Analytics dashboard
 3. Data visualization dashboard
 ```
 
 **Message 3: Add Indicator Cards**
+
 ```
 Below the dashboard preview, add 3 indicator cards:
 
 Cards (horizontal layout):
 Card 1: "Plan your schedules" (with icon)
-Card 2: "Data to insights" (with icon)  
+Card 2: "Data to insights" (with icon)
 Card 3: "Explore templates" (with icon)
 
 Style:
@@ -1346,6 +1407,7 @@ Active card:
 ```
 
 **Message 4: Implement Rotation Logic**
+
 ```
 Implement auto-rotation for the dashboard images:
 
@@ -1364,6 +1426,7 @@ Ensure smooth animations and proper cleanup on unmount.
 ```
 
 **Message 5: Progress Bar Animation**
+
 ```
 Add progress bar to active indicator card:
 
@@ -1385,6 +1448,7 @@ Animation:
 ### Session 3: Feature Sections (Messages 1-5)
 
 **Message 1: Smart Simple Brilliant Section**
+
 ```
 Create "Smart, Simple, Brilliant" section:
 
@@ -1422,6 +1486,7 @@ Section Spacing: 96px vertical padding
 ```
 
 **Message 2: Work in Sync Section**
+
 ```
 Create "Your work, perfectly in sync" section:
 
@@ -1434,14 +1499,14 @@ Block 1 (Image left, text right):
 - Placeholder image: 500px x 400px
 - Text content:
   - Heading: "Collaborate seamlessly"
-  - Description: "Work together with your team in real-time with 
+  - Description: "Work together with your team in real-time with
     shared workspaces and instant updates."
   - 3 bullet points with checkmark icons
 
 Block 2 (Text left, image right):
 - Text content:
   - Heading: "Stay organized"
-  - Description: "Keep all your contracts and invoices in one place 
+  - Description: "Keep all your contracts and invoices in one place
     with our intuitive organization system."
   - 3 bullet points
 
@@ -1452,6 +1517,7 @@ Spacing:
 ```
 
 **Message 3: Integration Section**
+
 ```
 Create "Effortless Integration" section:
 
@@ -1487,6 +1553,7 @@ Section Spacing: 96px padding
 ```
 
 **Message 4: Numbers Section**
+
 ```
 Create statistics section:
 
@@ -1527,6 +1594,7 @@ Section Padding: 96px vertical
 ```
 
 **Message 5: Documentation Preview**
+
 ```
 Create documentation section:
 
@@ -1571,6 +1639,7 @@ Section Padding: 96px
 ### Session 4: Social Proof & Forms (Messages 1-5)
 
 **Message 1: Testimonials Section**
+
 ```
 Create testimonials carousel:
 
@@ -1581,7 +1650,7 @@ Title (52px, centered):
 
 Card 1:
 - 5 stars (yellow, 16px each)
-- Quote: "Brillance transformed how we handle billing. It's incredibly 
+- Quote: "Brillance transformed how we handle billing. It's incredibly
   intuitive and saves us hours every week."
 - Avatar: 64px circle (placeholder or upload)
 - Name: "Sarah Johnson" (bold)
@@ -1589,7 +1658,7 @@ Card 1:
 
 Card 2:
 - 5 stars
-- Quote: "The automation features are game-changing. We've cut our 
+- Quote: "The automation features are game-changing. We've cut our
   billing time in half."
 - Avatar: 64px circle
 - Name: "Michael Chen"
@@ -1597,7 +1666,7 @@ Card 2:
 
 Card 3:
 - 5 stars
-- Quote: "Best billing solution we've used. The support team is 
+- Quote: "Best billing solution we've used. The support team is
   incredibly responsive."
 - Avatar: 64px circle
 - Name: "Emily Rodriguez"
@@ -1618,6 +1687,7 @@ Card Style:
 ```
 
 **Message 2: FAQ Accordion**
+
 ```
 Create FAQ section with shadcn/ui Accordion:
 
@@ -1627,36 +1697,36 @@ Title (52px, centered):
 8 Questions (use Accordion component):
 
 Q1: "How does the free trial work?"
-A: "Start with a 14-day free trial with full access to all Pro features. 
+A: "Start with a 14-day free trial with full access to all Pro features.
 No credit card required. Cancel anytime."
 
 Q2: "Can I change plans later?"
-A: "Yes, you can upgrade or downgrade at any time. Changes take effect 
+A: "Yes, you can upgrade or downgrade at any time. Changes take effect
 immediately and we'll prorate the difference."
 
 Q3: "What payment methods do you accept?"
-A: "We accept all major credit cards (Visa, Mastercard, Amex), PayPal, 
+A: "We accept all major credit cards (Visa, Mastercard, Amex), PayPal,
 and bank transfers for Enterprise plans."
 
 Q4: "Is my data secure?"
-A: "Yes, we use bank-level encryption (AES-256) and are SOC 2 Type II 
+A: "Yes, we use bank-level encryption (AES-256) and are SOC 2 Type II
 certified. Your data is stored in secure, redundant data centers."
 
 Q5: "Do you offer discounts for annual billing?"
-A: "Yes, save 20% when you pay annually instead of monthly. Annual plans 
+A: "Yes, save 20% when you pay annually instead of monthly. Annual plans
 also get priority support."
 
 Q6: "Can I cancel anytime?"
-A: "Absolutely. No long-term contracts or cancellation fees. Cancel anytime 
+A: "Absolutely. No long-term contracts or cancellation fees. Cancel anytime
 from your account settings."
 
 Q7: "Do you offer custom plans for enterprises?"
-A: "Yes, we offer custom Enterprise plans with dedicated support, SLA 
+A: "Yes, we offer custom Enterprise plans with dedicated support, SLA
 guarantees, and custom integrations. Contact our sales team."
 
 Q8: "How does customer support work?"
-A: "All plans include email support. Pro and Enterprise plans get priority 
-support with faster response times. Enterprise includes dedicated account 
+A: "All plans include email support. Pro and Enterprise plans get priority
+support with faster response times. Enterprise includes dedicated account
 management."
 
 Style:
@@ -1669,6 +1739,7 @@ Style:
 ```
 
 **Message 3: Pricing Section**
+
 ```
 Create pricing comparison:
 
@@ -1743,6 +1814,7 @@ Section Spacing: 96px vertical padding
 ```
 
 **Message 4: Email Capture (Optional)**
+
 ```
 Add email capture form in hero section:
 
@@ -1785,6 +1857,7 @@ Mobile:
 ```
 
 **Message 5: Contact Modal (Optional)**
+
 ```
 Create contact form modal triggered by "Contact sales" button:
 
@@ -1847,6 +1920,7 @@ Close Actions:
 ### Session 5: Final CTA & Footer (Messages 1-5)
 
 **Message 1: Final CTA Section**
+
 ```
 Create prominent call-to-action section before footer:
 
@@ -1894,6 +1968,7 @@ Optional:
 ```
 
 **Message 2: Footer Structure**
+
 ```
 Create comprehensive footer:
 
@@ -1958,6 +2033,7 @@ Mobile: Stack columns vertically
 ```
 
 **Message 3: Footer Bottom Bar**
+
 ```
 Add footer bottom section:
 
@@ -1989,6 +2065,7 @@ Mobile:
 ```
 
 **Message 4: Scroll to Top Button (Optional)**
+
 ```
 Add "Back to Top" button in footer:
 
@@ -2018,6 +2095,7 @@ Mobile:
 ```
 
 **Message 5: Add Vertical Page Borders**
+
 ```
 Add decorative vertical lines on page edges:
 
@@ -2052,6 +2130,7 @@ Mobile:
 **Problem:** Dashboard rotation or other animations appear choppy
 
 **Solution Prompt:**
+
 ```
 The animation is not smooth. Please optimize it:
 
@@ -2068,6 +2147,7 @@ The animation is not smooth. Please optimize it:
 **Problem:** Uploaded images don't display correctly
 
 **Solution Prompt:**
+
 ```
 Images are not loading. Let's debug:
 
@@ -2084,6 +2164,7 @@ Images are not loading. Let's debug:
 **Problem:** Responsive design doesn't work on mobile devices
 
 **Solution Prompt:**
+
 ```
 The mobile layout is broken. Fix responsive design:
 
@@ -2102,6 +2183,7 @@ The mobile layout is broken. Fix responsive design:
 **Problem:** Lovable shows "Build unsuccessful" error
 
 **Solution Prompt:**
+
 ```
 Build error detected. Please try to fix it automatically.
 
@@ -2112,7 +2194,7 @@ Common causes:
 - Missing required props
 - Circular dependencies
 
-Use the "Try to fix it" button or describe the specific error message 
+Use the "Try to fix it" button or describe the specific error message
 and I'll help resolve it.
 ```
 
@@ -2121,6 +2203,7 @@ and I'll help resolve it.
 **Problem:** Page loads slowly or feels laggy
 
 **Solution Prompt:**
+
 ```
 Optimize performance:
 
@@ -2217,6 +2300,7 @@ OR: 1 day on paid plan (100 messages/month at $20)
 ### Custom Animations Library
 
 **Lovable Prompt:**
+
 ```
 Create reusable animation utilities:
 
@@ -2248,6 +2332,7 @@ Implement using Intersection Observer API and CSS transitions.
 ### Dark Mode Support
 
 **Lovable Prompt:**
+
 ```
 Add dark mode toggle functionality:
 
@@ -2269,6 +2354,7 @@ Update all sections to support both themes with proper contrast ratios.
 ### Multi-Language Support (i18n)
 
 **Lovable Prompt:**
+
 ```
 Add internationalization support:
 
@@ -2306,6 +2392,7 @@ Ensure proper text direction and formatting for each language.
 ### A/B Testing Setup
 
 **Lovable Prompt:**
+
 ```
 Set up A/B testing for CTA buttons:
 
@@ -2336,6 +2423,7 @@ Use environment variable or feature flag to control test activation.
 ### Event Tracking Setup
 
 **Lovable Prompt:**
+
 ```
 Implement analytics event tracking:
 
@@ -2376,6 +2464,7 @@ Add privacy-compliant cookie consent banner.
 ### Heatmap Integration
 
 **Lovable Prompt:**
+
 ```
 Set up heatmap tracking for user behavior analysis:
 
@@ -2408,11 +2497,12 @@ Use insights to optimize:
 ### GDPR Compliance
 
 **Lovable Prompt:**
+
 ```
 Add GDPR-compliant cookie consent:
 
 Banner (appears at bottom on first visit):
-- Message: "We use cookies to enhance your experience. By continuing, 
+- Message: "We use cookies to enhance your experience. By continuing,
   you agree to our cookie policy."
 - Buttons:
   - "Accept all" (primary)
@@ -2437,6 +2527,7 @@ Privacy Policy Link: Required in banner
 ### Content Security Policy
 
 **Lovable Prompt:**
+
 ```
 Implement Content Security Policy headers:
 
@@ -2468,6 +2559,7 @@ Test CSP with browser console before deploying.
 
 ```markdown
 ## Technical Checks
+
 - [ ] All images compressed and optimized
 - [ ] Lighthouse score > 90 (Performance, Accessibility, SEO)
 - [ ] No console errors in production
@@ -2481,6 +2573,7 @@ Test CSP with browser console before deploying.
 - [ ] Sitemap.xml generated
 
 ## Content Checks
+
 - [ ] All copy proofread (no typos)
 - [ ] Brand name consistent throughout
 - [ ] Contact information accurate
@@ -2492,6 +2585,7 @@ Test CSP with browser console before deploying.
 - [ ] Favicon added
 
 ## SEO Checks
+
 - [ ] Title tags optimized (< 60 chars)
 - [ ] Meta descriptions (< 160 chars)
 - [ ] Header hierarchy correct (H1 → H2 → H3)
@@ -2503,6 +2597,7 @@ Test CSP with browser console before deploying.
 - [ ] Page speed optimized
 
 ## Analytics & Tracking
+
 - [ ] Analytics installed and tested
 - [ ] Conversion tracking configured
 - [ ] Event tracking tested
@@ -2510,6 +2605,7 @@ Test CSP with browser console before deploying.
 - [ ] Privacy policy linked
 
 ## Final Tests
+
 - [ ] Cross-browser testing (Chrome, Safari, Firefox)
 - [ ] Mobile device testing (iOS, Android)
 - [ ] Tablet testing
@@ -2651,24 +2747,28 @@ SEO Metrics:
 ## 📚 Additional Resources
 
 ### Lovable Documentation
+
 - **Getting Started:** https://docs.lovable.dev/introduction/getting-started
 - **Prompting Guide:** https://lovable.dev/blog/2025-01-16-lovable-prompting-handbook
 - **Troubleshooting:** https://docs.lovable.dev/troubleshooting
 - **Community:** Discord server for support
 
 ### Design Inspiration
+
 - **Dribbble:** https://dribbble.com/tags/landing-page
 - **Land-book:** https://land-book.com
 - **Awwwards:** https://www.awwwards.com/websites/landing-page/
 - **SaaS Pages:** https://saaspages.xyz
 
 ### Tools & Testing
+
 - **PageSpeed Insights:** https://pagespeed.web.dev
 - **GTmetrix:** https://gtmetrix.com
 - **BrowserStack:** https://www.browserstack.com
 - **WAVE Accessibility:** https://wave.webaim.org
 
 ### Learning Resources
+
 - **React Docs:** https://react.dev
 - **Tailwind CSS:** https://tailwindcss.com/docs
 - **shadcn/ui:** https://ui.shadcn.com
@@ -2762,16 +2862,16 @@ const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text);
     // Show success toast
-    toast.success('Copied to clipboard!');
+    toast.success("Copied to clipboard!");
   } catch (err) {
     // Fallback method
-    const textArea = document.createElement('textarea');
+    const textArea = document.createElement("textarea");
     textArea.value = text;
     document.body.appendChild(textArea);
     textArea.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(textArea);
-    toast.success('Copied to clipboard!');
+    toast.success("Copied to clipboard!");
   }
 };
 ```
@@ -2821,12 +2921,14 @@ const [ref, isInView] = useInView();
 ### Getting Help
 
 **Lovable Support:**
+
 - Documentation: docs.lovable.dev
 - Discord Community: Join for peer support
 - Email: support@lovable.dev (for technical issues)
 - Twitter: @lovable_dev (updates and tips)
 
 **This Project:**
+
 - Reference this guide for all build steps
 - Use the detailed prompts provided
 - Follow the step-by-step sequence
@@ -2868,7 +2970,7 @@ You now have a complete, production-ready plan to rebuild your landing page temp
 ✓ **Animation implementations** with code examples  
 ✓ **Testing & deployment checklists** for launch  
 ✓ **Troubleshooting guides** for common issues  
-✓ **Best practices & tips** for Lovable development  
+✓ **Best practices & tips** for Lovable development
 
 **Estimated Total Time:** 5-6 hours with Lovable (vs 48 hours traditional development)  
 **Complexity Level:** Intermediate  
@@ -2890,8 +2992,8 @@ Good luck with your build! 🚀
 **Last Updated:** November 14, 2025  
 **Total Word Count:** ~25,000 words  
 **Total Prompts:** 50+  
-**Estimated Read Time:** 90 minutes  
+**Estimated Read Time:** 90 minutes
 
 ---
 
-*This guide is designed to be comprehensive and actionable. Bookmark it, refer to it often, and use it as your complete reference for building modern landing pages with Lovable.dev.*
+_This guide is designed to be comprehensive and actionable. Bookmark it, refer to it often, and use it as your complete reference for building modern landing pages with Lovable.dev._

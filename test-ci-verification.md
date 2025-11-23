@@ -20,6 +20,7 @@
 ### Integration Tests Should Run
 
 With GitHub Secrets configured, integration tests should:
+
 - Connect to Exa API for ordinance search
 - Connect to Anthropic API for requirement extraction
 - Complete all 4 test scenarios

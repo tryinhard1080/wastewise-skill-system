@@ -4,12 +4,12 @@
  * Reusable helper functions for comparing TypeScript vs Python implementations
  */
 
-import type { EvalComparison, EvalResult, EvalSummary } from './types'
+import type { EvalComparison, EvalResult, EvalSummary } from "./types";
 
 /**
  * Default tolerance for calculations (0.01% = 0.0001)
  */
-export const DEFAULT_TOLERANCE = 0.0001
+export const DEFAULT_TOLERANCE = 0.0001;
 
 /**
  * Compare two numeric values and generate a comparison result
@@ -24,11 +24,14 @@ export function compareValues(
   metric: string,
   tsValue: number,
   pythonValue: number,
-  tolerance: number = DEFAULT_TOLERANCE
+  tolerance: number = DEFAULT_TOLERANCE,
 ): EvalComparison {
-  const difference = tsValue - pythonValue
-  const percentDiff = pythonValue !== 0 ? Math.abs(difference / pythonValue) : Math.abs(difference)
-  const pass = percentDiff <= tolerance
+  const difference = tsValue - pythonValue;
+  const percentDiff =
+    pythonValue !== 0
+      ? Math.abs(difference / pythonValue)
+      : Math.abs(difference);
+  const pass = percentDiff <= tolerance;
 
   return {
     metric,
@@ -38,7 +41,7 @@ export function compareValues(
     percentDiff,
     pass,
     tolerance,
-  }
+  };
 }
 
 /**
@@ -50,11 +53,11 @@ export function compareValues(
  */
 export function compareMetrics(
   metrics: Record<string, [number, number]>,
-  tolerance: number = DEFAULT_TOLERANCE
+  tolerance: number = DEFAULT_TOLERANCE,
 ): EvalComparison[] {
   return Object.entries(metrics).map(([metric, [tsValue, pythonValue]]) =>
-    compareValues(metric, tsValue, pythonValue, tolerance)
-  )
+    compareValues(metric, tsValue, pythonValue, tolerance),
+  );
 }
 
 /**
@@ -65,7 +68,7 @@ export function compareMetrics(
  * @returns Formatted string
  */
 export function formatNumber(value: number, decimals: number = 2): string {
-  return value.toFixed(decimals)
+  return value.toFixed(decimals);
 }
 
 /**
@@ -76,7 +79,7 @@ export function formatNumber(value: number, decimals: number = 2): string {
  * @returns Formatted string with % symbol
  */
 export function formatPercent(value: number, decimals: number = 4): string {
-  return `${(value * 100).toFixed(decimals)}%`
+  return `${(value * 100).toFixed(decimals)}%`;
 }
 
 /**
@@ -86,65 +89,65 @@ export function formatPercent(value: number, decimals: number = 4): string {
  * @returns Formatted text report
  */
 export function formatEvalReport(summary: EvalSummary): string {
-  const lines: string[] = []
+  const lines: string[] = [];
 
-  lines.push('='.repeat(80))
-  lines.push('EVAL VALIDATION REPORT')
-  lines.push('='.repeat(80))
-  lines.push('')
-  lines.push(`Executed: ${summary.executedAt.toISOString()}`)
-  lines.push(`Total Tests: ${summary.totalTests}`)
-  lines.push(`Passing: ${summary.passing}`)
-  lines.push(`Failing: ${summary.failing}`)
-  lines.push(`Pass Rate: ${formatPercent(summary.passRate / 100, 2)}`)
-  lines.push('')
+  lines.push("=".repeat(80));
+  lines.push("EVAL VALIDATION REPORT");
+  lines.push("=".repeat(80));
+  lines.push("");
+  lines.push(`Executed: ${summary.executedAt.toISOString()}`);
+  lines.push(`Total Tests: ${summary.totalTests}`);
+  lines.push(`Passing: ${summary.passing}`);
+  lines.push(`Failing: ${summary.failing}`);
+  lines.push(`Pass Rate: ${formatPercent(summary.passRate / 100, 2)}`);
+  lines.push("");
 
   if (summary.failing > 0) {
-    lines.push('⚠️  FAILURES DETECTED')
-    lines.push('')
+    lines.push("⚠️  FAILURES DETECTED");
+    lines.push("");
   }
 
   for (const result of summary.results) {
-    lines.push('-'.repeat(80))
-    lines.push(`Test: ${result.testCaseId}`)
-    lines.push(`Description: ${result.description}`)
-    lines.push(`Status: ${result.pass ? '✓ PASS' : '✗ FAIL'}`)
+    lines.push("-".repeat(80));
+    lines.push(`Test: ${result.testCaseId}`);
+    lines.push(`Description: ${result.description}`);
+    lines.push(`Status: ${result.pass ? "✓ PASS" : "✗ FAIL"}`);
 
     if (result.error) {
-      lines.push(`Error: ${result.error}`)
+      lines.push(`Error: ${result.error}`);
     }
 
-    lines.push('')
-    lines.push('Metric Comparisons:')
+    lines.push("");
+    lines.push("Metric Comparisons:");
 
     for (const comp of result.comparisons) {
-      const status = comp.pass ? '✓' : '✗'
-      lines.push(`  ${status} ${comp.metric}`)
-      lines.push(`    TypeScript:  ${formatNumber(comp.tsValue, 4)}`)
-      lines.push(`    Python:      ${formatNumber(comp.pythonValue, 4)}`)
-      lines.push(`    Difference:  ${formatNumber(comp.difference, 6)}`)
-      lines.push(`    % Diff:      ${formatPercent(comp.percentDiff, 4)}`)
-      lines.push(`    Tolerance:   ${formatPercent(comp.tolerance, 4)}`)
+      const status = comp.pass ? "✓" : "✗";
+      lines.push(`  ${status} ${comp.metric}`);
+      lines.push(`    TypeScript:  ${formatNumber(comp.tsValue, 4)}`);
+      lines.push(`    Python:      ${formatNumber(comp.pythonValue, 4)}`);
+      lines.push(`    Difference:  ${formatNumber(comp.difference, 6)}`);
+      lines.push(`    % Diff:      ${formatPercent(comp.percentDiff, 4)}`);
+      lines.push(`    Tolerance:   ${formatPercent(comp.tolerance, 4)}`);
 
       if (!comp.pass) {
-        lines.push(`    ⚠️  EXCEEDS TOLERANCE`)
+        lines.push(`    ⚠️  EXCEEDS TOLERANCE`);
       }
 
-      lines.push('')
+      lines.push("");
     }
   }
 
-  lines.push('='.repeat(80))
+  lines.push("=".repeat(80));
 
   if (summary.failing === 0) {
-    lines.push('✓ ALL TESTS PASSED')
+    lines.push("✓ ALL TESTS PASSED");
   } else {
-    lines.push(`✗ ${summary.failing} TEST(S) FAILED`)
+    lines.push(`✗ ${summary.failing} TEST(S) FAILED`);
   }
 
-  lines.push('='.repeat(80))
+  lines.push("=".repeat(80));
 
-  return lines.join('\n')
+  return lines.join("\n");
 }
 
 /**
@@ -154,10 +157,10 @@ export function formatEvalReport(summary: EvalSummary): string {
  * @returns Summary statistics
  */
 export function generateEvalSummary(results: EvalResult[]): EvalSummary {
-  const totalTests = results.length
-  const passing = results.filter(r => r.pass).length
-  const failing = totalTests - passing
-  const passRate = totalTests > 0 ? (passing / totalTests) * 100 : 0
+  const totalTests = results.length;
+  const passing = results.filter((r) => r.pass).length;
+  const failing = totalTests - passing;
+  const passRate = totalTests > 0 ? (passing / totalTests) * 100 : 0;
 
   return {
     totalTests,
@@ -166,7 +169,7 @@ export function generateEvalSummary(results: EvalResult[]): EvalSummary {
     passRate,
     results,
     executedAt: new Date(),
-  }
+  };
 }
 
 /**
@@ -182,17 +185,17 @@ export function assertWithinTolerance(
   actual: number,
   expected: number,
   metric: string,
-  tolerance: number = DEFAULT_TOLERANCE
+  tolerance: number = DEFAULT_TOLERANCE,
 ): void {
-  const comparison = compareValues(metric, actual, expected, tolerance)
+  const comparison = compareValues(metric, actual, expected, tolerance);
 
   if (!comparison.pass) {
     throw new Error(
       `${metric} exceeds tolerance:\n` +
-      `  Expected: ${formatNumber(expected, 4)}\n` +
-      `  Actual:   ${formatNumber(actual, 4)}\n` +
-      `  Diff:     ${formatNumber(comparison.difference, 6)} (${formatPercent(comparison.percentDiff, 4)})\n` +
-      `  Max:      ${formatPercent(tolerance, 4)}`
-    )
+        `  Expected: ${formatNumber(expected, 4)}\n` +
+        `  Actual:   ${formatNumber(actual, 4)}\n` +
+        `  Diff:     ${formatNumber(comparison.difference, 6)} (${formatPercent(comparison.percentDiff, 4)})\n` +
+        `  Max:      ${formatPercent(tolerance, 4)}`,
+    );
   }
 }

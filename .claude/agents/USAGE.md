@@ -9,6 +9,7 @@
 ## When to Use Agents (ALWAYS)
 
 ### ✅ For ANY Code Changes
+
 - UI components → Frontend Agent
 - API routes → Backend Agent
 - Database schema → Backend Agent
@@ -16,9 +17,11 @@
 - Tests → Testing Agent
 
 ### ✅ Before EVERY Commit
+
 - Code Analyzer Agent (validates schema, types, API contracts)
 
 ### ❌ NEVER
+
 - Make direct file edits without agent validation
 - Skip Code Analyzer before commit
 - Assume schema/types without reading migrations/contracts
@@ -27,15 +30,15 @@
 
 ## Agent Selection Matrix
 
-| Task Type | Agent to Use | Why |
-|-----------|--------------|-----|
-| **UI Component** | `frontend-dev` | Validates against DB schema, ensures type safety, checks responsive design |
-| **API Route** | `backend-dev` | Validates request/response shapes, ensures DB query correctness, checks error handling |
-| **Database Schema** | `backend-dev` | Validates migrations, ensures constraints are enforceable, checks backwards compatibility |
-| **Skill Logic** | `skills-agent` | Ports Python logic, ensures conversion rate consistency, validates formulas |
-| **Tests** | `tester` | Adds unit/integration/E2E tests, runs evals against Python reference |
-| **Pre-Commit Review** | `code-analyzer` | **MANDATORY** - Validates everything before commit |
-| **Multi-step Tasks** | `planner` | Creates implementation plan with proper agent delegation |
+| Task Type             | Agent to Use    | Why                                                                                       |
+| --------------------- | --------------- | ----------------------------------------------------------------------------------------- |
+| **UI Component**      | `frontend-dev`  | Validates against DB schema, ensures type safety, checks responsive design                |
+| **API Route**         | `backend-dev`   | Validates request/response shapes, ensures DB query correctness, checks error handling    |
+| **Database Schema**   | `backend-dev`   | Validates migrations, ensures constraints are enforceable, checks backwards compatibility |
+| **Skill Logic**       | `skills-agent`  | Ports Python logic, ensures conversion rate consistency, validates formulas               |
+| **Tests**             | `tester`        | Adds unit/integration/E2E tests, runs evals against Python reference                      |
+| **Pre-Commit Review** | `code-analyzer` | **MANDATORY** - Validates everything before commit                                        |
+| **Multi-step Tasks**  | `planner`       | Creates implementation plan with proper agent delegation                                  |
 
 ---
 
@@ -46,6 +49,7 @@
 **Task**: Create a JobsList component that shows analysis jobs
 
 **CORRECT Approach**:
+
 ```
 Use frontend-dev agent to create the JobsList component that:
 - Fetches jobs from /api/jobs endpoint
@@ -67,6 +71,7 @@ Agent should:
 ```
 
 **What the Agent Will Do**:
+
 - ✅ Read `app/api/jobs/route.ts` for API response shape
 - ✅ Read `supabase/migrations/*.sql` for database schema
 - ✅ Create `AnalysisJob` interface matching API (camelCase)
@@ -75,6 +80,7 @@ Agent should:
 - ✅ Check for responsive design issues
 
 **What You Get**:
+
 - Component that actually works at runtime
 - No undefined errors from field mismatches
 - Proper TypeScript validation
@@ -87,6 +93,7 @@ Agent should:
 **Task**: Add /api/jobs endpoint that returns formatted job data
 
 **CORRECT Approach**:
+
 ```
 Use backend-dev agent to create /api/jobs route that:
 - Fetches analysis_jobs from Supabase for a given projectId
@@ -114,6 +121,7 @@ Agent should:
 ```
 
 **What the Agent Will Do**:
+
 - ✅ Read database schema for exact field names
 - ✅ Create transformation function (DB → API format)
 - ✅ Add proper error handling
@@ -121,6 +129,7 @@ Agent should:
 - ✅ Test TypeScript compilation
 
 **What You Get**:
+
 - API that returns consistent camelCase format
 - No field name mismatches
 - Proper error responses
@@ -133,6 +142,7 @@ Agent should:
 **Task**: Review all changes before committing
 
 **CORRECT Approach**:
+
 ```
 Use code-analyzer agent to review all changes and validate:
 - Database schema alignment (forms match CHECK constraints)
@@ -152,6 +162,7 @@ Agent should:
 ```
 
 **What the Agent Will Do**:
+
 - ✅ Run `tsc --noEmit` - MUST pass with 0 errors
 - ✅ Check form values vs database CHECK constraints
 - ✅ Compare API routes vs component interfaces
@@ -160,6 +171,7 @@ Agent should:
 - ✅ Validate auth guards exist
 
 **What You Get**:
+
 - Confidence code won't crash at runtime
 - No schema mismatches
 - No type errors
@@ -172,6 +184,7 @@ Agent should:
 ## Quality Checklist Per Agent
 
 ### Frontend Agent Must Validate:
+
 - [ ] Component types match API responses (not database schema)
 - [ ] Form values match database CHECK constraints
 - [ ] Imports canonical types (not redefined)
@@ -181,6 +194,7 @@ Agent should:
 - [ ] Error states handled gracefully
 
 ### Backend Agent Must Validate:
+
 - [ ] API response shape is documented
 - [ ] Database queries use correct field names (from migrations)
 - [ ] Migrations are read before schema changes
@@ -189,6 +203,7 @@ Agent should:
 - [ ] Auth checks before user-specific queries
 
 ### Code Analyzer Agent Must Check:
+
 - [ ] `tsc --noEmit` passes with 0 errors
 - [ ] All database operations match schema
 - [ ] API contracts match component expectations
@@ -204,24 +219,29 @@ Agent should:
 ### ❌ Without Agents (Phase 3 Mistakes)
 
 **Problem 1**: Project creation failed 100% of the time
+
 ```typescript
 // Direct edit - didn't check schema
-property_type: 'multifamily'  // ❌ DB expects 'Garden-Style'
-status: 'active'              // ❌ DB expects 'draft'
+property_type: "multifamily"; // ❌ DB expects 'Garden-Style'
+status: "active"; // ❌ DB expects 'draft'
 ```
 
 **Problem 2**: JobsList component broke on SWR polling
+
 ```typescript
 // Direct edit - didn't match API
 interface Job {
-  job_type: string  // ❌ API returns jobType (camelCase)
+  job_type: string; // ❌ API returns jobType (camelCase)
 }
 ```
 
 **Problem 3**: Results dashboard showed "undefined"
+
 ```typescript
 // Direct edit - assumed field exists
-{results.dsqMonitorCost?.install}  // ❌ Skill doesn't return this
+{
+  results.dsqMonitorCost?.install;
+} // ❌ Skill doesn't return this
 ```
 
 **All fixed in 30 minutes when using agents properly.**
@@ -231,6 +251,7 @@ interface Job {
 ### ✅ With Agents (Correct Approach)
 
 **Frontend Agent**:
+
 ```
 Task: Create project creation form
 
@@ -246,6 +267,7 @@ Agent actions:
 ```
 
 **Backend Agent**:
+
 ```
 Task: Create /api/jobs endpoint
 
@@ -258,6 +280,7 @@ Agent actions:
 ```
 
 **Code Analyzer Agent**:
+
 ```
 Task: Review before commit
 
@@ -325,6 +348,7 @@ The agent should:
 ## Benefits of Agent-Based Development
 
 ### Without Agents (Direct Edits):
+
 - ❌ Schema mismatches cause 100% failure
 - ❌ Type errors hidden until runtime
 - ❌ API/component mismatches break features
@@ -332,6 +356,7 @@ The agent should:
 - ❌ Missing validation = production bugs
 
 ### With Agents:
+
 - ✅ Schema validated before code written
 - ✅ TypeScript errors caught at dev time
 - ✅ API contracts enforced
@@ -343,6 +368,7 @@ The agent should:
 ## Summary: The Golden Rule
 
 **Before ANY code change**:
+
 1. ✅ Choose the right agent (Frontend/Backend/Skills)
 2. ✅ Agent reads schema/contracts FIRST
 3. ✅ Agent validates as it builds
@@ -350,6 +376,7 @@ The agent should:
 5. ✅ `tsc --noEmit` passes with 0 errors
 
 **Never**:
+
 - ❌ Edit files directly
 - ❌ Skip agent validation
 - ❌ Commit without Code Analyzer review

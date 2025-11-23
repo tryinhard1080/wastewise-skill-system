@@ -1,7 +1,7 @@
 # WasteWise Local Development Docker Compose
 # For testing multi-service deployment locally
 
-version: '3.8'
+version: "3.8"
 
 services:
   # Next.js Web Service

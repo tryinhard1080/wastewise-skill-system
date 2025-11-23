@@ -60,6 +60,7 @@ source ~/.backup_env
 ### Procedure 1: Full Database Backup
 
 **When to Use**:
+
 - Before major deployments
 - Before schema migrations
 - Monthly compliance backups
@@ -68,6 +69,7 @@ source ~/.backup_env
 **Steps**:
 
 1. **Prepare environment**:
+
 ```bash
 # Load environment variables
 source ~/.backup_env
@@ -84,6 +86,7 @@ echo "Starting backup: $BACKUP_FILE"
 ```
 
 2. **Create backup**:
+
 ```bash
 pg_dump $DATABASE_URL \
   --format=custom \
@@ -95,6 +98,7 @@ pg_dump $DATABASE_URL \
 ```
 
 **Options Explained**:
+
 - `--format=custom`: Binary format, smaller and faster to restore
 - `--compress=9`: Maximum compression (1-9 scale)
 - `--verbose`: Show progress
@@ -102,6 +106,7 @@ pg_dump $DATABASE_URL \
 - `--no-privileges`: Don't restore grants (Supabase manages this)
 
 3. **Verify backup integrity**:
+
 ```bash
 # Check file was created
 if [ ! -f "$BACKUP_FILE" ]; then
@@ -126,6 +131,7 @@ fi
 ```
 
 4. **Calculate checksum**:
+
 ```bash
 # Create checksum file
 sha256sum $BACKUP_FILE > ${BACKUP_FILE}.sha256
@@ -135,6 +141,7 @@ cat ${BACKUP_FILE}.sha256
 ```
 
 5. **Upload to S3**:
+
 ```bash
 # Upload with server-side encryption
 aws s3 cp $BACKUP_FILE \
@@ -151,6 +158,7 @@ echo "✅ Backup uploaded to S3"
 ```
 
 6. **Verify S3 upload**:
+
 ```bash
 # Check file exists in S3
 aws s3 ls "${S3_BACKUP_BUCKET}/$(date +%Y/%m/)/${BACKUP_FILE}"
@@ -161,6 +169,7 @@ aws s3 cp "${S3_BACKUP_BUCKET}/$(date +%Y/%m/)/${BACKUP_FILE}.sha256" - | \
 ```
 
 7. **Clean up local files**:
+
 ```bash
 # Keep local copy for 7 days
 find ~/backups -name "*.dump" -mtime +7 -delete
@@ -176,6 +185,7 @@ echo "✅ Backup complete: $BACKUP_FILE"
 ### Procedure 2: Schema-Only Backup
 
 **When to Use**:
+
 - Document database structure
 - Compare schema versions
 - Lightweight backups for development
@@ -207,6 +217,7 @@ aws s3 cp $SCHEMA_FILE \
 ### Procedure 3: Table-Specific Backup
 
 **When to Use**:
+
 - Backup single critical table
 - Extract data for analysis
 - Partial restore preparation
@@ -240,6 +251,7 @@ aws s3 cp $TABLE_FILE \
 ### Procedure 4: Data-Only Backup (No Schema)
 
 **When to Use**:
+
 - Seed data extraction
 - Data migration
 - Testing data duplication
@@ -275,6 +287,7 @@ aws s3 cp $DATA_FILE \
 1. **Create backup script** (see `scripts/backup-database.sh`)
 
 2. **Test script manually**:
+
 ```bash
 cd /path/to/wastewise
 ./scripts/backup-database.sh
@@ -284,6 +297,7 @@ echo $?  # Should be 0 for success
 ```
 
 3. **Schedule with cron**:
+
 ```bash
 # Edit crontab
 crontab -e
@@ -293,6 +307,7 @@ crontab -e
 ```
 
 4. **Verify cron job**:
+
 ```bash
 # List cron jobs
 crontab -l
@@ -302,6 +317,7 @@ sudo systemctl status cron
 ```
 
 5. **Test cron execution**:
+
 ```bash
 # Temporarily change to run in 5 minutes
 # Wait and verify log output
@@ -511,6 +527,7 @@ Next backup: $(date -d 'next Sunday 3:00' +%Y-%m-%d\ %H:%M)"
 **Cause**: Database connection issue
 
 **Solution**:
+
 ```bash
 # Test connection
 psql $DATABASE_URL -c "SELECT 1;"
@@ -530,6 +547,7 @@ echo $DATABASE_URL | sed 's/:.*@/:***@/'
 **Cause**: Large database, insufficient RAM
 
 **Solution**:
+
 ```bash
 # Use --format=plain with streaming
 pg_dump $DATABASE_URL \
@@ -547,6 +565,7 @@ pg_dump $DATABASE_URL | gzip > backup.sql.gz
 **Cause**: Permissions issue or database empty
 
 **Solution**:
+
 ```bash
 # Check database has data
 psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
@@ -565,6 +584,7 @@ pg_dump $DATABASE_URL --verbose --file=backup.dump 2>&1 | tee backup.log
 **Cause**: Incorrect AWS credentials or IAM permissions
 
 **Solution**:
+
 ```bash
 # Verify AWS credentials
 aws sts get-caller-identity
@@ -582,12 +602,12 @@ aws s3 ls ${S3_BACKUP_BUCKET}/
 
 ## Backup Schedule Summary
 
-| Backup Type | Frequency | Retention | Storage | Automation |
-|-------------|-----------|-----------|---------|------------|
-| Supabase Daily | Daily 2 AM UTC | 7-30 days | Supabase | Automatic |
-| Custom Weekly | Sunday 3 AM UTC | 90 days | S3 | Cron |
-| Pre-deployment | On deploy | 7 days | S3 | CI/CD |
-| Manual | As needed | 90 days | S3 | Manual |
+| Backup Type    | Frequency       | Retention | Storage  | Automation |
+| -------------- | --------------- | --------- | -------- | ---------- |
+| Supabase Daily | Daily 2 AM UTC  | 7-30 days | Supabase | Automatic  |
+| Custom Weekly  | Sunday 3 AM UTC | 90 days   | S3       | Cron       |
+| Pre-deployment | On deploy       | 7 days    | S3       | CI/CD      |
+| Manual         | As needed       | 90 days   | S3       | Manual     |
 
 ---
 

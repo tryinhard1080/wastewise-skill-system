@@ -1,4 +1,5 @@
 # WasteWise Technical Specification
+
 ## Complete System Architecture & Implementation Details
 
 ---
@@ -65,6 +66,7 @@
 ### Complete Table Definitions
 
 #### `projects` Table
+
 ```sql
 create table projects (
   id uuid primary key default uuid_generate_v4(),
@@ -88,6 +90,7 @@ create index idx_projects_created_at on projects(created_at desc);
 ```
 
 **Key Fields**:
+
 - `status`: Workflow state machine
 - `progress`: Real-time processing indicator (0-100)
 - `total_savings`: Calculated sum of all optimization opportunities
@@ -95,6 +98,7 @@ create index idx_projects_created_at on projects(created_at desc);
 ---
 
 #### `project_files` Table
+
 ```sql
 create table project_files (
   id uuid primary key default uuid_generate_v4(),
@@ -118,6 +122,7 @@ create index idx_project_files_type on project_files(file_type);
 ---
 
 #### `invoice_data` Table
+
 ```sql
 create table invoice_data (
   id uuid primary key default uuid_generate_v4(),
@@ -130,7 +135,7 @@ create table invoice_data (
   total_amount numeric(10,2) not null,
   tonnage numeric(10,3),
   hauls integer,
-  charges jsonb, 
+  charges jsonb,
   -- JSON structure:
   -- {
   --   "disposal": 850.00,
@@ -150,12 +155,14 @@ create index idx_invoice_data_vendor on invoice_data(vendor_name);
 ```
 
 **Derived Fields** (calculated on query):
+
 - `month`: `to_char(invoice_date, 'Mon YYYY')`
 - `cost_per_door`: `total_amount / projects.units`
 
 ---
 
 #### `haul_log` Table
+
 ```sql
 create table haul_log (
   id uuid primary key default uuid_generate_v4(),
@@ -173,8 +180,9 @@ create index idx_haul_log_date on haul_log(haul_date);
 ```
 
 **Business Logic**:
+
 - `days_since_last`: Calculated from previous haul date
-- `status`: 
+- `status`:
   - `low_utilization` if tonnage < 7.0
   - `high_utilization` if tonnage > 9.0
   - `normal` otherwise
@@ -182,6 +190,7 @@ create index idx_haul_log_date on haul_log(haul_date);
 ---
 
 #### `contract_terms` Table
+
 ```sql
 create table contract_terms (
   id uuid primary key default uuid_generate_v4(),
@@ -212,6 +221,7 @@ create index idx_contract_terms_project_id on contract_terms(project_id);
 ```
 
 **Clause Categories**:
+
 1. Term & Renewal
 2. Rate Increases
 3. Termination
@@ -223,6 +233,7 @@ create index idx_contract_terms_project_id on contract_terms(project_id);
 ---
 
 #### `regulatory_data` Table
+
 ```sql
 create table regulatory_data (
   id uuid primary key default uuid_generate_v4(),
@@ -254,6 +265,7 @@ create index idx_regulatory_confidence on regulatory_data(confidence_score);
 ```
 
 **Confidence Scoring Logic**:
+
 - HIGH: 2+ official .gov sources, specific requirements, penalties documented
 - MEDIUM: 1 official source, some details missing
 - LOW: No official sources or insufficient data
@@ -261,11 +273,12 @@ create index idx_regulatory_confidence on regulatory_data(confidence_score);
 ---
 
 #### `optimization_results` Table
+
 ```sql
 create table optimization_results (
   id uuid primary key default uuid_generate_v4(),
   project_id uuid references projects on delete cascade not null,
-  recommendation_type text not null check (recommendation_type in 
+  recommendation_type text not null check (recommendation_type in
     ('compactor_monitor', 'contamination_reduction', 'bulk_subscription', 'service_frequency', 'vendor_consolidation')),
   recommended boolean not null,
   priority integer check (priority between 1 and 5),
@@ -303,6 +316,7 @@ create index idx_optimization_priority on optimization_results(priority);
 ---
 
 #### `reports` Table
+
 ```sql
 create table reports (
   id uuid primary key default uuid_generate_v4(),
@@ -321,6 +335,7 @@ create index idx_reports_type on reports(report_type);
 ---
 
 #### `activity_log` Table
+
 ```sql
 create table activity_log (
   id uuid primary key default uuid_generate_v4(),
@@ -336,6 +351,7 @@ create index idx_activity_created_at on activity_log(created_at desc);
 ```
 
 **Activity Types**:
+
 - `project_created`
 - `files_uploaded`
 - `processing_started`
@@ -350,6 +366,7 @@ create index idx_activity_created_at on activity_log(created_at desc);
 ### Row Level Security (RLS) Policies
 
 **Pattern for All Tables**:
+
 ```sql
 -- Users can only access data from their own projects
 create policy "Users access own project data"
@@ -364,6 +381,7 @@ create policy "Users access own project data"
 ```
 
 **Storage Policies**:
+
 ```sql
 -- Users can only access files in their own folders
 create policy "Users access own files"
@@ -392,14 +410,16 @@ create policy "Users upload to own folders"
 **Purpose**: Extract structured data from uploaded invoice files
 
 **Input**:
+
 ```typescript
 interface ExtractInvoiceRequest {
-  projectId: string
-  fileUrls: string[]
+  projectId: string;
+  fileUrls: string[];
 }
 ```
 
 **Process**:
+
 1. Download files from Supabase Storage
 2. Extract text (PDF.js for PDFs, XLSX for Excel)
 3. Send to OpenAI GPT-4o with extraction prompt
@@ -409,18 +429,20 @@ interface ExtractInvoiceRequest {
 7. Update project progress
 
 **Output**:
+
 ```typescript
 interface ExtractInvoiceResponse {
-  success: boolean
-  invoiceCount: number
+  success: boolean;
+  invoiceCount: number;
   errors?: Array<{
-    fileName: string
-    error: string
-  }>
+    fileName: string;
+    error: string;
+  }>;
 }
 ```
 
 **OpenAI Prompt Template**:
+
 ```
 Extract the following fields from this invoice:
 - invoice_number
@@ -460,15 +482,17 @@ Invoice text:
 **Purpose**: Research local waste ordinances
 
 **Input**:
+
 ```typescript
 interface RegulatorResearchRequest {
-  projectId: string
-  city: string
-  state: string
+  projectId: string;
+  city: string;
+  state: string;
 }
 ```
 
 **Process**:
+
 1. Search Brave: `"{city}" "{state}" waste recycling ordinance multifamily`
 2. Filter for .gov sources
 3. Fetch top 3 sources with web_fetch
@@ -478,6 +502,7 @@ interface RegulatorResearchRequest {
 7. Store in `regulatory_data` table
 
 **Claude Prompt Template**:
+
 ```
 From these search results, extract the following information about waste management ordinances in {city}, {state}:
 
@@ -519,11 +544,12 @@ Search results:
 ```
 
 **Output**:
+
 ```typescript
 interface RegulatoryResearchResponse {
-  success: boolean
-  confidence: 'HIGH' | 'MEDIUM' | 'LOW'
-  haulerCount: number
+  success: boolean;
+  confidence: "HIGH" | "MEDIUM" | "LOW";
+  haulerCount: number;
 }
 ```
 
@@ -534,13 +560,15 @@ interface RegulatoryResearchResponse {
 **Purpose**: Calculate optimization opportunities
 
 **Input**:
+
 ```typescript
 interface AnalyzeOptimizationsRequest {
-  projectId: string
+  projectId: string;
 }
 ```
 
 **Process**:
+
 1. Fetch invoice_data and haul_log
 2. Calculate yards per door
 3. Run compactor optimization algorithm
@@ -550,53 +578,57 @@ interface AnalyzeOptimizationsRequest {
 7. Update `projects.total_savings`
 
 **Compactor Optimization Algorithm**:
+
 ```typescript
 function analyzeCompactorOptimization(
   haulLog: HaulRecord[],
   propertyUnits: number,
-  costPerHaul: number
+  costPerHaul: number,
 ): OptimizationResult {
   // Calculate average tons per haul
-  const totalTons = haulLog.reduce((sum, h) => sum + h.tonnage, 0)
-  const avgTonsPerHaul = totalTons / haulLog.length
-  
+  const totalTons = haulLog.reduce((sum, h) => sum + h.tonnage, 0);
+  const avgTonsPerHaul = totalTons / haulLog.length;
+
   // Check threshold (CRITICAL: < 7 tons/haul)
   if (avgTonsPerHaul >= 7.0) {
-    return { recommended: false, reason: 'Above threshold' }
+    return { recommended: false, reason: "Above threshold" };
   }
-  
+
   // Check max interval constraint (≤ 14 days)
-  const maxInterval = Math.max(...haulLog.map(h => h.days_since_last || 0))
+  const maxInterval = Math.max(...haulLog.map((h) => h.days_since_last || 0));
   if (maxInterval > 14) {
-    return { recommended: false, reason: 'Interval too long' }
+    return { recommended: false, reason: "Interval too long" };
   }
-  
+
   // Calculate savings
-  const targetTonsPerHaul = 8.5
-  const monthsAnalyzed = new Set(haulLog.map(h => 
-    h.haul_date.toISOString().substring(0, 7)
-  )).size
-  
-  const currentHaulsPerMonth = haulLog.length / monthsAnalyzed
-  const currentAnnualHauls = currentHaulsPerMonth * 12
-  const currentAnnualCost = currentAnnualHauls * costPerHaul
-  
-  const optimizedHaulsPerMonth = (totalTons / monthsAnalyzed) / targetTonsPerHaul
-  const optimizedAnnualHauls = optimizedHaulsPerMonth * 12
-  const optimizedAnnualCost = optimizedAnnualHauls * costPerHaul
-  
-  const installationCost = 300
-  const annualMonitoringCost = 2400 // $200/month
-  
-  const grossSavings = currentAnnualCost - optimizedAnnualCost
-  const netYear1Savings = grossSavings - installationCost - annualMonitoringCost
-  const roiPercent = (netYear1Savings / (installationCost + annualMonitoringCost)) * 100
-  const paybackMonths = (installationCost + annualMonitoringCost) / (grossSavings / 12)
-  
+  const targetTonsPerHaul = 8.5;
+  const monthsAnalyzed = new Set(
+    haulLog.map((h) => h.haul_date.toISOString().substring(0, 7)),
+  ).size;
+
+  const currentHaulsPerMonth = haulLog.length / monthsAnalyzed;
+  const currentAnnualHauls = currentHaulsPerMonth * 12;
+  const currentAnnualCost = currentAnnualHauls * costPerHaul;
+
+  const optimizedHaulsPerMonth = totalTons / monthsAnalyzed / targetTonsPerHaul;
+  const optimizedAnnualHauls = optimizedHaulsPerMonth * 12;
+  const optimizedAnnualCost = optimizedAnnualHauls * costPerHaul;
+
+  const installationCost = 300;
+  const annualMonitoringCost = 2400; // $200/month
+
+  const grossSavings = currentAnnualCost - optimizedAnnualCost;
+  const netYear1Savings =
+    grossSavings - installationCost - annualMonitoringCost;
+  const roiPercent =
+    (netYear1Savings / (installationCost + annualMonitoringCost)) * 100;
+  const paybackMonths =
+    (installationCost + annualMonitoringCost) / (grossSavings / 12);
+
   return {
     recommended: true,
     priority: 1,
-    title: 'Install Compactor Monitors',
+    title: "Install Compactor Monitors",
     description: `Current average of ${avgTonsPerHaul.toFixed(2)} tons/haul indicates early pickups.`,
     annual_savings: netYear1Savings,
     roi_percent: roiPercent,
@@ -612,25 +644,26 @@ function analyzeCompactorOptimization(
       gross_annual_savings: grossSavings,
       installation_cost: installationCost,
       annual_monitoring_cost: annualMonitoringCost,
-      net_year1_savings: netYear1Savings
+      net_year1_savings: netYear1Savings,
     },
     contact_info: {
-      name: 'Keith Conrad',
-      company: 'DSQ Technologies',
-      email: 'keith.conrad@dsqtech.com'
+      name: "Keith Conrad",
+      company: "DSQ Technologies",
+      email: "keith.conrad@dsqtech.com",
     },
-    implementation_timeline: '2-4 weeks',
-    confidence: 'HIGH'
-  }
+    implementation_timeline: "2-4 weeks",
+    confidence: "HIGH",
+  };
 }
 ```
 
 **Output**:
+
 ```typescript
 interface AnalyzeOptimizationsResponse {
-  success: boolean
-  optimizationCount: number
-  totalSavings: number
+  success: boolean;
+  optimizationCount: number;
+  totalSavings: number;
 }
 ```
 
@@ -641,13 +674,15 @@ interface AnalyzeOptimizationsResponse {
 **Purpose**: Create downloadable Excel workbook
 
 **Input**:
+
 ```typescript
 interface GenerateExcelRequest {
-  projectId: string
+  projectId: string;
 }
 ```
 
 **Process**:
+
 1. Fetch all project data
 2. Create ExcelJS workbook
 3. Generate 9 tabs:
@@ -668,6 +703,7 @@ interface GenerateExcelRequest {
 **Excel Workbook Structure**:
 
 **Tab 1: SUMMARY_FULL**
+
 - Row 1: "Potential to Reduce 2026 Trash Expense by $XX,XXX" (bold, green, size 14)
 - Property Overview section
 - Cost Metrics section
@@ -675,6 +711,7 @@ interface GenerateExcelRequest {
 - Regulatory Compliance Status
 
 **Tab 2: EXPENSE_ANALYSIS**
+
 - Title row (dark blue background)
 - Headers: Month | Vendor | Service Type | Invoice # | Amount | Cost/Door | Notes
 - Data rows (one per invoice)
@@ -682,23 +719,27 @@ interface GenerateExcelRequest {
 - Grand total row (medium gray background)
 
 **Tab 3: HAUL_LOG** (conditional)
+
 - Only created if compactor service detected
 - Headers: Date | Tonnage | Days Since Last | Status
 - Color-coded rows (red for low utilization, green for good)
 
 **Tab 4: OPTIMIZATION**
+
 - Each recommendation as a section
 - Calculation breakdown tables
 - Contact information
 - Implementation details
 
 **Tab 5: CONTRACT_TERMS** (conditional)
+
 - Only if contract file provided
 - 7 clause categories
 - Risk severity indicators
 - Calendar reminders
 
 **Tab 6: REGULATORY_COMPLIANCE**
+
 - Ordinance overview
 - Mandatory requirements table
 - Compliance checklist
@@ -707,29 +748,33 @@ interface GenerateExcelRequest {
 - Sources consulted
 
 **Tab 7: LEASE-UP_NOTES** (conditional)
+
 - Only if yards/door >40% below benchmark
 - Status indicators
 - Assessment
 - Monitoring recommendations
 
 **Tab 8: DOCUMENTATION_NOTES**
+
 - Vendor contacts
 - Formulas used
 - Contract information
 - Reference data
 
 **Tab 9: QUALITY_CHECK**
+
 - Validation summary
 - Checks performed
 - Errors/warnings (if any)
 
 **Output**:
+
 ```typescript
 interface GenerateExcelResponse {
-  success: boolean
-  fileUrl: string
-  fileName: string
-  fileSize: number
+  success: boolean;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
 }
 ```
 
@@ -742,6 +787,7 @@ interface GenerateExcelResponse {
 **Input**: Same as `generate-excel-report`
 
 **Process**:
+
 1. Fetch all project data
 2. Generate HTML with embedded data
 3. Include Chart.js for visualizations
@@ -751,6 +797,7 @@ interface GenerateExcelResponse {
 7. Create `reports` record
 
 **HTML Structure**:
+
 - 6 tabs (Dashboard, Expense, Haul Log, Optimization, Contract, Regulatory)
 - Embedded Chart.js visualizations
 - Interactive filters
@@ -768,12 +815,14 @@ interface GenerateExcelResponse {
 **Method**: Supabase Auth with email/password and OAuth (Google)
 
 **Session Management**:
+
 - JWT tokens stored in httpOnly cookies
 - Refresh token rotation
 - Session timeout: 24 hours
 - Auto-refresh on activity
 
 **Password Requirements**:
+
 - Minimum 8 characters
 - At least 1 uppercase letter
 - At least 1 number
@@ -784,11 +833,13 @@ interface GenerateExcelResponse {
 ### Authorization
 
 **Row Level Security (RLS)**:
+
 - All tables have RLS enabled
 - Users can only access their own projects
 - Service role key used for Edge Functions (bypasses RLS)
 
 **API Rate Limiting**:
+
 - 100 requests/minute per user
 - 10 file uploads/hour per user
 - 5 analysis requests/hour per user
@@ -798,17 +849,20 @@ interface GenerateExcelResponse {
 ### Data Security
 
 **File Upload Validation**:
+
 - File type whitelist: PDF, XLSX, XLS, CSV
 - Max file size: 10MB
 - Virus scanning (ClamAV integration)
 - Sanitize file names
 
 **Input Sanitization**:
+
 - SQL injection prevention (Supabase handles)
 - XSS prevention (React escapes by default)
 - CSRF tokens for state-changing operations
 
 **Data Encryption**:
+
 - At rest: PostgreSQL encryption
 - In transit: TLS 1.3
 - Backups: AES-256 encryption
@@ -820,17 +874,20 @@ interface GenerateExcelResponse {
 ### Frontend
 
 **Code Splitting**:
+
 ```typescript
-const Dashboard = lazy(() => import('./pages/Dashboard'))
-const ProjectView = lazy(() => import('./pages/ProjectView'))
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ProjectView = lazy(() => import("./pages/ProjectView"));
 ```
 
 **Image Optimization**:
+
 - WebP format with JPEG fallback
 - Lazy loading
 - Responsive images with srcset
 
 **Bundle Size**:
+
 - Target: < 500KB initial load
 - Tree shaking enabled
 - Dynamic imports for heavy libraries
@@ -840,19 +897,22 @@ const ProjectView = lazy(() => import('./pages/ProjectView'))
 ### Backend
 
 **Database Optimization**:
+
 - Indexes on frequently queried columns
 - Connection pooling (PgBouncer)
 - Read replicas for reports
 
 **Caching Strategy**:
+
 - Redis for session data
 - CDN for static assets
 - Browser caching headers
 
 **Query Optimization**:
+
 ```sql
 -- Example: Optimized project list query
-SELECT 
+SELECT
   p.id, p.property_name, p.units, p.city, p.state,
   p.status, p.created_at,
   COUNT(pf.id) as file_count,
@@ -875,27 +935,29 @@ LIMIT 20;
 **Framework**: Vitest + React Testing Library
 
 **Coverage Targets**:
+
 - Components: 80%
 - Utils: 90%
 - Edge Functions: 85%
 
 **Example Test**:
+
 ```typescript
-describe('CompactorOptimization', () => {
-  it('recommends monitors when avg < 7 tons/haul', () => {
+describe("CompactorOptimization", () => {
+  it("recommends monitors when avg < 7 tons/haul", () => {
     const haulLog = [
       { tonnage: 5.2, days_since_last: 7 },
       { tonnage: 6.1, days_since_last: 6 },
-      { tonnage: 5.8, days_since_last: 7 }
-    ]
-    
-    const result = analyzeCompactorOptimization(haulLog, 248, 165)
-    
-    expect(result.recommended).toBe(true)
-    expect(result.priority).toBe(1)
-    expect(result.annual_savings).toBeGreaterThan(10000)
-  })
-})
+      { tonnage: 5.8, days_since_last: 7 },
+    ];
+
+    const result = analyzeCompactorOptimization(haulLog, 248, 165);
+
+    expect(result.recommended).toBe(true);
+    expect(result.priority).toBe(1);
+    expect(result.annual_savings).toBeGreaterThan(10000);
+  });
+});
 ```
 
 ---
@@ -905,6 +967,7 @@ describe('CompactorOptimization', () => {
 **Framework**: Playwright
 
 **Test Scenarios**:
+
 1. User sign up → create project → upload files → view results
 2. File upload error handling
 3. Real-time progress updates
@@ -917,6 +980,7 @@ describe('CompactorOptimization', () => {
 **Framework**: Playwright + Real Database
 
 **Critical Paths**:
+
 - Complete analysis workflow
 - Multi-file upload
 - Report generation
@@ -931,12 +995,14 @@ describe('CompactorOptimization', () => {
 **Tool**: Sentry
 
 **Tracked Metrics**:
+
 - Error rate
 - Response time
 - Database query performance
 - API latency
 
 **Alerts**:
+
 - Error rate > 1%
 - Response time > 3s
 - Database connections > 80%
@@ -948,6 +1014,7 @@ describe('CompactorOptimization', () => {
 **Tool**: PostHog or Mixpanel
 
 **Key Events**:
+
 - User signup
 - Project created
 - Files uploaded
@@ -956,6 +1023,7 @@ describe('CompactorOptimization', () => {
 - Optimization viewed
 
 **Funnels**:
+
 1. Landing → Signup → Project Creation → Analysis Complete
 2. Analysis Complete → View Results → Download Report
 
@@ -964,6 +1032,7 @@ describe('CompactorOptimization', () => {
 ### Logging
 
 **Structure**:
+
 ```json
 {
   "timestamp": "2025-11-13T10:30:00Z",
@@ -980,6 +1049,7 @@ describe('CompactorOptimization', () => {
 ```
 
 **Log Levels**:
+
 - ERROR: System failures, exceptions
 - WARN: Degraded performance, validation issues
 - INFO: Business events, completions
@@ -1006,6 +1076,7 @@ describe('CompactorOptimization', () => {
 **Tool**: GitHub Actions
 
 **Pipeline**:
+
 ```yaml
 name: Deploy
 
@@ -1038,11 +1109,13 @@ jobs:
 ### Environment Configuration
 
 **Environments**:
+
 1. Development (dev.wastewise.com)
 2. Staging (staging.wastewise.com)
 3. Production (wastewise.com)
 
 **Environment Variables**:
+
 ```
 # Supabase
 SUPABASE_URL=https://xxx.supabase.co
@@ -1076,9 +1149,11 @@ NODE_ENV=production
 **Authentication**: Bearer token in Authorization header
 
 #### `POST /projects`
+
 Create new project
 
 **Request**:
+
 ```json
 {
   "property_name": "Orion McKinney",
@@ -1090,6 +1165,7 @@ Create new project
 ```
 
 **Response**:
+
 ```json
 {
   "id": "uuid",
@@ -1101,11 +1177,13 @@ Create new project
 ---
 
 #### `POST /projects/:id/files`
+
 Upload files to project
 
 **Request**: multipart/form-data with file attachments
 
 **Response**:
+
 ```json
 {
   "uploaded": 8,
@@ -1122,9 +1200,11 @@ Upload files to project
 ---
 
 #### `POST /projects/:id/analyze`
+
 Start analysis
 
 **Response**:
+
 ```json
 {
   "status": "processing",
@@ -1135,9 +1215,11 @@ Start analysis
 ---
 
 #### `GET /projects/:id`
+
 Get project details
 
 **Response**:
+
 ```json
 {
   "id": "uuid",
@@ -1145,7 +1227,7 @@ Get project details
   "units": 248,
   "status": "completed",
   "progress": 100,
-  "total_savings": 15234.00,
+  "total_savings": 15234.0,
   "created_at": "2025-11-13T10:30:00Z"
 }
 ```
@@ -1153,9 +1235,11 @@ Get project details
 ---
 
 #### `GET /projects/:id/results`
+
 Get analysis results
 
 **Response**:
+
 ```json
 {
   "summary": {
@@ -1172,6 +1256,7 @@ Get analysis results
 ---
 
 #### `GET /projects/:id/reports/:type`
+
 Download report (type: excel, html, pdf)
 
 **Response**: File download
@@ -1183,20 +1268,25 @@ Download report (type: excel, html, pdf)
 ### For Developers
 
 **React + TypeScript**:
+
 - https://react.dev
 - https://www.typescriptlang.org/docs
 
 **Supabase**:
+
 - https://supabase.com/docs
 - https://supabase.com/docs/guides/functions
 
 **Tailwind CSS**:
+
 - https://tailwindcss.com/docs
 
 **shadcn/ui**:
+
 - https://ui.shadcn.com
 
 **Chart.js**:
+
 - https://www.chartjs.org/docs
 
 ---
@@ -1204,12 +1294,14 @@ Download report (type: excel, html, pdf)
 ### For Non-Technical Users
 
 **User Guide** (to be created):
+
 - How to create a project
 - Uploading invoices
 - Understanding results
 - Downloading reports
 
 **Video Tutorials** (planned):
+
 - 5-minute quick start
 - Deep dive on optimization recommendations
 - Understanding regulatory compliance
@@ -1223,6 +1315,7 @@ Download report (type: excel, html, pdf)
 **Email**: support@wastewise.com
 
 **Response Time**:
+
 - Critical: 2 hours
 - High: 8 hours
 - Normal: 24 hours
@@ -1232,6 +1325,7 @@ Download report (type: excel, html, pdf)
 **GitHub Issues**: github.com/wastewise/app
 
 **Template**:
+
 - Steps to reproduce
 - Expected behavior
 - Actual behavior
@@ -1243,18 +1337,21 @@ Download report (type: excel, html, pdf)
 ## 🔄 Version History
 
 **v1.0.0** (Launch) - November 2025
+
 - Initial release
 - Core analysis features
 - Excel + HTML reports
 - Regulatory research
 
 **Planned v1.1.0** - Q1 2026
+
 - PDF summary reports
 - Email delivery
 - Batch analysis
 - API access
 
 **Planned v2.0.0** - Q2 2026
+
 - Mobile app
 - Advanced analytics
 - Predictive modeling
@@ -1262,6 +1359,6 @@ Download report (type: excel, html, pdf)
 
 ---
 
-*Technical Specification v1.0*  
-*Last Updated: November 13, 2025*  
-*Maintained by: WasteWise Engineering Team*
+_Technical Specification v1.0_  
+_Last Updated: November 13, 2025_  
+_Maintained by: WasteWise Engineering Team_

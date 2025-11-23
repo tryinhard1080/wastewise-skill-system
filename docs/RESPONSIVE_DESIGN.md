@@ -4,13 +4,13 @@
 
 WasteWise uses a mobile-first approach with the following breakpoints:
 
-| Device | Width | Tailwind Class | Usage |
-|--------|-------|----------------|-------|
-| Mobile Small | 375px | (default) | iPhone SE, base mobile |
-| Mobile Large | 414px | (default) | iPhone 14 Pro Max |
-| Tablet | 768px | `md:` | iPad, small tablets |
-| Desktop | 1024px | `lg:` | Small desktops, laptops |
-| Large Desktop | 1440px | `xl:` | MacBook Pro, large screens |
+| Device        | Width  | Tailwind Class | Usage                      |
+| ------------- | ------ | -------------- | -------------------------- |
+| Mobile Small  | 375px  | (default)      | iPhone SE, base mobile     |
+| Mobile Large  | 414px  | (default)      | iPhone 14 Pro Max          |
+| Tablet        | 768px  | `md:`          | iPad, small tablets        |
+| Desktop       | 1024px | `lg:`          | Small desktops, laptops    |
+| Large Desktop | 1440px | `xl:`          | MacBook Pro, large screens |
 
 ## Core Principles
 
@@ -76,14 +76,14 @@ Use responsive padding and margins:
 Use `ResponsiveContainer` for consistent page-level padding:
 
 ```tsx
-import { ResponsiveContainer } from '@/components/responsive/responsive-container'
+import { ResponsiveContainer } from "@/components/responsive/responsive-container";
 
 export default function Page() {
   return (
     <ResponsiveContainer maxWidth="xl">
       <h1>Page Content</h1>
     </ResponsiveContainer>
-  )
+  );
 }
 ```
 
@@ -92,7 +92,7 @@ export default function Page() {
 Use `ResponsiveGrid` for consistent grid layouts:
 
 ```tsx
-import { ResponsiveGrid } from '@/components/responsive/responsive-grid'
+import { ResponsiveGrid } from "@/components/responsive/responsive-grid";
 
 export default function Dashboard() {
   return (
@@ -102,7 +102,7 @@ export default function Dashboard() {
       <StatCard />
       <StatCard />
     </ResponsiveGrid>
-  )
+  );
 }
 ```
 
@@ -111,7 +111,7 @@ export default function Dashboard() {
 Always wrap tables in `ResponsiveTable` for horizontal scroll on mobile:
 
 ```tsx
-import { ResponsiveTable } from '@/components/responsive/responsive-table'
+import { ResponsiveTable } from "@/components/responsive/responsive-table";
 
 export default function DataTable() {
   return (
@@ -121,7 +121,7 @@ export default function DataTable() {
         <tbody>...</tbody>
       </table>
     </ResponsiveTable>
-  )
+  );
 }
 ```
 
@@ -240,9 +240,7 @@ Define appropriate sizes for different viewports:
 
 ```tsx
 // ✅ CORRECT - Accounts for notches/home indicators
-<div className="pb-safe-bottom pt-safe-top">
-  Content
-</div>
+<div className="pb-safe-bottom pt-safe-top">Content</div>
 ```
 
 ## Testing Checklist

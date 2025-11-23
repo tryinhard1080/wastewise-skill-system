@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Start Analysis Button Component
@@ -6,10 +6,10 @@
  * Button to create a new analysis job with job type selection
  */
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -18,70 +18,70 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import { PlayCircle, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { PlayCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface StartAnalysisButtonProps {
-  projectId: string
+  projectId: string;
 }
 
 export function StartAnalysisButton({ projectId }: StartAnalysisButtonProps) {
-  const router = useRouter()
-  const supabase = createClient()
-  const [open, setOpen] = useState(false)
-  const [jobType, setJobType] = useState<string>('complete_analysis')
-  const [isCreating, setIsCreating] = useState(false)
+  const router = useRouter();
+  const supabase = createClient();
+  const [open, setOpen] = useState(false);
+  const [jobType, setJobType] = useState<string>("complete_analysis");
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleStartAnalysis = async () => {
-    setIsCreating(true)
+    setIsCreating(true);
     try {
       // Call API to create analysis job
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
+      const response = await fetch("/api/analyze", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           projectId,
           jobType,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to start analysis')
+        const error = await response.json();
+        throw new Error(error.error || "Failed to start analysis");
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       // Show success toast
-      toast.success('Analysis started!')
+      toast.success("Analysis started!");
 
       // Close dialog
-      setOpen(false)
+      setOpen(false);
 
       // Navigate to processing page
-      router.push(`/projects/${projectId}/processing`)
+      router.push(`/projects/${projectId}/processing`);
     } catch (error) {
-      console.error('Error starting analysis:', error)
+      console.error("Error starting analysis:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Failed to start analysis. Please try again.'
-      )
+          : "Failed to start analysis. Please try again.",
+      );
     } finally {
-      setIsCreating(false)
+      setIsCreating(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -122,14 +122,14 @@ export function StartAnalysisButton({ projectId }: StartAnalysisButtonProps) {
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
-              {jobType === 'complete_analysis' &&
-                'Full WasteWise analysis workflow with optimization recommendations'}
-              {jobType === 'invoice_extraction' &&
-                'Extract data from uploaded invoices using AI'}
-              {jobType === 'regulatory_research' &&
-                'Research local waste management regulations'}
-              {jobType === 'report_generation' &&
-                'Generate comprehensive analysis reports'}
+              {jobType === "complete_analysis" &&
+                "Full WasteWise analysis workflow with optimization recommendations"}
+              {jobType === "invoice_extraction" &&
+                "Extract data from uploaded invoices using AI"}
+              {jobType === "regulatory_research" &&
+                "Research local waste management regulations"}
+              {jobType === "report_generation" &&
+                "Generate comprehensive analysis reports"}
             </p>
           </div>
         </div>
@@ -145,5 +145,5 @@ export function StartAnalysisButton({ projectId }: StartAnalysisButtonProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

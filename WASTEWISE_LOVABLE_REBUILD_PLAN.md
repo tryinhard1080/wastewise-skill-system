@@ -12,6 +12,7 @@
 This document provides a step-by-step plan to rebuild the WasteWise Complete Suite (currently a Claude-based analysis tool) as a standalone web application using Lovable.dev. The application will enable multifamily property managers to upload waste invoices and contracts, receive AI-powered analysis, and download comprehensive Excel workbooks and interactive HTML dashboards.
 
 **Key Capabilities:**
+
 - ✅ File upload (PDF, Excel, CSV)
 - ✅ AI-powered invoice and contract analysis
 - ✅ Regulatory compliance research
@@ -26,6 +27,7 @@ This document provides a step-by-step plan to rebuild the WasteWise Complete Sui
 ## 🎯 Core Architecture
 
 ### Technology Stack (Lovable Default)
+
 ```
 Frontend:  React + TypeScript + Tailwind CSS + Vite
 Backend:   Supabase (PostgreSQL + Edge Functions)
@@ -36,6 +38,7 @@ Deploy:    Lovable hosting + Custom domain
 ```
 
 ### Application Structure
+
 ```
 WasteWise App
 ├── Landing Page (marketing)
@@ -58,8 +61,9 @@ WasteWise App
 ### Step 1.1: Initialize Project in Lovable
 
 **Initial Prompt to Lovable:**
+
 ```
-Create a modern SaaS landing page for "WasteWise by THE Trash Hub" - 
+Create a modern SaaS landing page for "WasteWise by THE Trash Hub" -
 a waste management analysis platform for multifamily properties.
 
 Tech stack: React + TypeScript + Tailwind CSS + shadcn/ui components
@@ -79,7 +83,7 @@ Brand colors:
 - Secondary: Blue (#2563EB for trust)
 - Accent: Purple for premium features
 
-Include: 
+Include:
 - Sticky navigation header
 - Mobile responsive design
 - Smooth scroll animations
@@ -89,6 +93,7 @@ Include:
 ### Step 1.2: Implement Supabase Authentication
 
 **Prompt:**
+
 ```
 Integrate Supabase authentication with the following:
 
@@ -118,6 +123,7 @@ Create login and signup pages with:
 ### Step 1.3: Create Base Dashboard
 
 **Prompt:**
+
 ```
 Create authenticated dashboard layout with:
 
@@ -149,6 +155,7 @@ Mobile: Collapsible sidebar, hamburger menu
 ### Step 2.1: File Upload Interface
 
 **Prompt:**
+
 ```
 Create "New Analysis" page with multi-file upload:
 
@@ -185,6 +192,7 @@ Use: shadcn/ui Form, Input, Select, Card, Progress components
 ### Step 2.2: Supabase Storage Configuration
 
 **Prompt:**
+
 ```
 Set up Supabase Storage for file handling:
 
@@ -209,7 +217,7 @@ Set up Supabase Storage for file handling:
      - status (text) - 'draft', 'processing', 'complete', 'failed'
      - created_at (timestamp)
      - updated_at (timestamp)
-   
+
    - project_files
      - id (uuid, primary key)
      - project_id (uuid, foreign key to projects)
@@ -218,7 +226,7 @@ Set up Supabase Storage for file handling:
      - file_path (text) - Supabase storage path
      - file_size (integer)
      - uploaded_at (timestamp)
-   
+
    - analysis_results
      - id (uuid, primary key)
      - project_id (uuid, foreign key to projects)
@@ -236,6 +244,7 @@ Set up Supabase Storage for file handling:
 ### Step 2.3: Backend Processing Setup
 
 **Prompt:**
+
 ```
 Create Supabase Edge Function 'process-waste-analysis' that:
 
@@ -276,43 +285,48 @@ Include rate limiting and timeout handling
 **Document Processing API Options:**
 
 **Option A: Use OpenAI Vision API for Document Parsing**
+
 ```typescript
 // In Edge Function
 const extractInvoiceData = async (fileBuffer: Buffer) => {
   const response = await openai.chat.completions.create({
     model: "gpt-4-vision-preview",
-    messages: [{
-      role: "user",
-      content: [
-        {
-          type: "text",
-          text: "Extract invoice data from this document. Return JSON with: invoice_number, date, vendor, charges (disposal, pickup_fees, rental, contamination, bulk, other), total, tonnage, hauls"
-        },
-        {
-          type: "image_url",
-          image_url: {
-            url: `data:image/jpeg;base64,${fileBuffer.toString('base64')}`
-          }
-        }
-      ]
-    }],
-    response_format: { type: "json_object" }
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Extract invoice data from this document. Return JSON with: invoice_number, date, vendor, charges (disposal, pickup_fees, rental, contamination, bulk, other), total, tonnage, hauls",
+          },
+          {
+            type: "image_url",
+            image_url: {
+              url: `data:image/jpeg;base64,${fileBuffer.toString("base64")}`,
+            },
+          },
+        ],
+      },
+    ],
+    response_format: { type: "json_object" },
   });
-  
+
   return JSON.parse(response.choices[0].message.content);
 };
 ```
 
 **Option B: Use Anthropic Claude API with PDF OCR**
+
 ```typescript
 // Alternative: Use Claude with PDF content
 const extractInvoiceData = async (pdfText: string) => {
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 4000,
-    messages: [{
-      role: "user",
-      content: `Extract invoice data from the following document text and return as JSON:
+    messages: [
+      {
+        role: "user",
+        content: `Extract invoice data from the following document text and return as JSON:
       
       ${pdfText}
       
@@ -325,15 +339,17 @@ const extractInvoiceData = async (pdfText: string) => {
       - tonnage (if compactor)
       - hauls (if compactor)
       
-      Return ONLY valid JSON.`
-    }]
+      Return ONLY valid JSON.`,
+      },
+    ],
   });
-  
+
   return JSON.parse(response.content[0].text);
 };
 ```
 
 **Option C: Use Specialized Document AI Service**
+
 - Google Cloud Document AI
 - AWS Textract
 - Azure Form Recognizer
@@ -347,6 +363,7 @@ const extractInvoiceData = async (pdfText: string) => {
 ### Step 3.1: Calculation Functions
 
 **Prompt:**
+
 ```
 Create TypeScript utility functions for waste calculations:
 
@@ -397,6 +414,7 @@ Include unit tests using Vitest.
 ### Step 3.2: Validation Framework
 
 **Prompt:**
+
 ```
 Create validation service:
 
@@ -433,6 +451,7 @@ Return detailed ValidationResult object with:
 ### Step 3.3: Regulatory Research Integration
 
 **Prompt:**
+
 ```
 Create regulatory research service using web search:
 
@@ -470,6 +489,7 @@ Cache results in Supabase to avoid redundant searches
 ### Step 4.1: Excel Workbook Generation
 
 **Prompt:**
+
 ```
 Create Excel generation service using ExcelJS:
 
@@ -542,6 +562,7 @@ Styling:
 ### Step 4.2: Interactive HTML Dashboard
 
 **Prompt:**
+
 ```
 Create HTML dashboard generator:
 
@@ -556,23 +577,23 @@ Structure (6 tabs):
    - Savings banner (green)
    - 3 KPI cards (Monthly Cost, Cost/Door, Annual Savings)
    - 2 gauge charts (Capacity Utilization, Tons/Haul)
-   
+
 2. Expense Analysis
    - Line chart: Monthly cost per door trend
    - Bar chart: Expense breakdown by category
-   
+
 3. Haul Log (if compactor)
    - Sortable/filterable table
    - Color-coded rows (red for low utilization)
-   
+
 4. Optimization
    - Opportunity cards with savings calculations
    - Bar charts showing ROI and payback
-   
+
 5. Contract Terms
    - Risk matrix visualization
    - Timeline for important dates
-   
+
 6. Regulatory Compliance
    - Checklist with progress indicators
    - Licensed haulers table
@@ -594,6 +615,7 @@ Technology:
 ### Step 5.1: Results View Component
 
 **Prompt:**
+
 ```
 Create Results page that displays after analysis completes:
 
@@ -633,6 +655,7 @@ Include loading states and error handling
 ### Step 5.2: File Download Implementation
 
 **Prompt:**
+
 ```
 Implement file download functionality:
 
@@ -670,6 +693,7 @@ Add download tracking:
 ### Step 6.1: Email Notifications
 
 **Prompt:**
+
 ```
 Integrate Resend for email notifications:
 
@@ -678,10 +702,10 @@ Email templates needed:
 1. Analysis Started
    - Subject: "WasteWise Analysis Started - [Property Name]"
    - Body: Property details, estimated completion time
-   
+
 2. Analysis Complete
    - Subject: "Your WasteWise Report is Ready! 💰 Save $X,XXX"
-   - Body: 
+   - Body:
      * Savings amount (large, bold)
      * Key findings (3 bullets)
      * CTA buttons (View Report, Download Excel)
@@ -703,6 +727,7 @@ Add unsubscribe link
 ### Step 6.2: Analytics & Monitoring
 
 **Prompt:**
+
 ```
 Implement analytics tracking:
 
@@ -736,6 +761,7 @@ Admin dashboard:
 ### Step 6.3: Error Handling & User Feedback
 
 **Prompt:**
+
 ```
 Implement comprehensive error handling:
 
@@ -772,6 +798,7 @@ Display user-friendly error messages
 ### Step 7.1: Subscription & Pricing
 
 **Prompt:**
+
 ```
 Integrate Stripe for subscriptions:
 
@@ -781,7 +808,7 @@ Pricing tiers:
    - 3 analyses per month
    - Basic features
    - 7-day report access
-   
+
 2. Pro Tier ($99/month):
    - Unlimited analyses
    - Priority processing
@@ -805,6 +832,7 @@ Show usage meter in dashboard
 ### Step 7.2: Team Collaboration (Future)
 
 **Prompt:**
+
 ```
 Add team features for enterprise customers:
 
@@ -812,12 +840,12 @@ Add team features for enterprise customers:
    - Create organization entity
    - Multiple users under one org
    - Shared projects and reports
-   
+
 2. Role-based access:
    - Admin (full access)
    - Analyst (create analyses)
    - Viewer (read-only)
-   
+
 3. Collaboration features:
    - Comments on reports
    - Internal notes
@@ -834,11 +862,12 @@ Create separate pricing tier: Teams ($299/month)
 ### Best Practices for Working with Lovable
 
 **1. Start with Clear, Detailed Prompts**
+
 ```
 ✅ GOOD:
-"Create a dashboard with 3 KPI cards showing: Total Projects (number), 
-Active Analyses (number with yellow badge), and Reports Generated (number). 
-Use shadcn/ui Card components with icons from lucide-react. Cards should 
+"Create a dashboard with 3 KPI cards showing: Total Projects (number),
+Active Analyses (number with yellow badge), and Reports Generated (number).
+Use shadcn/ui Card components with icons from lucide-react. Cards should
 have light gray background, rounded corners, and hover effect."
 
 ❌ BAD:
@@ -846,12 +875,14 @@ have light gray background, rounded corners, and hover effect."
 ```
 
 **2. Reference Official Docs**
+
 ```
 When integrating Supabase, explicitly state:
 "Follow the Supabase integration guide at docs.lovable.dev/integrations/supabase"
 ```
 
 **3. Iterate Incrementally**
+
 ```
 Build feature by feature:
 1. First: Basic layout and UI
@@ -863,12 +894,14 @@ Don't try to build everything at once
 ```
 
 **4. Use Visual References**
+
 ```
 "Style the hero section similar to the uploaded landing-template.zip,
 with gradient background (blue to purple), large heading, and CTA buttons"
 ```
 
 **5. Specify Components Explicitly**
+
 ```
 "Use these shadcn/ui components:
 - Form, Input, Select for the property details form
@@ -880,6 +913,7 @@ with gradient background (blue to purple), large heading, and CTA buttons"
 ### Debugging and Refinement
 
 **When Something Doesn't Work:**
+
 ```
 1. Ask Lovable to explain what's currently happening
 2. Show the error message or unexpected behavior
@@ -892,6 +926,7 @@ user_id folder. Fix the policy and test with a sample upload."
 ```
 
 **Refactoring Prompts:**
+
 ```
 "Refactor the analysis processing function to:
 1. Extract invoice parsing into separate function
@@ -986,41 +1021,42 @@ wastewise-app/
 ## 🎨 Design System & Branding
 
 ### Color Palette
+
 ```css
 /* Primary Colors */
---green-600: #22C55E;  /* Success, savings */
---blue-600: #2563EB;   /* Trust, professional */
---purple-600: #9333EA; /* Premium features */
+--green-600: #22c55e; /* Success, savings */
+--blue-600: #2563eb; /* Trust, professional */
+--purple-600: #9333ea; /* Premium features */
 
 /* Neutrals */
---gray-50: #F9FAFB;
---gray-100: #F3F4F6;
---gray-200: #E5E7EB;
---gray-500: #6B7280;
+--gray-50: #f9fafb;
+--gray-100: #f3f4f6;
+--gray-200: #e5e7eb;
+--gray-500: #6b7280;
 --gray-900: #111827;
 
 /* Semantic Colors */
---red-600: #DC2626;    /* Errors, warnings */
---yellow-500: #F59E0B; /* Cautions, pending */
+--red-600: #dc2626; /* Errors, warnings */
+--yellow-500: #f59e0b; /* Cautions, pending */
 ```
 
 ### Typography
+
 ```css
 /* Headings */
-font-family: 'Inter', sans-serif;
---heading-xl: 48px / 56px, weight 700
---heading-lg: 36px / 44px, weight 700
---heading-md: 24px / 32px, weight 600
-
-/* Body */
---body-lg: 18px / 28px, weight 400
---body-md: 16px / 24px, weight 400
---body-sm: 14px / 20px, weight 400
+font-family: "Inter", sans-serif;
+--heading-xl:
+  48px / 56px, weight 700 --heading-lg: 36px / 44px,
+  weight 700 --heading-md: 24px / 32px,
+  weight 600 /* Body */ --body-lg: 18px / 28px,
+  weight 400 --body-md: 16px / 24px, weight 400 --body-sm: 14px / 20px,
+  weight 400;
 ```
 
 ### Component Patterns
 
 **Button Variants:**
+
 ```tsx
 <Button variant="default">   // Primary green
 <Button variant="secondary"> // Gray outline
@@ -1029,6 +1065,7 @@ font-family: 'Inter', sans-serif;
 ```
 
 **Card Styles:**
+
 ```tsx
 <Card className="border-2 hover:shadow-lg transition-shadow">
   <CardHeader>
@@ -1068,6 +1105,7 @@ font-family: 'Inter', sans-serif;
 ### Custom Domain Setup
 
 **In Lovable:**
+
 ```
 1. Go to Project Settings → Custom Domain
 2. Add domain: wastewise.thetrashhub.com
@@ -1086,12 +1124,14 @@ Lovable handles SSL automatically via Let's Encrypt
 ### Key Performance Indicators
 
 **Technical Metrics:**
+
 - Page load time < 2 seconds
 - Analysis processing time < 60 seconds
 - Uptime > 99.5%
 - Error rate < 1%
 
 **Business Metrics:**
+
 - User signups per week
 - Analyses completed per week
 - Conversion rate (free → pro)
@@ -1099,6 +1139,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - Average savings identified per property
 
 **User Experience:**
+
 - Time to first analysis < 10 minutes
 - Customer satisfaction score > 4.5/5
 - Support tickets < 5% of analyses
@@ -1108,6 +1149,7 @@ Lovable handles SSL automatically via Let's Encrypt
 ## 🔒 Security Considerations
 
 ### Authentication & Authorization
+
 - ✅ Secure password hashing (Supabase handles)
 - ✅ JWT token-based auth
 - ✅ Row Level Security (RLS) on all tables
@@ -1115,6 +1157,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - ✅ HTTPS only (enforced by Lovable)
 
 ### Data Protection
+
 - ✅ User data encrypted at rest
 - ✅ Files stored in private buckets
 - ✅ No sensitive data in client-side code
@@ -1122,6 +1165,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - ✅ CORS properly configured
 
 ### Compliance
+
 - ✅ GDPR-compliant data handling
 - ✅ Terms of Service and Privacy Policy pages
 - ✅ User data export capability
@@ -1134,22 +1178,27 @@ Lovable handles SSL automatically via Let's Encrypt
 ### Monthly Operational Costs
 
 **Lovable Pro:** $40/month
+
 - Includes hosting, custom domain, team features
 
 **Supabase Pro:** $25/month
+
 - Includes database, storage, edge functions
 
 **OpenAI API:** ~$50-200/month
+
 - Depends on analysis volume
 - Estimate: 100 analyses × $0.50-2.00 each
 
 **Resend:** $20/month
+
 - Email notifications
 - 50,000 emails included
 
 **Total:** ~$135-285/month for production
 
 **Revenue Target:**
+
 - 10 Pro users @ $99/month = $990/month
 - Break-even at ~2 paying customers
 
@@ -1158,12 +1207,14 @@ Lovable handles SSL automatically via Let's Encrypt
 ## 📚 Additional Resources
 
 ### Lovable Documentation
+
 - Main docs: https://docs.lovable.dev
 - Supabase integration: https://docs.lovable.dev/integrations/supabase
 - GitHub integration: https://docs.lovable.dev/integrations/github
 - Prompting guide: https://lovable.dev/blog/2025-01-16-lovable-prompting-handbook
 
 ### API Documentation
+
 - OpenAI Vision API: https://platform.openai.com/docs/guides/vision
 - Anthropic Claude API: https://docs.anthropic.com/claude/docs
 - Supabase Docs: https://supabase.com/docs
@@ -1171,6 +1222,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - Chart.js: https://www.chartjs.org/docs/
 
 ### Design Resources
+
 - shadcn/ui components: https://ui.shadcn.com
 - Tailwind CSS: https://tailwindcss.com/docs
 - Lucide icons: https://lucide.dev
@@ -1278,15 +1330,18 @@ Lovable handles SSL automatically via Let's Encrypt
 ## 📞 Support & Contact
 
 **WasteWise Development Support:**
+
 - Richard Bates: richard@thetrashhub.com
 - Documentation: [Link to internal docs]
 
 **Lovable Support:**
+
 - Email: hi@lovable.dev
 - Docs: docs.lovable.dev
 - Community: [Discord/Slack link]
 
 **Supabase Support:**
+
 - Docs: supabase.com/docs
 - Community: github.com/supabase/supabase/discussions
 
@@ -1297,6 +1352,7 @@ Lovable handles SSL automatically via Let's Encrypt
 ### Pre-Launch Checklist
 
 **Development:**
+
 - [ ] All features implemented and tested
 - [ ] Error handling in place
 - [ ] Loading states for async operations
@@ -1305,6 +1361,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - [ ] Performance optimization done
 
 **Security:**
+
 - [ ] RLS policies tested
 - [ ] API keys secured in Vault
 - [ ] HTTPS enforced
@@ -1313,6 +1370,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - [ ] Rate limiting configured
 
 **Content:**
+
 - [ ] Terms of Service page
 - [ ] Privacy Policy page
 - [ ] Help/FAQ section
@@ -1321,6 +1379,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - [ ] Documentation for users
 
 **Business:**
+
 - [ ] Stripe integration tested
 - [ ] Email notifications working
 - [ ] Analytics tracking verified
@@ -1329,6 +1388,7 @@ Lovable handles SSL automatically via Let's Encrypt
 - [ ] Backup strategy in place
 
 **Launch:**
+
 - [ ] Beta users invited
 - [ ] Feedback mechanism ready
 - [ ] Support email monitored
@@ -1343,17 +1403,20 @@ Lovable handles SSL automatically via Let's Encrypt
 ### For Richard's Team
 
 **Getting Started with Lovable:**
+
 1. Watch: Lovable intro video
 2. Read: Lovable prompting handbook
 3. Practice: Build simple app (todo list)
 4. Tutorial: Supabase integration guide
 
 **React & TypeScript Basics:**
+
 - React docs: react.dev
 - TypeScript handbook: typescriptlang.org/docs
 - Video course: [Recommended course]
 
 **Supabase Fundamentals:**
+
 - Database basics
 - RLS policies
 - Edge functions
@@ -1362,16 +1425,19 @@ Lovable handles SSL automatically via Let's Encrypt
 ### Advanced Topics
 
 **Excel Generation:**
+
 - ExcelJS documentation
 - Tutorial: Creating formatted workbooks
 - Example: WasteWise expense analysis tab
 
 **Chart.js Mastery:**
+
 - Official docs: chartjs.org
 - Tutorial: Interactive dashboards
 - Example: WasteWise gauge charts
 
 **Document AI:**
+
 - OpenAI Vision API guide
 - PDF parsing strategies
 - Structured data extraction

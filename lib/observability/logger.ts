@@ -7,65 +7,72 @@
  * Integrated with Sentry for error tracking in production.
  */
 
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from "@sentry/nextjs";
 
 export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error',
+  DEBUG = "debug",
+  INFO = "info",
+  WARN = "warn",
+  ERROR = "error",
 }
 
 export interface LogContext {
   /** User ID if available */
-  userId?: string
+  userId?: string;
 
   /** Project ID if applicable */
-  projectId?: string
+  projectId?: string;
 
   /** Job ID for async operations */
-  jobId?: string
+  jobId?: string;
 
   /** Skill name */
-  skillName?: string
+  skillName?: string;
 
   /** Request ID for tracing */
-  requestId?: string
+  requestId?: string;
 
   /** Additional context fields */
-  [key: string]: any
+  [key: string]: any;
 }
 
 export interface LogEntry {
-  level: LogLevel
-  message: string
-  timestamp: string
-  context?: LogContext
-  data?: any
+  level: LogLevel;
+  message: string;
+  timestamp: string;
+  context?: LogContext;
+  data?: any;
   error?: {
-    message: string
-    stack?: string
-    code?: string
-  }
+    message: string;
+    stack?: string;
+    code?: string;
+  };
 }
 
 class Logger {
-  private minLevel: LogLevel
+  private minLevel: LogLevel;
 
   constructor() {
     // Set minimum log level from environment
-    const envLevel = process.env.LOG_LEVEL || 'info'
-    this.minLevel = LogLevel[envLevel.toUpperCase() as keyof typeof LogLevel] || LogLevel.INFO
+    const envLevel = process.env.LOG_LEVEL || "info";
+    this.minLevel =
+      LogLevel[envLevel.toUpperCase() as keyof typeof LogLevel] ||
+      LogLevel.INFO;
   }
 
   /**
    * Check if a log level should be logged
    */
   private shouldLog(level: LogLevel): boolean {
-    const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR]
-    const currentIndex = levels.indexOf(level)
-    const minIndex = levels.indexOf(this.minLevel)
-    return currentIndex >= minIndex
+    const levels = [
+      LogLevel.DEBUG,
+      LogLevel.INFO,
+      LogLevel.WARN,
+      LogLevel.ERROR,
+    ];
+    const currentIndex = levels.indexOf(level);
+    const minIndex = levels.indexOf(this.minLevel);
+    return currentIndex >= minIndex;
   }
 
   /**
@@ -76,20 +83,20 @@ class Logger {
     message: string,
     context?: LogContext,
     data?: any,
-    error?: Error
+    error?: Error,
   ): LogEntry {
     const entry: LogEntry = {
       level,
       message,
       timestamp: new Date().toISOString(),
-    }
+    };
 
     if (context) {
-      entry.context = context
+      entry.context = context;
     }
 
     if (data) {
-      entry.data = data
+      entry.data = data;
     }
 
     if (error) {
@@ -97,10 +104,10 @@ class Logger {
         message: error.message,
         stack: error.stack,
         code: (error as any).code,
-      }
+      };
     }
 
-    return entry
+    return entry;
   }
 
   /**
@@ -110,43 +117,49 @@ class Logger {
    */
   private output(entry: LogEntry): void {
     if (!this.shouldLog(entry.level)) {
-      return
+      return;
     }
 
-    const { level, message, timestamp, context, data, error } = entry
+    const { level, message, timestamp, context, data, error } = entry;
 
     // Format for console output
-    const contextStr = context ? ` [${JSON.stringify(context)}]` : ''
-    const dataStr = data ? ` ${JSON.stringify(data)}` : ''
-    const errorStr = error ? `\n  Error: ${error.message}\n  ${error.stack}` : ''
+    const contextStr = context ? ` [${JSON.stringify(context)}]` : "";
+    const dataStr = data ? ` ${JSON.stringify(data)}` : "";
+    const errorStr = error
+      ? `\n  Error: ${error.message}\n  ${error.stack}`
+      : "";
 
-    const fullMessage = `[${timestamp}] [${level.toUpperCase()}]${contextStr} ${message}${dataStr}${errorStr}`
+    const fullMessage = `[${timestamp}] [${level.toUpperCase()}]${contextStr} ${message}${dataStr}${errorStr}`;
 
     // Console output based on level
     switch (level) {
       case LogLevel.DEBUG:
-        console.debug(fullMessage)
-        break
+        console.debug(fullMessage);
+        break;
       case LogLevel.INFO:
-        console.log(fullMessage)
-        break
+        console.log(fullMessage);
+        break;
       case LogLevel.WARN:
-        console.warn(fullMessage)
-        break
+        console.warn(fullMessage);
+        break;
       case LogLevel.ERROR:
-        console.error(fullMessage)
-        break
+        console.error(fullMessage);
+        break;
     }
 
     // Send errors to Sentry in production
-    if (level === LogLevel.ERROR && error && process.env.NODE_ENV === 'production') {
+    if (
+      level === LogLevel.ERROR &&
+      error &&
+      process.env.NODE_ENV === "production"
+    ) {
       // Reconstruct Error object from serialized error
-      const errorObj = new Error(error.message)
-      errorObj.name = error.message
-      errorObj.stack = error.stack
+      const errorObj = new Error(error.message);
+      errorObj.name = error.message;
+      errorObj.stack = error.stack;
 
       Sentry.captureException(errorObj, {
-        level: 'error',
+        level: "error",
         contexts: {
           custom: context || {},
         },
@@ -157,17 +170,17 @@ class Logger {
           ...(context?.jobId && { jobId: context.jobId }),
           ...(context?.skillName && { skillName: context.skillName }),
         },
-      })
+      });
     }
 
     // Send warnings to Sentry in production (as breadcrumbs)
-    if (level === LogLevel.WARN && process.env.NODE_ENV === 'production') {
+    if (level === LogLevel.WARN && process.env.NODE_ENV === "production") {
       Sentry.addBreadcrumb({
-        category: 'warning',
+        category: "warning",
         message,
-        level: 'warning',
+        level: "warning",
         data: { ...context, ...data },
-      })
+      });
     }
   }
 
@@ -175,32 +188,43 @@ class Logger {
    * Debug-level logging
    */
   debug(message: string, context?: LogContext, data?: any): void {
-    const entry = this.createEntry(LogLevel.DEBUG, message, context, data)
-    this.output(entry)
+    const entry = this.createEntry(LogLevel.DEBUG, message, context, data);
+    this.output(entry);
   }
 
   /**
    * Info-level logging
    */
   info(message: string, context?: LogContext, data?: any): void {
-    const entry = this.createEntry(LogLevel.INFO, message, context, data)
-    this.output(entry)
+    const entry = this.createEntry(LogLevel.INFO, message, context, data);
+    this.output(entry);
   }
 
   /**
    * Warning-level logging
    */
   warn(message: string, context?: LogContext, data?: any): void {
-    const entry = this.createEntry(LogLevel.WARN, message, context, data)
-    this.output(entry)
+    const entry = this.createEntry(LogLevel.WARN, message, context, data);
+    this.output(entry);
   }
 
   /**
    * Error-level logging
    */
-  error(message: string, error?: Error, context?: LogContext, data?: any): void {
-    const entry = this.createEntry(LogLevel.ERROR, message, context, data, error)
-    this.output(entry)
+  error(
+    message: string,
+    error?: Error,
+    context?: LogContext,
+    data?: any,
+  ): void {
+    const entry = this.createEntry(
+      LogLevel.ERROR,
+      message,
+      context,
+      data,
+      error,
+    );
+    this.output(entry);
   }
 
   /**
@@ -214,7 +238,7 @@ class Logger {
    * jobLogger.info('Analysis complete')
    */
   child(baseContext: LogContext): ChildLogger {
-    return new ChildLogger(this, baseContext)
+    return new ChildLogger(this, baseContext);
   }
 
   /**
@@ -228,11 +252,13 @@ class Logger {
    * endTimer() // Logs: "Timer: API call" with duration_ms
    */
   startTimer(label: string, context?: LogContext): () => void {
-    const start = performance.now()
+    const start = performance.now();
     return () => {
-      const duration = performance.now() - start
-      this.info(`Timer: ${label}`, context, { duration_ms: duration.toFixed(2) })
-    }
+      const duration = performance.now() - start;
+      this.info(`Timer: ${label}`, context, {
+        duration_ms: duration.toFixed(2),
+      });
+    };
   }
 }
 
@@ -242,32 +268,37 @@ class Logger {
 class ChildLogger {
   constructor(
     private parent: Logger,
-    private baseContext: LogContext
+    private baseContext: LogContext,
   ) {}
 
   private mergeContext(context?: LogContext): LogContext {
-    return { ...this.baseContext, ...context }
+    return { ...this.baseContext, ...context };
   }
 
   debug(message: string, context?: LogContext, data?: any): void {
-    this.parent.debug(message, this.mergeContext(context), data)
+    this.parent.debug(message, this.mergeContext(context), data);
   }
 
   info(message: string, context?: LogContext, data?: any): void {
-    this.parent.info(message, this.mergeContext(context), data)
+    this.parent.info(message, this.mergeContext(context), data);
   }
 
   warn(message: string, context?: LogContext, data?: any): void {
-    this.parent.warn(message, this.mergeContext(context), data)
+    this.parent.warn(message, this.mergeContext(context), data);
   }
 
-  error(message: string, error?: Error, context?: LogContext, data?: any): void {
-    this.parent.error(message, error, this.mergeContext(context), data)
+  error(
+    message: string,
+    error?: Error,
+    context?: LogContext,
+    data?: any,
+  ): void {
+    this.parent.error(message, error, this.mergeContext(context), data);
   }
 }
 
 // Export singleton instance
-export const logger = new Logger()
+export const logger = new Logger();
 
 /**
  * Usage examples:

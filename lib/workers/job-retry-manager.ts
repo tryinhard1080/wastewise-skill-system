@@ -14,25 +14,25 @@
  * Phase 7: Production readiness - enterprise job management
  */
 
-import { createClient } from '@supabase/supabase-js'
-import type { Database, Tables } from '@/types/database.types'
-import { logger } from '@/lib/observability/logger'
+import { createClient } from "@supabase/supabase-js";
+import type { Database, Tables } from "@/types/database.types";
+import { logger } from "@/lib/observability/logger";
 
-type AnalysisJob = Tables<'analysis_jobs'>
+type AnalysisJob = Tables<"analysis_jobs">;
 
 /**
  * Error classification for retry decisions
  */
 export enum ErrorCategory {
-  RETRYABLE = 'retryable', // Network, timeout, rate limit - retry
-  PERMANENT = 'permanent', // Invalid input, permissions - don't retry
-  UNKNOWN = 'unknown', // Unclassified - retry with caution
+  RETRYABLE = "retryable", // Network, timeout, rate limit - retry
+  PERMANENT = "permanent", // Invalid input, permissions - don't retry
+  UNKNOWN = "unknown", // Unclassified - retry with caution
 }
 
 interface RetryableError {
-  category: ErrorCategory
-  shouldRetry: boolean
-  reason: string
+  category: ErrorCategory;
+  shouldRetry: boolean;
+  reason: string;
 }
 
 /**
@@ -43,7 +43,7 @@ const RETRY_DELAYS = {
   2: 5 * 60 * 1000, // 5 minutes
   3: 15 * 60 * 1000, // 15 minutes
   4: 30 * 60 * 1000, // 30 minutes (max backoff)
-} as const
+} as const;
 
 /**
  * Error patterns for classification
@@ -61,7 +61,7 @@ const RETRYABLE_ERROR_PATTERNS = [
   /504/i, // HTTP 504 Gateway Timeout
   /temporary/i,
   /unavailable/i,
-]
+];
 
 const PERMANENT_ERROR_PATTERNS = [
   /invalid.*input/i,
@@ -75,10 +75,10 @@ const PERMANENT_ERROR_PATTERNS = [
   /404/i, // HTTP 404 Not Found
   /missing.*required/i,
   /schema.*mismatch/i,
-]
+];
 
 export class JobRetryManager {
-  private supabase: ReturnType<typeof createClient<Database>>
+  private supabase: ReturnType<typeof createClient<Database>>;
 
   constructor(supabaseUrl: string, supabaseServiceKey: string) {
     this.supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
@@ -86,15 +86,16 @@ export class JobRetryManager {
         autoRefreshToken: false,
         persistSession: false,
       },
-    })
+    });
   }
 
   /**
    * Classify error to determine if it should be retried
    */
   classifyError(error: Error | string): RetryableError {
-    const errorMessage = typeof error === 'string' ? error : error.message
-    const errorCode = typeof error === 'object' ? (error as any).code : undefined
+    const errorMessage = typeof error === "string" ? error : error.message;
+    const errorCode =
+      typeof error === "object" ? (error as any).code : undefined;
 
     // Check permanent error patterns first
     for (const pattern of PERMANENT_ERROR_PATTERNS) {
@@ -103,7 +104,7 @@ export class JobRetryManager {
           category: ErrorCategory.PERMANENT,
           shouldRetry: false,
           reason: `Permanent error detected: ${errorMessage}`,
-        }
+        };
       }
     }
 
@@ -114,19 +115,24 @@ export class JobRetryManager {
           category: ErrorCategory.RETRYABLE,
           shouldRetry: true,
           reason: `Retryable error detected: ${errorMessage}`,
-        }
+        };
       }
     }
 
     // Check specific error codes
     if (errorCode) {
-      const retryableCodes = ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'RATE_LIMIT']
+      const retryableCodes = [
+        "ECONNRESET",
+        "ETIMEDOUT",
+        "ECONNREFUSED",
+        "RATE_LIMIT",
+      ];
       if (retryableCodes.includes(errorCode)) {
         return {
           category: ErrorCategory.RETRYABLE,
           shouldRetry: true,
           reason: `Retryable error code: ${errorCode}`,
-        }
+        };
       }
     }
 
@@ -135,7 +141,7 @@ export class JobRetryManager {
       category: ErrorCategory.UNKNOWN,
       shouldRetry: true,
       reason: `Unknown error type: ${errorMessage}`,
-    }
+    };
   }
 
   /**
@@ -143,9 +149,9 @@ export class JobRetryManager {
    */
   getRetryDelay(attemptNumber: number): number {
     if (attemptNumber in RETRY_DELAYS) {
-      return RETRY_DELAYS[attemptNumber as keyof typeof RETRY_DELAYS]
+      return RETRY_DELAYS[attemptNumber as keyof typeof RETRY_DELAYS];
     }
-    return RETRY_DELAYS[4] // Max backoff for attempts beyond 4
+    return RETRY_DELAYS[4]; // Max backoff for attempts beyond 4
   }
 
   /**
@@ -161,23 +167,25 @@ export class JobRetryManager {
       jobId: job.id,
       retryCount: job.retry_count,
       maxRetries: job.max_retries,
-    })
+    });
 
     // Check if max retries reached
-    if (job.retry_count >= job.max_retries) {
-      retryLogger.warn('Max retries reached, will not retry')
-      return false
+    const retryCount = job.retry_count ?? 0;
+    const maxRetries = job.max_retries ?? 3;
+    if (retryCount >= maxRetries) {
+      retryLogger.warn("Max retries reached, will not retry");
+      return false;
     }
 
     // Classify error
-    const classification = this.classifyError(error)
-    retryLogger.info('Error classified', {
+    const classification = this.classifyError(error);
+    retryLogger.info("Error classified", {
       category: classification.category,
       shouldRetry: classification.shouldRetry,
       reason: classification.reason,
-    })
+    });
 
-    return classification.shouldRetry
+    return classification.shouldRetry;
   }
 
   /**
@@ -190,109 +198,128 @@ export class JobRetryManager {
    * - Error logged in retry_error_log
    */
   async scheduleRetry(job: AnalysisJob, error: Error | string): Promise<void> {
+    const retryCount = job.retry_count ?? 0;
     const retryLogger = logger.child({
       jobId: job.id,
-      currentRetry: job.retry_count,
-      nextRetry: job.retry_count + 1,
-    })
+      currentRetry: retryCount,
+      nextRetry: retryCount + 1,
+    });
 
-    const errorMessage = typeof error === 'string' ? error : error.message
+    const errorMessage = typeof error === "string" ? error : error.message;
     const errorCode =
-      typeof error === 'object' ? (error as any).code || 'UNKNOWN_ERROR' : 'UNKNOWN_ERROR'
+      typeof error === "object"
+        ? (error as any).code || "UNKNOWN_ERROR"
+        : "UNKNOWN_ERROR";
 
-    retryLogger.info('Scheduling job retry', {
+    retryLogger.info("Scheduling job retry", {
       errorMessage,
       errorCode,
-    })
+    });
 
     // Call database function to schedule retry
-    const { error: scheduleError } = await this.supabase.rpc('schedule_job_retry', {
-      job_id: job.id,
-      error_msg: errorMessage,
-      error_cd: errorCode,
-    })
+    const { error: scheduleError } = await this.supabase.rpc(
+      "schedule_job_retry",
+      {
+        job_id: job.id,
+        error_msg: errorMessage,
+        error_cd: errorCode,
+      },
+    );
 
     if (scheduleError) {
-      retryLogger.error('Failed to schedule retry', scheduleError as Error)
-      throw new Error(`Failed to schedule retry: ${scheduleError.message}`)
+      retryLogger.error("Failed to schedule retry", scheduleError as Error);
+      throw new Error(`Failed to schedule retry: ${scheduleError.message}`);
     }
 
-    const nextAttempt = job.retry_count + 1
-    const delay = this.getRetryDelay(nextAttempt)
+    const nextAttempt = retryCount + 1;
+    const delay = this.getRetryDelay(nextAttempt);
 
-    retryLogger.info('Retry scheduled successfully', {
+    retryLogger.info("Retry scheduled successfully", {
       nextAttempt,
       delayMs: delay,
       retryAfter: new Date(Date.now() + delay).toISOString(),
-    })
+    });
   }
 
   /**
    * Mark job as permanently failed (no more retries)
    */
-  async markPermanentlyFailed(job: AnalysisJob, error: Error | string): Promise<void> {
-    const failLogger = logger.child({ jobId: job.id })
+  async markPermanentlyFailed(
+    job: AnalysisJob,
+    error: Error | string,
+  ): Promise<void> {
+    const failLogger = logger.child({ jobId: job.id });
 
-    const errorMessage = typeof error === 'string' ? error : error.message
+    const errorMessage = typeof error === "string" ? error : error.message;
     const errorCode =
-      typeof error === 'object' ? (error as any).code || 'PERMANENT_FAILURE' : 'PERMANENT_FAILURE'
+      typeof error === "object"
+        ? (error as any).code || "PERMANENT_FAILURE"
+        : "PERMANENT_FAILURE";
 
-    failLogger.info('Marking job as permanently failed', {
+    const retryCount = job.retry_count ?? 0;
+    failLogger.info("Marking job as permanently failed", {
       errorMessage,
       errorCode,
-      totalAttempts: job.retry_count + 1,
-    })
+      totalAttempts: retryCount + 1,
+    });
 
     // Update job status directly to 'failed'
     const { error: updateError } = await this.supabase
-      .from('analysis_jobs')
+      .from("analysis_jobs")
       .update({
-        status: 'failed',
+        status: "failed",
         error_message: errorMessage,
         error_code: errorCode,
         completed_at: new Date().toISOString(),
       })
-      .eq('id', job.id)
+      .eq("id", job.id);
 
     if (updateError) {
-      failLogger.error('Failed to mark job as permanently failed', updateError as Error)
-      throw new Error(`Failed to mark job as failed: ${updateError.message}`)
+      failLogger.error(
+        "Failed to mark job as permanently failed",
+        updateError as Error,
+      );
+      throw new Error(`Failed to mark job as failed: ${updateError.message}`);
     }
 
-    failLogger.warn('Job permanently failed', {
-      totalAttempts: job.retry_count + 1,
+    failLogger.warn("Job permanently failed", {
+      totalAttempts: retryCount + 1,
       errorHistory: job.retry_error_log,
-    })
+    });
   }
 
   /**
    * Get retry statistics for a job
    */
   getRetryStatistics(job: AnalysisJob): {
-    attemptsRemaining: number
-    totalAttempts: number
-    errorHistory: any[]
-    nextRetryTime: Date | null
+    attemptsRemaining: number;
+    totalAttempts: number;
+    errorHistory: any[];
+    nextRetryTime: Date | null;
   } {
-    const attemptsRemaining = Math.max(0, job.max_retries - job.retry_count)
-    const errorHistory = Array.isArray(job.retry_error_log) ? job.retry_error_log : []
-    const nextRetryTime = job.retry_after ? new Date(job.retry_after) : null
+    const retryCount = job.retry_count ?? 0;
+    const maxRetries = job.max_retries ?? 3;
+    const attemptsRemaining = Math.max(0, maxRetries - retryCount);
+    const errorHistory = Array.isArray(job.retry_error_log)
+      ? job.retry_error_log
+      : [];
+    const nextRetryTime = job.retry_after ? new Date(job.retry_after) : null;
 
     return {
       attemptsRemaining,
-      totalAttempts: job.retry_count,
+      totalAttempts: retryCount,
       errorHistory,
       nextRetryTime,
-    }
+    };
   }
 
   /**
    * Check if job is ready for retry (retry_after has passed)
    */
   isReadyForRetry(job: AnalysisJob): boolean {
-    if (!job.retry_after) return true
+    if (!job.retry_after) return true;
 
-    const retryTime = new Date(job.retry_after)
-    return retryTime <= new Date()
+    const retryTime = new Date(job.retry_after);
+    return retryTime <= new Date();
   }
 }

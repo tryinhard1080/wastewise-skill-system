@@ -11,6 +11,7 @@
 
 **Problem**:
 Worker tried to use `createClient()` from `lib/supabase/server.ts`, which requires HTTP request context (cookies). Worker runs outside HTTP context, causing error:
+
 ```
 Error: cookies() was called outside a request scope
 ```
@@ -19,6 +20,7 @@ Error: cookies() was called outside a request scope
 Changed `lib/reports/storage.ts` to use `createServiceClient()` instead.
 
 **Files Modified**:
+
 - `lib/reports/storage.ts:15` - Import `createServiceClient`
 - `lib/reports/storage.ts:60` - Use `createServiceClient()`
 - `lib/reports/storage.ts:175` - Use `createServiceClient()`
@@ -31,12 +33,14 @@ Changed `lib/reports/storage.ts` to use `createServiceClient()` instead.
 
 **Problem**:
 Worker attempted to upload reports but got error:
+
 ```
 Storage upload failed: Bucket not found
 ```
 
 **Root Cause**:
 Migration `20251118154619_create_storage_bucket.sql` failed because:
+
 - `storage.objects` table is owned by `supabase_storage_admin` role
 - Migration runs as `postgres` role
 - Cannot execute `ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY` due to insufficient privileges
@@ -45,9 +49,11 @@ Migration `20251118154619_create_storage_bucket.sql` failed because:
 Created bucket programmatically using Supabase JS SDK instead of SQL migration.
 
 **Files Created**:
+
 - `scripts/check-storage.ts` - Script to check and create bucket
 
 **Configuration**:
+
 ```typescript
 Bucket: 'project-files'
 Public: false (private, requires authentication)
@@ -69,6 +75,7 @@ Allowed MIME Types:
 ## 🔍 Verification - Worker Logs Show Success
 
 **Example Job Execution** (2025-11-18T16:07:33.599Z):
+
 ```
 Job ID: cc9562a6-d3c4-4da8-b983-ba97d94e9d16
 Project: Riverside Gardens Apartments (250 units, COMPACTOR)
@@ -91,13 +98,13 @@ Execution Time: 2,172ms
 ## 🧪 E2E Test Results
 
 **Tests Passing (4/5)**:
+
 1. ✅ Landing Page Branding (4260ms)
 2. ✅ Login Flow (8642ms)
 3. ✅ Project Navigation (3793ms)
 4. ✅ Start Analysis (3876ms)
 
-**Tests Failing (1/5)**:
-5. ❌ Monitor Progress (timeout after 5 minutes)
+**Tests Failing (1/5)**: 5. ❌ Monitor Progress (timeout after 5 minutes)
 
 ---
 
@@ -106,6 +113,7 @@ Execution Time: 2,172ms
 ### Problem Analysis
 
 After clicking "Start Analysis", the test expects this flow:
+
 ```
 1. Click "Start Analysis" button
 2. → Navigate to /projects/{id}/processing
@@ -116,6 +124,7 @@ After clicking "Start Analysis", the test expects this flow:
 ```
 
 **Current Behavior**:
+
 ```
 1. ✅ Click "Start Analysis" button
 2. ❌ Stay on /projects/{id} (no navigation)
@@ -126,6 +135,7 @@ After clicking "Start Analysis", the test expects this flow:
 ```
 
 **Test Error Message**:
+
 ```
 ⚠️  Expected navigation to processing page, got: http://localhost:3000/projects/b9d24307-f0b2-439a-9f84-7e2f23978ba6
 Progress: , Step:   (empty - no DOM elements found)
@@ -140,6 +150,7 @@ Progress: , Step:   (empty - no DOM elements found)
 **File**: `app/projects/[id]/processing/page.tsx`
 
 **Requirements**:
+
 ```typescript
 'use client'
 
@@ -276,6 +287,7 @@ export default function ProcessingPage() {
 ```
 
 **Critical Data Attributes** (for E2E testing):
+
 - `data-job-status` - Current job status (pending/processing/completed/failed)
 - `data-progress` - Progress percentage (0-100)
 - `data-current-step` - Current step description
@@ -287,6 +299,7 @@ export default function ProcessingPage() {
 **File**: `app/projects/[id]/results/page.tsx`
 
 **Requirements**:
+
 ```typescript
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
@@ -412,67 +425,70 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
 **File**: `components/project/start-analysis-button.tsx`
 
 **Current Code** (line 69-74):
+
 ```typescript
 // Close dialog and refresh
-setOpen(false)
-router.refresh()
+setOpen(false);
+router.refresh();
 
 // Optional: Navigate to job monitoring page
 // router.push(`/jobs/${data.jobId}`)
 ```
 
 **Change To**:
+
 ```typescript
 // Close dialog
-setOpen(false)
+setOpen(false);
 
 // Navigate to processing page
-router.push(`/projects/${projectId}/processing`)
+router.push(`/projects/${projectId}/processing`);
 ```
 
 **Complete Function** (lines 44-85):
+
 ```typescript
 const handleStartAnalysis = async () => {
-  setIsCreating(true)
+  setIsCreating(true);
   try {
     // Call API to create analysis job
-    const response = await fetch('/api/analyze', {
-      method: 'POST',
+    const response = await fetch("/api/analyze", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         projectId,
         jobType,
       }),
-    })
+    });
 
     if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to start analysis')
+      const error = await response.json();
+      throw new Error(error.error || "Failed to start analysis");
     }
 
-    const data = await response.json()
+    const data = await response.json();
 
     // Show success toast
-    toast.success('Analysis started!')
+    toast.success("Analysis started!");
 
     // Close dialog
-    setOpen(false)
+    setOpen(false);
 
     // Navigate to processing page
-    router.push(`/projects/${projectId}/processing`)
+    router.push(`/projects/${projectId}/processing`);
   } catch (error) {
-    console.error('Error starting analysis:', error)
+    console.error("Error starting analysis:", error);
     toast.error(
       error instanceof Error
         ? error.message
-        : 'Failed to start analysis. Please try again.'
-    )
+        : "Failed to start analysis. Please try again.",
+    );
   } finally {
-    setIsCreating(false)
+    setIsCreating(false);
   }
-}
+};
 ```
 
 ---
@@ -480,18 +496,22 @@ const handleStartAnalysis = async () => {
 ## 📁 Files Modified Today
 
 ### ✅ Files Changed
+
 1. `lib/reports/storage.ts` - Lines 15, 60, 175 (use `createServiceClient`)
 2. `.env.local` - Added E2E test configuration
 
 ### ✅ Files Created
+
 1. `scripts/check-storage.ts` - Programmatic bucket creation
 2. `supabase/migrations/20251118154619_create_storage_bucket.sql` - SQL migration (failed but documented)
 
 ### ⏳ Files To Create (Phase 8)
+
 1. `app/projects/[id]/processing/page.tsx` - Job progress monitoring
 2. `app/projects/[id]/results/page.tsx` - Analysis results display
 
 ### ⏳ Files To Modify (Phase 8)
+
 1. `components/project/start-analysis-button.tsx` - Line 71 (navigation)
 
 ---
@@ -499,6 +519,7 @@ const handleStartAnalysis = async () => {
 ## 🎯 Success Criteria for Phase 8
 
 When complete, all 5 E2E tests should pass:
+
 ```
 ✅ Test 1: Landing Page Branding
 ✅ Test 2: Login Flow
@@ -508,6 +529,7 @@ When complete, all 5 E2E tests should pass:
 ```
 
 **Test 5 Success Conditions**:
+
 - Navigate to processing page after clicking "Start Analysis"
 - Poll job status every 2 seconds
 - Display progress percentage and current step
@@ -523,6 +545,7 @@ When complete, all 5 E2E tests should pass:
 3. **Run E2E tests**: `pnpm test:ui`
 
 **Files to create first**:
+
 - `app/projects/[id]/processing/page.tsx` (most critical)
 - `app/projects/[id]/results/page.tsx`
 - Update `components/project/start-analysis-button.tsx:71`
@@ -534,6 +557,7 @@ When complete, all 5 E2E tests should pass:
 ## 🚀 What's Working Right Now
 
 ### Backend (100% Complete) ✅
+
 - [x] Async job queue with `analysis_jobs` table
 - [x] Background worker polls for pending jobs
 - [x] Worker processes complete analysis in ~2 seconds
@@ -546,11 +570,13 @@ When complete, all 5 E2E tests should pass:
 - [x] Service role authentication for worker
 
 ### API Routes (100% Complete) ✅
+
 - [x] `POST /api/analyze` - Create analysis job
 - [x] `GET /api/jobs/[id]` - Get job status and progress
 - [x] `DELETE /api/jobs/[id]` - Cancel running job
 
 ### Frontend - Existing (80% Complete) ✅
+
 - [x] Landing page with WasteWise branding
 - [x] Authentication (login/signup)
 - [x] Dashboard
@@ -560,6 +586,7 @@ When complete, all 5 E2E tests should pass:
 - [x] Start Analysis button (creates jobs)
 
 ### Frontend - Missing (Phase 8)
+
 - [ ] Processing page (job progress monitoring)
 - [ ] Results page (display analysis results)
 - [ ] Navigation from Start Analysis to Processing page
@@ -657,6 +684,7 @@ npx tsx scripts/check-storage.ts  # Check/create bucket
 **Phase 8 Status**: Not Started (Frontend Pages 0%)
 
 **Next Session Goals**:
+
 1. Create processing page with real-time progress tracking
 2. Create results page with download links
 3. Wire up navigation in Start Analysis button

@@ -10,8 +10,9 @@ description: Streamlined WasteWise analysis with regulatory compliance research,
 ## Core Principle
 
 Execute analysis with MINIMAL token output. Only surface:
+
 - ❌ Critical errors
-- ⚠️ Important warnings  
+- ⚠️ Important warnings
 - ✅ Final status
 - 🔗 Download link
 
@@ -38,6 +39,7 @@ No verbose explanations. No step-by-step narration. Just results.
 ## Required Input
 
 User must provide:
+
 - Property name (extract from invoices if not provided)
 - Unit count (extract from context if not provided)
 - Location (city, state - extract from invoices/contract)
@@ -47,6 +49,7 @@ User must provide:
 ## Streamlined Workflow
 
 ### Phase 1: Data Extraction (Silent)
+
 ```python
 # Extract from invoices:
 - Property name, location, unit count
@@ -63,6 +66,7 @@ User must provide:
 ```
 
 ### Phase 2: Regulatory Research (Focused)
+
 ```python
 # Search Pattern - Execute 2-3 targeted searches max:
 search_1 = f"{city} {state} waste recycling ordinance"
@@ -82,6 +86,7 @@ search_3 = f"{city} composting mandate commercial" # Only if needed
 ```
 
 ### Phase 3: Validation (Background)
+
 ```python
 # Run all validation checks silently
 # Only output if FAILED
@@ -99,6 +104,7 @@ validations = {
 ```
 
 ### Phase 4: Excel Generation (Silent)
+
 ```python
 # Create workbook with sheets:
 sheets = [
@@ -138,7 +144,7 @@ Key Compliance Items:
 
 [If LOW confidence:]
 ⚠️ MANUAL REVIEW REQUIRED
-Research quality below threshold. Complete workbook generated but 
+Research quality below threshold. Complete workbook generated but
 regulatory section needs verification. Contact [Agency] at [Phone].
 
 📊 [Download Link]
@@ -147,6 +153,7 @@ regulatory section needs verification. Contact [Agency] at [Phone].
 ## Optimization Rules (Enforced)
 
 ### Compactor Monitoring
+
 ```
 ONLY recommend if:
 - Average < 6 tons per haul AND
@@ -160,12 +167,14 @@ Calculate:
 ```
 
 ### Contamination Reduction
+
 ```
 ONLY recommend if:
 - Contamination charges > 3% of total spend
 ```
 
 ### Bulk Trash Subscription
+
 ```
 ONLY recommend if:
 - Average bulk charges > $500/month
@@ -174,6 +183,7 @@ ONLY recommend if:
 ## Sheet Structure Requirements
 
 ### SUMMARY_FULL
+
 - 2026 projected savings one-liner at very top
 - Property details, unit count, cost per door
 - Service summary table
@@ -181,28 +191,33 @@ ONLY recommend if:
 - Regulatory compliance status
 
 ### EXPENSE_ANALYSIS
+
 - Month-by-month in COLUMN format (months as columns)
 - Service types as rows
 - Totals and averages
 
 ### OPTIMIZATION
+
 - Three opportunities with full calculation breakdowns
 - Per-compactor pricing (not per-property)
 - 14-day constraint enforced
 - ROI including all costs
 
 ### HAUL_LOG (if compactor)
+
 - Date, tons, days between pickups
 - Running averages
 - Identify low-utilization hauls
 
 ### CONTRACT_TERMS (if contract provided)
+
 - Extract verbatim clause text (not paraphrased)
 - 7 categories: Term & Renewal, Rate Increases, Termination, Liability, Service Level, Force Majeure, Indemnification
 - Calendar reminders: 90/60/30 days before expiration
 - Risk severity: HIGH/MEDIUM/LOW
 
 ### REGULATORY_COMPLIANCE
+
 ```
 1. Executive Summary
    - Property applicability to local ordinances
@@ -316,11 +331,13 @@ except RegulatoryResearchError as e:
 ## Usage Example
 
 **User prompt:**
+
 ```
 Analyze Columbia Square Living invoices with regulatory compliance.
 ```
 
 **Claude response:**
+
 ```
 ✅ WasteWise Regulatory Analysis Complete
 

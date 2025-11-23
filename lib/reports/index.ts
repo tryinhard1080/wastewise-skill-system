@@ -10,24 +10,24 @@ export {
   validateExcelInput,
   type ExcelGeneratorInput,
   type ExcelGeneratorOutput,
-} from './excel-generator'
+} from "./excel-generator";
 
 // Excel formatters (for custom tab creation)
-export * from './formatters'
+export * from "./formatters";
 
 // Individual tab generators (for testing or custom workflows)
-export { generateExecutiveSummary } from './excel-tabs/executive-summary'
-export { generateExpenseAnalysis } from './excel-tabs/expense-analysis'
-export { generateHaulLog } from './excel-tabs/haul-log'
-export { generateOptimization } from './excel-tabs/optimization'
-export { generateContractTerms } from './excel-tabs/contract-terms'
+export { generateExecutiveSummary } from "./excel-tabs/executive-summary";
+export { generateExpenseAnalysis } from "./excel-tabs/expense-analysis";
+export { generateHaulLog } from "./excel-tabs/haul-log";
+export { generateOptimization } from "./excel-tabs/optimization";
+export { generateContractTerms } from "./excel-tabs/contract-terms";
 
 // HTML generation
 export {
   generateHtmlDashboard,
   type HtmlGeneratorInput,
   type HtmlGeneratorOutput,
-} from './html-generator'
+} from "./html-generator";
 
 // Report storage
 export {
@@ -36,4 +36,4 @@ export {
   deleteOldReports,
   type UploadReportInput,
   type UploadReportOutput,
-} from './storage'
+} from "./storage";

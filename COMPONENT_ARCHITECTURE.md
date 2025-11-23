@@ -254,6 +254,7 @@
 ## Reusable Components Library
 
 ### Button Component
+
 ```typescript
 interface ButtonProps {
   variant: 'primary' | 'secondary' | 'outline';
@@ -269,6 +270,7 @@ interface ButtonProps {
 ```
 
 ### Card Component
+
 ```typescript
 interface CardProps {
   icon?: React.ReactNode;
@@ -289,6 +291,7 @@ interface CardProps {
 ```
 
 ### Section Header
+
 ```typescript
 interface SectionHeaderProps {
   title: string;
@@ -311,6 +314,7 @@ interface SectionHeaderProps {
 ### 📝 Section Headers
 
 **Smart Simple Brilliant:**
+
 ```
 Title: "Smart, Simple, Brilliant"
 Font: Serif, 52px, centered
@@ -324,6 +328,7 @@ Max-width: 600px
 ```
 
 **Work in Sync:**
+
 ```
 Title: "Your work, perfectly in sync"
 Font: Serif, 52px, left-aligned
@@ -332,6 +337,7 @@ Spacing: 96px padding vertical
 ```
 
 **Integration:**
+
 ```
 Title: "Effortless Integration"
 Font: Serif, 52px, centered
@@ -343,6 +349,7 @@ Color: rgba(55, 50, 47, 0.8)
 ```
 
 **Numbers:**
+
 ```
 Title: "Numbers that speak for themselves"
 Font: Serif, 52px, centered
@@ -351,6 +358,7 @@ Spacing: 96px padding vertical
 ```
 
 **Testimonials:**
+
 ```
 Title: "Loved by teams worldwide"
 Font: Serif, 52px, centered
@@ -359,6 +367,7 @@ Spacing: 96px padding vertical
 ```
 
 **Documentation:**
+
 ```
 Title: "Comprehensive documentation"
 Font: Serif, 52px, centered
@@ -370,6 +379,7 @@ Color: rgba(55, 50, 47, 0.8)
 ```
 
 **FAQ:**
+
 ```
 Title: "Frequently asked questions"
 Font: Serif, 52px, centered
@@ -378,6 +388,7 @@ Spacing: 96px padding vertical
 ```
 
 **Pricing:**
+
 ```
 Title: "Simple, transparent pricing"
 Font: Serif, 52px, centered
@@ -393,32 +404,34 @@ Color: rgba(55, 50, 47, 0.8)
 ## 🎨 Style Specifications
 
 ### Colors
+
 ```css
 /* Backgrounds */
---bg-primary: #F7F5F3;
---bg-secondary: #FFFFFF;
---bg-dark: #37322F;
---bg-darker: #2F3037;
+--bg-primary: #f7f5f3;
+--bg-secondary: #ffffff;
+--bg-dark: #37322f;
+--bg-darker: #2f3037;
 
 /* Text */
---text-primary: #37322F;
---text-secondary: rgba(55, 50, 47, 0.80);
---text-tertiary: rgba(55, 50, 47, 0.60);
---text-white: #FFFFFF;
+--text-primary: #37322f;
+--text-secondary: rgba(55, 50, 47, 0.8);
+--text-tertiary: rgba(55, 50, 47, 0.6);
+--text-white: #ffffff;
 
 /* Borders */
 --border-light: rgba(55, 50, 47, 0.06);
 --border-medium: rgba(55, 50, 47, 0.12);
---border-dark: rgba(55, 50, 47, 0.20);
+--border-dark: rgba(55, 50, 47, 0.2);
 
 /* Accent */
---accent-primary: #2563EB; /* Blue */
---accent-success: #22C55E; /* Green */
---accent-warning: #F59E0B; /* Orange */
---accent-error: #DC2626; /* Red */
+--accent-primary: #2563eb; /* Blue */
+--accent-success: #22c55e; /* Green */
+--accent-warning: #f59e0b; /* Orange */
+--accent-error: #dc2626; /* Red */
 ```
 
 ### Typography Scale
+
 ```css
 /* Display */
 --text-display: 80px / 96px line-height;
@@ -440,6 +453,7 @@ Color: rgba(55, 50, 47, 0.8)
 ```
 
 ### Spacing Scale
+
 ```css
 --space-1: 8px;
 --space-2: 16px;
@@ -456,6 +470,7 @@ Color: rgba(55, 50, 47, 0.8)
 ```
 
 ### Border Radius
+
 ```css
 --radius-none: 0;
 --radius-sm: 3px;
@@ -469,18 +484,19 @@ Color: rgba(55, 50, 47, 0.8)
 ```
 
 ### Shadows
+
 ```css
 /* Subtle */
 --shadow-xs: 0px 0px 0px 0.9px rgba(0, 0, 0, 0.08);
 --shadow-sm: 0px 1px 2px rgba(55, 50, 47, 0.12);
 
 /* Medium */
---shadow-md: 0px 4px 6px rgba(55, 50, 47, 0.10);
+--shadow-md: 0px 4px 6px rgba(55, 50, 47, 0.1);
 --shadow-lg: 0px 10px 15px rgba(55, 50, 47, 0.12);
 
 /* Heavy */
 --shadow-xl: 0px 20px 25px rgba(55, 50, 47, 0.15);
---shadow-2xl: 0px 25px 50px rgba(55, 50, 47, 0.20);
+--shadow-2xl: 0px 25px 50px rgba(55, 50, 47, 0.2);
 
 /* Inner */
 --shadow-inner: inset 0px 2px 4px rgba(0, 0, 0, 0.06);
@@ -494,6 +510,7 @@ Color: rgba(55, 50, 47, 0.8)
 ## 🔄 State Management Patterns
 
 ### Dashboard Rotation State
+
 ```typescript
 // State
 const [activeCard, setActiveCard] = useState(0);
@@ -504,22 +521,24 @@ const mountedRef = useRef(true);
 useEffect(() => {
   const interval = setInterval(() => {
     if (!mountedRef.current) return;
-    
-    setProgress(prev => {
+
+    setProgress((prev) => {
       if (prev >= 100) {
-        setActiveCard(current => (current + 1) % 3);
+        setActiveCard((current) => (current + 1) % 3);
         return 0;
       }
       return prev + 2; // 2% every 100ms = 5s total
     });
   }, 100);
-  
+
   return () => clearInterval(interval);
 }, []);
 
 // Cleanup
 useEffect(() => {
-  return () => { mountedRef.current = false; };
+  return () => {
+    mountedRef.current = false;
+  };
 }, []);
 
 // Manual card selection
@@ -530,13 +549,14 @@ const handleCardClick = (index: number) => {
 ```
 
 ### Form State Pattern
+
 ```typescript
 // Form state
 const [formData, setFormData] = useState({
-  name: '',
-  email: '',
-  company: '',
-  message: ''
+  name: "",
+  email: "",
+  company: "",
+  message: "",
 });
 const [errors, setErrors] = useState<Record<string, string>>({});
 const [isSubmitting, setIsSubmitting] = useState(false);
@@ -545,35 +565,35 @@ const [submitted, setSubmitted] = useState(false);
 // Validation
 const validateForm = () => {
   const newErrors: Record<string, string> = {};
-  
-  if (!formData.name) newErrors.name = 'Name is required';
-  if (!formData.email) newErrors.email = 'Email is required';
+
+  if (!formData.name) newErrors.name = "Name is required";
+  if (!formData.email) newErrors.email = "Email is required";
   if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    newErrors.email = 'Email is invalid';
+    newErrors.email = "Email is invalid";
   }
-  if (!formData.message) newErrors.message = 'Message is required';
-  
+  if (!formData.message) newErrors.message = "Message is required";
+
   return newErrors;
 };
 
 // Submit handler
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  
+
   const newErrors = validateForm();
   if (Object.keys(newErrors).length > 0) {
     setErrors(newErrors);
     return;
   }
-  
+
   setIsSubmitting(true);
-  
+
   try {
     // Submit to Supabase or API
     await submitForm(formData);
     setSubmitted(true);
   } catch (error) {
-    setErrors({ submit: 'Failed to submit. Please try again.' });
+    setErrors({ submit: "Failed to submit. Please try again." });
   } finally {
     setIsSubmitting(false);
   }
@@ -581,6 +601,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 ```
 
 ### Modal State Pattern
+
 ```typescript
 // Modal state
 const [isOpen, setIsOpen] = useState(false);
@@ -592,17 +613,17 @@ const closeModal = () => setIsOpen(false);
 // Keyboard support
 useEffect(() => {
   const handleEscape = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === "Escape") closeModal();
   };
-  
+
   if (isOpen) {
-    document.addEventListener('keydown', handleEscape);
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden"; // Prevent background scroll
   }
-  
+
   return () => {
-    document.removeEventListener('keydown', handleEscape);
-    document.body.style.overflow = 'unset';
+    document.removeEventListener("keydown", handleEscape);
+    document.body.style.overflow = "unset";
   };
 }, [isOpen]);
 ```
@@ -612,12 +633,15 @@ useEffect(() => {
 ## 🎬 Animation Specifications
 
 ### Fade In on Scroll
+
 ```css
 /* CSS */
 .fade-in-section {
   opacity: 0;
   transform: translateY(50px);
-  transition: opacity 600ms ease-out, transform 600ms ease-out;
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
 }
 
 .fade-in-section.visible {
@@ -630,8 +654,8 @@ useEffect(() => {
 // React Implementation
 const [ref, isVisible] = useInView({ threshold: 0.2 });
 
-<div 
-  ref={ref} 
+<div
+  ref={ref}
   className={isVisible ? 'fade-in-section visible' : 'fade-in-section'}
 >
   Content
@@ -639,9 +663,12 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ```
 
 ### Card Hover Effect
+
 ```css
 .card {
-  transition: transform 300ms ease, box-shadow 300ms ease;
+  transition:
+    transform 300ms ease,
+    box-shadow 300ms ease;
 }
 
 .card:hover {
@@ -651,9 +678,12 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ```
 
 ### Button Hover
+
 ```css
 .button {
-  transition: opacity 200ms ease, transform 100ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 100ms ease;
 }
 
 .button:hover {
@@ -666,13 +696,15 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ```
 
 ### Dashboard Image Transition
+
 ```css
 .dashboard-image {
   position: absolute;
   inset: 0;
-  transition: opacity 500ms ease-in-out,
-              transform 500ms ease-in-out,
-              filter 500ms ease-in-out;
+  transition:
+    opacity 500ms ease-in-out,
+    transform 500ms ease-in-out,
+    filter 500ms ease-in-out;
 }
 
 .dashboard-image.active {
@@ -689,11 +721,12 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ```
 
 ### Progress Bar Animation
+
 ```css
 .progress-bar {
   width: 0%;
   height: 4px;
-  background: linear-gradient(to right, #D1D5DB, #2563EB);
+  background: linear-gradient(to right, #d1d5db, #2563eb);
   border-radius: 2px;
   transition: width 100ms linear;
 }
@@ -703,8 +736,12 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 }
 
 @keyframes progress {
-  from { width: 0%; }
-  to { width: 100%; }
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 ```
 
@@ -713,6 +750,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ## 📱 Responsive Breakpoints
 
 ### Tailwind Breakpoints
+
 ```css
 /* Mobile (default) */
 /* 320px - 640px */
@@ -753,12 +791,13 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ```
 
 ### Grid Responsive Patterns
+
 ```css
 /* Feature Cards Grid */
 .feature-grid {
   display: grid;
   gap: 24px;
-  
+
   /* Mobile: 1 column */
   grid-template-columns: 1fr;
 }
@@ -779,6 +818,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ```
 
 ### Typography Responsive
+
 ```css
 .hero-heading {
   /* Mobile */
@@ -816,6 +856,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ### Manual Testing Checklist
 
 **Navigation:**
+
 - [ ] Logo links to home
 - [ ] All nav links work
 - [ ] Mobile menu toggles
@@ -823,6 +864,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] Smooth scroll to sections
 
 **Hero Section:**
+
 - [ ] Heading displays correctly
 - [ ] CTA button hover works
 - [ ] Background pattern visible
@@ -830,6 +872,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] Button click triggers action
 
 **Dashboard Preview:**
+
 - [ ] All 3 images load
 - [ ] Auto-rotation works (5s)
 - [ ] Manual card click works
@@ -838,6 +881,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] No console errors
 
 **Feature Sections:**
+
 - [ ] All icons render
 - [ ] Grids responsive (3 → 2 → 1)
 - [ ] Cards hover effects work
@@ -845,6 +889,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] Text readable on all devices
 
 **Forms:**
+
 - [ ] Email validation works
 - [ ] Required fields enforced
 - [ ] Loading state shows
@@ -852,6 +897,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] Error messages clear
 
 **Testimonials:**
+
 - [ ] Carousel scrolls smoothly
 - [ ] Auto-play works (if enabled)
 - [ ] Manual navigation works
@@ -859,6 +905,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] Avatars load
 
 **Pricing:**
+
 - [ ] Toggle switches plans
 - [ ] Prices update correctly
 - [ ] Popular badge shows
@@ -866,6 +913,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] Feature lists complete
 
 **FAQ:**
+
 - [ ] Accordion expands/collapses
 - [ ] Only one open at a time (optional)
 - [ ] Smooth animation
@@ -873,6 +921,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - [ ] All content readable
 
 **Footer:**
+
 - [ ] All links work
 - [ ] Social icons link correctly
 - [ ] Copyright year correct
@@ -884,6 +933,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ## 🎯 Quick Reference: Component Sizes
 
 ### Container Widths
+
 - Main Container: 1060px max-width
 - Hero Content: 937px max-width
 - Hero Heading: 748px max-width
@@ -893,6 +943,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - CTA Content: 800px max-width
 
 ### Component Heights
+
 - Header: 84px
 - Dashboard Container: 695px
 - Card Padding: 32px
@@ -901,6 +952,7 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 - Icon Size: 32px (sections), 48px (large), 20px (small)
 
 ### Spacing Patterns
+
 - Section Vertical: 96px padding
 - Between Elements: 24px gap
 - Card Grid Gap: 24px
@@ -913,39 +965,41 @@ const [ref, isVisible] = useInView({ threshold: 0.2 });
 ## 💾 Data Structures
 
 ### Pricing Plan Data
+
 ```typescript
 interface PricingPlan {
   name: string;
-  price: number | 'Custom';
-  period: 'month' | 'year';
+  price: number | "Custom";
+  period: "month" | "year";
   tagline: string;
   popular?: boolean;
   features: string[];
   ctaText: string;
-  ctaVariant: 'primary' | 'outline';
+  ctaVariant: "primary" | "outline";
 }
 
 const plans: PricingPlan[] = [
   {
-    name: 'Starter',
+    name: "Starter",
     price: 19,
-    period: 'month',
-    tagline: 'Perfect for small teams',
+    period: "month",
+    tagline: "Perfect for small teams",
     features: [
-      'Up to 50 contracts/month',
-      'Basic automation rules',
-      'Email support',
-      '10GB storage',
-      '2 team members'
+      "Up to 50 contracts/month",
+      "Basic automation rules",
+      "Email support",
+      "10GB storage",
+      "2 team members",
     ],
-    ctaText: 'Start free trial',
-    ctaVariant: 'outline'
+    ctaText: "Start free trial",
+    ctaVariant: "outline",
   },
   // ... more plans
 ];
 ```
 
 ### Testimonial Data
+
 ```typescript
 interface Testimonial {
   id: string;
@@ -961,21 +1015,22 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    id: '1',
+    id: "1",
     rating: 5,
-    quote: 'Brillance transformed how we handle billing...',
+    quote: "Brillance transformed how we handle billing...",
     author: {
-      name: 'Sarah Johnson',
-      title: 'CFO',
-      company: 'TechCorp',
-      avatar: '/avatars/sarah.jpg'
-    }
+      name: "Sarah Johnson",
+      title: "CFO",
+      company: "TechCorp",
+      avatar: "/avatars/sarah.jpg",
+    },
   },
   // ... more testimonials
 ];
 ```
 
 ### FAQ Data
+
 ```typescript
 interface FAQItem {
   id: string;
@@ -985,9 +1040,10 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    id: '1',
-    question: 'How does the free trial work?',
-    answer: 'Start with a 14-day free trial with full access to all Pro features. No credit card required.'
+    id: "1",
+    question: "How does the free trial work?",
+    answer:
+      "Start with a 14-day free trial with full access to all Pro features. No credit card required.",
   },
   // ... more FAQs
 ];
@@ -998,6 +1054,7 @@ const faqs: FAQItem[] = [
 ## 🚀 Performance Optimization Tips
 
 ### Image Optimization
+
 ```typescript
 // Use next/image (if using Next.js) or optimize manually
 - Compress images: TinyPNG, ImageOptim
@@ -1014,31 +1071,35 @@ const faqs: FAQItem[] = [
 ```
 
 ### Code Splitting
+
 ```typescript
 // Lazy load sections below fold
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const TestimonialsSection = dynamic(() => import('./TestimonialsSection'));
-const PricingSection = dynamic(() => import('./PricingSection'));
-const FAQSection = dynamic(() => import('./FAQSection'));
+const TestimonialsSection = dynamic(() => import("./TestimonialsSection"));
+const PricingSection = dynamic(() => import("./PricingSection"));
+const FAQSection = dynamic(() => import("./FAQSection"));
 
 // Only load when needed
 ```
 
 ### CSS Optimization
+
 ```css
 /* Remove unused Tailwind classes */
 /* In tailwind.config.js: */
 module.exports = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
-  ],
-  // Tailwind will purge unused classes in production
+  content:
+    [ "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    ],
+    // Tailwind will purge unused classes in production
+;
 }
 ```
 
 ### JavaScript Optimization
+
 ```typescript
 // Memoize expensive computations
 const memoizedValue = useMemo(() => {

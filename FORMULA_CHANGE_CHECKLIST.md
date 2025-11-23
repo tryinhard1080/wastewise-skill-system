@@ -10,6 +10,7 @@
 ## When to Use This Checklist
 
 Use this checklist whenever you need to change:
+
 - Conversion rates (e.g., TONS_TO_YARDS, WEEKS_PER_MONTH)
 - Optimization thresholds (e.g., COMPACTOR_OPTIMIZATION_THRESHOLD)
 - Target values (e.g., COMPACTOR_TARGET_TONS)
@@ -40,6 +41,7 @@ Before making any formula changes, document:
   - Impact notes
 
 - [ ] Add entry to `CHANGELOG.md` (if exists) or git commit message:
+
   ```
   feat(formulas): Update COMPACTOR_OPTIMIZATION_THRESHOLD from X to Y
 
@@ -52,12 +54,13 @@ Before making any formula changes, document:
 ### Step 2: Update Code Constants
 
 - [ ] Update `lib/constants/formulas.ts`:
+
   ```typescript
   // Before
-  export const COMPACTOR_OPTIMIZATION_THRESHOLD = 7.0
+  export const COMPACTOR_OPTIMIZATION_THRESHOLD = 7.0;
 
   // After (with comment explaining change)
-  export const COMPACTOR_OPTIMIZATION_THRESHOLD = 6.0 // Updated 2025-11-14: Per industry analysis
+  export const COMPACTOR_OPTIMIZATION_THRESHOLD = 6.0; // Updated 2025-11-14: Per industry analysis
   ```
 
 - [ ] Verify all imports are using the constant (no hardcoded values):
@@ -71,6 +74,7 @@ Before making any formula changes, document:
 ### Step 3: Update Database
 
 - [ ] Update seed data in `supabase/seed.sql`:
+
   ```sql
   update skills_config
   set thresholds = jsonb_set(
@@ -82,6 +86,7 @@ Before making any formula changes, document:
   ```
 
 - [ ] Create migration if schema/seed data changes:
+
   ```bash
   supabase migration new update_compactor_threshold
   ```
@@ -100,17 +105,19 @@ Before making any formula changes, document:
   - Boundary test cases
 
 - [ ] Update eval test cases:
+
   ```typescript
   // Before
-  expect(shouldRecommendMonitors(6.8, 12)).toBe(true);  // Below 7.0
+  expect(shouldRecommendMonitors(6.8, 12)).toBe(true); // Below 7.0
   expect(shouldRecommendMonitors(7.0, 12)).toBe(false); // At 7.0
 
   // After
-  expect(shouldRecommendMonitors(5.8, 12)).toBe(true);  // Below 6.0
+  expect(shouldRecommendMonitors(5.8, 12)).toBe(true); // Below 6.0
   expect(shouldRecommendMonitors(6.0, 12)).toBe(false); // At 6.0
   ```
 
 - [ ] Run full test suite:
+
   ```bash
   pnpm test
   pnpm test:unit
@@ -118,6 +125,7 @@ Before making any formula changes, document:
   ```
 
 - [ ] Run calculation evals:
+
   ```bash
   pnpm eval
   ```
@@ -173,12 +181,14 @@ Before making any formula changes, document:
 ### Step 7: Validation
 
 - [ ] Run runtime validation:
+
   ```bash
   pnpm dev
   # Check console for validateFormulaConstants() output
   ```
 
 - [ ] Verify database sync:
+
   ```bash
   pnpm run verify-database
   # Should show all skills have correct thresholds
@@ -241,6 +251,7 @@ If issues arise after deployment:
 ## Example: Changing COMPACTOR_OPTIMIZATION_THRESHOLD from 7.0 to 6.0
 
 ### Context
+
 - **Date**: 2025-11-14
 - **Reason**: WASTE_FORMULAS_REFERENCE.md v2.0 updated based on industry analysis
 - **Impact**: Compactor optimization recommendations will trigger at lower tonnage
@@ -248,25 +259,30 @@ If issues arise after deployment:
 ### Checklist Execution
 
 **Step 1: Documentation**
+
 - ✅ Updated WASTE_FORMULAS_REFERENCE.md v1.0 → v2.0
 - ✅ Added justification based on industry data
 
 **Step 2: Code Constants**
+
 - ✅ Updated lib/constants/formulas.ts: `6.0` with comment
 - ✅ Searched for hardcoded "7.0" - found 15 instances
 
 **Step 3: Database**
+
 - ✅ Updated seed.sql with new threshold
 - ✅ Created migration (not needed - seed data only)
 - ✅ Ran supabase db reset successfully
 
 **Step 4: Tests & Evals**
+
 - ✅ Updated test fixtures with new boundary values
 - ✅ Updated 12 test cases across 4 test files
 - ✅ All tests passing
 - ✅ All evals passing (<0.001% deviation)
 
 **Step 5: Agent Docs**
+
 - ✅ Updated orchestrator.md (2 locations)
 - ✅ Updated backend-agent.md (2 locations)
 - ✅ Updated skills-agent.md (8 locations)
@@ -274,17 +290,20 @@ If issues arise after deployment:
 - ✅ No hardcoded "7.0" remaining (only in NOT 7.0 comments)
 
 **Step 6: Application Code**
+
 - ✅ All calculation files use imported constant
 - ✅ All skills use config.thresholds
 - ✅ No hardcoded values found
 
 **Step 7: Validation**
+
 - ✅ Runtime validation passing
 - ✅ Database verification passing
 - ✅ Manual spot check: 5.8 tons → recommend monitors ✓
 - ✅ No breaking changes (existing data will produce slightly different recommendations)
 
 **Step 8: Documentation**
+
 - ✅ Git commit with detailed message
 - ✅ Added to Phase 1.5-A completion notes
 - ✅ Team notified via project documentation
@@ -298,6 +317,7 @@ If issues arise after deployment:
 When changing formulas, always check these locations:
 
 ### Documentation
+
 - [ ] WASTE_FORMULAS_REFERENCE.md
 - [ ] .claude/CLAUDE.md
 - [ ] .claude/agents/orchestrator.md
@@ -306,24 +326,28 @@ When changing formulas, always check these locations:
 - [ ] .claude/agents/testing-agent.md
 
 ### Code
+
 - [ ] lib/constants/formulas.ts
-- [ ] lib/calculations/*.ts
-- [ ] lib/skills/skills/*.ts
+- [ ] lib/calculations/\*.ts
+- [ ] lib/skills/skills/\*.ts
 - [ ] lib/skills/executor.ts
 - [ ] lib/skills/validator.ts
 
 ### Database
+
 - [ ] supabase/seed.sql
-- [ ] supabase/migrations/*.sql
+- [ ] supabase/migrations/\*.sql
 
 ### Tests
-- [ ] __tests__/unit/*.test.ts
-- [ ] __tests__/integration/*.test.ts
-- [ ] lib/evals/*.ts
-- [ ] __tests__/fixtures/*.json
+
+- [ ] **tests**/unit/\*.test.ts
+- [ ] **tests**/integration/\*.test.ts
+- [ ] lib/evals/\*.ts
+- [ ] **tests**/fixtures/\*.json
 
 ### Application
-- [ ] app/api/*/route.ts
+
+- [ ] app/api/\*/route.ts
 - [ ] components/**/**.tsx (if displaying threshold values)
 
 ---

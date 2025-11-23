@@ -21,32 +21,24 @@
  * ```
  */
 
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
-import { Database } from '@/types/database.types'
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+import { Database } from "@/types/database.types";
 
 /**
  * Protected routes that require authentication
  */
-const PROTECTED_ROUTES = [
-  '/dashboard',
-  '/projects',
-  '/settings',
-]
+const PROTECTED_ROUTES = ["/dashboard", "/projects", "/settings"];
 
 /**
  * Auth routes that should redirect to dashboard if already logged in
  */
-const AUTH_ROUTES = [
-  '/login',
-  '/signup',
-  '/forgot-password',
-]
+const AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
+  const supabaseResponse = NextResponse.next({
     request,
-  })
+  });
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,17 +46,17 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            supabaseResponse.cookies.set(name, value, options)
-          })
+            request.cookies.set(name, value);
+            supabaseResponse.cookies.set(name, value, options);
+          });
         },
       },
-    }
-  )
+    },
+  );
 
   // IMPORTANT: Avoid writing any logic between createServerClient and
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
@@ -72,33 +64,31 @@ export async function updateSession(request: NextRequest) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname
+  const pathname = request.nextUrl.pathname;
 
   // Check if trying to access protected route without auth
-  const isProtectedRoute = PROTECTED_ROUTES.some(route =>
-    pathname.startsWith(route)
-  )
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
+    pathname.startsWith(route),
+  );
 
   if (isProtectedRoute && !user) {
     // Redirect to login, saving the original destination
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirectTo', pathname)
-    return NextResponse.redirect(url)
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("redirectTo", pathname);
+    return NextResponse.redirect(url);
   }
 
   // Check if logged in user is trying to access auth routes
-  const isAuthRoute = AUTH_ROUTES.some(route =>
-    pathname.startsWith(route)
-  )
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
   if (isAuthRoute && user) {
     // Redirect to dashboard if already logged in
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
@@ -114,5 +104,5 @@ export async function updateSession(request: NextRequest) {
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely.
 
-  return supabaseResponse
+  return supabaseResponse;
 }

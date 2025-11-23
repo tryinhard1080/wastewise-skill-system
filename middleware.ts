@@ -8,8 +8,8 @@
  * Runs on every request to protected routes
  */
 
-import { type NextRequest, NextResponse } from 'next/server'
-import { updateSession } from '@/lib/supabase/middleware'
+import { type NextRequest, NextResponse } from "next/server";
+import { updateSession } from "@/lib/supabase/middleware";
 
 /**
  * Generate a random nonce for CSP
@@ -18,17 +18,20 @@ import { updateSession } from '@/lib/supabase/middleware'
  */
 function generateNonce(): string {
   // Generate cryptographically secure random bytes
-  const randomBytes = new Uint8Array(16)
-  crypto.getRandomValues(randomBytes)
+  const randomBytes = new Uint8Array(16);
+  crypto.getRandomValues(randomBytes);
 
   // Convert to base64
-  return Buffer.from(randomBytes).toString('base64')
+  return Buffer.from(randomBytes).toString("base64");
 }
 
 /**
  * Apply security headers to response
  */
-function applySecurityHeaders(response: NextResponse, nonce: string): NextResponse {
+function applySecurityHeaders(
+  response: NextResponse,
+  nonce: string,
+): NextResponse {
   // Content Security Policy (CSP)
   // Prevents XSS attacks by controlling which resources can load
   const cspDirectives = [
@@ -43,59 +46,59 @@ function applySecurityHeaders(response: NextResponse, nonce: string): NextRespon
     "form-action 'self'", // Only allow form submissions to same origin
     "object-src 'none'", // Block <object>, <embed>, <applet>
     "upgrade-insecure-requests", // Upgrade HTTP to HTTPS
-  ]
+  ];
 
-  const csp = cspDirectives.join('; ')
-  response.headers.set('Content-Security-Policy', csp)
+  const csp = cspDirectives.join("; ");
+  response.headers.set("Content-Security-Policy", csp);
 
   // X-Frame-Options: Prevent clickjacking
   // Redundant with CSP frame-ancestors, but good defense-in-depth
-  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set("X-Frame-Options", "DENY");
 
   // X-Content-Type-Options: Prevent MIME sniffing
   // Forces browsers to respect declared Content-Type
-  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set("X-Content-Type-Options", "nosniff");
 
   // Referrer-Policy: Control referrer information
   // Don't leak full URL to external sites
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
   // Permissions-Policy: Disable unnecessary browser features
   // Reduces attack surface
   response.headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
-  )
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+  );
 
   // Strict-Transport-Security (HSTS): Force HTTPS
   // Only set in production (dev uses HTTP)
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === "production") {
     response.headers.set(
-      'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload'
-    )
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload",
+    );
   }
 
   // X-DNS-Prefetch-Control: Control DNS prefetching
   // Slight privacy improvement
-  response.headers.set('X-DNS-Prefetch-Control', 'on')
+  response.headers.set("X-DNS-Prefetch-Control", "on");
 
-  return response
+  return response;
 }
 
 export async function middleware(request: NextRequest) {
   // Step 1: Handle authentication
-  const response = await updateSession(request)
+  const response = await updateSession(request);
 
   // Step 2: Apply security headers
-  const nonce = generateNonce()
-  const secureResponse = applySecurityHeaders(response, nonce)
+  const nonce = generateNonce();
+  const secureResponse = applySecurityHeaders(response, nonce);
 
   // TODO: Store nonce in request context for use in pages
   // This would allow using the nonce in inline scripts
   // For now, we avoid inline scripts entirely
 
-  return secureResponse
+  return secureResponse;
 }
 
 export const config = {
@@ -107,6 +110,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
-}
+};

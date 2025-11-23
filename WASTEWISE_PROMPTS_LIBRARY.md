@@ -1,4 +1,5 @@
 # WasteWise Prompts Library
+
 ## Copy-Paste Ready Prompts for Lovable
 
 ---
@@ -133,7 +134,7 @@ STATS BAR (between How It Works and Pricing):
 - Full-width background: Light green tint
 - 3 stats in a row:
   * "$2.4M+" label "Saved for Clients"
-  * "850+" label "Properties Analyzed"  
+  * "850+" label "Properties Analyzed"
   * "95%" label "Client Satisfaction"
 - Bold numbers, smaller label text
 - Animated count-up on scroll (optional)
@@ -451,9 +452,9 @@ Form with fields:
    - Label: "Property Type"
    - Select: Garden-Style, Mid-Rise, High-Rise
    - Required
-   - Helper text: 
+   - Helper text:
      * Garden-Style: <150 units, 2-3 stories
-     * Mid-Rise: 150-300 units, 4-8 stories  
+     * Mid-Rise: 150-300 units, 4-8 stories
      * High-Rise: 300+ units, 9+ stories
 
 Buttons:
@@ -533,7 +534,7 @@ Style with validation states, loading states, smooth transitions
 
 ### PROMPT 5A: Processing Page with Progress
 
-```
+````
 Create processing/status page at /projects/[id]/processing:
 
 HEADER:
@@ -585,7 +586,7 @@ Subscribe to Supabase Realtime for project updates:
 ```typescript
 const subscription = supabase
   .channel(`project:${projectId}`)
-  .on('postgres_changes', 
+  .on('postgres_changes',
     { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${projectId}` },
     (payload) => {
       // Update progress, status, activity log
@@ -594,9 +595,10 @@ const subscription = supabase
     }
   )
   .subscribe()
-```
+````
 
 For MVP: Simulate progress with intervals:
+
 - 0-30%: Processing files (3 seconds)
 - 30-50%: Extracting data (3 seconds)
 - 50-70%: Regulatory research (4 seconds)
@@ -607,6 +609,7 @@ Add activity log messages at each milestone
 
 Use shadcn/ui: Card, Progress, ScrollArea, Button components
 Add smooth animations and transitions
+
 ```
 
 ---
@@ -614,10 +617,12 @@ Add smooth animations and transitions
 ### PROMPT 5B: Results Dashboard - Overview Tab
 
 ```
+
 Create results dashboard at /projects/[id]/results:
 
 LAYOUT:
 Tabs at top:
+
 - Overview (active)
 - Expense Analysis
 - Recommendations
@@ -626,6 +631,7 @@ Tabs at top:
 OVERVIEW TAB CONTENT:
 
 HEADER CARD (full width, prominent):
+
 - Background: Green gradient
 - White text
 - Large text: "Potential to Reduce 2026 Trash Expense by $15,234"
@@ -634,18 +640,21 @@ HEADER CARD (full width, prominent):
 KEY METRICS (3 cards in row):
 
 Card 1 - Average Monthly Cost:
+
 - Icon: DollarSign
 - Value: "$3,247" (large, bold)
 - Label: "Average Monthly Cost"
 - Trend: "+2.3% from last quarter" (small, gray)
 
 Card 2 - Cost Per Door:
+
 - Icon: Home
 - Value: "$13.09" (large, bold)
 - Label: "Cost Per Door"
 - Comparison: "Target: $10-15" (small, green if in range)
 
 Card 3 - Annual Savings Opportunity:
+
 - Icon: TrendingUp
 - Value: "$15,234" (large, bold, green)
 - Label: "Potential Annual Savings"
@@ -654,6 +663,7 @@ Card 3 - Annual Savings Opportunity:
 CHARTS SECTION (2 columns):
 
 Left - Monthly Cost Trend:
+
 - Line chart using Chart.js
 - X-axis: Months (last 13 months)
 - Y-axis: Total cost
@@ -661,16 +671,18 @@ Left - Monthly Cost Trend:
 - Highlight: Highest and lowest months
 
 Right - Cost Breakdown:
+
 - Doughnut chart using Chart.js
 - Segments:
-  * Disposal (60%)
-  * Pickup Fees (20%)
-  * Rental (10%)
-  * Contamination (5%)
-  * Other (5%)
+  - Disposal (60%)
+  - Pickup Fees (20%)
+  - Rental (10%)
+  - Contamination (5%)
+  - Other (5%)
 - Legend below
 
 PROPERTY DETAILS CARD:
+
 - Property name
 - Units count
 - Location
@@ -679,6 +691,7 @@ PROPERTY DETAILS CARD:
 - Vendor(s)
 
 TOP RECOMMENDATION PREVIEW:
+
 - Card with green left border
 - Badge: "Priority 1"
 - Title: "Install Compactor Monitors"
@@ -689,6 +702,7 @@ TOP RECOMMENDATION PREVIEW:
 Use shadcn/ui: Tabs, Card, Badge components
 Integrate Chart.js for visualizations
 Make responsive (stack on mobile)
+
 ```
 
 ---
@@ -696,20 +710,23 @@ Make responsive (stack on mobile)
 ### PROMPT 6: Expense Analysis Tab
 
 ```
+
 Add Expense Analysis tab to the results dashboard:
 
 TAB CONTENT:
 
 FILTERS BAR:
+
 - Month range selector (date picker)
 - Vendor filter (multi-select dropdown)
 - Service type filter (dropdown: All, Disposal, Bulk, etc.)
 - "Export to CSV" button (right side)
 
 MONTHLY TREND CHART:
+
 - Line chart showing:
-  * Cost per door (primary line, blue)
-  * Total monthly cost (secondary line, green)
+  - Cost per door (primary line, blue)
+  - Total monthly cost (secondary line, green)
 - X-axis: Months
 - Y-axis: Dollars
 - Tooltip: Show exact values on hover
@@ -717,6 +734,7 @@ MONTHLY TREND CHART:
 
 DETAILED EXPENSE TABLE:
 Headers:
+
 - Month (sortable)
 - Vendor (sortable)
 - Service Type (filterable)
@@ -726,21 +744,25 @@ Headers:
 - Notes (expandable)
 
 Data rows:
+
 - October 2024 | Waste Management | Hauling | 5998169-1571-5 | $1,388.51 | $5.60 | Regular service
 - October 2024 | Ally Waste | Bulk Trash | 41953 | $909.33 | $3.67 | Monthly pickup
 - [more rows...]
 
 Monthly subtotal rows:
+
 - Bold text
 - Background: Light gray
 - Shows: Month + "TOTAL" | | | | $2,297.84 | $9.27 | Monthly budget: $9.27/door
 
 Grand total row at bottom:
+
 - Bold, larger font
 - Background: Medium gray
 - Shows: GRAND TOTAL | | | | $42,273.92 | $13.09 | Avg monthly: $13.09/door
 
 TABLE FEATURES:
+
 - Pagination (20 per page)
 - Search bar (searches invoice numbers, vendors)
 - Sort by any column
@@ -748,6 +770,7 @@ TABLE FEATURES:
 - Row highlighting on hover
 
 STATS SUMMARY (above table):
+
 - Total invoices processed: 47
 - Date range: Oct 2023 - Oct 2024
 - Unique vendors: 3
@@ -756,6 +779,7 @@ STATS SUMMARY (above table):
 Use shadcn/ui: Table, Select, Input, Button, DatePicker components
 Implement with real data from database
 Add loading states and empty states
+
 ```
 
 ---
@@ -763,11 +787,13 @@ Add loading states and empty states
 ### PROMPT 7: Recommendations Tab
 
 ```
+
 Add Recommendations tab to show optimization opportunities:
 
 TAB CONTENT:
 
 HEADER:
+
 - Title: "Cost Optimization Opportunities"
 - Subtitle: "3 recommendations identified"
 - Total savings badge: "$15,234 annual savings"
@@ -776,6 +802,7 @@ RECOMMENDATION CARDS (stacked vertically):
 
 CARD 1 - Install Compactor Monitors:
 Header row:
+
 - Badge: "Priority 1" (green)
 - Title: "Install Compactor Monitors" (large, bold)
 - Status: "Recommended" (green dot)
@@ -784,22 +811,22 @@ Description:
 "Current average of 5.2 tons/haul indicates early pickups. Installing DSQ compactor monitors will optimize pickups to target 8-9 tons/haul, significantly reducing pickup frequency."
 
 Metrics row (3 columns):
+
 - Current Performance:
-  * Avg tons/haul: 5.2
-  * Pickups/month: 18
-  * Capacity utilization: 58%
-  
+  - Avg tons/haul: 5.2
+  - Pickups/month: 18
+  - Capacity utilization: 58%
 - Target Performance:
-  * Avg tons/haul: 8.5
-  * Pickups/month: 11
-  * Capacity utilization: 94%
-  
+  - Avg tons/haul: 8.5
+  - Pickups/month: 11
+  - Capacity utilization: 94%
 - Financial Impact:
-  * Annual savings: $12,000
-  * ROI: 145%
-  * Payback: 8.3 months
+  - Annual savings: $12,000
+  - ROI: 145%
+  - Payback: 8.3 months
 
 Calculation Details (expandable):
+
 - Current annual hauls: 216
 - Optimized annual hauls: 132
 - Hauls eliminated: 84
@@ -811,6 +838,7 @@ Calculation Details (expandable):
 - Net annual savings (Year 2+): $11,460
 
 Implementation:
+
 - Timeline: "2-4 weeks"
 - Confidence: HIGH (badge)
 - Next steps: "Contact Keith Conrad at DSQ Technologies"
@@ -820,6 +848,7 @@ Implementation:
 
 CARD 2 - Reduce Contamination:
 Similar structure...
+
 - Priority 2
 - Current contamination: 5.2% of spend
 - Target: <3%
@@ -830,6 +859,7 @@ Similar structure...
 
 CARD 3 - Bulk Trash Subscription:
 Similar structure...
+
 - Priority 3
 - Current: On-demand averaging $625/month
 - Recommended: Monthly subscription $400
@@ -852,6 +882,7 @@ Use shadcn/ui: Card, Badge, Button, Collapsible, Table
 Add expand/collapse for calculation details
 Include contact information cards
 Make calculations prominent and easy to understand
+
 ```
 
 ---
@@ -859,11 +890,13 @@ Make calculations prominent and easy to understand
 ### PROMPT 8: Regulatory Compliance Tab
 
 ```
+
 Add Regulatory Compliance tab:
 
 TAB CONTENT:
 
 HEADER CARD:
+
 - Title: "McKinney, TX Waste & Recycling Ordinances"
 - Confidence score badge: "HIGH" (green) or "MEDIUM" (yellow) or "LOW" (red)
 - Sources consulted: "3 official sources"
@@ -876,34 +909,37 @@ Card with summary text:
 COMPLIANCE CHECKLIST:
 Table format:
 
-| Requirement | Status | Priority | Action Required |
-|-------------|--------|----------|-----------------|
-| Recycling Container | ⚠️ VERIFY | HIGH | Schedule site inspection |
-| Collection Service | ✓ COMPLIANT | HIGH | Service confirmed with vendor |
-| Verification Records | ⚠️ VERIFY | MEDIUM | Request annual submission |
-| Container Signage | ⚠️ VERIFY | MEDIUM | Check signage requirements |
-| Resident Access | ✓ COMPLIANT | MEDIUM | Containers co-located |
+| Requirement          | Status      | Priority | Action Required               |
+| -------------------- | ----------- | -------- | ----------------------------- |
+| Recycling Container  | ⚠️ VERIFY   | HIGH     | Schedule site inspection      |
+| Collection Service   | ✓ COMPLIANT | HIGH     | Service confirmed with vendor |
+| Verification Records | ⚠️ VERIFY   | MEDIUM   | Request annual submission     |
+| Container Signage    | ⚠️ VERIFY   | MEDIUM   | Check signage requirements    |
+| Resident Access      | ✓ COMPLIANT | MEDIUM   | Containers co-located         |
 
 Status badges:
+
 - ✓ COMPLIANT (green)
-- ⚠️ VERIFY (yellow)  
+- ⚠️ VERIFY (yellow)
 - ❌ NON-COMPLIANT (red)
 
 MANDATORY REQUIREMENTS SECTION:
 
 Recycling:
+
 - Requirement card:
-  * Icon: Recycle
-  * "MANDATORY for properties with 5+ units"
-  * Capacity: "Equal to 50% of waste capacity"
-  * Frequency: "Weekly minimum"
-  * Collection: "Co-located with trash"
+  - Icon: Recycle
+  - "MANDATORY for properties with 5+ units"
+  - Capacity: "Equal to 50% of waste capacity"
+  - Frequency: "Weekly minimum"
+  - Collection: "Co-located with trash"
 
 Composting/Organics:
+
 - Requirement card:
-  * Icon: Leaf
-  * Status: "NOT CURRENTLY REQUIRED"
-  * Note: "Monitor for future mandates"
+  - Icon: Leaf
+  - Status: "NOT CURRENTLY REQUIRED"
+  - Note: "Monitor for future mandates"
 
 LICENSED HAULERS TABLE:
 | Company | Phone | Website | Services |
@@ -914,6 +950,7 @@ LICENSED HAULERS TABLE:
 | [3 more haulers...] |
 
 PENALTIES & ENFORCEMENT:
+
 - Classification: "Municipal code violation"
 - Enforcement agency: "McKinney Environmental Services"
 - Contact: John Doe, (972) 555-0400
@@ -921,11 +958,13 @@ PENALTIES & ENFORCEMENT:
 
 CALENDAR REMINDERS (if contract provided):
 List of upcoming dates:
+
 - "90 days before contract renewal: Send termination notice if desired"
 - "Annual compliance verification due: March 31, 2025"
 
 SOURCES SECTION:
 List of sources consulted:
+
 1. McKinney Municipal Code, Chapter 10 - Solid Waste
    Link: library.municode.com/tx/mckinney/...
 2. McKinney Environmental Services - Recycling Requirements
@@ -939,6 +978,7 @@ Use shadcn/ui: Card, Badge, Table, Accordion, Link components
 Color-code compliance status
 Make links clickable
 Include print-friendly styling
+
 ```
 
 ---
@@ -948,6 +988,7 @@ Include print-friendly styling
 ### PROMPT 9: Excel Report Generation
 
 ```
+
 Create Excel workbook generation feature:
 
 Add button to results page: "Download Excel Report"
@@ -956,138 +997,154 @@ BACKEND FUNCTION (Supabase Edge Function):
 Create function: generate-excel-report
 
 Install dependencies:
+
 - ExcelJS
 
 Function logic:
+
 ```typescript
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import ExcelJS from 'exceljs'
-import { createClient } from '@supabase/supabase-js'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import ExcelJS from "exceljs";
+import { createClient } from "@supabase/supabase-js";
 
 serve(async (req) => {
-  const { projectId } = await req.json()
-  
+  const { projectId } = await req.json();
+
   // Initialize Supabase
   const supabase = createClient(
-    Deno.env.get('SUPABASE_URL'),
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  )
-  
+    Deno.env.get("SUPABASE_URL"),
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
+  );
+
   // Fetch project data
   const { data: project } = await supabase
-    .from('projects')
-    .select('*, project_files(*), invoice_data(*)')
-    .eq('id', projectId)
-    .single()
-  
+    .from("projects")
+    .select("*, project_files(*), invoice_data(*)")
+    .eq("id", projectId)
+    .single();
+
   // Create workbook
-  const workbook = new ExcelJS.Workbook()
-  
+  const workbook = new ExcelJS.Workbook();
+
   // TAB 1: SUMMARY_FULL
-  const summarySheet = workbook.addWorksheet('SUMMARY_FULL')
-  
+  const summarySheet = workbook.addWorksheet("SUMMARY_FULL");
+
   // First line MUST be savings statement
-  summarySheet.getCell('A1').value = `Potential to Reduce 2026 Trash Expense by $${project.total_savings.toFixed(0)}`
-  summarySheet.getCell('A1').font = { 
-    bold: true, 
-    size: 14, 
-    color: { argb: 'FF22C55E' } 
-  }
-  summarySheet.mergeCells('A1:E1')
-  summarySheet.getCell('A1').alignment = { horizontal: 'center' }
-  
+  summarySheet.getCell("A1").value =
+    `Potential to Reduce 2026 Trash Expense by $${project.total_savings.toFixed(0)}`;
+  summarySheet.getCell("A1").font = {
+    bold: true,
+    size: 14,
+    color: { argb: "FF22C55E" },
+  };
+  summarySheet.mergeCells("A1:E1");
+  summarySheet.getCell("A1").alignment = { horizontal: "center" };
+
   // Property Overview
-  summarySheet.getCell('A3').value = 'PROPERTY OVERVIEW'
-  summarySheet.getCell('A3').font = { bold: true, size: 12 }
-  
-  summarySheet.getCell('A4').value = 'Property Name:'
-  summarySheet.getCell('B4').value = project.property_name
-  
-  summarySheet.getCell('A5').value = 'Units:'
-  summarySheet.getCell('B5').value = project.units
-  
+  summarySheet.getCell("A3").value = "PROPERTY OVERVIEW";
+  summarySheet.getCell("A3").font = { bold: true, size: 12 };
+
+  summarySheet.getCell("A4").value = "Property Name:";
+  summarySheet.getCell("B4").value = project.property_name;
+
+  summarySheet.getCell("A5").value = "Units:";
+  summarySheet.getCell("B5").value = project.units;
+
   // Continue with all sections...
-  
+
   // TAB 2: EXPENSE_ANALYSIS
-  const expenseSheet = workbook.addWorksheet('EXPENSE_ANALYSIS')
-  
-  expenseSheet.getCell('A1').value = 'DETAILED MONTHLY EXPENSE ANALYSIS'
-  expenseSheet.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } }
-  expenseSheet.getCell('A1').fill = { 
-    type: 'pattern', 
-    pattern: 'solid', 
-    fgColor: { argb: 'FF1F4E78' } 
-  }
-  expenseSheet.mergeCells('A1:G1')
-  
+  const expenseSheet = workbook.addWorksheet("EXPENSE_ANALYSIS");
+
+  expenseSheet.getCell("A1").value = "DETAILED MONTHLY EXPENSE ANALYSIS";
+  expenseSheet.getCell("A1").font = {
+    bold: true,
+    size: 14,
+    color: { argb: "FFFFFFFF" },
+  };
+  expenseSheet.getCell("A1").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FF1F4E78" },
+  };
+  expenseSheet.mergeCells("A1:G1");
+
   // Headers
-  const headers = ['Month', 'Vendor', 'Service Type', 'Invoice Number', 'Amount', 'Cost/Door', 'Notes']
+  const headers = [
+    "Month",
+    "Vendor",
+    "Service Type",
+    "Invoice Number",
+    "Amount",
+    "Cost/Door",
+    "Notes",
+  ];
   headers.forEach((header, i) => {
-    const cell = expenseSheet.getCell(3, i + 1)
-    cell.value = header
-    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
-    cell.fill = { 
-      type: 'pattern', 
-      pattern: 'solid', 
-      fgColor: { argb: 'FF4472C4' } 
-    }
-  })
-  
+    const cell = expenseSheet.getCell(3, i + 1);
+    cell.value = header;
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF4472C4" },
+    };
+  });
+
   // Add invoice data rows
-  let row = 4
-  project.invoice_data.forEach(invoice => {
-    expenseSheet.getCell(row, 1).value = invoice.month
-    expenseSheet.getCell(row, 2).value = invoice.vendor_name
-    expenseSheet.getCell(row, 3).value = invoice.service_type
-    expenseSheet.getCell(row, 4).value = invoice.invoice_number
-    expenseSheet.getCell(row, 5).value = invoice.total_amount
-    expenseSheet.getCell(row, 5).numFmt = '$#,##0.00'
-    expenseSheet.getCell(row, 6).value = invoice.total_amount / project.units
-    expenseSheet.getCell(row, 6).numFmt = '$#,##0.00'
-    expenseSheet.getCell(row, 7).value = 'Regular waste service'
-    row++
-  })
-  
+  let row = 4;
+  project.invoice_data.forEach((invoice) => {
+    expenseSheet.getCell(row, 1).value = invoice.month;
+    expenseSheet.getCell(row, 2).value = invoice.vendor_name;
+    expenseSheet.getCell(row, 3).value = invoice.service_type;
+    expenseSheet.getCell(row, 4).value = invoice.invoice_number;
+    expenseSheet.getCell(row, 5).value = invoice.total_amount;
+    expenseSheet.getCell(row, 5).numFmt = "$#,##0.00";
+    expenseSheet.getCell(row, 6).value = invoice.total_amount / project.units;
+    expenseSheet.getCell(row, 6).numFmt = "$#,##0.00";
+    expenseSheet.getCell(row, 7).value = "Regular waste service";
+    row++;
+  });
+
   // Set column widths
-  expenseSheet.getColumn(1).width = 15
-  expenseSheet.getColumn(2).width = 20
-  expenseSheet.getColumn(3).width = 20
-  expenseSheet.getColumn(4).width = 18
-  expenseSheet.getColumn(5).width = 12
-  expenseSheet.getColumn(6).width = 10
-  expenseSheet.getColumn(7).width = 45
-  
+  expenseSheet.getColumn(1).width = 15;
+  expenseSheet.getColumn(2).width = 20;
+  expenseSheet.getColumn(3).width = 20;
+  expenseSheet.getColumn(4).width = 18;
+  expenseSheet.getColumn(5).width = 12;
+  expenseSheet.getColumn(6).width = 10;
+  expenseSheet.getColumn(7).width = 45;
+
   // Add remaining tabs:
   // TAB 3: RECOMMENDATIONS
   // TAB 4: REGULATORY_COMPLIANCE
   // etc.
-  
+
   // Generate buffer
-  const buffer = await workbook.xlsx.writeBuffer()
-  
+  const buffer = await workbook.xlsx.writeBuffer();
+
   // Upload to storage
-  const fileName = `${project.property_name.replace(/\s/g, '_')}_Analysis.xlsx`
+  const fileName = `${project.property_name.replace(/\s/g, "_")}_Analysis.xlsx`;
   const { data: uploadData } = await supabase.storage
-    .from('reports')
+    .from("reports")
     .upload(`${projectId}/${fileName}`, buffer, {
-      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      upsert: true
-    })
-  
+      contentType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      upsert: true,
+    });
+
   // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('reports')
-    .getPublicUrl(`${projectId}/${fileName}`)
-  
-  return new Response(
-    JSON.stringify({ url: publicUrl }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-})
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("reports").getPublicUrl(`${projectId}/${fileName}`);
+
+  return new Response(JSON.stringify({ url: publicUrl }), {
+    headers: { "Content-Type": "application/json" },
+  });
+});
 ```
 
 FRONTEND:
 Add download button that:
+
 1. Calls Supabase function
 2. Shows loading spinner
 3. Downloads file on completion
@@ -1096,6 +1153,7 @@ Add download button that:
 Style download button prominently
 Show file size estimate
 Include "View in Excel" helper text
+
 ```
 
 ---
@@ -1103,9 +1161,11 @@ Include "View in Excel" helper text
 ### PROMPT 10: Settings Page
 
 ```
+
 Create user settings page at /settings:
 
 LAYOUT with tabs:
+
 - Profile
 - Company
 - Notifications
@@ -1113,6 +1173,7 @@ LAYOUT with tabs:
 
 PROFILE TAB:
 Form with:
+
 - Avatar upload (circular, 100px)
 - Full name (editable)
 - Email (disabled, show "Verified" badge)
@@ -1121,6 +1182,7 @@ Form with:
 
 COMPANY TAB:
 Form with:
+
 - Company name
 - Industry (dropdown)
 - Property count (number)
@@ -1128,17 +1190,19 @@ Form with:
 
 NOTIFICATIONS TAB:
 Toggle switches:
+
 - Email notifications:
-  * Analysis complete
-  * New optimization found
-  * Regulatory updates
+  - Analysis complete
+  - New optimization found
+  - Regulatory updates
 - Push notifications (if enabled)
 
 BILLING TAB:
+
 - Current plan badge (Starter/Professional/Enterprise)
 - Usage stats:
-  * Analyses this month: 3 / 5
-  * Progress bar
+  - Analyses this month: 3 / 5
+  - Progress bar
 - "Upgrade Plan" button
 - Payment method card (if applicable)
 - Billing history table
@@ -1146,6 +1210,7 @@ BILLING TAB:
 Use shadcn/ui: Tabs, Form, Input, Switch, Button, Avatar components
 Add save confirmation toasts
 Include form validation
+
 ```
 
 ---
@@ -1155,6 +1220,7 @@ Include form validation
 ### PROMPT 11: Final Polish
 
 ```
+
 Polish the entire application:
 
 1. Add consistent loading states everywhere:
@@ -1197,11 +1263,13 @@ Polish the entire application:
    - Screen reader support
 
 Test thoroughly on:
+
 - Desktop (Chrome, Firefox, Safari)
 - Mobile (iOS Safari, Android Chrome)
 - Tablet
 
 Fix any bugs found.
+
 ```
 
 ---
@@ -1228,6 +1296,7 @@ Fix any bugs found.
 
 ---
 
-*Prompts Library v1.0*  
-*Total Prompts: 20+*  
+*Prompts Library v1.0*
+*Total Prompts: 20+*
 *Estimated Build Time: 8-16 hours*
+```

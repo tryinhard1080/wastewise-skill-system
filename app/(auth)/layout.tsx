@@ -5,29 +5,25 @@
  * Provides consistent branding and styling across auth flows
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'WasteWise Authentication',
-  description: 'Sign in to WasteWise by THE Trash Hub',
-}
+  title: "WasteWise Authentication",
+  description: "Sign in to WasteWise by THE Trash Hub",
+};
 
 export default function AuthLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 to-green-800 p-12 flex-col justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-white mb-4">
-            WasteWise
-          </h1>
-          <p className="text-green-100 text-lg">
-            by THE Trash Hub
-          </p>
+          <h1 className="text-4xl font-bold text-white mb-4">WasteWise</h1>
+          <p className="text-green-100 text-lg">by THE Trash Hub</p>
         </div>
 
         <div className="space-y-6 text-white">
@@ -36,14 +32,17 @@ export default function AuthLayout({
               Optimize Waste Management
             </h2>
             <p className="text-green-100">
-              Save thousands with AI-powered waste analysis and optimization recommendations.
+              Save thousands with AI-powered waste analysis and optimization
+              recommendations.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div>
               <div className="text-3xl font-bold">$50K+</div>
-              <div className="text-sm text-green-100">Average Annual Savings</div>
+              <div className="text-sm text-green-100">
+                Average Annual Savings
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold">95%</div>
@@ -67,10 +66,8 @@ export default function AuthLayout({
 
       {/* Right side - Auth forms */}
       <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
-        <div className="w-full max-w-md">
-          {children}
-        </div>
+        <div className="w-full max-w-md">{children}</div>
       </div>
     </div>
-  )
+  );
 }

@@ -23,23 +23,25 @@ pnpm test:e2e:ui responsive-viewports
 
 ## Viewports Tested
 
-| Device | Width | Tailwind | Usage |
-|--------|-------|----------|-------|
-| Mobile Small | 375px | (default) | iPhone SE |
-| Mobile Large | 414px | (default) | iPhone 14 Pro Max |
-| Tablet | 768px | `md:` | iPad |
-| Desktop | 1024px | `lg:` | Laptops |
-| Large Desktop | 1440px | `xl:` | MacBook Pro |
+| Device        | Width  | Tailwind  | Usage             |
+| ------------- | ------ | --------- | ----------------- |
+| Mobile Small  | 375px  | (default) | iPhone SE         |
+| Mobile Large  | 414px  | (default) | iPhone 14 Pro Max |
+| Tablet        | 768px  | `md:`     | iPad              |
+| Desktop       | 1024px | `lg:`     | Laptops           |
+| Large Desktop | 1440px | `xl:`     | MacBook Pro       |
 
 ## Current Status
 
 **Audit Results** (as of 2025-11-21):
+
 - Total Issues: 77
 - Errors: 0 🟢
 - Warnings: 41 🟡
 - Info: 36 🔵
 
 **Most Common Issues**:
+
 1. Hardcoded widths (w-[XXXpx])
 2. Grid layouts without mobile breakpoints
 3. Tables without overflow wrappers
@@ -49,30 +51,33 @@ pnpm test:e2e:ui responsive-viewports
 Use these helper components for consistent responsive behavior:
 
 ### ResponsiveContainer
+
 ```tsx
-import { ResponsiveContainer } from '@/components/responsive/responsive-container'
+import { ResponsiveContainer } from "@/components/responsive/responsive-container";
 
 <ResponsiveContainer maxWidth="xl" padding={true}>
   {children}
-</ResponsiveContainer>
+</ResponsiveContainer>;
 ```
 
 ### ResponsiveGrid
+
 ```tsx
-import { ResponsiveGrid } from '@/components/responsive/responsive-grid'
+import { ResponsiveGrid } from "@/components/responsive/responsive-grid";
 
 <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 4 }} gap="md">
   {cards}
-</ResponsiveGrid>
+</ResponsiveGrid>;
 ```
 
 ### ResponsiveTable
+
 ```tsx
-import { ResponsiveTable } from '@/components/responsive/responsive-table'
+import { ResponsiveTable } from "@/components/responsive/responsive-table";
 
 <ResponsiveTable>
   <table className="min-w-full">...</table>
-</ResponsiveTable>
+</ResponsiveTable>;
 ```
 
 ## Pre-Commit Checklist
@@ -101,6 +106,7 @@ ls __tests__/e2e/screenshots/
 ## Common Fixes
 
 ### Hardcoded Width
+
 ```tsx
 // ❌ WRONG
 <div className="w-[1200px]">Content</div>
@@ -110,6 +116,7 @@ ls __tests__/e2e/screenshots/
 ```
 
 ### Missing Mobile Breakpoint
+
 ```tsx
 // ❌ WRONG
 <div className="grid grid-cols-4 gap-4">
@@ -119,6 +126,7 @@ ls __tests__/e2e/screenshots/
 ```
 
 ### Table Overflow
+
 ```tsx
 // ❌ WRONG
 <table>...</table>
@@ -130,6 +138,7 @@ ls __tests__/e2e/screenshots/
 ```
 
 ### Button on Mobile
+
 ```tsx
 // ❌ WRONG
 <Button className="w-32">Submit</Button>
@@ -161,6 +170,7 @@ pnpm test:responsive:quick --grep "screenshot"
 ---
 
 **Quick Links**:
+
 - 📚 [Full Documentation](./docs/)
 - 🧪 [Test Suite](./__tests__/e2e/responsive-viewports.spec.ts)
 - 🛠️ [Audit Script](./scripts/audit-responsive.ts)

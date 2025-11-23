@@ -3,6 +3,7 @@
 ## Accessing the Documentation
 
 ### URL
+
 ```
 http://localhost:3000/api-docs
 ```
@@ -12,6 +13,7 @@ http://localhost:3000/api-docs
 ## Page Layout
 
 ### 1. Header Section (Blue Gradient)
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  WasteWise API Documentation                                    │
@@ -23,6 +25,7 @@ http://localhost:3000/api-docs
 ```
 
 ### 2. Quick Start Guide (Gray Background)
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Quick Start                                                    │
@@ -38,6 +41,7 @@ http://localhost:3000/api-docs
 ```
 
 ### 3. Interactive Swagger UI
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  WasteWise API  v1.0.0                                          │
@@ -82,6 +86,7 @@ http://localhost:3000/api-docs
 1. **Click the "Authorize" button** (top right, with lock icon)
 
 2. **Enter your JWT token**:
+
    ```
    Value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
@@ -95,10 +100,13 @@ Now all endpoints will include your token automatically!
 ### Step 2: Explore Endpoints
 
 #### Expand an Endpoint Group
+
 Click on a tag (e.g., "Analysis") to expand/collapse all endpoints in that category.
 
 #### View Endpoint Details
+
 Click on any endpoint to see:
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  POST /api/analyze                                              │
@@ -141,6 +149,7 @@ Click on any endpoint to see:
 ### Step 3: Test Endpoints
 
 #### Click "Try it out"
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  [Try it out]  ← Click this                                     │
@@ -150,6 +159,7 @@ Click on any endpoint to see:
 ```
 
 #### Edit Request Body
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Request body  *required                                        │
@@ -167,6 +177,7 @@ Click on any endpoint to see:
 ```
 
 #### Click "Execute"
+
 Sends the request and shows the response:
 
 ```
@@ -250,7 +261,9 @@ Sends the request and shows the response:
 ## Features Demonstrated
 
 ### 1. Request Examples
+
 Each endpoint shows multiple example requests:
+
 ```
 Examples ▼
   ▶ complete_analysis      Complete analysis with all features
@@ -258,7 +271,9 @@ Examples ▼
 ```
 
 ### 2. Response Examples
+
 Each response code shows example responses:
+
 ```
 Responses
   ▼ 201  Job created successfully
@@ -270,7 +285,9 @@ Responses
 ```
 
 ### 3. Schema Definitions
+
 Click on schemas to see structure:
+
 ```
 ▼ AnalysisJob
   {
@@ -282,13 +299,17 @@ Click on schemas to see structure:
 ```
 
 ### 4. Security Indicators
+
 Endpoints show lock icon if authentication required:
+
 ```
 POST /api/analyze  🔒
 ```
 
 ### 5. Validation Errors
+
 Shows detailed validation errors:
+
 ```
 {
   "error": "Validation failed",
@@ -307,7 +328,9 @@ Shows detailed validation errors:
 ## Tips and Tricks
 
 ### Filter Endpoints
+
 Use the filter box to quickly find endpoints:
+
 ```
 [Filter: jobs ]  ← Type "jobs"
 ```
@@ -315,10 +338,13 @@ Use the filter box to quickly find endpoints:
 Shows only endpoints with "jobs" in the path or description.
 
 ### Collapse All
+
 Click tag headers to collapse/expand sections for easier navigation.
 
 ### Copy as cURL
+
 After executing a request, you can copy as cURL command:
+
 ```bash
 curl -X POST "http://localhost:3000/api/analyze" \
   -H "accept: application/json" \
@@ -328,13 +354,17 @@ curl -X POST "http://localhost:3000/api/analyze" \
 ```
 
 ### Persistent Authorization
+
 Your authorization token persists in the browser, so you don't need to re-enter it every time you refresh the page.
 
 ### Response Duration
+
 Shows how long each request took - useful for performance testing.
 
 ### Download Spec
+
 Use "Download JSON" button in header to save the OpenAPI spec for:
+
 - Importing into Postman/Insomnia
 - Generating client SDKs
 - Offline reference
@@ -349,29 +379,36 @@ Use "Download JSON" button in header to save the OpenAPI spec for:
 ## Troubleshooting
 
 ### "Authorization required" errors
+
 1. Make sure you clicked "Authorize" button
 2. Verify token format: `Bearer <token>`
 3. Check token hasn't expired (1 hour lifetime)
 
 ### CORS errors
+
 - The API includes CORS headers for localhost
 - If testing from different origin, you may need to configure CORS in Next.js
 
 ### Rate limit errors
+
 - Wait for the time specified in `retryAfter`
 - Check `X-RateLimit-Reset` header for reset time
 
 ### 404 errors
+
 - Verify the endpoint path is correct
 - Check if you have the required permissions (e.g., admin endpoints)
 
 ## Advanced Usage
 
 ### Compare Responses
+
 Open multiple endpoints in different browser tabs to compare responses.
 
 ### Testing Error Cases
+
 Try invalid data to see error responses:
+
 ```json
 {
   "projectId": "not-a-uuid",
@@ -380,7 +417,9 @@ Try invalid data to see error responses:
 ```
 
 ### Rate Limit Testing
+
 Execute same endpoint multiple times quickly to trigger rate limit and see:
+
 - 429 status code
 - `retryAfter` seconds
 - Rate limit headers

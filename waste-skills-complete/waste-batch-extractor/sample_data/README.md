@@ -5,15 +5,18 @@ This folder contains sample data for testing the Waste Batch Extractor skill.
 ## Files Included
 
 ### sample_expenses.xlsx
+
 Multi-property expense report with waste management costs for September 2024.
 
 **Properties included:**
+
 - Columbia Square Living (Waste Management)
 - Jardine Apartments (Republic Services)
 - CityView Towers (Waste Connections)
 - Riverside Commons (GFL Environmental)
 
 **Columns:**
+
 - Property Name
 - Vendor
 - Invoice Date
@@ -21,6 +24,7 @@ Multi-property expense report with waste management costs for September 2024.
 - Description
 
 ### sample_documents_index.csv
+
 Reference file listing expected document metadata.
 
 ## Using Sample Data
@@ -58,6 +62,7 @@ To add your own documents for testing:
 3. Run the batch extractor
 
 The skill will automatically:
+
 - Categorize documents by type
 - Extract structured data
 - Organize results by property name

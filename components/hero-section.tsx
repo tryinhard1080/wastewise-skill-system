@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   return (
@@ -12,7 +12,8 @@ export function HeroSection() {
                 Reduce Waste Costs by Up to 30%
               </h1>
               <p className="max-w-[506px] text-center text-[#37322f]/80 text-lg font-medium leading-7">
-                Data-driven waste management analysis for multifamily properties. Upload invoices, get insights in minutes.
+                Data-driven waste management analysis for multifamily
+                properties. Upload invoices, get insights in minutes.
               </p>
             </div>
           </div>
@@ -26,5 +27,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

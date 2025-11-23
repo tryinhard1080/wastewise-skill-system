@@ -10,6 +10,7 @@ description: Analyze multifamily COMPACTOR performance (NOT open tops), calculat
 **This skill analyzes COMPACTORS with hydraulic compression ONLY.**
 
 **DO NOT use this skill for:**
+
 - Open top containers (roll-offs, dumpsters)
 - Non-compacted service
 - 10-yard, 20-yard, 30-yard, or 40-yard containers described as "open top"
@@ -17,6 +18,7 @@ description: Analyze multifamily COMPACTOR performance (NOT open tops), calculat
 ### Why the Distinction Matters
 
 **Compactors (This Skill Applies):**
+
 - Stationary units with hydraulic compression
 - Waste density: 580 lbs/CY (compacted)
 - Typical tonnage: 40-yard = 0-4 tons, 10-yard = ~1 ton
@@ -24,6 +26,7 @@ description: Analyze multifamily COMPACTOR performance (NOT open tops), calculat
 - Used for regular household waste streams
 
 **Open Tops (This Skill Does NOT Apply):**
+
 - Non-compacted containers (roll-offs, dumpsters)
 - Much lower waste density (no compression)
 - Typical tonnage: 30-yard = ~3 tons max, 20-yard = ~2 tons max
@@ -40,6 +43,7 @@ Analyze waste compactor performance for multifamily properties to identify cost 
 ## When to Use This Skill
 
 Use this skill when:
+
 - Analyzing COMPACTED waste service data or invoices (stationary compactors only)
 - Calculating COMPACTOR capacity utilization percentages
 - Determining optimal pickup frequencies for COMPACTORS
@@ -50,6 +54,7 @@ Use this skill when:
 - Responding to queries about compactor-specific cost reduction opportunities
 
 **DO NOT use this skill when:**
+
 - Data includes open top containers (non-compacted roll-offs or dumpsters)
 - Service is described as "open top", "roll-off", or non-compacted
 - User mentions 10-yard, 20-yard, 30-yard containers without specifying they are compactors
@@ -95,21 +100,25 @@ else:
 For ad-hoc analysis or when explaining methodology:
 
 **1. Calculate maximum capacity:**
+
 ```
 Max_Capacity_Tons = (Container_Size_CY × 580) / 2000
 ```
 
 **2. Calculate utilization:**
+
 ```
 Utilization_% = (Actual_Tons_Per_Pull / Max_Capacity_Tons) × 100
 ```
 
 **3. Determine yards per door:**
+
 ```
 Yards_Per_Door_Weekly = (Container_CY × Pickups_Per_Week) / Units
 ```
 
 **4. Assess optimization opportunity:**
+
 ```
 IF utilization < 60%:
     Optimal_Pickups = Current_Pickups × (Current_Utilization / 75)
@@ -121,12 +130,14 @@ IF utilization < 60%:
 ### Key Metrics
 
 **Capacity Utilization:**
+
 - < 60%: Over-serviced (high priority optimization)
 - 60-70%: Acceptable (room for optimization)
 - 70-85%: Optimal range (target zone)
 - > 90%: Under-serviced (overflow risk)
 
 **Yards Per Door Benchmarks:**
+
 - **COMPACTED service optimal: 0.09 yards/door/week** (range: 0.06-0.125)
   - This benchmark applies ONLY to compactors with hydraulic compression
   - Based on 580 lbs/CY compacted density
@@ -136,6 +147,7 @@ IF utilization < 60%:
   - Different optimization methodology required
 
 **Critical Insight:**
+
 - Frequency-dependent costs = 60-70% of total waste expenses
 - Cascading fees create 1.39x multiplier on haul charges
 - Every $1 saved on haul frequency = $1.39 in total savings
@@ -145,12 +157,13 @@ IF utilization < 60%:
 When analyzing a property:
 
 **0. VALIDATE CONTAINER TYPE (CRITICAL FIRST STEP):**
-   - Confirm service type is COMPACTED (stationary compactor with hydraulic compression)
-   - If data shows "open top", "roll-off", or non-compacted service → STOP
-   - If tonnage seems unusually low for container size → Ask user to clarify if open top
-   - Example validation:
-     - 30-yard with 2 tons average → Likely compactor ✓
-     - 30-yard with 0.5 tons average → Likely open top ✗ (cannot analyze)
+
+- Confirm service type is COMPACTED (stationary compactor with hydraulic compression)
+- If data shows "open top", "roll-off", or non-compacted service → STOP
+- If tonnage seems unusually low for container size → Ask user to clarify if open top
+- Example validation:
+  - 30-yard with 2 tons average → Likely compactor ✓
+  - 30-yard with 0.5 tons average → Likely open top ✗ (cannot analyze)
 
 1. **Gather required data:**
    - Number of units
@@ -186,6 +199,7 @@ references/compactor_optimization_reference.md
 ```
 
 This reference includes:
+
 - Complete calculation framework
 - Yards per door analysis methodology
 - Cost structure and cascading fee models
@@ -197,6 +211,7 @@ This reference includes:
 ## Sanitary Constraints (Always Enforce)
 
 **CRITICAL - Never violate these constraints:**
+
 - Food waste: Maximum 7 days between pickups
 - Hot climates (>85°F): 5 days maximum recommended
 - Multifamily properties: Never exceed 21 days
@@ -254,16 +269,18 @@ User asks how compactor optimization works → Explain methodology → Use refer
 If your waste service data includes open top containers (non-compacted roll-offs or dumpsters), this skill **cannot** perform optimization analysis on those containers.
 
 **Open tops require different analysis because:**
+
 - No compression = much lower waste density
 - Typical usage: bulky items, construction debris, move-outs
 - Different cost structure (often charged per haul vs. scheduled service)
 - Optimization focuses on haul frequency for episodic demand, not capacity utilization
 - Tonnage benchmarks are much lower:
   - 30-yard open top: ~3 tons maximum
-  - 20-yard open top: ~2 tons maximum  
+  - 20-yard open top: ~2 tons maximum
   - 10-yard open top: ~1 ton maximum
 
 **What to do:**
+
 1. Separate compactor data from open top data
 2. Use this skill ONLY for compactor analysis
 3. For open tops, evaluate:
@@ -274,9 +291,10 @@ If your waste service data includes open top containers (non-compacted roll-offs
 5. Consider if property could benefit from adding a compactor to reduce open top dependency
 
 **Example clarification:**
+
 - "I have data for a 30-yard compactor (3.5 tons/pull) and a 20-yard open top (1.8 tons/pull)"
 - Response: "I can optimize the 30-yard compactor for you. The 20-yard open top needs separate evaluation since it's non-compacted service with different optimization methodology."
 
 ---
 
-*For questions about Advantage Waste or implementation support, contact Richard Bates, Director of Waste and Diversion Strategies at Greystar.*
+_For questions about Advantage Waste or implementation support, contact Richard Bates, Director of Waste and Diversion Strategies at Greystar._

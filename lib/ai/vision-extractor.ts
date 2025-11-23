@@ -12,23 +12,27 @@
  * - Cost calculation
  */
 
-import Anthropic from '@anthropic-ai/sdk'
-import type { InvoiceData, HaulLogEntry, ContractData } from '@/lib/skills/types'
+import Anthropic from "@anthropic-ai/sdk";
+import type {
+  InvoiceData,
+  HaulLogEntry,
+  ContractData,
+} from "@/lib/skills/types";
 
 // Anthropic API pricing (as of Dec 2024)
-const INPUT_COST_PER_MTK = 3.0 // $3 per million tokens
-const OUTPUT_COST_PER_MTK = 15.0 // $15 per million tokens
+const INPUT_COST_PER_MTK = 3.0; // $3 per million tokens
+const OUTPUT_COST_PER_MTK = 15.0; // $15 per million tokens
 
 /**
  * Calculate cost for Anthropic API usage
  */
 export function calculateAnthropicCost(usage: {
-  input_tokens: number
-  output_tokens: number
+  input_tokens: number;
+  output_tokens: number;
 }): number {
-  const inputCost = (usage.input_tokens / 1_000_000) * INPUT_COST_PER_MTK
-  const outputCost = (usage.output_tokens / 1_000_000) * OUTPUT_COST_PER_MTK
-  return inputCost + outputCost
+  const inputCost = (usage.input_tokens / 1_000_000) * INPUT_COST_PER_MTK;
+  const outputCost = (usage.output_tokens / 1_000_000) * OUTPUT_COST_PER_MTK;
+  return inputCost + outputCost;
 }
 
 /**
@@ -104,7 +108,7 @@ IMPORTANT:
 - If container type is unclear, use "OTHER"
 - All numbers should be numeric values, not strings
 - Dates should be in YYYY-MM-DD format
-- Return ONLY the JSON object, no additional text`
+- Return ONLY the JSON object, no additional text`;
 
 /**
  * Haul log extraction prompt template
@@ -137,7 +141,7 @@ IMPORTANT:
 - All numbers should be numeric values, not strings
 - Dates should be in YYYY-MM-DD format
 - Time should be in HH:MM format (24-hour)
-- Return ONLY the JSON array, no additional text`
+- Return ONLY the JSON array, no additional text`;
 
 /**
  * Extract invoice data from a document using Claude Vision
@@ -145,103 +149,103 @@ IMPORTANT:
 export async function extractInvoiceWithVision(
   fileBuffer: Buffer,
   mimeType: string,
-  fileName: string
+  fileName: string,
 ): Promise<{
-  invoice: InvoiceData
-  usage: { input_tokens: number; output_tokens: number }
+  invoice: InvoiceData;
+  usage: { input_tokens: number; output_tokens: number };
 }> {
   if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
   }
 
   const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
-  })
+  });
 
-  const base64Data = fileBuffer.toString('base64')
+  const base64Data = fileBuffer.toString("base64");
 
   const message = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: "claude-3-5-sonnet-20241022",
     max_tokens: 4096,
     messages: [
       {
-        role: 'user',
+        role: "user",
         content: [
           {
-            type: 'image',
+            type: "image",
             source: {
-              type: 'base64',
+              type: "base64",
               media_type: mimeType as
-                | 'image/jpeg'
-                | 'image/png'
-                | 'image/gif'
-                | 'image/webp',
+                | "image/jpeg"
+                | "image/png"
+                | "image/gif"
+                | "image/webp",
               data: base64Data,
             },
           },
           {
-            type: 'text',
+            type: "text",
             text: INVOICE_EXTRACTION_PROMPT,
           },
         ],
       },
     ],
-  })
+  });
 
   // Extract text content from response
-  const textContent = message.content.find((c) => c.type === 'text')
-  if (!textContent || textContent.type !== 'text') {
-    throw new Error('No text content in Claude Vision response')
+  const textContent = message.content.find((c) => c.type === "text");
+  if (!textContent || textContent.type !== "text") {
+    throw new Error("No text content in Claude Vision response");
   }
 
   // Parse JSON response
-  let extractedData: any
+  let extractedData: any;
   try {
     // Remove markdown code blocks if present
-    let jsonText = textContent.text.trim()
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '')
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '')
+    let jsonText = textContent.text.trim();
+    if (jsonText.startsWith("```json")) {
+      jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
+    } else if (jsonText.startsWith("```")) {
+      jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
     }
-    extractedData = JSON.parse(jsonText)
+    extractedData = JSON.parse(jsonText);
   } catch (error) {
     throw new Error(
-      `Failed to parse JSON from Claude Vision response: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+      `Failed to parse JSON from Claude Vision response: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 
   // Transform extracted data to InvoiceData format
   const invoice: InvoiceData = {
     sourceFile: fileName,
     extractionDate: new Date().toISOString(),
-    propertyName: extractedData.property?.name || '',
-    propertyAddress: extractedData.property?.address || '',
+    propertyName: extractedData.property?.name || "",
+    propertyAddress: extractedData.property?.address || "",
     units: extractedData.property?.units || undefined,
-    servicePeriodStart: extractedData.service?.periodStart || '',
-    servicePeriodEnd: extractedData.service?.periodEnd || '',
-    invoiceNumber: extractedData.service?.invoiceNumber || '',
-    billingDate: extractedData.service?.billingDate || '',
+    servicePeriodStart: extractedData.service?.periodStart || "",
+    servicePeriodEnd: extractedData.service?.periodEnd || "",
+    invoiceNumber: extractedData.service?.invoiceNumber || "",
+    billingDate: extractedData.service?.billingDate || "",
     lineItems: (extractedData.lineItems || []).map((item: any) => ({
-      description: item.description || '',
-      containerType: item.containerType || 'OTHER',
+      description: item.description || "",
+      containerType: item.containerType || "OTHER",
       containerSize: item.containerSize || 0,
       quantity: item.quantity || 0,
-      frequency: item.frequency || '',
+      frequency: item.frequency || "",
       unitPrice: item.unitPrice || 0,
       totalPrice: item.totalPrice || 0,
     })),
     subtotal: extractedData.totals?.subtotal || 0,
     tax: extractedData.totals?.tax || 0,
     total: extractedData.totals?.total || 0,
-    vendorName: extractedData.vendor?.name || '',
+    vendorName: extractedData.vendor?.name || "",
     vendorContact: extractedData.vendor?.contact || undefined,
-  }
+  };
 
   return {
     invoice,
     usage: message.usage,
-  }
+  };
 }
 
 /**
@@ -250,89 +254,89 @@ export async function extractInvoiceWithVision(
 export async function extractHaulLogWithVision(
   fileBuffer: Buffer,
   mimeType: string,
-  fileName: string
+  fileName: string,
 ): Promise<{
-  haulLogs: HaulLogEntry[]
-  usage: { input_tokens: number; output_tokens: number }
+  haulLogs: HaulLogEntry[];
+  usage: { input_tokens: number; output_tokens: number };
 }> {
   if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
   }
 
   const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
-  })
+  });
 
-  const base64Data = fileBuffer.toString('base64')
+  const base64Data = fileBuffer.toString("base64");
 
   const message = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: "claude-3-5-sonnet-20241022",
     max_tokens: 4096,
     messages: [
       {
-        role: 'user',
+        role: "user",
         content: [
           {
-            type: 'image',
+            type: "image",
             source: {
-              type: 'base64',
+              type: "base64",
               media_type: mimeType as
-                | 'image/jpeg'
-                | 'image/png'
-                | 'image/gif'
-                | 'image/webp',
+                | "image/jpeg"
+                | "image/png"
+                | "image/gif"
+                | "image/webp",
               data: base64Data,
             },
           },
           {
-            type: 'text',
+            type: "text",
             text: HAUL_LOG_EXTRACTION_PROMPT,
           },
         ],
       },
     ],
-  })
+  });
 
   // Extract text content from response
-  const textContent = message.content.find((c) => c.type === 'text')
-  if (!textContent || textContent.type !== 'text') {
-    throw new Error('No text content in Claude Vision response')
+  const textContent = message.content.find((c) => c.type === "text");
+  if (!textContent || textContent.type !== "text") {
+    throw new Error("No text content in Claude Vision response");
   }
 
   // Parse JSON response
-  let extractedData: any[]
+  let extractedData: any[];
   try {
     // Remove markdown code blocks if present
-    let jsonText = textContent.text.trim()
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '')
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '')
+    let jsonText = textContent.text.trim();
+    if (jsonText.startsWith("```json")) {
+      jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
+    } else if (jsonText.startsWith("```")) {
+      jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
     }
-    extractedData = JSON.parse(jsonText)
+    extractedData = JSON.parse(jsonText);
   } catch (error) {
     throw new Error(
-      `Failed to parse JSON from Claude Vision response: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+      `Failed to parse JSON from Claude Vision response: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 
   // Transform extracted data to HaulLogEntry format
   const haulLogs: HaulLogEntry[] = extractedData.map((entry: any) => ({
     sourceFile: fileName,
-    date: entry.date || '',
+    date: entry.date || "",
     time: entry.time || undefined,
-    containerType: entry.containerType || 'OTHER',
+    containerType: entry.containerType || "OTHER",
     containerSize: entry.containerSize || 0,
     weight: entry.weight || undefined,
     volume: entry.volume || undefined,
-    serviceType: entry.serviceType || 'OTHER',
+    serviceType: entry.serviceType || "OTHER",
     notes: entry.notes || undefined,
-  }))
+  }));
 
   return {
     haulLogs,
     usage: message.usage,
-  }
+  };
 }
 
 /**
@@ -420,7 +424,7 @@ IMPORTANT:
 - Use uppercase for containerType: "COMPACTOR", "DUMPSTER", "OPEN_TOP", or "OTHER"
 - All numbers should be numeric values, not strings
 - Dates should be in YYYY-MM-DD format
-- Return ONLY the JSON object, no additional text`
+- Return ONLY the JSON object, no additional text`;
 
 /**
  * Extract contract data from a document using Claude Vision
@@ -428,70 +432,70 @@ IMPORTANT:
 export async function extractContractData(
   fileBuffer: Buffer,
   mimeType: string,
-  fileName: string
+  fileName: string,
 ): Promise<{
-  contract: ContractData
-  usage: { input_tokens: number; output_tokens: number }
+  contract: ContractData;
+  usage: { input_tokens: number; output_tokens: number };
 }> {
   if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
   }
 
   const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
-  })
+  });
 
-  const base64Data = fileBuffer.toString('base64')
+  const base64Data = fileBuffer.toString("base64");
 
   const message = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: "claude-3-5-sonnet-20241022",
     max_tokens: 4096,
     messages: [
       {
-        role: 'user',
+        role: "user",
         content: [
           {
-            type: 'image',
+            type: "image",
             source: {
-              type: 'base64',
+              type: "base64",
               media_type: mimeType as
-                | 'image/jpeg'
-                | 'image/png'
-                | 'image/gif'
-                | 'image/webp',
+                | "image/jpeg"
+                | "image/png"
+                | "image/gif"
+                | "image/webp",
               data: base64Data,
             },
           },
           {
-            type: 'text',
+            type: "text",
             text: CONTRACT_EXTRACTION_PROMPT,
           },
         ],
       },
     ],
-  })
+  });
 
   // Extract text content from response
-  const textContent = message.content.find((c) => c.type === 'text')
-  if (!textContent || textContent.type !== 'text') {
-    throw new Error('No text content in Claude Vision response')
+  const textContent = message.content.find((c) => c.type === "text");
+  if (!textContent || textContent.type !== "text") {
+    throw new Error("No text content in Claude Vision response");
   }
 
   // Parse JSON response
-  let extractedData: any
+  let extractedData: any;
   try {
     // Remove markdown code blocks if present
-    let jsonText = textContent.text.trim()
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '')
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '')
+    let jsonText = textContent.text.trim();
+    if (jsonText.startsWith("```json")) {
+      jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
+    } else if (jsonText.startsWith("```")) {
+      jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
     }
-    extractedData = JSON.parse(jsonText)
+    extractedData = JSON.parse(jsonText);
   } catch (error) {
     throw new Error(
-      `Failed to parse JSON from Claude Vision response: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+      `Failed to parse JSON from Claude Vision response: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 
   // Transform extracted data to ContractData format
@@ -499,26 +503,26 @@ export async function extractContractData(
     sourceFile: fileName,
     extractionDate: new Date().toISOString(),
     property: {
-      name: extractedData.property?.name || '',
-      address: extractedData.property?.address || '',
+      name: extractedData.property?.name || "",
+      address: extractedData.property?.address || "",
       units: extractedData.property?.units || undefined,
     },
     vendor: {
-      name: extractedData.vendor?.name || '',
+      name: extractedData.vendor?.name || "",
       contact: extractedData.vendor?.contact || undefined,
       phone: extractedData.vendor?.phone || undefined,
       email: extractedData.vendor?.email || undefined,
     },
     contractDates: {
-      effectiveDate: extractedData.contractDates?.effectiveDate || '',
-      expirationDate: extractedData.contractDates?.expirationDate || '',
+      effectiveDate: extractedData.contractDates?.effectiveDate || "",
+      expirationDate: extractedData.contractDates?.expirationDate || "",
       termMonths: extractedData.contractDates?.termMonths || 0,
       autoRenew: extractedData.contractDates?.autoRenew ?? false,
     },
     services: (extractedData.services || []).map((service: any) => ({
-      containerType: service.containerType || 'OTHER',
+      containerType: service.containerType || "OTHER",
       containerSize: service.containerSize || 0,
-      frequency: service.frequency || '',
+      frequency: service.frequency || "",
       serviceDays: service.serviceDays || undefined,
     })),
     pricing: {
@@ -532,52 +536,55 @@ export async function extractContractData(
     },
     terms: {
       terminationNoticeDays: extractedData.terms?.terminationNoticeDays || 30,
-      earlyTerminationPenalty: extractedData.terms?.earlyTerminationPenalty || undefined,
+      earlyTerminationPenalty:
+        extractedData.terms?.earlyTerminationPenalty || undefined,
       insuranceRequired: extractedData.terms?.insuranceRequired ?? false,
-      paymentTerms: extractedData.terms?.paymentTerms || 'Net 30',
+      paymentTerms: extractedData.terms?.paymentTerms || "Net 30",
       latePenalty: extractedData.terms?.latePenalty || undefined,
     },
-  }
+  };
 
   return {
     contract,
     usage: message.usage,
-  }
+  };
 }
 
 /**
  * Detect document type from file name and content
  */
-export function detectDocumentType(fileName: string): 'invoice' | 'haul-log' | 'contract' | 'unknown' {
-  const lowerName = fileName.toLowerCase()
+export function detectDocumentType(
+  fileName: string,
+): "invoice" | "haul-log" | "contract" | "unknown" {
+  const lowerName = fileName.toLowerCase();
 
   // Contract patterns
   if (
-    lowerName.includes('contract') ||
-    lowerName.includes('agreement') ||
-    lowerName.includes('service agreement')
+    lowerName.includes("contract") ||
+    lowerName.includes("agreement") ||
+    lowerName.includes("service agreement")
   ) {
-    return 'contract'
+    return "contract";
   }
 
   // Invoice patterns
   if (
-    lowerName.includes('invoice') ||
-    lowerName.includes('bill') ||
-    lowerName.includes('statement')
+    lowerName.includes("invoice") ||
+    lowerName.includes("bill") ||
+    lowerName.includes("statement")
   ) {
-    return 'invoice'
+    return "invoice";
   }
 
   // Haul log patterns
   if (
-    lowerName.includes('haul') ||
-    lowerName.includes('log') ||
-    lowerName.includes('pickup') ||
-    lowerName.includes('service')
+    lowerName.includes("haul") ||
+    lowerName.includes("log") ||
+    lowerName.includes("pickup") ||
+    lowerName.includes("service")
   ) {
-    return 'haul-log'
+    return "haul-log";
   }
 
-  return 'unknown'
+  return "unknown";
 }

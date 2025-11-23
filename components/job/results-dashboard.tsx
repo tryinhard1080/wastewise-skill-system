@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Results Dashboard Component
@@ -13,8 +13,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   TrendingDown,
   DollarSign,
@@ -22,9 +22,12 @@ import {
   AlertCircle,
   CheckCircle2,
   BarChart3,
-} from 'lucide-react'
-import type { CompactorOptimizationResult } from '@/lib/skills/types'
-import { DSQ_MONITOR_INSTALL, DSQ_MONITOR_MONTHLY } from '@/lib/constants/formulas'
+} from "lucide-react";
+import type { CompactorOptimizationResult } from "@/lib/skills/types";
+import {
+  DSQ_MONITOR_INSTALL,
+  DSQ_MONITOR_MONTHLY,
+} from "@/lib/constants/formulas";
 import {
   BarChart,
   Bar,
@@ -39,15 +42,15 @@ import {
   Cell,
   LineChart,
   Line,
-} from 'recharts'
+} from "recharts";
 
 interface ResultsDashboardProps {
-  results: CompactorOptimizationResult | any
-  jobType: string
-  project: any
+  results: CompactorOptimizationResult | any;
+  jobType: string;
+  project: any;
 }
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
+const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444"];
 
 export function ResultsDashboard({
   results,
@@ -55,8 +58,10 @@ export function ResultsDashboard({
   project,
 }: ResultsDashboardProps) {
   // Handle different job types
-  if (jobType === 'complete_analysis' || jobType.includes('compactor')) {
-    return <CompactorOptimizationDashboard results={results} project={project} />
+  if (jobType === "complete_analysis" || jobType.includes("compactor")) {
+    return (
+      <CompactorOptimizationDashboard results={results} project={project} />
+    );
   }
 
   // Default generic results display
@@ -65,7 +70,7 @@ export function ResultsDashboard({
       <CardHeader>
         <CardTitle>Analysis Results</CardTitle>
         <CardDescription>
-          Results for {jobType.replace(/_/g, ' ')}
+          Results for {jobType.replace(/_/g, " ")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -74,41 +79,41 @@ export function ResultsDashboard({
         </pre>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function CompactorOptimizationDashboard({
   results,
   project,
 }: {
-  results: CompactorOptimizationResult
-  project: any
+  results: CompactorOptimizationResult;
+  project: any;
 }) {
   // Prepare chart data
   const performanceData = [
     {
-      name: 'Current',
+      name: "Current",
       tons: results.avgTonsPerHaul,
-      fill: results.recommend ? '#f59e0b' : '#10b981',
+      fill: results.recommend ? "#f59e0b" : "#10b981",
     },
     {
-      name: 'Target',
+      name: "Target",
       tons: results.targetTonsPerHaul,
-      fill: '#10b981',
+      fill: "#10b981",
     },
-  ]
+  ];
 
   const savingsBreakdown = [
-    { name: 'Gross Annual Savings', value: results.grossAnnualSavings || 0 },
+    { name: "Gross Annual Savings", value: results.grossAnnualSavings || 0 },
     {
-      name: 'Installation Cost',
+      name: "Installation Cost",
       value: DSQ_MONITOR_INSTALL,
     },
     {
-      name: 'Annual Monitoring',
+      name: "Annual Monitoring",
       value: DSQ_MONITOR_MONTHLY * 12,
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -153,9 +158,7 @@ function CompactorOptimizationDashboard({
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Avg Tons/Haul
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Avg Tons/Haul</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -192,7 +195,9 @@ function CompactorOptimizationDashboard({
             <div className="text-2xl font-bold">
               {results.roiPercent?.toFixed(1)}%
             </div>
-            <p className="text-xs text-muted-foreground">Return on investment</p>
+            <p className="text-xs text-muted-foreground">
+              Return on investment
+            </p>
           </CardContent>
         </Card>
 
@@ -205,9 +210,7 @@ function CompactorOptimizationDashboard({
             <div className="text-2xl font-bold">
               {results.paybackMonths?.toFixed(1)} mo
             </div>
-            <p className="text-xs text-muted-foreground">
-              Time to break even
-            </p>
+            <p className="text-xs text-muted-foreground">Time to break even</p>
           </CardContent>
         </Card>
       </div>
@@ -227,7 +230,13 @@ function CompactorOptimizationDashboard({
               <BarChart data={performanceData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis label={{ value: 'Tons per Haul', angle: -90, position: 'insideLeft' }} />
+                <YAxis
+                  label={{
+                    value: "Tons per Haul",
+                    angle: -90,
+                    position: "insideLeft",
+                  }}
+                />
                 <Tooltip />
                 <Bar dataKey="tons" fill="#10b981" radius={[8, 8, 0, 0]} />
               </BarChart>
@@ -239,9 +248,7 @@ function CompactorOptimizationDashboard({
         <Card>
           <CardHeader>
             <CardTitle>Cost Analysis</CardTitle>
-            <CardDescription>
-              Savings vs implementation costs
-            </CardDescription>
+            <CardDescription>Savings vs implementation costs</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -272,7 +279,9 @@ function CompactorOptimizationDashboard({
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                      <span className="text-green-600 text-sm font-bold">1</span>
+                      <span className="text-green-600 text-sm font-bold">
+                        1
+                      </span>
                     </div>
                   </div>
                   <div>
@@ -287,13 +296,15 @@ function CompactorOptimizationDashboard({
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                      <span className="text-green-600 text-sm font-bold">2</span>
+                      <span className="text-green-600 text-sm font-bold">
+                        2
+                      </span>
                     </div>
                   </div>
                   <div>
                     <p className="font-medium">Optimize Pickup Schedule</p>
                     <p className="text-sm text-muted-foreground">
-                      Reduce pickups to achieve target capacity of{' '}
+                      Reduce pickups to achieve target capacity of{" "}
                       {results.targetTonsPerHaul} tons per haul
                     </p>
                   </div>
@@ -302,14 +313,19 @@ function CompactorOptimizationDashboard({
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                      <span className="text-green-600 text-sm font-bold">3</span>
+                      <span className="text-green-600 text-sm font-bold">
+                        3
+                      </span>
                     </div>
                   </div>
                   <div>
                     <p className="font-medium">Monitor Performance</p>
                     <p className="text-sm text-muted-foreground">
                       Review monthly savings (est. $
-                      {((results.grossAnnualSavings || 0) / 12).toLocaleString()}/month)
+                      {(
+                        (results.grossAnnualSavings || 0) / 12
+                      ).toLocaleString()}
+                      /month)
                     </p>
                   </div>
                 </div>
@@ -322,7 +338,7 @@ function CompactorOptimizationDashboard({
                 <div>
                   <p className="font-medium">Continue Current Operations</p>
                   <p className="text-sm text-muted-foreground">
-                    Your compactor is operating efficiently at{' '}
+                    Your compactor is operating efficiently at{" "}
                     {results.avgTonsPerHaul.toFixed(2)} tons per haul. No
                     optimization needed at this time.
                   </p>
@@ -333,5 +349,5 @@ function CompactorOptimizationDashboard({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

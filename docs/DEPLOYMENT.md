@@ -78,6 +78,7 @@ railway init
 ### 3. Create Two Services
 
 **Web Service** (Next.js):
+
 - Name: `wastewise-web`
 - Source: GitHub repository
 - Build Command: `pnpm install && pnpm build`
@@ -85,6 +86,7 @@ railway init
 - Port: 3000 (auto-detected)
 
 **Worker Service** (Background Jobs):
+
 - Name: `wastewise-worker`
 - Source: Same GitHub repository
 - Build Command: `pnpm install && pnpm build:worker`
@@ -138,6 +140,7 @@ pnpm deploy:production
 ```
 
 This script:
+
 1. Validates environment (strict mode)
 2. Runs all tests
 3. Creates git tag
@@ -175,6 +178,7 @@ curl https://wastewise.com/api/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "healthy",

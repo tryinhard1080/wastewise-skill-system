@@ -6,12 +6,12 @@
  * Future: Add validation, versioning, dynamic loading
  */
 
-import { Skill, SkillConfig, RegisteredSkill } from './types'
-import { createClient } from '@/lib/supabase/server'
-import { logger } from '@/lib/observability/logger'
+import { Skill, SkillConfig, RegisteredSkill } from "./types";
+import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/observability/logger";
 
 class SkillRegistry {
-  private skills = new Map<string, Skill>()
+  private skills = new Map<string, Skill>();
 
   /**
    * Register a skill
@@ -20,11 +20,11 @@ class SkillRegistry {
    */
   register(skill: Skill): void {
     if (this.skills.has(skill.name)) {
-      logger.warn(`Skill '${skill.name}' is already registered. Overwriting.`)
+      logger.warn(`Skill '${skill.name}' is already registered. Overwriting.`);
     }
 
-    this.skills.set(skill.name, skill)
-    logger.debug(`Registered skill: ${skill.name} (v${skill.version})`)
+    this.skills.set(skill.name, skill);
+    logger.debug(`Registered skill: ${skill.name} (v${skill.version})`);
   }
 
   /**
@@ -34,7 +34,7 @@ class SkillRegistry {
    * @returns Skill instance or undefined
    */
   get(name: string): Skill | undefined {
-    return this.skills.get(name)
+    return this.skills.get(name);
   }
 
   /**
@@ -43,7 +43,7 @@ class SkillRegistry {
    * @returns Array of all registered skills
    */
   getAll(): Skill[] {
-    return Array.from(this.skills.values())
+    return Array.from(this.skills.values());
   }
 
   /**
@@ -53,25 +53,27 @@ class SkillRegistry {
    * @returns Skill configuration
    */
   async getConfig(name: string): Promise<SkillConfig> {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from('skills_config')
-      .select('*')
-      .eq('skill_name', name)
-      .single()
+      .from("skills_config")
+      .select("*")
+      .eq("skill_name", name)
+      .single();
 
     if (error) {
-      throw new Error(`Failed to get config for skill '${name}': ${error.message}`)
+      throw new Error(
+        `Failed to get config for skill '${name}': ${error.message}`,
+      );
     }
 
     if (!data) {
-      throw new Error(`No configuration found for skill '${name}'`)
+      throw new Error(`No configuration found for skill '${name}'`);
     }
 
     // Parse JSONB fields
-    const conversionRates = data.conversion_rates as any
-    const thresholds = data.thresholds as any
+    const conversionRates = data.conversion_rates as any;
+    const thresholds = data.thresholds as any;
 
     return {
       conversionRates: {
@@ -85,7 +87,7 @@ class SkillRegistry {
         bulkMonthly: thresholds.bulk_monthly,
         leaseupVariance: thresholds.leaseup_variance,
       },
-    }
+    };
   }
 
   /**
@@ -95,7 +97,7 @@ class SkillRegistry {
    * @returns True if registered
    */
   has(name: string): boolean {
-    return this.skills.has(name)
+    return this.skills.has(name);
   }
 
   /**
@@ -104,7 +106,7 @@ class SkillRegistry {
    * @returns Number of registered skills
    */
   count(): number {
-    return this.skills.size
+    return this.skills.size;
   }
 
   /**
@@ -113,10 +115,10 @@ class SkillRegistry {
    * @returns Array of skill names
    */
   list(): string[] {
-    return Array.from(this.skills.keys())
+    return Array.from(this.skills.keys());
   }
 }
 
 // Export class and singleton instance
-export { SkillRegistry }
-export const skillRegistry = new SkillRegistry()
+export { SkillRegistry };
+export const skillRegistry = new SkillRegistry();

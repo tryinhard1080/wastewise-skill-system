@@ -26,6 +26,7 @@ The WasteWise SaaS platform has successfully reached 90% production readiness wi
 ### Remaining Work (⏳ To Complete)
 
 **Missing Critical Features** (10%):
+
 1. Regulatory research skill (ordinance extraction)
 2. User account management (settings, billing)
 3. Subscription/pricing integration (Stripe)
@@ -42,50 +43,55 @@ The WasteWise SaaS platform has successfully reached 90% production readiness wi
 ## Phase 9 Structure
 
 ### Phase 9.1: Complete Missing Skills (Week 1)
+
 **Goal**: Implement regulatory research skill and enhance existing skills
 
 #### Task 1.1: Regulatory Research Skill
+
 **Priority**: HIGH
 **Estimated Time**: 2-3 days
 
 **Implementation**:
+
 ```typescript
 // lib/skills/skills/regulatory-research.ts
 
 export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResult> {
-  readonly name = 'regulatory-research'
-  readonly version = '1.0.0'
+  readonly name = "regulatory-research";
+  readonly version = "1.0.0";
 
   async executeInternal(context: SkillContext): Promise<RegulatoryResult> {
     // 1. Extract property location from context
-    const { city, state, county } = context.propertyInfo
+    const { city, state, county } = context.propertyInfo;
 
     // 2. Search for municipal ordinances (web search)
-    const ordinances = await this.searchOrdinances(city, state, county)
+    const ordinances = await this.searchOrdinances(city, state, county);
 
     // 3. Extract compliance requirements using Claude
-    const requirements = await this.extractRequirements(ordinances)
+    const requirements = await this.extractRequirements(ordinances);
 
     // 4. Compare current service to requirements
     const complianceStatus = await this.assessCompliance(
       context.currentService,
-      requirements
-    )
+      requirements,
+    );
 
     // 5. Store in regulatory_compliance table
-    await this.saveCompliance(context.projectId, complianceStatus)
+    await this.saveCompliance(context.projectId, complianceStatus);
 
-    return complianceStatus
+    return complianceStatus;
   }
 }
 ```
 
 **Database Integration**:
+
 - Use existing `regulatory_compliance` table
 - Store ordinance text, requirements, compliance status
 - Track verification dates and sources
 
 **Deliverables**:
+
 - [ ] Implement RegulatoryResearchSkill class
 - [ ] Add web search integration (Exa or Tavily)
 - [ ] Create ordinance extraction prompts
@@ -96,16 +102,19 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResult> {
 - [ ] Update wastewise-analytics orchestrator
 
 #### Task 1.2: Enhanced Skill Orchestration
+
 **Priority**: MEDIUM
 **Estimated Time**: 1 day
 
 **Enhancements**:
+
 - Parallel skill execution where possible
 - Better error recovery (retry logic)
 - Progress aggregation across skills
 - Conditional skill execution based on data availability
 
 **Deliverables**:
+
 - [ ] Refactor executor for parallel execution
 - [ ] Add retry logic with exponential backoff
 - [ ] Improve progress tracking granularity
@@ -115,13 +124,16 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResult> {
 ---
 
 ### Phase 9.2: User Account Management (Week 2)
+
 **Goal**: Complete user profile, settings, and account management
 
 #### Task 2.1: User Settings Page
+
 **Priority**: HIGH
 **Estimated Time**: 2 days
 
 **Features**:
+
 - Profile information (name, email, company)
 - Password change
 - Notification preferences
@@ -129,6 +141,7 @@ export class RegulatoryResearchSkill extends BaseSkill<RegulatoryResult> {
 - Account deletion
 
 **Implementation**:
+
 ```
 app/settings/
 ├── page.tsx              # Main settings layout
@@ -139,6 +152,7 @@ app/settings/
 ```
 
 **Deliverables**:
+
 - [ ] Create settings pages
 - [ ] Add profile update API route
 - [ ] Implement password change flow
@@ -148,16 +162,19 @@ app/settings/
 - [ ] Write E2E tests
 
 #### Task 2.2: Team Management (Multi-User Support)
+
 **Priority**: MEDIUM
 **Estimated Time**: 2 days
 
 **Features**:
+
 - Team/organization concept
 - Invite team members
 - Role-based access control (Admin, Editor, Viewer)
 - Shared projects within teams
 
 **Database Updates**:
+
 ```sql
 -- New tables needed
 create table organizations (
@@ -179,6 +196,7 @@ alter table projects add column organization_id uuid references organizations(id
 ```
 
 **Deliverables**:
+
 - [ ] Create database migrations
 - [ ] Implement organization creation
 - [ ] Add team member invitation flow
@@ -190,58 +208,63 @@ alter table projects add column organization_id uuid references organizations(id
 ---
 
 ### Phase 9.3: Subscription & Billing (Week 3)
+
 **Goal**: Integrate Stripe for subscription management
 
 #### Task 3.1: Stripe Integration
+
 **Priority**: HIGH
 **Estimated Time**: 3-4 days
 
 **Pricing Tiers**:
+
 ```typescript
 const PRICING_TIERS = {
   free: {
-    name: 'Free',
+    name: "Free",
     price: 0,
     features: {
       projects: 1,
       analyses: 5,
-      storage: '100 MB',
+      storage: "100 MB",
       teamMembers: 1,
-      support: 'Community'
-    }
+      support: "Community",
+    },
   },
   professional: {
-    name: 'Professional',
+    name: "Professional",
     price: 49, // per month
     features: {
       projects: 10,
-      analyses: 'Unlimited',
-      storage: '10 GB',
+      analyses: "Unlimited",
+      storage: "10 GB",
       teamMembers: 5,
-      support: 'Email'
-    }
+      support: "Email",
+    },
   },
   enterprise: {
-    name: 'Enterprise',
+    name: "Enterprise",
     price: 199, // per month
     features: {
-      projects: 'Unlimited',
-      analyses: 'Unlimited',
-      storage: '100 GB',
-      teamMembers: 'Unlimited',
-      support: 'Priority + Phone'
-    }
-  }
-}
+      projects: "Unlimited",
+      analyses: "Unlimited",
+      storage: "100 GB",
+      teamMembers: "Unlimited",
+      support: "Priority + Phone",
+    },
+  },
+};
 ```
 
 **Implementation**:
+
 - Stripe Checkout for subscriptions
 - Webhook handlers for subscription events
 - Usage tracking and limits enforcement
 - Billing portal integration
 
 **Database Updates**:
+
 ```sql
 create table subscriptions (
   id uuid primary key default uuid_generate_v4(),
@@ -265,6 +288,7 @@ create table usage_tracking (
 ```
 
 **Deliverables**:
+
 - [ ] Set up Stripe account
 - [ ] Create pricing page
 - [ ] Implement Stripe Checkout
@@ -275,16 +299,19 @@ create table usage_tracking (
 - [ ] Write tests
 
 #### Task 3.2: Usage Limits & Enforcement
+
 **Priority**: HIGH
 **Estimated Time**: 1 day
 
 **Features**:
+
 - Track projects, analyses, storage per organization
 - Block actions when limits exceeded
 - Show usage dashboard
 - Upgrade prompts
 
 **Deliverables**:
+
 - [ ] Implement usage tracking middleware
 - [ ] Add limit checks to API routes
 - [ ] Create usage dashboard component
@@ -294,13 +321,16 @@ create table usage_tracking (
 ---
 
 ### Phase 9.4: Admin Dashboard (Week 4)
+
 **Goal**: Build internal admin tools for monitoring and support
 
 #### Task 4.1: Admin Portal
+
 **Priority**: MEDIUM
 **Estimated Time**: 3 days
 
 **Features**:
+
 - System health monitoring
 - User management (view, edit, delete)
 - Job queue monitoring
@@ -309,6 +339,7 @@ create table usage_tracking (
 - Feature flags
 
 **Implementation**:
+
 ```
 app/admin/
 ├── page.tsx              # Dashboard overview
@@ -320,6 +351,7 @@ app/admin/
 ```
 
 **Deliverables**:
+
 - [ ] Create admin role system
 - [ ] Build admin dashboard
 - [ ] Add user management UI
@@ -330,10 +362,12 @@ app/admin/
 - [ ] Write tests
 
 #### Task 4.2: System Monitoring
+
 **Priority**: HIGH
 **Estimated Time**: 2 days
 
 **Features**:
+
 - Job success/failure rates
 - AI API usage and costs
 - Response times
@@ -342,6 +376,7 @@ app/admin/
 - Database performance
 
 **Deliverables**:
+
 - [ ] Replace console logging with proper service (Sentry, LogRocket)
 - [ ] Add performance monitoring (New Relic, DataDog)
 - [ ] Create health check endpoints
@@ -352,13 +387,16 @@ app/admin/
 ---
 
 ### Phase 9.5: Production Deployment (Week 5)
+
 **Goal**: Deploy to production with proper infrastructure
 
 #### Task 5.1: Deployment Configuration
+
 **Priority**: HIGH
 **Estimated Time**: 2-3 days
 
 **Hosting Options**:
+
 1. **Vercel** (Recommended for Next.js)
    - Automatic deployments from GitHub
    - Edge functions for workers
@@ -374,6 +412,7 @@ app/admin/
    - Highest complexity
 
 **Infrastructure Needed**:
+
 ```
 Production Stack:
 ├── Frontend + API: Vercel
@@ -385,6 +424,7 @@ Production Stack:
 ```
 
 **Environment Setup**:
+
 ```bash
 # Production environment variables
 NEXT_PUBLIC_SUPABASE_URL=
@@ -398,6 +438,7 @@ SENTRY_DSN=
 ```
 
 **Deliverables**:
+
 - [ ] Set up production Supabase project
 - [ ] Configure Vercel deployment
 - [ ] Set up environment variables
@@ -408,10 +449,12 @@ SENTRY_DSN=
 - [ ] Document deployment process
 
 #### Task 5.2: CI/CD Pipeline
+
 **Priority**: HIGH
 **Estimated Time**: 1 day
 
 **GitHub Actions Workflow**:
+
 ```yaml
 # .github/workflows/production.yml
 name: Production Deploy
@@ -442,6 +485,7 @@ jobs:
 ```
 
 **Deliverables**:
+
 - [ ] Create GitHub Actions workflows
 - [ ] Add automated testing
 - [ ] Set up deployment approvals
@@ -452,13 +496,16 @@ jobs:
 ---
 
 ### Phase 9.6: Performance Optimization (Week 6)
+
 **Goal**: Achieve Lighthouse score >90
 
 #### Task 6.1: Frontend Performance
+
 **Priority**: MEDIUM
 **Estimated Time**: 2 days
 
 **Optimizations**:
+
 - Code splitting for larger pages
 - Image optimization (Next.js Image component)
 - Lazy loading for heavy components
@@ -466,12 +513,14 @@ jobs:
 - Caching strategies
 
 **Targets**:
+
 - Performance: >90
 - Accessibility: >95
 - Best Practices: >95
 - SEO: >90
 
 **Deliverables**:
+
 - [ ] Run Lighthouse audits
 - [ ] Optimize images
 - [ ] Implement code splitting
@@ -481,10 +530,12 @@ jobs:
 - [ ] Document optimizations
 
 #### Task 6.2: Backend Performance
+
 **Priority**: MEDIUM
 **Estimated Time**: 2 days
 
 **Optimizations**:
+
 - Database query optimization (indexes)
 - API response caching
 - Connection pooling
@@ -492,6 +543,7 @@ jobs:
 - Rate limiting tuning
 
 **Deliverables**:
+
 - [ ] Add database indexes
 - [ ] Implement Redis caching (if needed)
 - [ ] Optimize worker concurrency
@@ -501,13 +553,16 @@ jobs:
 ---
 
 ### Phase 9.7: Comprehensive Testing (Week 7)
+
 **Goal**: 100% test coverage for critical paths
 
 #### Task 7.1: Unit Test Coverage
+
 **Priority**: HIGH
 **Estimated Time**: 3 days
 
 **Test Coverage Goals**:
+
 - Calculations: 100%
 - Skills: 100%
 - API routes: 90%
@@ -515,6 +570,7 @@ jobs:
 - Utilities: 100%
 
 **Deliverables**:
+
 - [ ] Write missing unit tests
 - [ ] Achieve coverage targets
 - [ ] Add test documentation
@@ -522,10 +578,12 @@ jobs:
 - [ ] Add coverage gates to CI
 
 #### Task 7.2: Integration Testing
+
 **Priority**: HIGH
 **Estimated Time**: 2 days
 
 **Test Scenarios**:
+
 - Complete user workflows
 - Skill execution pipelines
 - Report generation end-to-end
@@ -533,6 +591,7 @@ jobs:
 - Team collaboration
 
 **Deliverables**:
+
 - [ ] Write integration tests
 - [ ] Add database test fixtures
 - [ ] Create test helper utilities
@@ -540,10 +599,12 @@ jobs:
 - [ ] Add to CI pipeline
 
 #### Task 7.3: E2E Testing
+
 **Priority**: MEDIUM
 **Estimated Time**: 2 days
 
 **Test Flows**:
+
 - User signup → project creation → analysis → download
 - Subscription upgrade flow
 - Team invitation flow
@@ -551,6 +612,7 @@ jobs:
 - Error scenarios
 
 **Deliverables**:
+
 - [ ] Expand E2E test suite
 - [ ] Add visual regression tests
 - [ ] Test error scenarios
@@ -560,13 +622,16 @@ jobs:
 ---
 
 ### Phase 9.8: Documentation & Training (Week 8)
+
 **Goal**: Complete user and developer documentation
 
 #### Task 8.1: User Documentation
+
 **Priority**: MEDIUM
 **Estimated Time**: 2 days
 
 **Documentation Needed**:
+
 - User guide (getting started)
 - Feature documentation
 - FAQ
@@ -574,6 +639,7 @@ jobs:
 - API documentation (if exposing API)
 
 **Deliverables**:
+
 - [ ] Create user guide
 - [ ] Write feature docs
 - [ ] Compile FAQ
@@ -581,10 +647,12 @@ jobs:
 - [ ] Add in-app help tooltips
 
 #### Task 8.2: Developer Documentation
+
 **Priority**: MEDIUM
 **Estimated Time**: 2 days
 
 **Documentation Needed**:
+
 - Architecture overview
 - Development setup
 - Contribution guidelines
@@ -592,6 +660,7 @@ jobs:
 - Troubleshooting guide
 
 **Deliverables**:
+
 - [ ] Update README.md
 - [ ] Document architecture
 - [ ] Create contribution guide
@@ -605,22 +674,15 @@ jobs:
 ### Phase 9 - Critical Path (Must Have for Launch)
 
 **Week 1-2: Core Features**
+
 1. ✅ Regulatory research skill
 2. ✅ User settings page
 3. ✅ Stripe integration
 4. ✅ Production deployment config
 
-**Week 3-4: Production Readiness**
-5. ✅ Monitoring & logging
-6. ✅ Performance optimization
-7. ✅ Test coverage >90%
-8. ✅ Admin dashboard (basic)
+**Week 3-4: Production Readiness** 5. ✅ Monitoring & logging 6. ✅ Performance optimization 7. ✅ Test coverage >90% 8. ✅ Admin dashboard (basic)
 
-**Week 5-6: Polish & Launch**
-9. ✅ Documentation
-10. ✅ Final testing
-11. ✅ Soft launch
-12. ✅ User feedback iteration
+**Week 5-6: Polish & Launch** 9. ✅ Documentation 10. ✅ Final testing 11. ✅ Soft launch 12. ✅ User feedback iteration
 
 ### Nice to Have (Post-Launch)
 
@@ -640,25 +702,28 @@ jobs:
 ## Success Metrics
 
 ### Technical Metrics
+
 - [ ] 100% uptime SLA
 - [ ] <2s average page load time
 - [ ] <5min average analysis completion time
-- [ ] >90 Lighthouse score
+- [ ] > 90 Lighthouse score
 - [ ] <1% error rate
 - [ ] 100% test coverage for calculations
 
 ### Business Metrics
+
 - [ ] 10 beta users onboarded
 - [ ] 50 analyses completed
 - [ ] 5 paying customers
 - [ ] <5% churn rate
-- [ ] >4.5 user satisfaction rating
+- [ ] > 4.5 user satisfaction rating
 
 ### User Experience Metrics
+
 - [ ] <1 minute signup to first analysis
-- [ ] >90% report download rate
+- [ ] > 90% report download rate
 - [ ] <2% support ticket rate
-- [ ] >80% feature adoption
+- [ ] > 80% feature adoption
 
 ---
 
@@ -667,16 +732,19 @@ jobs:
 ### Technical Risks
 
 **Risk 1: AI API Costs**
+
 - Mitigation: Implement usage limits, caching, optimize prompts
 - Monitoring: Track costs per analysis
 - Contingency: Rate limiting, tiered pricing
 
 **Risk 2: Worker Scalability**
+
 - Mitigation: Horizontal scaling, job prioritization
 - Monitoring: Queue length, processing times
 - Contingency: Auto-scaling, job throttling
 
 **Risk 3: Data Loss**
+
 - Mitigation: Regular backups, point-in-time recovery
 - Monitoring: Backup success rate
 - Contingency: Disaster recovery plan
@@ -684,11 +752,13 @@ jobs:
 ### Business Risks
 
 **Risk 1: Low Adoption**
+
 - Mitigation: Beta program, user feedback loop
 - Monitoring: Signup rate, activation rate
 - Contingency: Pivot features, adjust pricing
 
 **Risk 2: Accuracy Issues**
+
 - Mitigation: Comprehensive testing, evals
 - Monitoring: Error reports, user feedback
 - Contingency: Manual review queue
@@ -743,6 +813,7 @@ Week 8: Documentation & Launch Prep
 ## Next Steps (Immediate Actions)
 
 ### This Week (Week 1)
+
 1. **Start Task 1.1**: Implement regulatory research skill
    - Set up web search integration (Exa API)
    - Create ordinance extraction prompts
@@ -758,6 +829,7 @@ Week 8: Documentation & Launch Prep
    - Design subscription flow
 
 ### Blocking Issues to Resolve
+
 - [ ] Choose web search provider (Exa vs Tavily)
 - [ ] Finalize pricing tiers
 - [ ] Decide on hosting (Vercel vs Railway)
@@ -768,9 +840,11 @@ Week 8: Documentation & Launch Prep
 ## Budget Estimates
 
 ### Development Costs (8 weeks @ $100/hr, 40hrs/week)
+
 - Developer time: $32,000
 
 ### Infrastructure Costs (Annual)
+
 - Supabase Pro: $25/month × 12 = $300
 - Vercel Pro: $20/month × 12 = $240
 - Anthropic API: ~$500/month × 12 = $6,000 (estimate)
@@ -781,6 +855,7 @@ Week 8: Documentation & Launch Prep
 **Total Infrastructure**: ~$7,402/year
 
 ### Third-Party Services
+
 - Exa API (search): $50/month × 12 = $600
 - SendGrid (email): $15/month × 12 = $180
 

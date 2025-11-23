@@ -18,47 +18,47 @@
  *   - SUPABASE_SERVICE_ROLE_KEY
  */
 
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '../types/database.types'
-import dotenv from 'dotenv'
-import path from 'path'
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../types/database.types";
+import dotenv from "dotenv";
+import path from "path";
 
 // Load environment variables
-dotenv.config({ path: path.join(process.cwd(), '.env.local') })
+dotenv.config({ path: path.join(process.cwd(), ".env.local") });
 
 // Test user configuration
 const TEST_USER = {
-  email: 'test@wastewise.local',
-  password: 'TestPassword123!',
-  name: 'Test User',
-}
+  email: "test@wastewise.local",
+  password: "TestPassword123!",
+  name: "Test User",
+};
 
 // Test project configuration
 const TEST_PROJECT = {
-  property_name: 'Riverside Gardens Apartments',
+  property_name: "Riverside Gardens Apartments",
   units: 250,
-  city: 'Austin',
-  state: 'TX',
-  property_type: 'Garden-Style' as const,
-  equipment_type: 'COMPACTOR' as const,
+  city: "Austin",
+  state: "TX",
+  property_type: "Garden-Style" as const,
+  equipment_type: "COMPACTOR" as const,
   analysis_period_months: 6,
-}
+};
 
 // Vendor configuration
-const VENDOR_NAME = 'Waste Management of Texas'
+const VENDOR_NAME = "Waste Management of Texas";
 
 /**
  * Validate environment variables
  */
 function validateEnvironment(): void {
-  const required = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
-  const missing = required.filter((key) => !process.env[key])
+  const required = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"];
+  const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
-    console.error('\n❌ Missing required environment variables:')
-    missing.forEach((key) => console.error(`  - ${key}`))
-    console.error('\nPlease check your .env.local file\n')
-    process.exit(1)
+    console.error("\n❌ Missing required environment variables:");
+    missing.forEach((key) => console.error(`  - ${key}`));
+    console.error("\nPlease check your .env.local file\n");
+    process.exit(1);
   }
 }
 
@@ -74,42 +74,47 @@ function createAdminClient() {
         autoRefreshToken: false,
         persistSession: false,
       },
-    }
-  )
+    },
+  );
 }
 
 /**
  * Generate random number between min and max
  */
 function randomBetween(min: number, max: number): number {
-  return Math.random() * (max - min) + min
+  return Math.random() * (max - min) + min;
 }
 
 /**
  * Generate random integer between min and max (inclusive)
  */
 function randomInt(min: number, max: number): number {
-  return Math.floor(randomBetween(min, max + 1))
+  return Math.floor(randomBetween(min, max + 1));
 }
 
 /**
  * Create or get test user
  */
-async function createTestUser(supabase: ReturnType<typeof createClient<Database>>) {
-  console.log('\n🔑 Creating test user...')
+async function createTestUser(
+  supabase: ReturnType<typeof createClient<Database>>,
+) {
+  console.log("\n🔑 Creating test user...");
 
   // Check if user already exists
-  const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers()
+  const { data: existingUsers, error: listError } =
+    await supabase.auth.admin.listUsers();
 
   if (listError) {
-    throw new Error(`Failed to list users: ${listError.message}`)
+    throw new Error(`Failed to list users: ${listError.message}`);
   }
 
-  const existingUser = existingUsers.users.find((u) => u.email === TEST_USER.email)
+  const existingUser = existingUsers.users.find(
+    (u) => u.email === TEST_USER.email,
+  );
 
   if (existingUser) {
-    console.log(`✓ Test user already exists: ${TEST_USER.email}`)
-    return existingUser.id
+    console.log(`✓ Test user already exists: ${TEST_USER.email}`);
+    return existingUser.id;
   }
 
   // Create new user
@@ -120,14 +125,14 @@ async function createTestUser(supabase: ReturnType<typeof createClient<Database>
     user_metadata: {
       name: TEST_USER.name,
     },
-  })
+  });
 
   if (error) {
-    throw new Error(`Failed to create user: ${error.message}`)
+    throw new Error(`Failed to create user: ${error.message}`);
   }
 
-  console.log(`✓ Created test user: ${TEST_USER.email}`)
-  return data.user.id
+  console.log(`✓ Created test user: ${TEST_USER.email}`);
+  return data.user.id;
 }
 
 /**
@@ -135,26 +140,26 @@ async function createTestUser(supabase: ReturnType<typeof createClient<Database>
  */
 async function createTestProject(
   supabase: ReturnType<typeof createClient<Database>>,
-  userId: string
+  userId: string,
 ) {
-  console.log('\n🏢 Creating test project...')
+  console.log("\n🏢 Creating test project...");
 
   // Check if project already exists
   const { data: existing } = await supabase
-    .from('projects')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('property_name', TEST_PROJECT.property_name)
-    .maybeSingle()
+    .from("projects")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("property_name", TEST_PROJECT.property_name)
+    .maybeSingle();
 
   if (existing) {
-    console.log(`✓ Test project already exists: ${TEST_PROJECT.property_name}`)
-    return existing.id
+    console.log(`✓ Test project already exists: ${TEST_PROJECT.property_name}`);
+    return existing.id;
   }
 
   // Create new project
   const { data, error } = await supabase
-    .from('projects')
+    .from("projects")
     .insert({
       user_id: userId,
       property_name: TEST_PROJECT.property_name,
@@ -164,17 +169,17 @@ async function createTestProject(
       property_type: TEST_PROJECT.property_type,
       equipment_type: TEST_PROJECT.equipment_type,
       analysis_period_months: TEST_PROJECT.analysis_period_months,
-      status: 'draft',
+      status: "draft",
     })
     .select()
-    .single()
+    .single();
 
   if (error) {
-    throw new Error(`Failed to create project: ${error.message}`)
+    throw new Error(`Failed to create project: ${error.message}`);
   }
 
-  console.log(`✓ Created project: ${TEST_PROJECT.property_name}`)
-  return data.id
+  console.log(`✓ Created project: ${TEST_PROJECT.property_name}`);
+  return data.id;
 }
 
 /**
@@ -182,41 +187,42 @@ async function createTestProject(
  */
 async function generateInvoiceData(
   supabase: ReturnType<typeof createClient<Database>>,
-  projectId: string
+  projectId: string,
 ) {
-  console.log('\n📄 Generating invoice data...')
+  console.log("\n📄 Generating invoice data...");
 
   // Delete existing invoices for this project (idempotent)
-  await supabase.from('invoice_data').delete().eq('project_id', projectId)
+  await supabase.from("invoice_data").delete().eq("project_id", projectId);
 
-  const invoices = []
-  const startDate = new Date('2025-01-01')
+  const invoices = [];
+  const startDate = new Date("2025-01-01");
 
   for (let month = 0; month < 6; month++) {
-    const invoiceDate = new Date(startDate)
-    invoiceDate.setMonth(startDate.getMonth() + month)
+    const invoiceDate = new Date(startDate);
+    invoiceDate.setMonth(startDate.getMonth() + month);
 
     // Generate realistic charges
-    const disposal = randomBetween(2800, 3200)
-    const pickupFees = randomBetween(450, 550)
-    const rental = 200 // Fixed rental
-    const contamination = Math.random() > 0.7 ? randomBetween(50, 150) : 0 // 30% chance of contamination fee
-    const bulkService = Math.random() > 0.6 ? randomBetween(100, 300) : 0 // 40% chance of bulk service
+    const disposal = randomBetween(2800, 3200);
+    const pickupFees = randomBetween(450, 550);
+    const rental = 200; // Fixed rental
+    const contamination = Math.random() > 0.7 ? randomBetween(50, 150) : 0; // 30% chance of contamination fee
+    const bulkService = Math.random() > 0.6 ? randomBetween(100, 300) : 0; // 40% chance of bulk service
 
-    const totalAmount = disposal + pickupFees + rental + contamination + bulkService
+    const totalAmount =
+      disposal + pickupFees + rental + contamination + bulkService;
 
     // Calculate tonnage (12-18 tons per month)
-    const tonnage = randomBetween(12, 18)
+    const tonnage = randomBetween(12, 18);
 
     // Estimated hauls per month (3-4)
-    const hauls = randomInt(3, 4)
+    const hauls = randomInt(3, 4);
 
     invoices.push({
       project_id: projectId,
-      invoice_number: `INV-2025-${String(month + 1).padStart(2, '0')}-001`,
-      invoice_date: invoiceDate.toISOString().split('T')[0],
+      invoice_number: `INV-2025-${String(month + 1).padStart(2, "0")}-001`,
+      invoice_date: invoiceDate.toISOString().split("T")[0],
       vendor_name: VENDOR_NAME,
-      service_type: 'Compactor Service',
+      service_type: "Compactor Service",
       total_amount: Number(totalAmount.toFixed(2)),
       tonnage: Number(tonnage.toFixed(3)),
       hauls,
@@ -224,21 +230,25 @@ async function generateInvoiceData(
         disposal: Number(disposal.toFixed(2)),
         pickup_fees: Number(pickupFees.toFixed(2)),
         rental: Number(rental.toFixed(2)),
-        ...(contamination > 0 && { contamination: Number(contamination.toFixed(2)) }),
-        ...(bulkService > 0 && { bulk_service: Number(bulkService.toFixed(2)) }),
+        ...(contamination > 0 && {
+          contamination: Number(contamination.toFixed(2)),
+        }),
+        ...(bulkService > 0 && {
+          bulk_service: Number(bulkService.toFixed(2)),
+        }),
       },
-      notes: `Monthly service for ${invoiceDate.toLocaleString('default', { month: 'long', year: 'numeric' })}`,
-    })
+      notes: `Monthly service for ${invoiceDate.toLocaleString("default", { month: "long", year: "numeric" })}`,
+    });
   }
 
-  const { error } = await supabase.from('invoice_data').insert(invoices)
+  const { error } = await supabase.from("invoice_data").insert(invoices);
 
   if (error) {
-    throw new Error(`Failed to create invoices: ${error.message}`)
+    throw new Error(`Failed to create invoices: ${error.message}`);
   }
 
-  console.log(`✓ Created ${invoices.length} invoice records`)
-  return invoices
+  console.log(`✓ Created ${invoices.length} invoice records`);
+  return invoices;
 }
 
 /**
@@ -246,55 +256,55 @@ async function generateInvoiceData(
  */
 async function generateHaulLogData(
   supabase: ReturnType<typeof createClient<Database>>,
-  projectId: string
+  projectId: string,
 ) {
-  console.log('\n🚛 Generating haul log data...')
+  console.log("\n🚛 Generating haul log data...");
 
   // Delete existing haul logs for this project (idempotent)
-  await supabase.from('haul_log').delete().eq('project_id', projectId)
+  await supabase.from("haul_log").delete().eq("project_id", projectId);
 
-  const hauls = []
-  const startDate = new Date('2025-01-01')
-  let currentDate = new Date(startDate)
+  const hauls = [];
+  const startDate = new Date("2025-01-01");
+  let currentDate = new Date(startDate);
 
   // Generate 3-4 hauls per month for 6 months (approx 22 hauls total)
   for (let i = 0; i < 22; i++) {
     // Days between hauls: 7-12 days
-    const daysSinceLast = i === 0 ? 0 : randomInt(7, 12)
-    currentDate = new Date(currentDate)
-    currentDate.setDate(currentDate.getDate() + daysSinceLast)
+    const daysSinceLast = i === 0 ? 0 : randomInt(7, 12);
+    currentDate = new Date(currentDate);
+    currentDate.setDate(currentDate.getDate() + daysSinceLast);
 
     // Tonnage per haul: 3.5-6.5 tons (mix of low and high utilization)
     // Some hauls will be < 6.0 tons (optimization threshold)
-    const tonnage = randomBetween(3.5, 6.5)
+    const tonnage = randomBetween(3.5, 6.5);
 
     // Determine status based on tonnage
-    let status: 'normal' | 'low_utilization' | 'high_utilization'
+    let status: "normal" | "low_utilization" | "high_utilization";
     if (tonnage < 6.0) {
-      status = 'low_utilization'
+      status = "low_utilization";
     } else if (tonnage > 8.0) {
-      status = 'high_utilization'
+      status = "high_utilization";
     } else {
-      status = 'normal'
+      status = "normal";
     }
 
     hauls.push({
       project_id: projectId,
-      haul_date: currentDate.toISOString().split('T')[0],
+      haul_date: currentDate.toISOString().split("T")[0],
       tonnage: Number(tonnage.toFixed(3)),
       days_since_last: i === 0 ? null : daysSinceLast,
       status,
-    })
+    });
   }
 
-  const { error } = await supabase.from('haul_log').insert(hauls)
+  const { error } = await supabase.from("haul_log").insert(hauls);
 
   if (error) {
-    throw new Error(`Failed to create haul logs: ${error.message}`)
+    throw new Error(`Failed to create haul logs: ${error.message}`);
   }
 
-  console.log(`✓ Created ${hauls.length} haul log entries`)
-  return hauls
+  console.log(`✓ Created ${hauls.length} haul log entries`);
+  return hauls;
 }
 
 /**
@@ -302,136 +312,140 @@ async function generateHaulLogData(
  */
 async function createContractTerms(
   supabase: ReturnType<typeof createClient<Database>>,
-  projectId: string
+  projectId: string,
 ) {
-  console.log('\n📝 Creating contract terms...')
+  console.log("\n📝 Creating contract terms...");
 
   // Delete existing contract terms for this project (idempotent)
-  await supabase.from('contract_terms').delete().eq('project_id', projectId)
+  await supabase.from("contract_terms").delete().eq("project_id", projectId);
 
-  const { error } = await supabase.from('contract_terms').insert({
+  const { error } = await supabase.from("contract_terms").insert({
     project_id: projectId,
-    contract_start_date: '2025-01-01',
-    contract_end_date: '2025-12-31',
+    contract_start_date: "2025-01-01",
+    contract_end_date: "2025-12-31",
     term_length_years: 1.0,
     clauses: {
-      'Term & Renewal': [
-        'Initial term: 12 months starting January 1, 2025',
-        'Auto-renewal for successive 12-month periods',
-        '60-day written notice required for non-renewal',
+      "Term & Renewal": [
+        "Initial term: 12 months starting January 1, 2025",
+        "Auto-renewal for successive 12-month periods",
+        "60-day written notice required for non-renewal",
       ],
-      'Rate Increases': [
-        'Annual price adjustment based on Consumer Price Index (CPI)',
-        'Maximum increase capped at 5% per year',
+      "Rate Increases": [
+        "Annual price adjustment based on Consumer Price Index (CPI)",
+        "Maximum increase capped at 5% per year",
       ],
-      'Service Level': [
-        'Compactor service provided on as-needed basis',
-        'Target frequency: 2 pickups per week',
-        'Additional pickups available upon request',
+      "Service Level": [
+        "Compactor service provided on as-needed basis",
+        "Target frequency: 2 pickups per week",
+        "Additional pickups available upon request",
       ],
-      'Termination': [
-        'Either party may terminate with 60-day written notice',
-        'Early termination fee: $500 if terminated before initial term end',
+      Termination: [
+        "Either party may terminate with 60-day written notice",
+        "Early termination fee: $500 if terminated before initial term end",
       ],
-      'Liability': [
-        'Vendor maintains $2M general liability insurance',
-        'Property owner not liable for contamination originating from vendor equipment',
+      Liability: [
+        "Vendor maintains $2M general liability insurance",
+        "Property owner not liable for contamination originating from vendor equipment",
       ],
     },
     calendar_reminders: [
       {
-        type: 'renewal_notice',
-        date: '2025-11-01',
-        description: '60-day renewal notice deadline',
+        type: "renewal_notice",
+        date: "2025-11-01",
+        description: "60-day renewal notice deadline",
       },
       {
-        type: 'rate_review',
-        date: '2025-10-01',
-        description: 'Annual rate review and CPI adjustment',
+        type: "rate_review",
+        date: "2025-10-01",
+        description: "Annual rate review and CPI adjustment",
       },
     ],
-  })
+  });
 
   if (error) {
-    throw new Error(`Failed to create contract terms: ${error.message}`)
+    throw new Error(`Failed to create contract terms: ${error.message}`);
   }
 
-  console.log('✓ Created contract terms')
+  console.log("✓ Created contract terms");
 }
 
 /**
  * Print summary
  */
-function printSummary(projectId: string, invoiceCount: number, haulCount: number) {
-  console.log('\n' + '='.repeat(60))
-  console.log('✅ Seed completed successfully!')
-  console.log('='.repeat(60))
+function printSummary(
+  projectId: string,
+  invoiceCount: number,
+  haulCount: number,
+) {
+  console.log("\n" + "=".repeat(60));
+  console.log("✅ Seed completed successfully!");
+  console.log("=".repeat(60));
 
-  console.log('\n📋 Test Credentials:')
-  console.log(`  Email:    ${TEST_USER.email}`)
-  console.log(`  Password: ${TEST_USER.password}`)
+  console.log("\n📋 Test Credentials:");
+  console.log(`  Email:    ${TEST_USER.email}`);
+  console.log(`  Password: ${TEST_USER.password}`);
 
-  console.log('\n🏢 Test Project:')
-  console.log(`  ID:        ${projectId}`)
-  console.log(`  Name:      ${TEST_PROJECT.property_name}`)
-  console.log(`  Units:     ${TEST_PROJECT.units}`)
-  console.log(`  Equipment: ${TEST_PROJECT.equipment_type}`)
-  console.log(`  Location:  ${TEST_PROJECT.city}, ${TEST_PROJECT.state}`)
+  console.log("\n🏢 Test Project:");
+  console.log(`  ID:        ${projectId}`);
+  console.log(`  Name:      ${TEST_PROJECT.property_name}`);
+  console.log(`  Units:     ${TEST_PROJECT.units}`);
+  console.log(`  Equipment: ${TEST_PROJECT.equipment_type}`);
+  console.log(`  Location:  ${TEST_PROJECT.city}, ${TEST_PROJECT.state}`);
 
-  console.log('\n📊 Data Created:')
-  console.log(`  - ${invoiceCount} monthly invoices (Jan-Jun 2025)`)
-  console.log(`  - ${haulCount} haul log entries`)
-  console.log(`  - 1 contract terms record`)
+  console.log("\n📊 Data Created:");
+  console.log(`  - ${invoiceCount} monthly invoices (Jan-Jun 2025)`);
+  console.log(`  - ${haulCount} haul log entries`);
+  console.log(`  - 1 contract terms record`);
 
-  console.log('\n🚀 Next Steps:')
-  console.log('  1. Start development server: pnpm dev')
-  console.log('  2. Start background worker: pnpm worker')
-  console.log('  3. Login with test credentials')
-  console.log(`  4. Navigate to project: /projects/${projectId}`)
-  console.log('  5. Click "Start Analysis"')
-  console.log('')
+  console.log("\n🚀 Next Steps:");
+  console.log("  1. Start development server: pnpm dev");
+  console.log("  2. Start background worker: pnpm worker");
+  console.log("  3. Login with test credentials");
+  console.log(`  4. Navigate to project: /projects/${projectId}`);
+  console.log('  5. Click "Start Analysis"');
+  console.log("");
 }
 
 /**
  * Main entry point
  */
 async function main(): Promise<void> {
-  console.log('\n🌱 WasteWise Test Data Seeder')
-  console.log('=' .repeat(60))
+  console.log("\n🌱 WasteWise Test Data Seeder");
+  console.log("=".repeat(60));
 
   // Validate environment
-  validateEnvironment()
+  validateEnvironment();
 
   // Create admin client
-  const supabase = createAdminClient()
+  const supabase = createAdminClient();
 
   try {
     // Step 1: Create test user
-    const userId = await createTestUser(supabase)
+    const userId = await createTestUser(supabase);
 
     // Step 2: Create test project
-    const projectId = await createTestProject(supabase, userId)
+    const projectId = await createTestProject(supabase, userId);
 
     // Step 3: Generate invoice data
-    const invoices = await generateInvoiceData(supabase, projectId)
+    const invoices = await generateInvoiceData(supabase, projectId);
 
     // Step 4: Generate haul log data
-    const hauls = await generateHaulLogData(supabase, projectId)
+    const hauls = await generateHaulLogData(supabase, projectId);
 
     // Step 5: Create contract terms
-    await createContractTerms(supabase, projectId)
+    await createContractTerms(supabase, projectId);
 
     // Print summary
-    printSummary(projectId, invoices.length, hauls.length)
+    printSummary(projectId, invoices.length, hauls.length);
 
-    process.exit(0)
+    process.exit(0);
   } catch (error) {
-    console.error('\n❌ Seed failed:')
-    console.error((error as Error).message)
-    console.error('')
-    process.exit(1)
+    console.error("\n❌ Seed failed:");
+    console.error((error as Error).message);
+    console.error("");
+    process.exit(1);
   }
 }
 
 // Run seeder
-main()
+main();

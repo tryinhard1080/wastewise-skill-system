@@ -15,6 +15,7 @@
 **URL**: https://github.com/tryinhard1080/wastewise-skill-system/settings/branches
 
 Or navigate manually:
+
 1. Go to your repository on GitHub
 2. Click **Settings** (top menu)
 3. Click **Branches** (left sidebar)
@@ -30,11 +31,13 @@ Or navigate manually:
 Check the following boxes:
 
 #### Basic Protection
+
 - ✅ **Require a pull request before merging**
   - This prevents direct commits to master
   - All changes must go through PR workflow
 
 #### Recommended Additional Settings
+
 - ✅ **Require approvals**: 1 (optional but recommended)
   - Enforces code review before merging
   - Can be yourself reviewing your own PRs initially
@@ -60,6 +63,7 @@ Check the following boxes:
 ## What This Enables
 
 ### Before Branch Protection
+
 ```bash
 # Direct commits allowed (risky!)
 git checkout master
@@ -69,6 +73,7 @@ git push origin master  # ✅ Works (but bypasses review!)
 ```
 
 ### After Branch Protection
+
 ```bash
 # Direct commits blocked
 git checkout master
@@ -90,6 +95,7 @@ git push origin fix/quick-change
 ### Test Branch Protection is Working
 
 1. Try to push directly to master:
+
    ```bash
    git checkout master
    echo "test" >> README.md
@@ -98,6 +104,7 @@ git push origin fix/quick-change
    ```
 
 2. Expected result:
+
    ```
    remote: error: GH006: Protected branch update failed for refs/heads/master.
    remote: error: Changes must be made through a pull request.
@@ -238,6 +245,7 @@ Create `.github/CODEOWNERS` file:
 ```
 
 Then enable in branch protection:
+
 - ✅ **Require review from Code Owners**
 
 ### Restrict Who Can Push
@@ -265,6 +273,7 @@ With branch protection + PR template, you get:
 
 ```markdown
 ## Formula Validation (REQUIRED FOR CALCULATIONS)
+
 - [x] ⚠️ Formulas match `lib/constants/formulas.ts` (NO hardcoded values)
 - [x] ⚠️ No hardcoded conversion rates (14.49, 4.33, 8.5, 6.0)
 - [x] ⚠️ Calculations verified against `WASTE_FORMULAS_REFERENCE.md`
@@ -317,6 +326,7 @@ This will run automatically on every PR!
 ## Summary
 
 **What You Just Enabled**:
+
 - ✅ All changes require PR (no direct commits to master)
 - ✅ PR template auto-fills with WasteWise-specific checks
 - ✅ Formula validation checklist enforced
@@ -332,4 +342,4 @@ This will run automatically on every PR!
 ---
 
 **WasteWise Skill System** - Branch Protection Guide
-*One-time setup for continuous protection*
+_One-time setup for continuous protection_

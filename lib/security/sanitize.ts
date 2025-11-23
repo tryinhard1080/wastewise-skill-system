@@ -25,7 +25,7 @@
  * ```
  */
 
-import DOMPurify from 'isomorphic-dompurify'
+import DOMPurify from "isomorphic-dompurify";
 
 /**
  * Sanitize HTML content
@@ -41,10 +41,10 @@ import DOMPurify from 'isomorphic-dompurify'
  */
 export function sanitizeHTML(dirty: string): string {
   return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li'],
-    ALLOWED_ATTR: ['href'],
+    ALLOWED_TAGS: ["b", "i", "em", "strong", "a", "p", "br", "ul", "ol", "li"],
+    ALLOWED_ATTR: ["href"],
     ALLOWED_URI_REGEXP: /^https?:\/\//i, // Only allow http(s) URLs
-  })
+  });
 }
 
 /**
@@ -58,15 +58,15 @@ export function sanitizeHTML(dirty: string): string {
  */
 export function sanitizeInput(input: string): string {
   // Remove all HTML tags
-  let sanitized = input.replace(/<[^>]*>/g, '')
+  let sanitized = input.replace(/<[^>]*>/g, "");
 
   // Remove control characters (except newlines and tabs)
-  sanitized = sanitized.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+  sanitized = sanitized.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, "");
 
   // Trim whitespace
-  sanitized = sanitized.trim()
+  sanitized = sanitized.trim();
 
-  return sanitized
+  return sanitized;
 }
 
 /**
@@ -84,41 +84,43 @@ export function sanitizeFilename(filename: string): string {
   // First, remove all dangerous characters from the entire filename
   let sanitized = filename
     // Remove directory traversal
-    .replace(/\.\./g, '')
+    .replace(/\.\./g, "")
     // Remove path separators
-    .replace(/[/\\]/g, '')
+    .replace(/[/\\]/g, "")
     // Remove shell metacharacters
-    .replace(/[;&|`$()<>'"]/g, '')
+    .replace(/[;&|`$()<>'"]/g, "")
     // Remove null bytes
-    .replace(/\0/g, '')
+    .replace(/\0/g, "");
 
   // Split into name and extension to preserve extension
-  const lastDot = sanitized.lastIndexOf('.')
-  const name = lastDot === -1 ? sanitized : sanitized.substring(0, lastDot)
-  const ext = lastDot === -1 ? '' : sanitized.substring(lastDot + 1)
+  const lastDot = sanitized.lastIndexOf(".");
+  const name = lastDot === -1 ? sanitized : sanitized.substring(0, lastDot);
+  const ext = lastDot === -1 ? "" : sanitized.substring(lastDot + 1);
 
   // Sanitize name part - keep letters, numbers, dots, hyphens, underscores
   let sanitizedName = name
-    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
     // Collapse multiple underscores
-    .replace(/_{2,}/g, '_')
+    .replace(/_{2,}/g, "_")
     // Trim underscores and dots from start/end
-    .replace(/^[_.-]+|[_.-]+$/g, '')
+    .replace(/^[_.-]+|[_.-]+$/g, "");
 
   // Sanitize extension
-  const sanitizedExt = ext.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+  const sanitizedExt = ext.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
 
   // Combine name and extension
-  const fullName = sanitizedExt ? `${sanitizedName}.${sanitizedExt}` : sanitizedName
+  const fullName = sanitizedExt
+    ? `${sanitizedName}.${sanitizedExt}`
+    : sanitizedName;
 
   // Limit to 255 characters (filesystem limit)
   if (fullName.length > 255) {
-    const maxNameLength = 255 - (sanitizedExt.length + 1)
-    sanitizedName = sanitizedName.substring(0, maxNameLength)
-    return sanitizedExt ? `${sanitizedName}.${sanitizedExt}` : sanitizedName
+    const maxNameLength = 255 - (sanitizedExt.length + 1);
+    sanitizedName = sanitizedName.substring(0, maxNameLength);
+    return sanitizedExt ? `${sanitizedName}.${sanitizedExt}` : sanitizedName;
   }
 
-  return fullName
+  return fullName;
 }
 
 /**
@@ -134,20 +136,20 @@ export function sanitizePropertyName(name: string): string {
   return (
     name
       // Remove HTML tags and their content
-      .replace(/<[^>]*>.*?<\/[^>]*>/g, '')
+      .replace(/<[^>]*>.*?<\/[^>]*>/g, "")
       // Remove remaining HTML tags
-      .replace(/<[^>]*>/g, '')
+      .replace(/<[^>]*>/g, "")
       // Remove parentheses and brackets (often used in attacks)
-      .replace(/[(){}[\]]/g, '')
+      .replace(/[(){}[\]]/g, "")
       // Keep only safe characters (letters, numbers, spaces, and basic punctuation)
-      .replace(/[^a-zA-Z0-9 .,'-]/g, '')
+      .replace(/[^a-zA-Z0-9 .,'-]/g, "")
       // Normalize whitespace
-      .replace(/\s+/g, ' ')
+      .replace(/\s+/g, " ")
       // Trim
       .trim()
       // Limit length
       .substring(0, 255)
-  )
+  );
 }
 
 /**
@@ -159,7 +161,7 @@ export function sanitizePropertyName(name: string): string {
  * @returns Sanitized name
  */
 export function sanitizeVendorName(name: string): string {
-  return sanitizePropertyName(name) // Same rules as property names
+  return sanitizePropertyName(name); // Same rules as property names
 }
 
 /**
@@ -174,16 +176,16 @@ export function sanitizeAddress(address: string): string {
   return (
     address
       // Remove HTML tags
-      .replace(/<[^>]*>/g, '')
+      .replace(/<[^>]*>/g, "")
       // Keep only safe characters
-      .replace(/[^a-zA-Z0-9 .,#-]/g, '')
+      .replace(/[^a-zA-Z0-9 .,#-]/g, "")
       // Normalize whitespace
-      .replace(/\s+/g, ' ')
+      .replace(/\s+/g, " ")
       // Trim
       .trim()
       // Limit length
       .substring(0, 500)
-  )
+  );
 }
 
 /**
@@ -201,16 +203,16 @@ export function sanitizeEmail(email: string): string {
   return (
     email
       // Remove HTML tags
-      .replace(/<[^>]*>/g, '')
+      .replace(/<[^>]*>/g, "")
       // Keep only valid email characters
-      .replace(/[^a-zA-Z0-9@._+-]/g, '')
+      .replace(/[^a-zA-Z0-9@._+-]/g, "")
       // Lowercase
       .toLowerCase()
       // Trim
       .trim()
       // Limit length
       .substring(0, 320) // Max email length per RFC 5321
-  )
+  );
 }
 
 /**
@@ -223,17 +225,17 @@ export function sanitizeEmail(email: string): string {
  */
 export function sanitizeURL(url: string): string {
   try {
-    const parsed = new URL(url)
+    const parsed = new URL(url);
 
     // Only allow http and https
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return ''
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return "";
     }
 
-    return parsed.toString()
+    return parsed.toString();
   } catch {
     // Invalid URL
-    return ''
+    return "";
   }
 }
 
@@ -249,12 +251,12 @@ export function sanitizePhoneNumber(phone: string): string {
   return (
     phone
       // Keep only valid phone characters
-      .replace(/[^0-9 ()+-]/g, '')
+      .replace(/[^0-9 ()+-]/g, "")
       // Trim
       .trim()
       // Limit length
       .substring(0, 50)
-  )
+  );
 }
 
 /**
@@ -269,25 +271,25 @@ export function sanitizePhoneNumber(phone: string): string {
  */
 export function sanitizeObject<T extends Record<string, unknown>>(
   obj: T,
-  sanitizer: (value: string) => string = sanitizeInput
+  sanitizer: (value: string) => string = sanitizeInput,
 ): T {
-  const result: Record<string, unknown> = {}
+  const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(obj)) {
-    if (typeof value === 'string') {
-      result[key] = sanitizer(value)
+    if (typeof value === "string") {
+      result[key] = sanitizer(value);
     } else if (Array.isArray(value)) {
       result[key] = value.map((item) =>
-        typeof item === 'string' ? sanitizer(item) : item
-      )
-    } else if (value !== null && typeof value === 'object') {
-      result[key] = sanitizeObject(value as Record<string, unknown>, sanitizer)
+        typeof item === "string" ? sanitizer(item) : item,
+      );
+    } else if (value !== null && typeof value === "object") {
+      result[key] = sanitizeObject(value as Record<string, unknown>, sanitizer);
     } else {
-      result[key] = value
+      result[key] = value;
     }
   }
 
-  return result as T
+  return result as T;
 }
 
 /**
@@ -300,15 +302,15 @@ export const XSS_TEST_PAYLOADS = [
   '<img src=x onerror=alert("XSS")>',
   '<svg onload=alert("XSS")>',
   'javascript:alert("XSS")',
-  '<iframe src="javascript:alert(\'XSS\')">',
+  "<iframe src=\"javascript:alert('XSS')\">",
   '<body onload=alert("XSS")>',
   '<input onfocus=alert("XSS") autofocus>',
   '<select onfocus=alert("XSS") autofocus>',
   '<textarea onfocus=alert("XSS") autofocus>',
   '<button onclick=alert("XSS")>Click</button>',
-  '<a href="javascript:alert(\'XSS\')">Link</a>',
-  '<div style="background-image:url(javascript:alert(\'XSS\'))">',
+  "<a href=\"javascript:alert('XSS')\">Link</a>",
+  "<div style=\"background-image:url(javascript:alert('XSS'))\">",
   '"><script>alert(String.fromCharCode(88,83,83))</script>',
   '<img src="x" onerror="alert(1)">',
-  '<svg/onload=alert(1)>',
-] as const
+  "<svg/onload=alert(1)>",
+] as const;

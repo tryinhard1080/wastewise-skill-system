@@ -9,13 +9,15 @@ Results page components for displaying WasteWise analysis results.
 Displays summary metrics in card layout with icons.
 
 **Props:**
+
 ```typescript
 interface AnalysisSummaryProps {
-  summary: WasteWiseAnalyticsCompleteResult['summary']
+  summary: WasteWiseAnalyticsCompleteResult["summary"];
 }
 ```
 
 **Features:**
+
 - 4 metric cards: Total Savings, Current Cost, Optimized Cost, Savings %
 - Color-coded icons (green, blue, teal, amber)
 - Responsive grid layout (1 column mobile, 2 tablet, 4 desktop)
@@ -27,13 +29,15 @@ interface AnalysisSummaryProps {
 Displays optimization recommendations in collapsible accordion.
 
 **Props:**
+
 ```typescript
 interface RecommendationsListProps {
-  recommendations: WasteWiseAnalyticsCompleteResult['recommendations']
+  recommendations: WasteWiseAnalyticsCompleteResult["recommendations"];
 }
 ```
 
 **Features:**
+
 - Priority badges (Critical=red, High=default, Medium=secondary, Low=outline)
 - Confidence level badges (HIGH/MEDIUM/LOW)
 - Collapsible details with implementation timeline
@@ -46,14 +50,16 @@ interface RecommendationsListProps {
 Download buttons for Excel and HTML reports.
 
 **Props:**
+
 ```typescript
 interface DownloadButtonsProps {
-  excelUrl: string
-  htmlUrl: string
+  excelUrl: string;
+  htmlUrl: string;
 }
 ```
 
 **Features:**
+
 - Excel download button (teal background)
 - HTML view button (teal outline)
 - Responsive layout (stack on mobile, side-by-side on desktop)
@@ -85,6 +91,7 @@ export default function ResultsPage() {
 ## Color Scheme
 
 Following WasteWise brand colors:
+
 - **Primary (Teal)**: #0d9488 (teal-600)
 - **Accent (Amber)**: #f59e0b (amber-500)
 - **Success (Green)**: #16a34a (green-600)

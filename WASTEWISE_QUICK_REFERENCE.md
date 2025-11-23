@@ -21,7 +21,7 @@ landing-template.zip ..................... UI design inspiration
 **Step 2**: Open WASTEWISE_PROMPTS_LIBRARY.md  
 **Step 3**: Copy "PROMPT 1A: Landing Page Hero & Features"  
 **Step 4**: Paste into Lovable → Watch it build!  
-**Step 5**: Continue with prompts 1B, 1C, 2, 3...  
+**Step 5**: Continue with prompts 1B, 1C, 2, 3...
 
 ---
 
@@ -47,21 +47,24 @@ landing-template.zip ..................... UI design inspiration
 **Where data lives**: Supabase (like a smart database)  
 **Smart features**: OpenAI extracts invoice data, Claude researches ordinances  
 **Reports**: Excel files + interactive HTML dashboards  
-**Hosting**: Lovable handles everything (one-click deploy)  
+**Hosting**: Lovable handles everything (one-click deploy)
 
 ---
 
 ## 💰 Cost Reality Check
 
-**Development**: 
+**Development**:
+
 - DIY: Free (just your time)
 - Hire: $50-150K
 
 **Monthly Costs**:
+
 - Starting: ~$160/month
 - Growing: ~$700/month
 
 **Pricing (What you charge)**:
+
 - Starter: $99/month
 - Pro: $299/month
 - Enterprise: Custom
@@ -73,7 +76,7 @@ landing-template.zip ..................... UI design inspiration
 **Week 1**: Landing + Auth + Dashboard = DEMO  
 **Week 2-4**: File upload + Processing UI = MVP  
 **Week 5-8**: Real data + Analysis = BETA  
-**Week 9-12**: Reports + Polish = LAUNCH  
+**Week 9-12**: Reports + Polish = LAUNCH
 
 ---
 
@@ -94,6 +97,7 @@ Cards: White, subtle border, 8px corners
 ## 📊 Core Features Checklist
 
 **Must Have (MVP)**:
+
 - [ ] User login/signup
 - [ ] Upload invoices (PDF/Excel)
 - [ ] Property info form
@@ -102,6 +106,7 @@ Cards: White, subtle border, 8px corners
 - [ ] Download Excel report
 
 **Should Have (V1)**:
+
 - [ ] Interactive dashboard
 - [ ] Regulatory research
 - [ ] Optimization recommendations
@@ -109,6 +114,7 @@ Cards: White, subtle border, 8px corners
 - [ ] Mobile responsive
 
 **Nice to Have (V2+)**:
+
 - [ ] Batch analysis
 - [ ] Email delivery
 - [ ] Mobile app
@@ -119,20 +125,23 @@ Cards: White, subtle border, 8px corners
 ## 🔑 Critical Business Logic
 
 **Compactor Optimization**:
+
 ```
-IF avg_tons_per_haul < 7.0 
+IF avg_tons_per_haul < 7.0
    AND max_days_between < 14
 THEN recommend monitors
 SAVINGS = (current_hauls - target_hauls) × cost_per_haul - monitoring_cost
 ```
 
 **Contamination**:
+
 ```
 IF contamination_charges > 3% of total_spend
 THEN recommend reduction program
 ```
 
 **Bulk Subscription**:
+
 ```
 IF avg_monthly_bulk > $500
 THEN recommend subscription
@@ -145,6 +154,7 @@ THEN recommend subscription
 **Don't panic!** Lovable uses English, not code.
 
 **Learn these**:
+
 1. HTML/CSS basics (1 week) → freecodecamp.org
 2. JavaScript intro (1 week) → javascript.info
 3. React basics (2 weeks) → react.dev
@@ -179,7 +189,7 @@ THEN recommend subscription
 **Supabase Problems**: supabase.com/docs  
 **General Questions**: GPT-4 or Claude  
 **Stuck on Logic**: WASTEWISE_TECHNICAL_SPEC.md  
-**Stuck on UI**: landing-template.zip  
+**Stuck on UI**: landing-template.zip
 
 ---
 
@@ -190,7 +200,7 @@ THEN recommend subscription
 **Wednesday**: Dashboard shell  
 **Thursday**: Upload interface  
 **Friday**: Processing UI  
-**Weekend**: Test everything, fix bugs  
+**Weekend**: Test everything, fix bugs
 
 **Repeat** for each phase
 
@@ -201,9 +211,10 @@ THEN recommend subscription
 **Week 1**: Demo ready ✓  
 **Week 4**: First real analysis ✓  
 **Week 8**: 5 beta users ✓  
-**Week 12**: Launch! 🚀  
+**Week 12**: Launch! 🚀
 
 Track:
+
 - Features completed
 - Bugs fixed
 - Users signed up
@@ -215,6 +226,7 @@ Track:
 ## 🔥 Motivation Boost
 
 **You're building**:
+
 - A platform that saves properties $1000s/year
 - Technology Greystar's Advantage Waste can use
 - A product waste managers need
@@ -227,14 +239,14 @@ Track:
 
 ## 📖 Document Quick Access
 
-**Need to**... | **Open this**...
-----------------|------------------
-Understand project | EXECUTIVE_SUMMARY.md
-Build today | QUICK_START.md
-Copy prompts | PROMPTS_LIBRARY.md
-Understand tech | TECHNICAL_SPEC.md
-See full plan | LOVABLE_REBUILD_PLAN.md
-Design reference | landing-template.zip
+| **Need to**...     | **Open this**...        |
+| ------------------ | ----------------------- |
+| Understand project | EXECUTIVE_SUMMARY.md    |
+| Build today        | QUICK_START.md          |
+| Copy prompts       | PROMPTS_LIBRARY.md      |
+| Understand tech    | TECHNICAL_SPEC.md       |
+| See full plan      | LOVABLE_REBUILD_PLAN.md |
+| Design reference   | landing-template.zip    |
 
 ---
 
@@ -288,5 +300,5 @@ Design reference | landing-template.zip
 
 ---
 
-*One-Page Reference v1.0*  
-*Print this. Keep it visible. Build amazing things.*
+_One-Page Reference v1.0_  
+_Print this. Keep it visible. Build amazing things._

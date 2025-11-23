@@ -18,6 +18,7 @@ Transforms detailed waste management data into professional, interactive HTML da
 ## When to Use
 
 Invoke this skill when the user:
+
 - Wants to create an interactive dashboard from waste data
 - Needs a multi-tab analysis tool for property managers
 - Mentions "dashboard", "visual report", "interactive analysis"
@@ -44,7 +45,7 @@ from datetime import datetime
 def load_waste_data_enhanced(source):
     """
     Load waste analysis data with enhanced structure for multi-tab dashboard
-    
+
     Expected data structure:
     {
         "property_info": {
@@ -58,7 +59,7 @@ def load_waste_data_enhanced(source):
         "avg_monthly_cost": 11676.86,
         "cost_per_door": 20.85,
         "annual_savings_opportunity": 19348,
-        
+
         # Monthly expense breakdown for Expense Analysis tab
         "monthly_expenses": [
             {
@@ -72,14 +73,14 @@ def load_waste_data_enhanced(source):
             },
             # ... more months
         ],
-        
+
         # Haul-by-haul log for Haul Log tab
         "haul_log": [
             {"date": "2025-04-01", "tonnage": 5.49},
             {"date": "2025-04-04", "tonnage": 4.88},
             # ... more hauls
         ],
-        
+
         # Compactor performance metrics
         "compactor_metrics": {
             "avg_tons_per_haul": 4.70,
@@ -90,7 +91,7 @@ def load_waste_data_enhanced(source):
             "hauls_saved": 53,
             "cost_per_haul": 406.64
         },
-        
+
         # Optimization recommendations
         "optimizations": [
             {
@@ -106,7 +107,7 @@ def load_waste_data_enhanced(source):
                 "contact": "DSQ Technologies - Keith Conrad"
             }
         ],
-        
+
         # Contract risk analysis
         "contract_risks": [
             {
@@ -133,16 +134,16 @@ def load_waste_data_enhanced(source):
 ```python
 def generate_dashboard_html(data):
     """Generate complete interactive dashboard with 5 tabs and Chart.js visualizations"""
-    
+
     property_name = data['property_info']['name']
     units = data['property_info']['units']
-    
+
     # Calculate key metrics
     compactor = data.get('compactor_metrics', {})
     capacity_util = compactor.get('capacity_utilization', 58.8)
     avg_tons = compactor.get('avg_tons_per_haul', 4.70)
     target_tons = compactor.get('target_tons_per_haul', 8.00)
-    
+
     html_template = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -194,7 +195,7 @@ def generate_dashboard_html(data):
 <body class="bg-slate-50 font-sans">
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
-        
+
         <!-- Header -->
         <header class="mb-6 border-b border-slate-300 pb-4">
             <h1 class="text-3xl font-bold text-slate-800">Waste Analysis Dashboard</h1>
@@ -238,7 +239,7 @@ def generate_dashboard_html(data):
                         <p class="text-3xl font-bold text-slate-800">${data.get('avg_monthly_cost', 0):,.2f}</p>
                     </div>
                 </section>
-                
+
                 <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-xl font-bold text-red-700 mb-4">Finding #1: Compactor Inefficiency</h2>
@@ -272,29 +273,29 @@ def generate_dashboard_html(data):
                             <thead class="bg-slate-100">
                                 <tr>
                                     <th class="px-4 py-3 text-left font-medium text-slate-600 uppercase tracking-wider">Expense Category</th>"""
-    
+
     # Add monthly columns
     if 'monthly_expenses' in data and len(data['monthly_expenses']) > 0:
         for month_data in data['monthly_expenses']:
             html_template += f"""
                                     <th class="px-4 py-3 text-right font-medium text-slate-600 uppercase tracking-wider">{month_data['month']}</th>"""
-        
+
         html_template += """
                                     <th class="px-4 py-3 text-right font-medium text-slate-600 uppercase tracking-wider">Total</th>
                                     <th class="px-4 py-3 text-right font-medium text-slate-600 uppercase tracking-wider">Average</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-200">"""
-        
+
         # Calculate totals
         disposal_total = sum(m['disposal'] for m in data['monthly_expenses'])
         haul_total = sum(m['haul_fees'] for m in data['monthly_expenses'])
         container_total = sum(m['container_rental'] for m in data['monthly_expenses'])
         bulk_total = sum(m['bulk_service'] for m in data['monthly_expenses'])
         grand_total = sum(m['total'] for m in data['monthly_expenses'])
-        
+
         num_months = len(data['monthly_expenses'])
-        
+
         # Disposal row
         html_template += """
                                 <tr>
@@ -306,7 +307,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-right font-bold">${disposal_total:,.2f}</td>
                                     <td class="px-4 py-3 text-right font-bold">${disposal_total/num_months:,.2f}</td>
                                 </tr>"""
-        
+
         # Haul fees row
         html_template += """
                                 <tr>
@@ -318,7 +319,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-right font-bold">${haul_total:,.2f}</td>
                                     <td class="px-4 py-3 text-right font-bold">${haul_total/num_months:,.2f}</td>
                                 </tr>"""
-        
+
         # Container rental row
         html_template += """
                                 <tr>
@@ -330,7 +331,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-right font-bold">${container_total:,.2f}</td>
                                     <td class="px-4 py-3 text-right font-bold">${container_total/num_months:,.2f}</td>
                                 </tr>"""
-        
+
         # Bulk service row
         html_template += """
                                 <tr>
@@ -342,7 +343,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-right font-bold">${bulk_total:,.2f}</td>
                                     <td class="px-4 py-3 text-right font-bold">${bulk_total/num_months:,.2f}</td>
                                 </tr>"""
-        
+
         # Total row
         html_template += """
                                 <tr class="bg-slate-100 font-bold">
@@ -354,7 +355,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-right text-blue-700">${grand_total:,.2f}</td>
                                     <td class="px-4 py-3 text-right text-blue-700">${grand_total/num_months:,.2f}</td>
                                 </tr>"""
-        
+
         # Cost per door row
         html_template += """
                                 <tr>
@@ -367,7 +368,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-right font-bold text-blue-700 bg-blue-50">${cpd_total:.2f}</td>
                                     <td class="px-4 py-3 text-right font-bold text-blue-700 bg-blue-50">${cpd_total/num_months:.2f}</td>
                                 </tr>"""
-    
+
     html_template += """
                             </tbody>
                         </table>
@@ -404,11 +405,11 @@ def generate_dashboard_html(data):
                 <section class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h2 class="text-xl font-bold text-green-700 mb-4">Opportunity 1: Compactor Optimization</h2>
                     <p class="text-slate-600 mb-4">By installing compactor monitors, you can switch from a schedule-based to a fullness-based pickup model. This eliminates paying for hauls that are half-empty.</p>
-                    
+
                     <div class="w-full h-80 mb-4">
                         <canvas id="haulsChart"></canvas>
                     </div>
-                    
+
                     <div class="overflow-x-auto mb-4">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead>
@@ -442,7 +443,7 @@ def generate_dashboard_html(data):
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <tbody class="bg-white divide-y divide-slate-200">"""
-    
+
     if 'optimizations' in data and len(data['optimizations']) > 0:
         opt = data['optimizations'][0]
         html_template += f"""
@@ -470,7 +471,7 @@ def generate_dashboard_html(data):
                                     <td class="px-4 py-3 text-sm font-medium text-slate-600">Payback Period</td>
                                     <td class="px-4 py-3 text-right text-sm text-green-600 font-bold">{opt.get('payback_months', 0):.1f} Months</td>
                                 </tr>"""
-    
+
     html_template += """
                             </tbody>
                         </table>
@@ -496,7 +497,7 @@ def generate_dashboard_html(data):
             <div id="contract" class="tab-content hidden">
                 <section class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-bold text-slate-800 mb-4">Contract & Risk Analysis</h2>
-                    
+
                     <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mb-6">
                         <h3 class="text-lg font-bold text-red-800">⚠️ ACTION REQUIRED: Set Calendar Reminder</h3>
                         <p class="text-red-700 mt-1">Your 5-year contract auto-renews. To terminate, you must send certified notice during a very specific 90-day window.</p>
@@ -505,7 +506,7 @@ def generate_dashboard_html(data):
 
                     <div class="space-y-4">
                         <h3 class="text-lg font-semibold text-slate-800 mb-2">Common Contract Risks</h3>
-                        
+
                         <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
                             <h4 class="font-bold text-slate-700">RISK: Term & Auto-Renewal</h4>
                             <p class="text-sm text-slate-600 mt-2"><span class="font-bold">Impact:</span> Locked into 5-year auto-renewals. Missing termination window locks you in for another 5 years.</p>
@@ -528,7 +529,7 @@ def generate_dashboard_html(data):
 
     <script>
         const chartInstances = {{}};
-        
+
         function destroyChart(chartId) {{
             if (chartInstances[chartId]) {{
                 chartInstances[chartId].destroy();
@@ -541,7 +542,7 @@ def generate_dashboard_html(data):
         function populateHaulLog() {{
             const tableBody = document.getElementById('haul-log-body');
             if (!tableBody) return;
-            tableBody.innerHTML = ''; 
+            tableBody.innerHTML = '';
             haulLogData.forEach(haul => {{
                 const isPoor = haul.tonnage < 6.0;
                 const rowClass = isPoor ? 'haul-poor' : 'haul-good';
@@ -556,7 +557,7 @@ def generate_dashboard_html(data):
                 tableBody.innerHTML += row;
             }});
         }}
-        
+
         function createDashboardCharts() {{
             destroyChart('efficiencyGauge');
             const gaugeCanvas = document.getElementById('efficiencyGauge');
@@ -573,7 +574,7 @@ def generate_dashboard_html(data):
             destroyChart('costPerDoorChart');
             const cpdCanvas = document.getElementById('costPerDoorChart');
             if (cpdCanvas) {{"""
-    
+
     if 'monthly_expenses' in data:
         months = [m['month'] for m in data['monthly_expenses']]
         cpd_values = [m['cost_per_door'] for m in data['monthly_expenses']]
@@ -598,7 +599,7 @@ def generate_dashboard_html(data):
                         plugins: {{ title: {{ display: true, text: 'Monthly Cost Per Door Fluctuation' }} }}
                     }}
                 }});"""
-    
+
     html_template += """
             }}
         }}
@@ -624,7 +625,7 @@ def generate_dashboard_html(data):
                 }});
             }}
         }}
-        
+
         const chartsDrawn = {{
             dashboard: false, optimization: false, contract: true, haul_log: true, expense: false
         }};
@@ -632,10 +633,10 @@ def generate_dashboard_html(data):
         function showTab(tabId) {{
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active', 'text-blue-600'));
-            
+
             const activeTabContent = document.getElementById(tabId);
             if(activeTabContent) activeTabContent.classList.remove('hidden');
-            
+
             const activeButton = document.getElementById('tab-btn-' + tabId);
             if (activeButton) activeButton.classList.add('active', 'text-blue-600');
 
@@ -671,13 +672,13 @@ def generate_dashboard_html(data):
 
         document.addEventListener('DOMContentLoaded', () => {{
             showTab('dashboard');
-            populateHaulLog(); 
+            populateHaulLog();
             chartsDrawn.haul_log = true;
         }});
     </script>
 </body>
 </html>"""
-    
+
     return html_template
 ```
 
@@ -687,31 +688,31 @@ def generate_dashboard_html(data):
 def create_interactive_dashboard(data, output_filename=None):
     """
     Main function to create interactive dashboard
-    
+
     Args:
         data: Dictionary with comprehensive waste analysis data
         output_filename: Output HTML filename (auto-generated if None)
-    
+
     Returns:
         Path to created HTML file
     """
     html_content = generate_dashboard_html(data)
-    
+
     if output_filename is None:
         property_name = data['property_info']['name'].lower().replace(' ', '_')
         output_filename = f"{property_name}_dashboard.html"
-    
+
     output_path = f"/mnt/user-data/outputs/{output_filename}"
-    
+
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
-    
+
     print(f"✓ Interactive dashboard created: {output_filename}")
     print(f"✓ Total spend (6mo): ${data.get('total_spend_6mo', 0):,.2f}")
     print(f"✓ Cost per door: ${data.get('cost_per_door', 0):.2f}")
     print(f"✓ Annual savings opportunity: ${data.get('annual_savings_opportunity', 0):,.0f}")
     print(f"✓ Compactor efficiency: {data.get('compactor_metrics', {}).get('capacity_utilization', 0):.1f}%")
-    
+
     return output_path
 ```
 
@@ -725,6 +726,7 @@ def create_interactive_dashboard(data, output_filename=None):
 **User prompt**: "Create a visual report from my WasteWise analysis for Columbia Square Living"
 
 **Claude will**:
+
 1. Extract key metrics and findings from the analysis data
 2. Generate professional HTML report with Advantage Waste branding
 3. Include KPI cards with color-coded status indicators
@@ -733,6 +735,7 @@ def create_interactive_dashboard(data, output_filename=None):
 6. Save as single-page HTML file
 
 **Output files**:
+
 - `columbia_square_living_visual_report.html` - Professional one-page summary
 
 ## Integration with WasteWise Analysis

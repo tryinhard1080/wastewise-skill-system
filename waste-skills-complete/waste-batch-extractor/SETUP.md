@@ -61,9 +61,10 @@ python batch_extractor.py --input ./invoices_folder --output ./results
 
 1. Upload your waste documents (PDFs, images, Excel files)
 2. Use this prompt:
+
    ```
-   I've uploaded waste invoices and contracts. 
-   Please extract all data, organize by location, 
+   I've uploaded waste invoices and contracts.
+   Please extract all data, organize by location,
    and create a validation report.
    ```
 
@@ -127,6 +128,7 @@ The included sample files demonstrate proper document structure:
 ### For Best Extraction Results
 
 **Invoices should include:**
+
 - Property name and address
 - Vendor name and account number
 - Invoice number and date
@@ -134,6 +136,7 @@ The included sample files demonstrate proper document structure:
 - Total amount due
 
 **Contracts should include:**
+
 - Property name
 - Vendor name
 - Effective and expiration dates
@@ -141,6 +144,7 @@ The included sample files demonstrate proper document structure:
 - Key clauses (termination, renewal, price increases)
 
 **Excel reports should have:**
+
 - Clear column headers
 - Property name column
 - Vendor name column
@@ -152,32 +156,32 @@ The included sample files demonstrate proper document structure:
 ### Scenario 1: Monthly Invoice Processing
 
 ```
-"I have 25 waste invoices from September for all our properties. 
-Extract the data, organize by property, and show me which ones 
+"I have 25 waste invoices from September for all our properties.
+Extract the data, organize by property, and show me which ones
 have contamination or overage charges."
 ```
 
 ### Scenario 2: Contract Renewal Analysis
 
 ```
-"Extract all contract terms from these 10 agreements. 
-I need to know which contracts are expiring in the next 6 months 
+"Extract all contract terms from these 10 agreements.
+I need to know which contracts are expiring in the next 6 months
 and what the notice periods are."
 ```
 
 ### Scenario 3: Expense Report Validation
 
 ```
-"I have an Excel file with waste expenses for 50 properties. 
-Can you validate that all the data is complete and identify 
+"I have an Excel file with waste expenses for 50 properties.
+Can you validate that all the data is complete and identify
 any properties with missing vendor information?"
 ```
 
 ### Scenario 4: Multi-Vendor Comparison
 
 ```
-"Extract pricing from these WM, Republic, and Waste Connections 
-invoices for Columbia Square. I want to compare their monthly 
+"Extract pricing from these WM, Republic, and Waste Connections
+invoices for Columbia Square. I want to compare their monthly
 costs and service levels."
 ```
 
@@ -186,6 +190,7 @@ costs and service levels."
 ### "API key not found" error
 
 **Solution**: Set your Anthropic API key (Claude Code only):
+
 ```bash
 export ANTHROPIC_API_KEY="your-key"
 ```
@@ -193,6 +198,7 @@ export ANTHROPIC_API_KEY="your-key"
 ### "No documents found" error
 
 **Solution**: Check that your documents are in supported formats:
+
 - PDFs (.pdf)
 - Images (.png, .jpg, .jpeg, .tif, .tiff)
 - Excel (.xlsx, .xls)
@@ -201,6 +207,7 @@ export ANTHROPIC_API_KEY="your-key"
 ### Low confidence scores
 
 **Solution**:
+
 - Ensure scanned documents are 300 DPI or higher
 - Check that text is clearly readable
 - Verify document contains all critical fields
@@ -209,6 +216,7 @@ export ANTHROPIC_API_KEY="your-key"
 ### Excel file won't open
 
 **Solution**: Make sure xlsxwriter is installed:
+
 ```bash
 pip install xlsxwriter --break-system-packages
 ```
@@ -216,6 +224,7 @@ pip install xlsxwriter --break-system-packages
 ### Vision API rate limits
 
 **Solution**: For large batches (50+ documents), consider:
+
 - Processing in smaller batches
 - Adding delays between API calls
 - Using Claude Code's built-in rate limiting
@@ -238,6 +247,7 @@ python validation_script.py --input extraction_data.json --confidence-threshold 
 ## Support and Feedback
 
 For issues or questions about this skill:
+
 1. Check the SKILL.md for detailed implementation examples
 2. Review the sample documents for proper formatting
 3. Run the validation script for diagnostic information
@@ -246,6 +256,7 @@ For issues or questions about this skill:
 ## Updates and Maintenance
 
 This skill is maintained as part of the Advantage Waste platform. Updates may include:
+
 - Support for additional vendor formats
 - Enhanced validation rules
 - New extraction patterns

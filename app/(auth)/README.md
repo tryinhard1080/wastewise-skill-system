@@ -6,17 +6,17 @@ This directory contains all authentication-related pages and API routes for Wast
 
 ### Pages (UI)
 
-| Route | File | Purpose |
-|-------|------|---------|
-| `/login` | `login/page.tsx` | User login with email/password or OAuth |
-| `/signup` | `signup/page.tsx` | New user registration |
-| `/forgot-password` | `forgot-password/page.tsx` | Request password reset link |
-| `/reset-password` | `reset-password/page.tsx` | Set new password after reset |
+| Route              | File                       | Purpose                                 |
+| ------------------ | -------------------------- | --------------------------------------- |
+| `/login`           | `login/page.tsx`           | User login with email/password or OAuth |
+| `/signup`          | `signup/page.tsx`          | New user registration                   |
+| `/forgot-password` | `forgot-password/page.tsx` | Request password reset link             |
+| `/reset-password`  | `reset-password/page.tsx`  | Set new password after reset            |
 
 ### API Routes (Server)
 
-| Route | File | Purpose |
-|-------|------|---------|
+| Route            | File                | Purpose                                       |
+| ---------------- | ------------------- | --------------------------------------------- |
 | `/auth/callback` | `callback/route.ts` | OAuth callback handler and email confirmation |
 
 ## Authentication Flows
@@ -60,17 +60,20 @@ Enter new password → Submit → /login
 ### OAuth Callback (`callback/route.ts`)
 
 **Handles**:
+
 - OAuth provider redirects (Google, GitHub)
 - Email confirmation links
 - Session establishment via code exchange
 
 **Flow**:
+
 1. Extract `code` from URL params
 2. Call `supabase.auth.exchangeCodeForSession(code)`
 3. Redirect to `/dashboard` on success
 4. Redirect to `/login?error=...` on failure
 
 **Error Handling**:
+
 - Missing code
 - Invalid/expired code
 - OAuth provider errors
@@ -79,12 +82,14 @@ Enter new password → Submit → /login
 ### Password Reset (`reset-password/page.tsx`)
 
 **Features**:
+
 - Token validation on mount
 - Password strength validation (same as signup)
 - Success state with auto-redirect
 - Error state for invalid/expired tokens
 
 **Validation Rules**:
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
@@ -92,6 +97,7 @@ Enter new password → Submit → /login
 - Password and confirm password must match
 
 **States**:
+
 1. **Loading**: Checking token validity
 2. **Form**: Valid token, show password fields
 3. **Success**: Password updated, redirecting
@@ -102,6 +108,7 @@ Enter new password → Submit → /login
 ### Password Requirements
 
 All password fields enforce the following rules:
+
 - Minimum 8 characters
 - At least 1 uppercase letter (A-Z)
 - At least 1 lowercase letter (a-z)
@@ -121,15 +128,16 @@ All redirects use `requestUrl.origin` to prevent open redirect vulnerabilities:
 
 ```typescript
 // Safe redirect
-return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
+return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
 
 // Unsafe (DON'T DO THIS)
-return NextResponse.redirect(request.headers.get('referer'))
+return NextResponse.redirect(request.headers.get("referer"));
 ```
 
 ### Error Messages
 
 Error messages are intentionally vague for security:
+
 - Don't reveal if email exists in system
 - Don't expose internal error details
 - Log detailed errors server-side only
@@ -168,6 +176,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 **Cause**: Code is invalid, expired, or already used
 
 **Solution**:
+
 - Check Supabase project settings
 - Verify redirect URLs are configured correctly
 - Ensure code hasn't been used already (codes are single-use)

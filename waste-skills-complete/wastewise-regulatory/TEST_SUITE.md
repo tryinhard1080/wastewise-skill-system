@@ -3,12 +3,14 @@
 ## Purpose
 
 This test suite provides comprehensive test cases to validate both:
+
 1. The regulatory compliance research functionality
 2. The LLM Judge evaluation system
 
 ## Test Structure
 
 Each test case includes:
+
 - **Test ID**: Unique identifier
 - **Test Type**: Research Quality, Judge Accuracy, Integration, Edge Case
 - **Input Data**: Property information and research context
@@ -19,18 +21,23 @@ Each test case includes:
 ## Test Case Categories
 
 ### Category 1: High-Quality Research Tests
+
 Tests where research should pass all validations
 
 ### Category 2: Medium-Quality Research Tests
+
 Tests where research has minor issues but should proceed with warnings
 
 ### Category 3: Low-Quality Research Tests
+
 Tests where research should fail validation and require human review
 
 ### Category 4: Judge Accuracy Tests
+
 Tests specifically designed to evaluate judge decision-making
 
 ### Category 5: Edge Case Tests
+
 Tests for unusual or boundary conditions
 
 ---
@@ -38,11 +45,13 @@ Tests for unusual or boundary conditions
 ## TEST CASES
 
 ### Test Case 1.1: Ideal High-Quality Research
+
 **Test ID:** HQR-001  
 **Type:** Research Quality - High  
 **Objective:** Verify system correctly identifies excellent research
 
 **Input Property Data:**
+
 ```json
 {
   "property_name": "The Park at Meadowmont",
@@ -59,6 +68,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Research Output:**
+
 ```json
 {
   "location_verified": true,
@@ -181,6 +191,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Expected Judge Assessment:**
+
 - **Completeness Score:** 40/40
 - **Source Quality Score:** 25/25
 - **Specificity Score:** 20/20
@@ -191,6 +202,7 @@ Tests for unusual or boundary conditions
 - **Human Review Required:** NO
 
 **Success Criteria:**
+
 - ✅ All 3 waste streams addressed
 - ✅ 3+ official .gov sources
 - ✅ Ordinances properly cited
@@ -203,11 +215,13 @@ Tests for unusual or boundary conditions
 ---
 
 ### Test Case 2.1: Medium-Quality Research - Missing Details
+
 **Test ID:** MQR-001  
 **Type:** Research Quality - Medium  
 **Objective:** Verify system correctly identifies acceptable research with minor gaps
 
 **Input Property Data:**
+
 ```json
 {
   "property_name": "Riverside Apartments",
@@ -222,6 +236,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Research Output:**
+
 ```json
 {
   "location_verified": true,
@@ -242,9 +257,7 @@ Tests for unusual or boundary conditions
       "type": "official_gov"
     }
   ],
-  "ordinances_cited": [
-    "Portland City Code §17.102: Solid Waste and Recycling"
-  ],
+  "ordinances_cited": ["Portland City Code §17.102: Solid Waste and Recycling"],
   "requirements": {
     "waste": {
       "municipal_service": false,
@@ -296,6 +309,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Expected Judge Assessment:**
+
 - **Completeness Score:** 28/40 (Waste details missing, composting capacity vague)
 - **Source Quality Score:** 22/25 (Good sources but limited detail extraction)
 - **Specificity Score:** 12/20 (Multiple vague requirements)
@@ -306,6 +320,7 @@ Tests for unusual or boundary conditions
 - **Human Review Required:** YES (Priority: MEDIUM)
 
 **Specific Issues Identified:**
+
 - ⚠️ Waste collection frequency not specified
 - ⚠️ Container specifications vague
 - ⚠️ Composting capacity requirement not numerical
@@ -315,6 +330,7 @@ Tests for unusual or boundary conditions
 - ⚠️ Signage details incomplete
 
 **Judge Recommendations:**
+
 1. Contact Portland BPS directly to confirm composting capacity formula
 2. Obtain specific container size requirements from ordinance text
 3. Document exact penalty amounts from Portland City Code
@@ -322,6 +338,7 @@ Tests for unusual or boundary conditions
 5. Clarify bilingual signage requirements
 
 **Success Criteria:**
+
 - ✅ Judge correctly identifies as MEDIUM quality
 - ✅ Judge lists specific gaps requiring attention
 - ✅ Judge recommends MEDIUM priority human review
@@ -331,11 +348,13 @@ Tests for unusual or boundary conditions
 ---
 
 ### Test Case 3.1: Low-Quality Research - Critical Gaps
+
 **Test ID:** LQR-001  
 **Type:** Research Quality - Low  
 **Objective:** Verify system correctly rejects inadequate research
 
 **Input Property Data:**
+
 ```json
 {
   "property_name": "Sunset Villas",
@@ -349,6 +368,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Research Output:**
+
 ```json
 {
   "location_verified": true,
@@ -387,6 +407,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Expected Judge Assessment:**
+
 - **Completeness Score:** 8/40 (Major gaps in all streams)
 - **Source Quality Score:** 5/25 (Only 1 official source, no citations)
 - **Specificity Score:** 0/20 (All vague language)
@@ -396,6 +417,7 @@ Tests for unusual or boundary conditions
 - **Critical Errors:** 6+
 
 **Critical Errors:**
+
 1. ❌ Only 1 official government source
 2. ❌ Zero ordinance citations
 3. ❌ Recycling requirements entirely vague ("adequate", "regular")
@@ -405,11 +427,13 @@ Tests for unusual or boundary conditions
 7. ❌ No regulatory contact information
 
 **Expected Judge Decision:**
+
 - **Human Review Required:** YES (Priority: CRITICAL)
 - **Output Generation:** BLOCKED
 - **Recommendation:** Complete research redo required
 
 **Success Criteria:**
+
 - ✅ Judge correctly identifies as FAILED
 - ✅ Judge lists all critical errors
 - ✅ Judge blocks output generation
@@ -419,18 +443,32 @@ Tests for unusual or boundary conditions
 ---
 
 ### Test Case 4.1: Judge Accuracy - False Positive Detection
+
 **Test ID:** JA-001  
 **Type:** Judge Accuracy  
 **Objective:** Verify judge can detect research that APPEARS good but has hidden flaws
 
 **Input Research:**
+
 ```json
 {
-  "location": {"city": "Denver", "state": "Colorado"},
+  "location": { "city": "Denver", "state": "Colorado" },
   "sources_consulted": [
-    {"name": "Denver Environmental Health", "url": "denvergov.org", "type": "official_gov"},
-    {"name": "Colorado DEQ", "url": "colorado.gov/cdphe", "type": "official_gov"},
-    {"name": "Denver Waste Management", "url": "denvergov.org/waste", "type": "official_gov"}
+    {
+      "name": "Denver Environmental Health",
+      "url": "denvergov.org",
+      "type": "official_gov"
+    },
+    {
+      "name": "Colorado DEQ",
+      "url": "colorado.gov/cdphe",
+      "type": "official_gov"
+    },
+    {
+      "name": "Denver Waste Management",
+      "url": "denvergov.org/waste",
+      "type": "official_gov"
+    }
   ],
   "ordinances_cited": [
     "Denver Revised Municipal Code §48-151",
@@ -455,9 +493,9 @@ Tests for unusual or boundary conditions
     "enforcement_agency": "Denver Environmental Health"
   },
   "licensed_haulers": [
-    {"name": "Waste Management", "phone": "(303) 797-1600"},
-    {"name": "Republic Services", "phone": "(303) 288-2100"},
-    {"name": "Alpine Waste", "phone": "(303) 744-9881"}
+    { "name": "Waste Management", "phone": "(303) 797-1600" },
+    { "name": "Republic Services", "phone": "(303) 288-2100" },
+    { "name": "Alpine Waste", "phone": "(303) 744-9881" }
   ]
 }
 ```
@@ -465,17 +503,20 @@ Tests for unusual or boundary conditions
 **Hidden Flaw:** The composting mandate effective date of "January 1, 2024" is **fabricated** - Denver has NO mandatory composting ordinance as of November 2025.
 
 **Expected Judge Assessment:**
+
 - Judge should flag this as **SUSPICIOUS** due to:
   - Recent composting mandate (2024) not widely reported
   - Lack of specific ordinance citation for composting (only recycling cited)
   - Round percentage (25%) seems estimated rather than researched
 
 **Judge Should Recommend:**
+
 - ⚠️ **VERIFICATION NEEDED** on composting mandate
 - 🔍 Human review to confirm recent ordinance changes
 - Priority: HIGH (potential misinformation)
 
 **Success Criteria:**
+
 - ✅ Judge identifies potential fabrication
 - ✅ Judge flags recent ordinance claims for verification
 - ✅ Judge notes missing ordinance citation for composting
@@ -485,22 +526,29 @@ Tests for unusual or boundary conditions
 ---
 
 ### Test Case 4.2: Judge Accuracy - False Negative Detection
+
 **Test ID:** JA-002  
 **Type:** Judge Accuracy  
 **Objective:** Verify judge doesn't incorrectly fail adequate research
 
 **Input Research:**
+
 ```json
 {
-  "location": {"city": "San Francisco", "state": "California"},
+  "location": { "city": "San Francisco", "state": "California" },
   "sources_consulted": [
-    {"name": "SF Environment", "url": "sfenvironment.org", "type": "official_gov"},
-    {"name": "CalRecycle Commercial Recycling", "url": "calrecycle.ca.gov", "type": "official_gov"}
+    {
+      "name": "SF Environment",
+      "url": "sfenvironment.org",
+      "type": "official_gov"
+    },
+    {
+      "name": "CalRecycle Commercial Recycling",
+      "url": "calrecycle.ca.gov",
+      "type": "official_gov"
+    }
   ],
-  "ordinances_cited": [
-    "SF Environment Code Chapter 19",
-    "California AB 1826"
-  ],
+  "ordinances_cited": ["SF Environment Code Chapter 19", "California AB 1826"],
   "requirements": {
     "recycling": {
       "mandatory": true,
@@ -519,12 +567,14 @@ Tests for unusual or boundary conditions
 **Context:** San Francisco's approach IS different - they require waste characterization studies rather than fixed capacity ratios. This is CORRECT and well-documented.
 
 **Expected Judge Assessment:**
+
 - Judge should recognize this is a **LEGITIMATE ALTERNATIVE APPROACH**
 - Judge should NOT penalize for "vague" requirements
 - Judge should note the unique SF requirement in assessment
 - Confidence: HIGH or MEDIUM (not LOW)
 
 **Success Criteria:**
+
 - ✅ Judge recognizes legitimate alternative regulatory approach
 - ✅ Judge doesn't penalize for non-numerical requirements when appropriate
 - ✅ Judge notes the unique local requirement
@@ -534,11 +584,13 @@ Tests for unusual or boundary conditions
 ---
 
 ### Test Case 5.1: Edge Case - Rural Location with Limited Regulations
+
 **Test ID:** EC-001  
 **Type:** Edge Case  
 **Objective:** Handle locations with minimal or no waste regulations
 
 **Input Property Data:**
+
 ```json
 {
   "property_name": "Country Meadows",
@@ -553,13 +605,26 @@ Tests for unusual or boundary conditions
 ```
 
 **Research Output:**
+
 ```json
 {
   "location_verified": true,
   "sources_consulted": [
-    {"name": "Park County Solid Waste", "url": "parkcounty.org", "type": "official_gov"},
-    {"name": "Montana DEQ Solid Waste", "url": "deq.mt.gov", "type": "official_gov"},
-    {"name": "Livingston City Government", "url": "livingstonmontana.org", "type": "official_gov"}
+    {
+      "name": "Park County Solid Waste",
+      "url": "parkcounty.org",
+      "type": "official_gov"
+    },
+    {
+      "name": "Montana DEQ Solid Waste",
+      "url": "deq.mt.gov",
+      "type": "official_gov"
+    },
+    {
+      "name": "Livingston City Government",
+      "url": "livingstonmontana.org",
+      "type": "official_gov"
+    }
   ],
   "ordinances_cited": [],
   "findings": {
@@ -579,18 +644,20 @@ Tests for unusual or boundary conditions
     }
   },
   "licensed_haulers": [
-    {"name": "Park County Refuse", "phone": "(406) 222-4155"},
-    {"name": "Livingston Sanitation", "phone": "(406) 222-4000"}
+    { "name": "Park County Refuse", "phone": "(406) 222-4155" },
+    { "name": "Livingston Sanitation", "phone": "(406) 222-4000" }
   ]
 }
 ```
 
 **Expected Judge Assessment:**
+
 - **Confidence Level:** HIGH (for confirming ABSENCE of regulations)
 - **Critical Errors:** 0
 - **Special Note:** "Research correctly identifies absence of mandatory requirements"
 
 **Judge Should Note:**
+
 - ✅ Thorough search conducted (3 gov sources)
 - ✅ Absence of requirements is well-documented
 - ✅ Voluntary options identified
@@ -598,6 +665,7 @@ Tests for unusual or boundary conditions
 - ⚠️ Consider recommending voluntary best practices
 
 **Success Criteria:**
+
 - ✅ Judge recognizes valid "no requirements found" research
 - ✅ Judge doesn't penalize for lack of mandatory ordinances
 - ✅ Judge validates thoroughness of search
@@ -607,11 +675,13 @@ Tests for unusual or boundary conditions
 ---
 
 ### Test Case 5.2: Edge Case - Recent Ordinance Change During Research
+
 **Test ID:** EC-002  
 **Type:** Edge Case  
 **Objective:** Handle conflicting information due to very recent changes
 
 **Input Property Data:**
+
 ```json
 {
   "property_name": "Metro Plaza",
@@ -624,6 +694,7 @@ Tests for unusual or boundary conditions
 ```
 
 **Research Output:**
+
 ```json
 {
   "sources_consulted": [
@@ -653,17 +724,20 @@ Tests for unusual or boundary conditions
 ```
 
 **Expected Judge Assessment:**
+
 - **Confidence Level:** MEDIUM
 - **Human Review Required:** YES (Priority: HIGH)
 - **Reason:** "Conflicting sources regarding recent ordinance change"
 
 **Judge Should Recommend:**
+
 - 📞 Direct phone call to Seattle Public Utilities to confirm effective date
 - 📋 Request copy of final ordinance text
 - ⏰ Verify grace period or phase-in schedule
 - 🔄 Re-check sources in 30 days for consistency
 
 **Success Criteria:**
+
 - ✅ Judge recognizes legitimate conflict due to recency
 - ✅ Judge doesn't fail research for documented conflicts
 - ✅ Judge recommends appropriate verification steps
@@ -681,23 +755,23 @@ def run_test_case(test_case: Dict) -> Dict:
     """
     Execute a single test case and compare results to expectations
     """
-    
+
     # Extract test data
     property_data = test_case['input_property_data']
     research_output = test_case['research_output']
     expected_assessment = test_case['expected_judge_assessment']
-    
+
     # Run regulatory research validator
     validator = RegulatoryComplianceValidator()
     passed, confidence = validator.validate_regulatory_research(
         research_output, property_data
     )
-    
+
     # Run LLM judge
     judge_evaluation = evaluate_regulatory_research(
         research_output, property_data
     )
-    
+
     # Compare results to expectations
     test_results = {
         'test_id': test_case['test_id'],
@@ -714,14 +788,14 @@ def run_test_case(test_case: Dict) -> Dict:
         'human_review_required': judge_evaluation['human_review_required'],
         'expected_human_review': expected_assessment['human_review_required']
     }
-    
+
     # Evaluate test success
     test_results['test_passed'] = (
         test_results['confidence_match'] and
         test_results['human_review_required'] == test_results['expected_human_review'] and
         abs(test_results['critical_errors_found'] - test_results['expected_critical_errors']) <= 1
     )
-    
+
     return test_results
 
 
@@ -729,7 +803,7 @@ def run_full_test_suite(test_cases: List[Dict]) -> Dict:
     """
     Run all test cases and generate comprehensive report
     """
-    
+
     results = {
         'timestamp': datetime.now().isoformat(),
         'total_tests': len(test_cases),
@@ -738,32 +812,32 @@ def run_full_test_suite(test_cases: List[Dict]) -> Dict:
         'test_results': [],
         'summary_by_category': {}
     }
-    
+
     for test_case in test_cases:
         test_result = run_test_case(test_case)
         results['test_results'].append(test_result)
-        
+
         if test_result['test_passed']:
             results['tests_passed'] += 1
         else:
             results['tests_failed'] += 1
-    
+
     # Calculate pass rate
     results['pass_rate'] = results['tests_passed'] / results['total_tests'] * 100
-    
+
     # Generate summary by category
     categories = set(tc['type'] for tc in test_cases)
     for category in categories:
         category_tests = [r for r in results['test_results'] if r['test_type'] == category]
         category_passed = sum(1 for r in category_tests if r['test_passed'])
-        
+
         results['summary_by_category'][category] = {
             'total': len(category_tests),
             'passed': category_passed,
             'failed': len(category_tests) - category_passed,
             'pass_rate': category_passed / len(category_tests) * 100
         }
-    
+
     return results
 
 
@@ -771,9 +845,9 @@ def generate_test_report(results: Dict) -> str:
     """
     Generate human-readable test report
     """
-    
+
     report = f"""
-    
+
 ============================================================
     WASTEWISE REGULATORY COMPLIANCE TEST REPORT
 ============================================================
@@ -788,7 +862,7 @@ Overall Pass Rate: {results['pass_rate']:.1f}%
 RESULTS BY CATEGORY
 ------------------------------------------------------------
 """
-    
+
     for category, summary in results['summary_by_category'].items():
         report += f"""
 {category}:
@@ -797,16 +871,16 @@ RESULTS BY CATEGORY
   Failed: {summary['failed']}
   Pass Rate: {summary['pass_rate']:.1f}%
 """
-    
+
     report += """
 ------------------------------------------------------------
 DETAILED TEST RESULTS
 ------------------------------------------------------------
 """
-    
+
     for test_result in results['test_results']:
         status = "✅ PASSED" if test_result['test_passed'] else "❌ FAILED"
-        
+
         report += f"""
 {status} - {test_result['test_id']} ({test_result['test_type']})
   Judge Score: {test_result['judge_score']}/100
@@ -816,14 +890,14 @@ DETAILED TEST RESULTS
   Critical Errors: {test_result['critical_errors_found']} (Expected: {test_result['expected_critical_errors']})
   Human Review: {test_result['human_review_required']} (Expected: {test_result['expected_human_review']})
 """
-        
+
         if not test_result['test_passed']:
             report += f"  ⚠️  DISCREPANCY: Judge assessment did not match expectations\n"
-    
+
     report += """
 ============================================================
 """
-    
+
     return report
 ```
 
@@ -840,6 +914,7 @@ The test suite is considered successful if:
 ### Continuous Testing
 
 Run the test suite:
+
 - **After every judge prompt update**
 - **After every validator code change**
 - **Weekly on production system**
@@ -848,6 +923,7 @@ Run the test suite:
 ### Test Suite Maintenance
 
 Update test cases when:
+
 - New ordinance formats encountered
 - Judge makes systematic errors
 - New regulatory patterns emerge
@@ -866,9 +942,9 @@ Track these metrics from test suite execution:
 5. **Human Review Precision**: % of human reviews that were necessary
 
 ### Target Metrics:
+
 - Judge Accuracy: ≥95%
 - False Positive Rate: ≤10%
 - False Negative Rate: ≤2% (critical - better to over-flag than miss issues)
 - Critical Error Detection: 100%
 - Human Review Precision: ≥85%
-

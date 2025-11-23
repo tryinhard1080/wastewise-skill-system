@@ -5,6 +5,7 @@
 Edit `.env.local` and replace the placeholder values on these two lines:
 
 ### Line 18: Anthropic API Key
+
 ```bash
 # BEFORE (placeholder):
 ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
@@ -17,6 +18,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 **Expected format**: Starts with `sk-ant-api03-`, 100+ characters
 
 ### Line 29: Exa API Key
+
 ```bash
 # BEFORE (placeholder):
 EXA_API_KEY=your-exa-key-here

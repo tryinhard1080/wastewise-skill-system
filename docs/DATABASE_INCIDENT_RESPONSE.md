@@ -12,12 +12,12 @@ This document defines the incident response plan for database-related incidents 
 
 ### Severity Levels
 
-| Severity | Description | Response Time | Examples |
-|----------|-------------|---------------|----------|
-| **P0 - Critical** | Total service outage, data loss | Immediate (0-15 min) | Database down, ransomware, complete data loss |
-| **P1 - High** | Major feature broken, partial data loss | 1 hour | Table dropped, major corruption, failed migration |
-| **P2 - Medium** | Degraded performance, minor data issues | 4 hours | Slow queries, backup failure, minor corruption |
-| **P3 - Low** | Minimal impact, non-urgent issues | 24 hours | Storage warning, old backup retention |
+| Severity          | Description                             | Response Time        | Examples                                          |
+| ----------------- | --------------------------------------- | -------------------- | ------------------------------------------------- |
+| **P0 - Critical** | Total service outage, data loss         | Immediate (0-15 min) | Database down, ransomware, complete data loss     |
+| **P1 - High**     | Major feature broken, partial data loss | 1 hour               | Table dropped, major corruption, failed migration |
+| **P2 - Medium**   | Degraded performance, minor data issues | 4 hours              | Slow queries, backup failure, minor corruption    |
+| **P3 - Low**      | Minimal impact, non-urgent issues       | 24 hours             | Storage warning, old backup retention             |
 
 ### Incident Types
 
@@ -93,6 +93,7 @@ This document defines the incident response plan for database-related incidents 
 ### Automated Detection
 
 **Monitoring Alerts**:
+
 - Backup failure (via cron job email)
 - Database unreachable (via health checks)
 - Slow query alerts (via Supabase dashboard)
@@ -100,6 +101,7 @@ This document defines the incident response plan for database-related incidents 
 - Failed authentication attempts (via Supabase logs)
 
 **Health Check Endpoints**:
+
 ```bash
 # Application health check (should respond in <1s)
 curl http://wastewise.com/api/health
@@ -111,12 +113,14 @@ curl http://wastewise.com/api/db-check
 ### Manual Detection
 
 **User Reports**:
+
 - Missing data
 - Application errors
 - Slow performance
 - Authentication issues
 
 **Monitoring Dashboard**:
+
 - Supabase Dashboard → Database
 - AWS CloudWatch → Metrics
 - Application logs → Errors
@@ -128,6 +132,7 @@ curl http://wastewise.com/api/db-check
 ### Immediate Actions (0-5 minutes)
 
 1. **Confirm incident is real** (not false positive):
+
 ```bash
 # Test database connection
 psql $DATABASE_URL -c "SELECT 1;"
@@ -142,27 +147,32 @@ psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
 2. **Determine severity**:
 
 **P0 Checklist** (any YES → P0):
+
 - [ ] Database completely unreachable?
 - [ ] Critical table missing (users, projects)?
 - [ ] All users affected?
 - [ ] Data encrypted/ransomware?
 
 **P1 Checklist** (any YES → P1):
+
 - [ ] Single table dropped?
 - [ ] Partial data loss (>10% of records)?
 - [ ] Failed deployment/migration?
 - [ ] Major data corruption?
 
 **P2 Checklist** (any YES → P2):
+
 - [ ] Slow queries (>10s)?
 - [ ] Backup failure?
 - [ ] Minor data corruption (<10% of records)?
 - [ ] Storage >80% full?
 
 **P3 Checklist**:
+
 - [ ] Everything else
 
 3. **Document initial findings**:
+
 ```bash
 # Create incident log
 cat > incident-$(date +%Y%m%d-%H%M%S).log <<EOF
@@ -188,12 +198,12 @@ EOF
 
 ### Notification Matrix
 
-| Severity | Who to Notify | How | Response Time |
-|----------|---------------|-----|---------------|
-| **P0** | On-call engineer, CTO, DevOps team | PagerDuty + Slack #incidents | Immediate |
-| **P1** | On-call engineer, DevOps team | Slack #incidents | 1 hour |
-| **P2** | DevOps team | Slack #alerts | 4 hours |
-| **P3** | DevOps team | Email | 24 hours |
+| Severity | Who to Notify                      | How                          | Response Time |
+| -------- | ---------------------------------- | ---------------------------- | ------------- |
+| **P0**   | On-call engineer, CTO, DevOps team | PagerDuty + Slack #incidents | Immediate     |
+| **P1**   | On-call engineer, DevOps team      | Slack #incidents             | 1 hour        |
+| **P2**   | DevOps team                        | Slack #alerts                | 4 hours       |
+| **P3**   | DevOps team                        | Email                        | 24 hours      |
 
 ### Escalation Procedures
 
@@ -373,14 +383,14 @@ psql $DATABASE_URL -c "
 
 ### Select Recovery Procedure
 
-| Incident Type | Recovery Procedure | Reference |
-|---------------|-------------------|-----------|
-| Complete database loss | Full restore from S3 backup | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 1 |
-| Accidental table drop | PITR or table restore | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 2 |
-| Data corruption | Restore to point before corruption | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 3 |
-| Ransomware | New DB + immutable backup restore | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 |
-| Failed migration | Rollback to pre-deploy snapshot | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 5 |
-| Specific record loss | Extract from backup | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 6 |
+| Incident Type          | Recovery Procedure                 | Reference                                      |
+| ---------------------- | ---------------------------------- | ---------------------------------------------- |
+| Complete database loss | Full restore from S3 backup        | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 1 |
+| Accidental table drop  | PITR or table restore              | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 2 |
+| Data corruption        | Restore to point before corruption | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 3 |
+| Ransomware             | New DB + immutable backup restore  | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 4 |
+| Failed migration       | Rollback to pre-deploy snapshot    | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 5 |
+| Specific record loss   | Extract from backup                | `DATABASE_RECOVERY_PROCEDURES.md` → Scenario 6 |
 
 ### Recovery Progress Updates
 
@@ -410,11 +420,13 @@ curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
 ### Post-Recovery Validation Checklist
 
 - [ ] **Database connection test**:
+
 ```bash
 psql $DATABASE_URL -c "SELECT version();"
 ```
 
 - [ ] **Row count verification**:
+
 ```bash
 psql $DATABASE_URL -c "
   SELECT tablename, n_live_tup
@@ -426,6 +438,7 @@ psql $DATABASE_URL -c "
 ```
 
 - [ ] **Data integrity checks**:
+
 ```bash
 # No NULL values in required fields
 psql $DATABASE_URL -c "
@@ -442,6 +455,7 @@ psql $DATABASE_URL -c "
 ```
 
 - [ ] **Application smoke tests**:
+
 ```bash
 # Health check
 curl http://wastewise.com/api/health
@@ -456,6 +470,7 @@ curl http://wastewise.com/api/projects \
 ```
 
 - [ ] **Recent data check** (for P0/P1 with data loss):
+
 ```bash
 # Check for data within RPO window
 psql $DATABASE_URL -c "
@@ -467,6 +482,7 @@ psql $DATABASE_URL -c "
 ```
 
 - [ ] **Performance validation**:
+
 ```bash
 # Query response time
 time psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
@@ -480,6 +496,7 @@ time psql $DATABASE_URL -c "SELECT COUNT(*) FROM projects;"
 ### Resume Operations Checklist
 
 - [ ] **Restore write permissions** (if revoked):
+
 ```bash
 psql $DATABASE_URL -c "
   GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
@@ -489,6 +506,7 @@ psql $DATABASE_URL -c "
 - [ ] **Remove maintenance mode** (if enabled)
 
 - [ ] **Notify users**:
+
 ```bash
 # Email all active users
 aws ses send-email \
@@ -499,12 +517,14 @@ aws ses send-email \
 ```
 
 - [ ] **Update status page**:
+
 ```
 https://status.wastewise.com
 Status: All Systems Operational ✅
 ```
 
 - [ ] **Post to Slack**:
+
 ```bash
 curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
   -d '{
@@ -531,12 +551,14 @@ curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
 **Timeline**: Within 48 hours of incident resolution
 
 **Attendees**:
+
 - Incident responders
 - Engineering team
 - CTO (for P0/P1)
 - Affected stakeholders
 
 **Agenda**:
+
 1. Incident timeline review
 2. Root cause analysis (5 Whys technique)
 3. What went well
@@ -554,20 +576,23 @@ curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
 **Impact**: [Brief description]
 
 ## Summary
+
 [One paragraph summary of what happened]
 
 ## Timeline
-| Time | Event |
-|------|-------|
-| 14:00 | Incident detected via monitoring alert |
-| 14:05 | On-call engineer paged |
-| 14:10 | Root cause identified (accidental DROP TABLE) |
+
+| Time  | Event                                          |
+| ----- | ---------------------------------------------- |
+| 14:00 | Incident detected via monitoring alert         |
+| 14:05 | On-call engineer paged                         |
+| 14:10 | Root cause identified (accidental DROP TABLE)  |
 | 14:15 | Recovery initiated (table restore from backup) |
-| 14:30 | Table restored, verification started |
-| 14:40 | Service resumed |
-| 14:45 | Incident closed |
+| 14:30 | Table restored, verification started           |
+| 14:40 | Service resumed                                |
+| 14:45 | Incident closed                                |
 
 ## Root Cause
+
 [Detailed explanation using 5 Whys technique]
 
 1. Why did the table get dropped?
@@ -588,36 +613,42 @@ curl -X POST https://hooks.slack.com/services/YOUR_WEBHOOK \
 **Root Cause**: Insufficient access controls and deployment safeguards
 
 ## Impact
+
 - **Users Affected**: 0 (detected before user impact)
 - **Data Loss**: None (restored from backup within minutes)
 - **Revenue Impact**: None
 - **Downtime**: 40 minutes
 
 ## What Went Well
+
 - Monitoring detected issue immediately
 - On-call engineer responded within 5 minutes
 - Backup restoration worked flawlessly
 - Communication was clear and frequent
 
 ## What Went Poorly
+
 - Production database was accessible without safeguards
 - No deployment checklist followed
 - No automated backups before migrations
 
 ## Action Items
-| Action | Owner | Due Date | Priority |
-|--------|-------|----------|----------|
-| Implement read-only production DB access | DevOps | 2025-01-25 | P0 |
-| Create pre-deployment checklist | Engineering | 2025-01-22 | P1 |
-| Automate pre-migration backups | DevOps | 2025-01-28 | P1 |
-| Document deployment procedures | Technical Writer | 2025-02-05 | P2 |
+
+| Action                                   | Owner            | Due Date   | Priority |
+| ---------------------------------------- | ---------------- | ---------- | -------- |
+| Implement read-only production DB access | DevOps           | 2025-01-25 | P0       |
+| Create pre-deployment checklist          | Engineering      | 2025-01-22 | P1       |
+| Automate pre-migration backups           | DevOps           | 2025-01-28 | P1       |
+| Document deployment procedures           | Technical Writer | 2025-02-05 | P2       |
 
 ## Lessons Learned
+
 - Never underestimate the importance of access controls
 - Checklists prevent human error
 - Regular backup testing saved us (we knew restore worked)
 
 ## Appendix
+
 - Incident log: incident-20250121-140000.log
 - Slack thread: https://wastewise.slack.com/archives/...
 - Related incidents: None
@@ -705,19 +736,23 @@ Lessons Learned: [Key takeaways]
 ## Emergency Contacts
 
 **Database Incidents**:
+
 - Primary: devops@wastewise.com
 - On-call: +1-555-0100 (PagerDuty)
 - Escalation: cto@wastewise.com
 
 **Supabase Support**:
+
 - Email: support@supabase.io
 - Priority Support: Dashboard → Support (Pro tier+)
 
 **Security Incidents**:
+
 - CISO: security@wastewise.com
 - FBI IC3: https://www.ic3.gov/ (ransomware)
 
 **AWS Support**:
+
 - Support Console: https://console.aws.amazon.com/support
 - Phone: 1-866-947-0031 (Business Support+)
 

@@ -11,14 +11,14 @@ Comprehensive monitoring and alerting configuration for WasteWise database backu
 
 ### Critical Metrics
 
-| Metric | Target | Alert Threshold | Action |
-|--------|--------|-----------------|--------|
-| Backup Success Rate | 100% | <100% | Page on-call |
-| Backup Duration | <15 min | >30 min | Investigate |
-| Backup File Size | ±20% of avg | >±50% | Alert DevOps |
-| Storage Capacity | <80% | >90% | Increase capacity |
-| Last Successful Backup | <24 hours | >48 hours | Critical alert |
-| Restore Test Pass Rate | 100% | <100% | Block deployments |
+| Metric                 | Target      | Alert Threshold | Action            |
+| ---------------------- | ----------- | --------------- | ----------------- |
+| Backup Success Rate    | 100%        | <100%           | Page on-call      |
+| Backup Duration        | <15 min     | >30 min         | Investigate       |
+| Backup File Size       | ±20% of avg | >±50%           | Alert DevOps      |
+| Storage Capacity       | <80%        | >90%            | Increase capacity |
+| Last Successful Backup | <24 hours   | >48 hours       | Critical alert    |
+| Restore Test Pass Rate | 100%        | <100%           | Block deployments |
 
 ## Automated Monitoring
 
@@ -93,33 +93,42 @@ fi
 ### Slack Webhooks
 
 **Setup**:
+
 1. Create incoming webhook in Slack
 2. Configure channels:
    - `#alerts` - P2/P3 notifications
    - `#incidents` - P0/P1 critical alerts
 
 **Alert Template**:
+
 ```json
 {
   "channel": "#alerts",
   "username": "Backup Monitor",
   "icon_emoji": ":floppy_disk:",
-  "attachments": [{
-    "color": "warning",
-    "title": "Backup Alert",
-    "fields": [
-      {"title": "Event", "value": "Backup size anomaly", "short": true},
-      {"title": "Severity", "value": "Medium", "short": true},
-      {"title": "Details", "value": "Latest backup 60% larger than average", "short": false}
-    ],
-    "footer": "WasteWise Backup Monitor"
-  }]
+  "attachments": [
+    {
+      "color": "warning",
+      "title": "Backup Alert",
+      "fields": [
+        { "title": "Event", "value": "Backup size anomaly", "short": true },
+        { "title": "Severity", "value": "Medium", "short": true },
+        {
+          "title": "Details",
+          "value": "Latest backup 60% larger than average",
+          "short": false
+        }
+      ],
+      "footer": "WasteWise Backup Monitor"
+    }
+  ]
 }
 ```
 
 ### Email Notifications
 
 **AWS SES Configuration**:
+
 ```bash
 # Daily backup summary
 aws ses send-email \
@@ -139,6 +148,7 @@ Next Backup: $(date -d 'next Sunday 3:00' +%Y-%m-%d\ %H:%M)
 ### PagerDuty Integration
 
 **Critical Alerts Only** (P0/P1):
+
 ```bash
 # Trigger incident
 curl -X POST https://events.pagerduty.com/v2/enqueue \
@@ -166,6 +176,7 @@ curl -X POST https://events.pagerduty.com/v2/enqueue \
 **Navigate to**: Project Settings → Database → Usage
 
 **Key Metrics**:
+
 - Database size trend
 - Connection pool usage
 - Query performance
@@ -174,6 +185,7 @@ curl -X POST https://events.pagerduty.com/v2/enqueue \
 ### Custom CloudWatch Dashboard
 
 **Metrics to display**:
+
 ```json
 {
   "widgets": [
@@ -181,9 +193,9 @@ curl -X POST https://events.pagerduty.com/v2/enqueue \
       "type": "metric",
       "properties": {
         "metrics": [
-          ["WasteWise/Backups", "BackupDuration", {"stat": "Average"}],
-          [".", "BackupSize", {"stat": "Average"}],
-          [".", "BackupSuccess", {"stat": "Sum"}]
+          ["WasteWise/Backups", "BackupDuration", { "stat": "Average" }],
+          [".", "BackupSize", { "stat": "Average" }],
+          [".", "BackupSuccess", { "stat": "Sum" }]
         ],
         "period": 86400,
         "stat": "Average",
@@ -194,9 +206,7 @@ curl -X POST https://events.pagerduty.com/v2/enqueue \
     {
       "type": "metric",
       "properties": {
-        "metrics": [
-          ["AWS/S3", "BucketSizeBytes", {"stat": "Average"}]
-        ],
+        "metrics": [["AWS/S3", "BucketSizeBytes", { "stat": "Average" }]],
         "period": 86400,
         "stat": "Average",
         "title": "S3 Storage Usage"
@@ -265,6 +275,7 @@ echo "Storage Usage: ${USAGE_PERCENT}%"
 **Location**: `/var/log/wastewise-backup.log`
 
 **Log Format**:
+
 ```
 [2025-01-21 03:00:00] [INFO] Starting weekly backup
 [2025-01-21 03:00:05] [INFO] Database connection successful
@@ -276,6 +287,7 @@ echo "Storage Usage: ${USAGE_PERCENT}%"
 ```
 
 **Log Rotation**:
+
 ```bash
 # /etc/logrotate.d/wastewise-backup
 /var/log/wastewise-backup.log {
@@ -342,16 +354,17 @@ Dashboard: https://console.aws.amazon.com/s3/buckets/wastewise-backups
 
 **Track and review monthly**:
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Mean Time to Detect (MTTD) | <5 min | - |
-| Mean Time to Respond (MTTR) | <15 min | - |
-| False Positive Rate | <5% | - |
-| Alert Fatigue Score | Low | - |
+| Metric                      | Target  | Current |
+| --------------------------- | ------- | ------- |
+| Mean Time to Detect (MTTD)  | <5 min  | -       |
+| Mean Time to Respond (MTTR) | <15 min | -       |
+| False Positive Rate         | <5%     | -       |
+| Alert Fatigue Score         | Low     | -       |
 
 ## Alert Tuning
 
 **Review quarterly**:
+
 - Adjust thresholds based on observed patterns
 - Reduce false positives
 - Ensure critical alerts are not missed

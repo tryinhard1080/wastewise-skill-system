@@ -35,38 +35,47 @@ This package contains **9 specialized Claude Skills** designed to transform manu
 ## 🎯 Skill Selection Guide
 
 ### **"I have invoices and need quick analysis"**
+
 → Use: **wastewise-regulatory-lite**  
 Best for: Fast turnaround, token-efficient, silent execution
 
 ### **"I need complete analysis with regulatory compliance"**
+
 → Use: **wastewise-regulatory**  
 Best for: Comprehensive reports, ordinance research, compliance checklists
 
 ### **"I need maximum quality assurance"**
+
 → Use: **wastewise-analytics-validated**  
 Best for: Enterprise-grade validation, detailed quality reports
 
 ### **"I have a contract PDF to analyze"**
+
 → Use: **waste-contract-extractor**  
 Best for: Contract parsing, clause extraction, term identification
 
 ### **"I have multiple properties to process"**
+
 → Use: **waste-batch-extractor**  
 Best for: Batch processing, location-specific reports, validation summaries
 
 ### **"I need to optimize compactor service"**
+
 → Use: **compactor-optimization**  
 Best for: ROI calculations, utilization analysis, monitoring recommendations
 
 ### **"I want interactive visual reports"**
+
 → Use: **waste-visual-reporter**  
 Best for: Stakeholder presentations, filterable data tables, Chart.js charts
 
 ### **"I'm planning a new development project"**
+
 → Use: **waste-dev-report-visualizer**  
 Best for: Multi-building analysis, equipment specs, cost comparisons
 
 ### **"I need a comprehensive trash management plan"**
+
 → Use: **trash-management-planner**  
 Best for: Development projects, regulatory compliance, implementation roadmaps
 
@@ -77,6 +86,7 @@ Best for: Development projects, regulatory compliance, implementation roadmaps
 ### Installation Options
 
 **Option 1: Individual Skills (Recommended for Testing)**
+
 ```bash
 # Extract this archive
 unzip waste-skills-complete.zip
@@ -86,12 +96,14 @@ cp -r wastewise-regulatory ~/.claude/skills/
 ```
 
 **Option 2: Full Ecosystem (Recommended for Production)**
+
 ```bash
 # Install all skills at once
 cp -r waste-skills-complete/* ~/.claude/skills/
 ```
 
 **Option 3: Claude.ai Browser**
+
 1. Go to Settings → Capabilities → Skills
 2. Click "Upload Skill"
 3. Select individual skill folder (zipped)
@@ -102,21 +114,25 @@ cp -r waste-skills-complete/* ~/.claude/skills/
 ## 📊 Industry Benchmarks Reference
 
 ### Cost Per Door Metrics
+
 - **Garden-Style Properties**: $18-35/month/unit
 - **High-Rise Properties**: $25-45/month/unit
 - **Budget Target**: <$30/month/unit optimal
 
 ### Yards Per Door (Compacted Service)
+
 - **Target Range**: 2.0-2.5 yards/unit/month
 - **Below 2.0**: Possible underutilization
 - **Above 2.5**: Review for optimization opportunities
 
 ### Compactor Efficiency Targets
+
 - **Tons Per Haul**: 8-9 tons (industry standard)
 - **Below 6 tons**: Consider monitoring systems
 - **Days Between Pickups**: <14 days for optimization eligibility
 
 ### ROI Expectations
+
 - **Monitoring Systems**: 500-900% ROI typical
 - **Contamination Reduction**: Recommend if charges >3-5% of spend
 - **Bulk Subscriptions**: Recommend if avg >$500/month
@@ -126,6 +142,7 @@ cp -r waste-skills-complete/* ~/.claude/skills/
 ## 🏗️ Typical Workflows
 
 ### Workflow 1: New Property Analysis
+
 ```
 1. Upload invoices (6+ months) → wastewise-regulatory
 2. Review optimization recommendations
@@ -134,6 +151,7 @@ cp -r waste-skills-complete/* ~/.claude/skills/
 ```
 
 ### Workflow 2: Portfolio-Wide Assessment
+
 ```
 1. Collect invoices from multiple properties
 2. Process batch → waste-batch-extractor
@@ -142,6 +160,7 @@ cp -r waste-skills-complete/* ~/.claude/skills/
 ```
 
 ### Workflow 3: Development Project Planning
+
 ```
 1. Gather building data (units, SF, stories)
 2. Generate plan → trash-management-planner
@@ -150,6 +169,7 @@ cp -r waste-skills-complete/* ~/.claude/skills/
 ```
 
 ### Workflow 4: Contract Review & Renewal
+
 ```
 1. Upload existing contract → waste-contract-extractor
 2. Review extracted terms and dates
@@ -162,11 +182,13 @@ cp -r waste-skills-complete/* ~/.claude/skills/
 ## 🔧 Technical Requirements
 
 ### Required Libraries (Install Once)
+
 ```bash
 pip install pandas openpyxl python-dateutil anthropic --break-system-packages
 ```
 
 ### Optional Libraries (For Specific Skills)
+
 ```bash
 # For contract extraction
 pip install pdfplumber pymupdf --break-system-packages
@@ -176,6 +198,7 @@ pip install beautifulsoup4 requests --break-system-packages
 ```
 
 ### System Requirements
+
 - Python 3.8+
 - 4GB RAM minimum
 - Claude API access (for document processing)
@@ -215,32 +238,37 @@ waste-skills-complete/
 ## 🎓 Example Prompts
 
 ### WasteWise Analysis
+
 ```
-"Analyze these Columbia Square Living invoices and generate a complete 
+"Analyze these Columbia Square Living invoices and generate a complete
 WasteWise report with regulatory compliance for Portland, Oregon."
 ```
 
 ### Batch Processing
+
 ```
-"I have invoices for 12 properties in different cities. Extract all data, 
+"I have invoices for 12 properties in different cities. Extract all data,
 organize by location, and create validation reports."
 ```
 
 ### Contract Review
+
 ```
-"Extract terms from this Waste Management contract. I need to know about 
+"Extract terms from this Waste Management contract. I need to know about
 rate increases, termination clauses, and renewal dates."
 ```
 
 ### Development Planning
+
 ```
-"Create a trash management plan for our 3-building development in Austin, TX. 
+"Create a trash management plan for our 3-building development in Austin, TX.
 Total 620 units, 8 stories each, ground floor commercial space."
 ```
 
 ### Visual Dashboard
+
 ```
-"Generate an interactive HTML dashboard from this WasteWise analysis. 
+"Generate an interactive HTML dashboard from this WasteWise analysis.
 I need it ready to present to regional directors."
 ```
 
@@ -281,10 +309,12 @@ wastewise-analytics-validated
 ## 🏢 Vendor & Partner References
 
 ### Preferred Partners
+
 - **DSQ Technologies** (Keith Conrad) - Compactor monitoring systems
 - **Ally Waste** (Cole Myers) - Contamination & bulk services
 
 ### Major Haulers Supported
+
 - Waste Management (WM)
 - Republic Services
 - GFL Environmental
@@ -301,11 +331,13 @@ Director of Waste & Diversion Strategies
 Advantage Waste / Greystar Real Estate Partners
 
 **For Technical Issues:**
+
 - Check individual SKILL.md files for troubleshooting
 - Review sample prompts in each skill folder
 - Verify all required libraries are installed
 
 **For Feature Requests:**
+
 - Skills are actively maintained and updated
 - Feedback drives continuous improvement
 - Custom skills available for specific needs
@@ -315,6 +347,7 @@ Advantage Waste / Greystar Real Estate Partners
 ## 📝 Change Log
 
 ### Version 2.0 (November 2025)
+
 - Added wastewise-analytics-validated with comprehensive validation
 - Enhanced regulatory compliance research in wastewise-regulatory
 - Improved token efficiency in wastewise-regulatory-lite
@@ -322,6 +355,7 @@ Advantage Waste / Greystar Real Estate Partners
 - Updated all skills with latest industry benchmarks
 
 ### Version 1.0 (October 2025)
+
 - Initial ecosystem release
 - Core WasteWise analysis skills
 - Contract extraction capabilities
@@ -332,17 +366,20 @@ Advantage Waste / Greystar Real Estate Partners
 ## 📚 Additional Resources
 
 **Industry Standards:**
+
 - EPA Density Standards: 138 lbs/yd³
 - Compaction Ratio: 4:1 standard for multifamily
 - Target Tons Per Haul: 8-9 tons
 
 **Regulatory Compliance:**
+
 - AB 341 (California Recycling)
 - AB 1826 (California Organics)
 - AB 1383 (California Short-Lived Climate Pollutants)
 - ENERGY STAR Portfolio Manager requirements
 
 **Equipment References:**
+
 - Wastequip A-Series compactors (industry standard)
 - DSQ monitoring systems (recommended)
 - Standard container sizes and capacities
@@ -352,16 +389,19 @@ Advantage Waste / Greystar Real Estate Partners
 ## ⚖️ Important Notes
 
 ### Data Privacy
+
 - All processing happens locally
 - No data is stored or transmitted without user consent
 - Suitable for confidential contract analysis
 
 ### Quality Assurance
+
 - Built-in validation across all skills
 - Confidence scoring for automated research
 - Manual review flags for low-confidence results
 
 ### Customization
+
 - Skills can be modified for specific workflows
 - Template structures are fully editable
 - Custom branding and formatting supported
@@ -371,6 +411,7 @@ Advantage Waste / Greystar Real Estate Partners
 ## 🎯 Success Metrics
 
 Using this ecosystem, typical results include:
+
 - **80-90% reduction** in analysis time
 - **500-900% ROI** on optimization recommendations
 - **Unlimited reports** across entire property portfolio
@@ -379,7 +420,7 @@ Using this ecosystem, typical results include:
 ---
 
 **Advantage Waste | Greystar Real Estate Partners**  
-*Simplifying waste management for multifamily communities nationwide*
+_Simplifying waste management for multifamily communities nationwide_
 
 For the latest updates and documentation:  
 https://github.com/your-repo (if applicable)

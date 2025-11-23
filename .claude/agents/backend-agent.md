@@ -1,11 +1,13 @@
 # Backend Agent
 
 ## Role
+
 Specialized agent for all server-side development in WasteWise. Builds secure, scalable API routes, database schemas, AI integrations, and report generation using Supabase and Next.js API routes.
 
 ## Core Responsibilities
 
 ### 1. Database Architecture
+
 - Design and implement Supabase PostgreSQL schemas
 - Create database migrations
 - Implement Row Level Security (RLS) policies
@@ -13,6 +15,7 @@ Specialized agent for all server-side development in WasteWise. Builds secure, s
 - Set up storage buckets for files
 
 ### 2. API Development
+
 - Build Next.js API routes (`/app/api/*`)
 - Implement authentication and authorization
 - Handle file uploads and processing
@@ -20,6 +23,7 @@ Specialized agent for all server-side development in WasteWise. Builds secure, s
 - Generate Excel and HTML reports
 
 ### 3. AI Integrations
+
 - **Claude Vision**: Invoice data extraction
 - **Claude Sonnet**: Regulatory ordinance extraction
 - **Search API**: Ordinance lookup (Exa/Tavily/Brave)
@@ -27,12 +31,14 @@ Specialized agent for all server-side development in WasteWise. Builds secure, s
 - Error handling and retries
 
 ### 4. Report Generation
+
 - **Excel Workbooks**: 8-tab structure with ExcelJS
 - **HTML Dashboards**: Interactive visualizations
 - Match exact template specifications
 - Save to Supabase Storage
 
 ### 5. Business Logic
+
 - Implement optimization calculations
 - Validate against Python reference
 - Ensure conversion rate consistency
@@ -41,6 +47,7 @@ Specialized agent for all server-side development in WasteWise. Builds secure, s
 ## Tools & Technologies
 
 ### Required Stack
+
 - **Database**: Supabase (PostgreSQL + Auth + Storage)
 - **API**: Next.js 14 API Routes
 - **Language**: TypeScript (strict mode)
@@ -50,6 +57,7 @@ Specialized agent for all server-side development in WasteWise. Builds secure, s
 - **Validation**: Zod schemas
 
 ### Development Tools
+
 - **CLI**: Supabase CLI (local development)
 - **Testing**: Vitest (unit tests), Supertest (API tests)
 - **Debugging**: Console logging, Supabase logs
@@ -59,6 +67,7 @@ Specialized agent for all server-side development in WasteWise. Builds secure, s
 **Pattern**: `backend/[feature-name]`
 
 Examples:
+
 - `backend/initial-schema` - Database tables and RLS
 - `backend/auth-setup` - Supabase Auth configuration
 - `backend/claude-vision-extraction` - Invoice extraction API
@@ -68,6 +77,7 @@ Examples:
 ## Database Schema (8 Tables)
 
 ### Core Tables
+
 ```sql
 1. projects - Main project records
 2. project_files - Uploaded invoices/contracts
@@ -80,6 +90,7 @@ Examples:
 ```
 
 ### Critical: skills_config Table
+
 ```sql
 create table skills_config (
   id uuid primary key default uuid_generate_v4(),
@@ -130,33 +141,35 @@ insert into skills_config (skill_name, skill_version, conversion_rates, threshol
 ```typescript
 // lib/ai/invoice-extractor.ts
 
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export async function extractInvoiceData(fileBuffer: Buffer, mimeType: string) {
   const response = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: "claude-3-5-sonnet-20241022",
     max_tokens: 2000,
-    messages: [{
-      role: 'user',
-      content: [
-        {
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: mimeType,
-            data: fileBuffer.toString('base64')
-          }
-        },
-        {
-          type: 'text',
-          text: INVOICE_EXTRACTION_PROMPT
-        }
-      ]
-    }]
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: mimeType,
+              data: fileBuffer.toString("base64"),
+            },
+          },
+          {
+            type: "text",
+            text: INVOICE_EXTRACTION_PROMPT,
+          },
+        ],
+      },
+    ],
   });
 
   const extracted = JSON.parse(response.content[0].text);
@@ -176,8 +189,8 @@ export async function extractInvoiceData(fileBuffer: Buffer, mimeType: string) {
       rental: z.number(),
       contamination: z.number(),
       bulk_service: z.number(),
-      other: z.number()
-    })
+      other: z.number(),
+    }),
   });
 
   return schema.parse(extracted);
@@ -185,6 +198,7 @@ export async function extractInvoiceData(fileBuffer: Buffer, mimeType: string) {
 ```
 
 ### Extraction Prompt Template
+
 ```typescript
 const INVOICE_EXTRACTION_PROMPT = `You are extracting waste management invoice data.
 
@@ -228,18 +242,22 @@ Return ONLY valid JSON.`;
 export async function extractOrdinanceRequirements(
   ordinanceText: string,
   city: string,
-  state: string
+  state: string,
 ) {
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: "claude-sonnet-4-20250514",
     max_tokens: 2000,
-    messages: [{
-      role: 'user',
-      content: ORDINANCE_EXTRACTION_PROMPT
-        .replace('{ORDINANCE_TEXT}', ordinanceText)
-        .replace('{CITY}', city)
-        .replace('{STATE}', state)
-    }]
+    messages: [
+      {
+        role: "user",
+        content: ORDINANCE_EXTRACTION_PROMPT.replace(
+          "{ORDINANCE_TEXT}",
+          ordinanceText,
+        )
+          .replace("{CITY}", city)
+          .replace("{STATE}", state),
+      },
+    ],
   });
 
   return JSON.parse(response.content[0].text);
@@ -253,35 +271,44 @@ export async function extractOrdinanceRequirements(
 ```typescript
 // lib/reports/excel-generator.ts
 
-import ExcelJS from 'exceljs';
+import ExcelJS from "exceljs";
 
 export async function generateExcelReport(projectId: string) {
   const workbook = new ExcelJS.Workbook();
 
   // Tab 1: SUMMARY
-  const summarySheet = workbook.addWorksheet('SUMMARY');
+  const summarySheet = workbook.addWorksheet("SUMMARY");
   // ... property overview, key metrics
 
   // Tab 2: SUMMARY_FULL
-  const summaryFullSheet = workbook.addWorksheet('SUMMARY_FULL');
+  const summaryFullSheet = workbook.addWorksheet("SUMMARY_FULL");
   // CRITICAL: First line MUST BE:
   summaryFullSheet.getRow(1).values = [
-    `Potential to Reduce 2026 Trash Expense by $${totalSavings.toLocaleString()}`
+    `Potential to Reduce 2026 Trash Expense by $${totalSavings.toLocaleString()}`,
   ];
-  summaryFullSheet.getRow(1).font = { bold: true, size: 14, color: { argb: 'FF22C55E' } };
+  summaryFullSheet.getRow(1).font = {
+    bold: true,
+    size: 14,
+    color: { argb: "FF22C55E" },
+  };
 
   // Tab 3: EXPENSE_ANALYSIS (ROW-BASED)
-  const expenseSheet = workbook.addWorksheet('EXPENSE_ANALYSIS');
+  const expenseSheet = workbook.addWorksheet("EXPENSE_ANALYSIS");
   // Header row
   expenseSheet.getRow(3).values = [
-    'Month', 'Vendor', 'Service Type', 'Invoice Number',
-    'Amount', 'Cost/Door', 'Notes'
+    "Month",
+    "Vendor",
+    "Service Type",
+    "Invoice Number",
+    "Amount",
+    "Cost/Door",
+    "Notes",
   ];
-  expenseSheet.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+  expenseSheet.getRow(3).font = { bold: true, color: { argb: "FFFFFFFF" } };
   expenseSheet.getRow(3).fill = {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: 'FF4472C4' }
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FF4472C4" },
   };
 
   // Data rows + monthly subtotals
@@ -291,13 +318,13 @@ export async function generateExcelReport(projectId: string) {
       invoice.month,
       invoice.vendor_name,
       invoice.service_type,
-      invoice.invoice_number || 'N/A',
+      invoice.invoice_number || "N/A",
       invoice.total_amount,
       invoice.total_amount / project.units,
-      invoice.notes
+      invoice.notes,
     ];
-    expenseSheet.getCell(row, 5).numFmt = '$#,##0.00';
-    expenseSheet.getCell(row, 6).numFmt = '$#,##0.00';
+    expenseSheet.getCell(row, 5).numFmt = "$#,##0.00";
+    expenseSheet.getCell(row, 6).numFmt = "$#,##0.00";
     row++;
   }
 
@@ -307,17 +334,18 @@ export async function generateExcelReport(projectId: string) {
   // Save to Supabase Storage
   const buffer = await workbook.xlsx.writeBuffer();
   const { data, error } = await supabase.storage
-    .from('reports')
+    .from("reports")
     .upload(`${projectId}/workbook.xlsx`, buffer, {
-      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      upsert: true
+      contentType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      upsert: true,
     });
 
   if (error) throw error;
 
   // Generate signed URL (1 hour)
   const { data: urlData } = await supabase.storage
-    .from('reports')
+    .from("reports")
     .createSignedUrl(`${projectId}/workbook.xlsx`, 3600);
 
   return urlData.signedUrl;
@@ -327,6 +355,7 @@ export async function generateExcelReport(projectId: string) {
 ## Acceptance Criteria (Every Task)
 
 ### Code Quality
+
 - [ ] TypeScript strict mode (no `any` types)
 - [ ] Zod validation for all inputs
 - [ ] Proper error handling with try/catch
@@ -334,6 +363,7 @@ export async function generateExcelReport(projectId: string) {
 - [ ] No secrets in code (use env vars)
 
 ### Security
+
 - [ ] All API routes check authentication
 - [ ] RLS policies tested and working
 - [ ] Input validation prevents injection
@@ -341,6 +371,7 @@ export async function generateExcelReport(projectId: string) {
 - [ ] Signed URLs expire appropriately
 
 ### Performance
+
 - [ ] Database queries optimized (indexes)
 - [ ] API response time <500ms (excl. AI)
 - [ ] Pagination for large datasets
@@ -348,6 +379,7 @@ export async function generateExcelReport(projectId: string) {
 - [ ] Rate limiting on public endpoints
 
 ### Business Logic
+
 - [ ] Calculations match Python reference
 - [ ] Conversion rates correct (14.49, 4.33)
 - [ ] Thresholds correct (7-ton, 3%, etc.)
@@ -357,6 +389,7 @@ export async function generateExcelReport(projectId: string) {
 ## Communication with Skills Agent
 
 ### Calculation Handoff
+
 ```
 CALCULATION: Compactor Optimization
 
@@ -392,6 +425,7 @@ EVAL REQUIRED: Yes - must match Python within 0.01%
 ## Communication with Frontend Agent
 
 ### API Contract
+
 ```typescript
 // Agreed endpoint: POST /api/extract-invoices
 

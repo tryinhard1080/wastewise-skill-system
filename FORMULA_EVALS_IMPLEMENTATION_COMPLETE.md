@@ -15,6 +15,7 @@ Implemented comprehensive formula validation evals framework for WasteWise to en
 ## What Was Implemented
 
 ### 1. Main Eval Runner ✅
+
 **File**: `scripts/run-evals.ts`
 
 - Orchestrates complete validation workflow
@@ -24,11 +25,13 @@ Implemented comprehensive formula validation evals framework for WasteWise to en
 - Exits with appropriate codes for CI/CD integration
 
 **Usage**:
+
 ```bash
 pnpm eval
 ```
 
 **Output**:
+
 ```
 🧪 WasteWise Formula Validation Evals
 ================================================================================
@@ -51,6 +54,7 @@ Pass Rate:    100.00%
 ---
 
 ### 2. Package.json Script ✅
+
 **File**: `package.json`
 
 Added `pnpm eval` script for easy execution:
@@ -64,11 +68,13 @@ Added `pnpm eval` script for easy execution:
 ---
 
 ### 3. Test Fixtures ✅
+
 **Directory**: `lib/evals/fixtures/`
 
 Created comprehensive JSON test fixtures with expected values:
 
 #### `compactor-optimization.json`
+
 - 8 test cases covering:
   - Standard properties (250-400 units)
   - Edge cases (exactly 6.0 tons, 5.99 tons)
@@ -76,12 +82,14 @@ Created comprehensive JSON test fixtures with expected values:
   - Various utilization levels
 
 #### `yards-per-door.json`
+
 - 8 test cases for YPD calculations:
   - Compactor service (various tonnages)
   - Dumpster service (various configurations)
   - Edge cases (single unit, large properties)
 
 #### `cost-per-door.json`
+
 - 8 test cases for cost calculations:
   - Different property sizes (100-1000 units)
   - Various service levels ($10-$25 per door)
@@ -94,15 +102,18 @@ Created comprehensive JSON test fixtures with expected values:
 ### 4. GitHub Actions Workflows ✅
 
 #### New Workflow: `.github/workflows/evals.yml`
+
 Dedicated formula validation workflow:
 
 **Triggers**:
+
 - Pull requests to master
 - Pushes to master
 - Manual dispatch
 - File changes in calculation paths
 
 **Features**:
+
 - Runs `pnpm eval` automatically
 - Posts detailed comments on PR (pass/fail)
 - Provides troubleshooting guidance
@@ -111,15 +122,18 @@ Dedicated formula validation workflow:
 **Status Check**: Required for merge approval
 
 #### Updated Workflow: `.github/workflows/pr-checks.yml`
+
 Enhanced existing PR checks with eval integration:
 
 **Added Steps**:
+
 1. **Hardcoded Value Detection**: Scans for formula constants in code
 2. **Calculation Tests**: Runs unit tests for calculations
 3. **Formula Validation Evals**: Executes `pnpm eval`
 4. **PR Comments**: Posts detailed failure information
 
 **Validation Chain**:
+
 ```
 Hardcoded Check → Calculation Tests → Formula Evals → Build Test
          ↓                ↓                 ↓              ↓
@@ -129,40 +143,47 @@ Hardcoded Check → Calculation Tests → Formula Evals → Build Test
 ---
 
 ### 5. Comprehensive Documentation ✅
+
 **File**: `docs/FORMULA_VALIDATION.md`
 
 Complete guide covering:
 
 #### Core Concepts
+
 - Why evals are critical (business + technical)
 - Formula constants as single source of truth
 - Tolerance explanation (0.01% requirement)
 
 #### Developer Workflow
+
 - Running evals locally
 - Understanding output
 - Troubleshooting failures
 - Adding new test cases
 
 #### Formula Management
+
 - How to update formulas safely
 - Required validation steps
 - Formula change checklist
 - Version control best practices
 
 #### CI/CD Integration
+
 - Automated checks
 - PR workflow
 - Required checks
 - Status reporting
 
 #### Best Practices
+
 - Test-driven development
 - Multiple validation sources
 - Edge case documentation
 - Version control
 
 #### FAQ
+
 - Common issues and solutions
 - Tolerance questions
 - Process exceptions
@@ -175,6 +196,7 @@ Complete guide covering:
 ## Validation Results ✅
 
 ### Local Execution
+
 ```bash
 $ pnpm eval
 
@@ -209,12 +231,14 @@ Executed:     2025-11-22T00:55:19.793Z
 ```
 
 ### Test Coverage
+
 - **Formula Constants**: 12/12 validated (100%)
 - **Compactor Optimization**: 6/6 tests passed (100%)
 - **Total Evals**: 6 tests, 100% pass rate
 - **Tolerance**: All within <0.01% requirement
 
 ### Critical Validations
+
 ✅ COMPACTOR_YPD_CONVERSION = 14.49
 ✅ DUMPSTER_YPD_CONVERSION = 4.33
 ✅ COMPACTOR_TARGET_TONS = 8.5
@@ -227,6 +251,7 @@ Executed:     2025-11-22T00:55:19.793Z
 ## Files Created/Modified
 
 ### New Files
+
 ```
 scripts/run-evals.ts                          # Main eval runner
 lib/evals/fixtures/compactor-optimization.json # Test fixtures
@@ -237,6 +262,7 @@ docs/FORMULA_VALIDATION.md                    # Comprehensive guide
 ```
 
 ### Modified Files
+
 ```
 package.json                                   # Added eval script
 .github/workflows/pr-checks.yml               # Integrated evals
@@ -247,6 +273,7 @@ package.json                                   # Added eval script
 ## CI/CD Integration
 
 ### Automated Checks (PR)
+
 When a PR is created touching calculation files:
 
 1. ✅ **Hardcoded Value Detection**
@@ -269,7 +296,9 @@ When a PR is created touching calculation files:
    - Links to documentation
 
 ### Required for Merge
+
 All PRs must pass:
+
 - TypeScript compilation
 - ESLint
 - Unit tests
@@ -283,6 +312,7 @@ All PRs must pass:
 ## Developer Experience
 
 ### Before Evals
+
 ❌ Manual calculation verification
 ❌ Risk of formula drift
 ❌ No automated validation
@@ -290,6 +320,7 @@ All PRs must pass:
 ❌ Production bugs from calculation errors
 
 ### After Evals
+
 ✅ Automated validation on every PR
 ✅ <0.01% tolerance enforced
 ✅ Instant feedback on failures
@@ -302,18 +333,21 @@ All PRs must pass:
 ## Key Benefits
 
 ### Business Impact
+
 - **Financial Accuracy**: Calculations verified to <0.01% precision
 - **Customer Trust**: Consistent, validated metrics
 - **Risk Mitigation**: Catch errors before production
 - **Compliance**: Auditable calculation validation
 
 ### Technical Benefits
+
 - **Regression Prevention**: Changes validated automatically
 - **Code Quality**: Enforces best practices (no hardcoded values)
 - **Refactoring Confidence**: Safe to restructure code
 - **Documentation**: Executable specifications
 
 ### Developer Benefits
+
 - **Fast Feedback**: Know immediately if calculations are correct
 - **Clear Guidance**: Detailed error messages and docs
 - **Easy Execution**: Single command (`pnpm eval`)
@@ -324,6 +358,7 @@ All PRs must pass:
 ## Usage Examples
 
 ### Daily Development
+
 ```bash
 # Before committing changes
 pnpm eval
@@ -338,6 +373,7 @@ pnpm eval
 ```
 
 ### Adding New Calculations
+
 ```bash
 # 1. Add test fixture with expected values
 # lib/evals/fixtures/new-calculation.json
@@ -356,6 +392,7 @@ git add . && git commit
 ```
 
 ### Updating Formulas
+
 ```bash
 # 1. Update WASTE_FORMULAS_REFERENCE.md
 # 2. Update lib/constants/formulas.ts
@@ -372,12 +409,14 @@ pnpm eval
 ## Next Steps
 
 ### Immediate (Done)
+
 - ✅ Eval framework implemented
 - ✅ GitHub Actions configured
 - ✅ Documentation complete
 - ✅ Local validation passing
 
 ### Short-term (Recommended)
+
 - [ ] Add more skill evals as skills are completed:
   - `wastewise-analytics-eval.ts`
   - `contract-extractor-eval.ts`
@@ -395,6 +434,7 @@ pnpm eval
   - Monitor tolerance trends
 
 ### Long-term (Future)
+
 - [ ] Integration with monitoring (Sentry)
 - [ ] Performance benchmarking in evals
 - [ ] Automated Python reference comparison
@@ -405,6 +445,7 @@ pnpm eval
 ## Success Metrics
 
 ### Current Status
+
 - ✅ 100% of critical formulas validated
 - ✅ 6/6 compactor optimization tests passing
 - ✅ 0 hardcoded values in calculations
@@ -413,6 +454,7 @@ pnpm eval
 - ✅ Documentation comprehensive
 
 ### Production Readiness
+
 - ✅ All calculations accurate
 - ✅ Automated validation in place
 - ✅ PR blocking configured
@@ -426,18 +468,21 @@ pnpm eval
 ## References
 
 ### Documentation
+
 - **Formula Guide**: `docs/FORMULA_VALIDATION.md`
 - **Canonical Formulas**: `WASTE_FORMULAS_REFERENCE.md`
 - **Formula Constants**: `lib/constants/formulas.ts`
 - **Eval Framework**: `lib/evals/README.md`
 
 ### Code
+
 - **Main Runner**: `scripts/run-evals.ts`
 - **Test Fixtures**: `lib/evals/fixtures/`
 - **Eval Utils**: `lib/evals/eval-utils.ts`
 - **Compactor Eval**: `lib/evals/compactor-optimization-eval.ts`
 
 ### CI/CD
+
 - **Evals Workflow**: `.github/workflows/evals.yml`
 - **PR Checks**: `.github/workflows/pr-checks.yml`
 
@@ -448,6 +493,7 @@ pnpm eval
 The formula validation evals framework is **complete and production-ready**. All critical calculations are now automatically validated against canonical specifications with <0.01% tolerance on every PR.
 
 This implementation provides:
+
 - ✅ Automated accuracy validation
 - ✅ CI/CD integration
 - ✅ Developer-friendly tooling

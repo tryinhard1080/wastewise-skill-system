@@ -5,6 +5,7 @@ Complete admin dashboard UI built with Next.js 14 + React Server Components + sh
 ## What's Been Built
 
 ### ✅ Core Infrastructure
+
 - **Admin Layout** (`app/admin/layout.tsx`)
   - Protected route with admin role check
   - Sidebar navigation with responsive mobile drawer
@@ -77,6 +78,7 @@ Complete admin dashboard UI built with Next.js 14 + React Server Components + sh
    - Usage breakdown by skill
 
 ### ✅ API Integration
+
 - **SWR Hooks** (`lib/hooks/useAdminData.ts`)
   - Data fetching: `useUsers`, `useJobs`, `useSystemMetrics`, etc.
   - Mutations: `disableUser`, `retryJob`, `updateSkillConfig`, etc.
@@ -86,6 +88,7 @@ Complete admin dashboard UI built with Next.js 14 + React Server Components + sh
 ## Mobile Responsiveness
 
 All components are mobile-responsive:
+
 - Sidebar collapses to hamburger menu on mobile
 - Tables stack or scroll horizontally
 - Cards stack vertically
@@ -95,6 +98,7 @@ All components are mobile-responsive:
 ## Loading & Error States
 
 Every page includes:
+
 - ✅ Loading skeletons while fetching data
 - ✅ Error messages if fetch fails
 - ✅ Empty state if no data
@@ -109,15 +113,18 @@ The admin frontend is **functionally complete** but has TypeScript errors due to
 **Root Cause**: Admin tables (`profiles`, `user_roles`, `user_status`, `admin_audit_log`) are not in the generated Supabase database types (`types/database.types.ts`).
 
 **Errors**:
+
 - `app/admin/layout.tsx` - Cannot query `profiles` table (fixed with temporary email-based check)
 - `app/api/admin/users/route.ts` - Cannot query `user_roles`, `user_status`
 - `lib/admin/audit-logger.ts` - Cannot insert into `admin_audit_log`
 
 **Temporary Fix Applied**:
+
 - Admin check uses `user.user_metadata?.role === 'admin'` OR email pattern match
 - This works for development/testing but should be replaced with proper DB queries
 
 **Permanent Fix Required**:
+
 1. Create admin database tables (see backend documentation)
 2. Regenerate Supabase types: `pnpm supabase gen types typescript`
 3. Remove temporary auth check in `app/admin/layout.tsx`
@@ -126,6 +133,7 @@ The admin frontend is **functionally complete** but has TypeScript errors due to
 ## Dependencies
 
 All required dependencies are already installed:
+
 - ✅ `swr` (v2.3.6) - Data fetching
 - ✅ `date-fns` (v4.1.0) - Date formatting
 - ✅ `recharts` (v2.15.4) - Charts
@@ -165,6 +173,7 @@ lib/hooks/
 ## Testing Checklist
 
 ### Manual Testing (When Backend Ready)
+
 - [ ] Can navigate between all admin pages
 - [ ] Can filter users and jobs
 - [ ] Can disable/enable user
@@ -179,11 +188,13 @@ lib/hooks/
 - [ ] Mobile responsive at 375px, 768px, 1024px
 
 ### TypeScript Validation (After DB Types Fixed)
+
 ```bash
 pnpm tsc --noEmit  # Should have 0 errors
 ```
 
 ### Lint Check
+
 ```bash
 pnpm lint  # Should pass
 ```
@@ -214,18 +225,23 @@ pnpm lint  # Should pass
 ## Usage
 
 ### Development
+
 ```bash
 pnpm dev  # Start development server
 # Visit http://localhost:3000/admin
 ```
 
 ### Admin Access (Temporary)
+
 Until database tables are created, admin access is granted via:
+
 - User metadata: `user.user_metadata.role === 'admin'`
 - OR email pattern: `user.email.endsWith('@admin.wastewise.local')`
 
 ### Production Setup
+
 1. Create test admin user:
+
    ```sql
    -- Update user metadata
    UPDATE auth.users

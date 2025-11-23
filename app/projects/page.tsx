@@ -4,9 +4,9 @@
  * Displays all user projects with filtering and search capabilities
  */
 
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,27 +14,28 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Plus, Building2, Calendar, TrendingDown, Eye } from 'lucide-react'
-import Link from 'next/link'
-import { format } from 'date-fns'
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Building2, Calendar, TrendingDown, Eye } from "lucide-react";
+import Link from "next/link";
+import { format } from "date-fns";
 
 export default async function ProjectsPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // Fetch all projects for the user
   const { data: projects, error } = await supabase
-    .from('projects')
-    .select(`
+    .from("projects")
+    .select(
+      `
       *,
       analysis_jobs(
         id,
@@ -42,12 +43,13 @@ export default async function ProjectsPage() {
         created_at,
         result_data
       )
-    `)
-    .eq('user_id', user?.id!)
-    .order('created_at', { ascending: false })
+    `,
+    )
+    .eq("user_id", user?.id!)
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching projects:', error)
+    console.error("Error fetching projects:", error);
   }
 
   return (
@@ -89,10 +91,11 @@ export default async function ProjectsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => {
-            const latestAnalysis = project.analysis_jobs?.[0]
-            const completedAnalyses = project.analysis_jobs?.filter(
-              (job: any) => job.status === 'completed'
-            ).length || 0
+            const latestAnalysis = project.analysis_jobs?.[0];
+            const completedAnalyses =
+              project.analysis_jobs?.filter(
+                (job: any) => job.status === "completed",
+              ).length || 0;
 
             return (
               <Card key={project.id} className="flex flex-col">
@@ -103,11 +106,14 @@ export default async function ProjectsPage() {
                         {project.property_name}
                       </CardTitle>
                       <CardDescription className="line-clamp-2">
-                        {project.city && project.state ? `${project.city}, ${project.state}` : 'No location provided'}
+                        {project.city && project.state
+                          ? `${project.city}, ${project.state}`
+                          : "No location provided"}
                       </CardDescription>
                     </div>
                     <Badge variant="secondary">
-                      {completedAnalyses} {completedAnalyses === 1 ? 'analysis' : 'analyses'}
+                      {completedAnalyses}{" "}
+                      {completedAnalyses === 1 ? "analysis" : "analyses"}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -117,14 +123,12 @@ export default async function ProjectsPage() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Units</p>
-                      <p className="font-medium">
-                        {project.units || 'N/A'}
-                      </p>
+                      <p className="font-medium">{project.units || "N/A"}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Equipment Type</p>
                       <p className="font-medium capitalize">
-                        {project.equipment_type || 'N/A'}
+                        {project.equipment_type || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -138,11 +142,11 @@ export default async function ProjectsPage() {
                         </span>
                         <Badge
                           variant={
-                            latestAnalysis.status === 'completed'
-                              ? 'default'
-                              : latestAnalysis.status === 'failed'
-                              ? 'destructive'
-                              : 'secondary'
+                            latestAnalysis.status === "completed"
+                              ? "default"
+                              : latestAnalysis.status === "failed"
+                                ? "destructive"
+                                : "secondary"
                           }
                         >
                           {latestAnalysis.status}
@@ -150,23 +154,24 @@ export default async function ProjectsPage() {
                       </div>
                       <div className="flex items-center text-xs text-muted-foreground">
                         <Calendar className="mr-1 h-3 w-3" />
-                        {latestAnalysis.created_at && format(
-                          new Date(latestAnalysis.created_at),
-                          'MMM d, yyyy'
-                        )}
+                        {latestAnalysis.created_at &&
+                          format(
+                            new Date(latestAnalysis.created_at),
+                            "MMM d, yyyy",
+                          )}
                       </div>
                     </div>
                   )}
 
                   {/* Savings Indicator (if available) */}
                   {latestAnalysis?.result_data &&
-                    typeof latestAnalysis.result_data === 'object' &&
-                    'netYear1Savings' in latestAnalysis.result_data &&
-                    typeof latestAnalysis.result_data.netYear1Savings === 'number' && (
+                    typeof latestAnalysis.result_data === "object" &&
+                    "netYear1Savings" in latestAnalysis.result_data &&
+                    typeof latestAnalysis.result_data.netYear1Savings ===
+                      "number" && (
                       <div className="flex items-center gap-2 text-sm font-medium text-green-600">
-                        <TrendingDown className="h-4 w-4" />
-                        $
-                        {latestAnalysis.result_data.netYear1Savings.toLocaleString()}{' '}
+                        <TrendingDown className="h-4 w-4" />$
+                        {latestAnalysis.result_data.netYear1Savings.toLocaleString()}{" "}
                         potential savings
                       </div>
                     )}
@@ -181,10 +186,10 @@ export default async function ProjectsPage() {
                   </Link>
                 </CardFooter>
               </Card>
-            )
+            );
           })}
         </div>
       )}
     </div>
-  )
+  );
 }

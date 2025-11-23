@@ -17,7 +17,7 @@
  * - AI usage tracking
  */
 
-import { BaseSkill } from '../base-skill'
+import { BaseSkill } from "../base-skill";
 import type {
   SkillContext,
   ValidationResult,
@@ -25,32 +25,48 @@ import type {
   InvoiceData,
   HaulLogEntry,
   ProcessingDetail,
-} from '../types'
+} from "../types";
 import {
   extractInvoiceWithVision,
   extractHaulLogWithVision,
   detectDocumentType,
   calculateAnthropicCost,
-} from '@/lib/ai/vision-extractor'
-import { createClient } from '@/lib/supabase/server'
-import { logger } from '@/lib/observability/logger'
-import { metrics } from '@/lib/observability/metrics'
-import { SkillExecutionError, ValidationError } from '@/lib/types/errors'
-import { InvoiceRepository, HaulLogRepository, type InvoiceRecord, type HaulLogRecord, type InvoiceCharges } from '@/lib/db'
-import ExcelJS from 'exceljs'
-import Papa from 'papaparse'
+} from "@/lib/ai/vision-extractor";
+import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/observability/logger";
+import { metrics } from "@/lib/observability/metrics";
+import { SkillExecutionError, ValidationError } from "@/lib/types/errors";
+import {
+  InvoiceRepository,
+  HaulLogRepository,
+  type InvoiceRecord,
+  type HaulLogRecord,
+  type InvoiceCharges,
+} from "@/lib/db";
+import ExcelJS from "exceljs";
+import Papa from "papaparse";
 
 /**
  * Container type validation
  */
-const VALID_CONTAINER_TYPES = ['COMPACTOR', 'DUMPSTER', 'OPEN_TOP', 'OTHER'] as const
-const VALID_SERVICE_TYPES = ['PICKUP', 'DELIVERY', 'EXCHANGE', 'OTHER'] as const
+const VALID_CONTAINER_TYPES = [
+  "COMPACTOR",
+  "DUMPSTER",
+  "OPEN_TOP",
+  "OTHER",
+] as const;
+const VALID_SERVICE_TYPES = [
+  "PICKUP",
+  "DELIVERY",
+  "EXCHANGE",
+  "OTHER",
+] as const;
 
 export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
-  readonly name = 'batch-extractor'
-  readonly version = '1.0.0'
+  readonly name = "batch-extractor";
+  readonly version = "1.0.0";
   readonly description =
-    'Extracts structured data from waste management documents using Claude Vision API'
+    "Extracts structured data from waste management documents using Claude Vision API";
 
   /**
    * Validate that we have files to process
@@ -59,147 +75,150 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     const validationLogger = logger.child({
       skillName: this.name,
       projectId: context.projectId,
-    })
+    });
 
-    validationLogger.debug('Starting validation')
+    validationLogger.debug("Starting validation");
 
-    const errors: Array<{ field: string; message: string; code: string }> = []
+    const errors: Array<{ field: string; message: string; code: string }> = [];
 
     // Get files from database
-    const supabase = await createClient()
+    const supabase = await createClient();
     const { data: files, error: filesError } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', context.projectId)
+      .from("project_files")
+      .select("*")
+      .eq("project_id", context.projectId);
 
     if (filesError) {
       errors.push({
-        field: 'project_files',
+        field: "project_files",
         message: `Failed to fetch project files: ${filesError.message}`,
-        code: 'DATABASE_ERROR',
-      })
+        code: "DATABASE_ERROR",
+      });
     } else if (!files || files.length === 0) {
       errors.push({
-        field: 'project_files',
-        message: 'No files found for this project. Upload files before running extraction.',
-        code: 'NO_FILES',
-      })
+        field: "project_files",
+        message:
+          "No files found for this project. Upload files before running extraction.",
+        code: "NO_FILES",
+      });
     }
 
     // Check API key
     if (!process.env.ANTHROPIC_API_KEY) {
       errors.push({
-        field: 'anthropic_api_key',
-        message: 'ANTHROPIC_API_KEY environment variable is not set',
-        code: 'MISSING_API_KEY',
-      })
+        field: "anthropic_api_key",
+        message: "ANTHROPIC_API_KEY environment variable is not set",
+        code: "MISSING_API_KEY",
+      });
     }
 
     if (errors.length > 0) {
-      validationLogger.warn('Validation failed', { errors })
-      return { valid: false, errors }
+      validationLogger.warn("Validation failed", { errors });
+      return { valid: false, errors };
     }
 
-    validationLogger.debug('Validation passed', { fileCount: files?.length })
-    return { valid: true }
+    validationLogger.debug("Validation passed", { fileCount: files?.length });
+    return { valid: true };
   }
 
   /**
    * Execute batch extraction
    */
-  protected async executeInternal(context: SkillContext): Promise<BatchExtractorResult> {
+  protected async executeInternal(
+    context: SkillContext,
+  ): Promise<BatchExtractorResult> {
     const executionLogger = logger.child({
       skillName: this.name,
       projectId: context.projectId,
-    })
+    });
 
-    executionLogger.info('Starting batch extraction')
+    executionLogger.info("Starting batch extraction");
 
     // Initialize result containers
-    const invoices: InvoiceData[] = []
-    const haulLogs: HaulLogEntry[] = []
-    const processingDetails: ProcessingDetail[] = []
-    let totalRequests = 0
-    let totalTokensInput = 0
-    let totalTokensOutput = 0
+    const invoices: InvoiceData[] = [];
+    const haulLogs: HaulLogEntry[] = [];
+    const processingDetails: ProcessingDetail[] = [];
+    let totalRequests = 0;
+    let totalTokensInput = 0;
+    let totalTokensOutput = 0;
 
     // Get files from database
     await this.updateProgress(context, {
       percent: 5,
-      step: 'Fetching project files',
-    })
+      step: "Fetching project files",
+    });
 
-    const supabase = await createClient()
+    const supabase = await createClient();
     const { data: files, error: filesError } = await supabase
-      .from('project_files')
-      .select('*')
-      .eq('project_id', context.projectId)
+      .from("project_files")
+      .select("*")
+      .eq("project_id", context.projectId);
 
     if (filesError || !files || files.length === 0) {
       throw new SkillExecutionError(
         this.name,
-        'NO_FILES',
-        'No files found to process'
-      )
+        "NO_FILES",
+        "No files found to process",
+      );
     }
 
-    executionLogger.info('Files retrieved', { fileCount: files.length })
+    executionLogger.info("Files retrieved", { fileCount: files.length });
 
     // Process each file
     for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const percentComplete = Math.round(((i + 1) / files.length) * 85) + 10 // 10-95%
+      const file = files[i];
+      const percentComplete = Math.round(((i + 1) / files.length) * 85) + 10; // 10-95%
 
-      this.checkCancellation(context)
+      this.checkCancellation(context);
 
       await this.updateProgress(context, {
         percent: percentComplete,
         step: `Processing file ${i + 1}/${files.length}: ${file.file_name}`,
         stepNumber: i + 1,
         totalSteps: files.length,
-      })
+      });
 
       try {
-        executionLogger.debug('Processing file', {
+        executionLogger.debug("Processing file", {
           fileId: file.id,
           fileName: file.file_name,
           fileType: file.file_type,
           mimeType: file.mime_type,
-        })
+        });
 
         // Download file from Supabase Storage
         const { data: fileData, error: downloadError } = await supabase.storage
-          .from('project-files')
-          .download(file.storage_path)
+          .from("project-files")
+          .download(file.storage_path);
 
         if (downloadError || !fileData) {
-          throw new Error(`Failed to download file: ${downloadError?.message}`)
+          throw new Error(`Failed to download file: ${downloadError?.message}`);
         }
 
         // Convert Blob to Buffer
-        const arrayBuffer = await fileData.arrayBuffer()
-        const fileBuffer = Buffer.from(arrayBuffer)
+        const arrayBuffer = await fileData.arrayBuffer();
+        const fileBuffer = Buffer.from(arrayBuffer);
 
         // Process based on file type
         const processedData = await this.processFile(
           file,
           fileBuffer,
-          executionLogger
-        )
+          executionLogger,
+        );
 
         // Add to results
         if (processedData.invoices) {
-          invoices.push(...processedData.invoices)
+          invoices.push(...processedData.invoices);
         }
         if (processedData.haulLogs) {
-          haulLogs.push(...processedData.haulLogs)
+          haulLogs.push(...processedData.haulLogs);
         }
 
         // Track AI usage
         if (processedData.usage) {
-          totalRequests++
-          totalTokensInput += processedData.usage.input_tokens
-          totalTokensOutput += processedData.usage.output_tokens
+          totalRequests++;
+          totalTokensInput += processedData.usage.input_tokens;
+          totalTokensOutput += processedData.usage.output_tokens;
         }
 
         // Record success
@@ -207,41 +226,44 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
           fileId: file.id,
           fileName: file.file_name,
           fileType: file.file_type,
-          status: 'success',
+          status: "success",
           extractedRecords:
             (processedData.invoices?.length || 0) +
             (processedData.haulLogs?.length || 0),
-        })
+        });
 
-        metrics.increment('batch_extractor.file.success', 1, {
+        metrics.increment("batch_extractor.file.success", 1, {
           projectId: context.projectId,
           fileType: file.file_type,
-        })
+        });
 
-        executionLogger.info('File processed successfully', {
+        executionLogger.info("File processed successfully", {
           fileId: file.id,
           invoicesExtracted: processedData.invoices?.length || 0,
           haulLogsExtracted: processedData.haulLogs?.length || 0,
-        })
+        });
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : "Unknown error";
 
-        executionLogger.error(`Failed to process file: ${file.file_name}`, error as Error)
+        executionLogger.error(
+          `Failed to process file: ${file.file_name}`,
+          error as Error,
+        );
 
         processingDetails.push({
           fileId: file.id,
           fileName: file.file_name,
           fileType: file.file_type,
-          status: 'failed',
+          status: "failed",
           extractedRecords: 0,
           error: errorMessage,
-        })
+        });
 
-        metrics.increment('batch_extractor.file.failed', 1, {
+        metrics.increment("batch_extractor.file.failed", 1, {
           projectId: context.projectId,
           fileType: file.file_type,
-        })
+        });
 
         // Continue processing other files
       }
@@ -250,63 +272,66 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     // Validate all extracted data
     await this.updateProgress(context, {
       percent: 95,
-      step: 'Validating extracted data',
-    })
+      step: "Validating extracted data",
+    });
 
-    executionLogger.debug('Validating extracted data')
+    executionLogger.debug("Validating extracted data");
 
     const validatedInvoices = invoices
       .map((invoice) => this.validateInvoiceData(invoice, executionLogger))
-      .filter((inv): inv is InvoiceData => inv !== null)
+      .filter((inv): inv is InvoiceData => inv !== null);
 
     const validatedHaulLogs = haulLogs
       .map((log) => this.validateHaulLogEntry(log, executionLogger))
-      .filter((log): log is HaulLogEntry => log !== null)
+      .filter((log): log is HaulLogEntry => log !== null);
 
     // Calculate total cost
     const totalCostUsd = calculateAnthropicCost({
       input_tokens: totalTokensInput,
       output_tokens: totalTokensOutput,
-    })
+    });
 
-    executionLogger.info('Batch extraction complete', {
+    executionLogger.info("Batch extraction complete", {
       totalFiles: files.length,
-      successfulFiles: processingDetails.filter((d) => d.status === 'success').length,
-      failedFiles: processingDetails.filter((d) => d.status === 'failed').length,
+      successfulFiles: processingDetails.filter((d) => d.status === "success")
+        .length,
+      failedFiles: processingDetails.filter((d) => d.status === "failed")
+        .length,
       invoicesExtracted: validatedInvoices.length,
       haulLogsExtracted: validatedHaulLogs.length,
       totalCostUsd,
-    })
+    });
 
-    metrics.record('batch_extractor.ai_cost_usd', totalCostUsd, 'usd', {
+    metrics.record("batch_extractor.ai_cost_usd", totalCostUsd, "usd", {
       projectId: context.projectId,
-    })
+    });
 
     // Save extracted data to database
     await this.updateProgress(context, {
       percent: 96,
-      step: 'Saving extracted data to database',
-    })
+      step: "Saving extracted data to database",
+    });
 
     await this.saveToDatabase(
       context.projectId,
       validatedInvoices,
       validatedHaulLogs,
       supabase,
-      executionLogger
-    )
+      executionLogger,
+    );
 
     await this.updateProgress(context, {
       percent: 100,
-      step: 'Extraction complete',
-    })
+      step: "Extraction complete",
+    });
 
     return {
       summary: {
         totalFilesProcessed: files.length,
         invoicesExtracted: validatedInvoices.length,
         haulLogsExtracted: validatedHaulLogs.length,
-        failedFiles: processingDetails.filter((d) => d.status === 'failed').length,
+        failedFiles: processingDetails.filter((d) => d.status === "failed")
+          .length,
       },
       invoices: validatedInvoices,
       haulLogs: validatedHaulLogs,
@@ -317,7 +342,7 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
         totalTokensOutput,
         totalCostUsd,
       },
-    }
+    };
   }
 
   /**
@@ -326,42 +351,45 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
   private async processFile(
     file: any,
     fileBuffer: Buffer,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<{
-    invoices?: InvoiceData[]
-    haulLogs?: HaulLogEntry[]
-    usage?: { input_tokens: number; output_tokens: number }
+    invoices?: InvoiceData[];
+    haulLogs?: HaulLogEntry[];
+    usage?: { input_tokens: number; output_tokens: number };
   }> {
-    const mimeType = file.mime_type || 'application/octet-stream'
+    const mimeType = file.mime_type || "application/octet-stream";
 
     // Handle image/PDF files with Vision API
-    if (
-      mimeType.startsWith('image/') ||
-      mimeType === 'application/pdf'
-    ) {
-      return this.processWithVision(file, fileBuffer, mimeType, executionLogger)
+    if (mimeType.startsWith("image/") || mimeType === "application/pdf") {
+      return this.processWithVision(
+        file,
+        fileBuffer,
+        mimeType,
+        executionLogger,
+      );
     }
 
     // Handle Excel files
     if (
-      mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      mimeType === 'application/vnd.ms-excel'
+      mimeType ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      mimeType === "application/vnd.ms-excel"
     ) {
-      executionLogger.info('Parsing Excel file', {
+      executionLogger.info("Parsing Excel file", {
         fileName: file.file_name,
-      })
-      return this.processExcelFile(file, fileBuffer, executionLogger)
+      });
+      return this.processExcelFile(file, fileBuffer, executionLogger);
     }
 
     // Handle CSV files
-    if (mimeType === 'text/csv') {
-      executionLogger.info('Parsing CSV file', {
+    if (mimeType === "text/csv") {
+      executionLogger.info("Parsing CSV file", {
         fileName: file.file_name,
-      })
-      return this.processCSVFile(file, fileBuffer, executionLogger)
+      });
+      return this.processCSVFile(file, fileBuffer, executionLogger);
     }
 
-    throw new Error(`Unsupported file type: ${mimeType}`)
+    throw new Error(`Unsupported file type: ${mimeType}`);
   }
 
   /**
@@ -371,54 +399,57 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     file: any,
     fileBuffer: Buffer,
     mimeType: string,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<{
-    invoices?: InvoiceData[]
-    haulLogs?: HaulLogEntry[]
-    usage?: { input_tokens: number; output_tokens: number }
+    invoices?: InvoiceData[];
+    haulLogs?: HaulLogEntry[];
+    usage?: { input_tokens: number; output_tokens: number };
   }> {
     // Detect document type
-    const docType = detectDocumentType(file.file_name)
+    const docType = detectDocumentType(file.file_name);
 
-    executionLogger.debug('Processing with Vision API', {
+    executionLogger.debug("Processing with Vision API", {
       fileName: file.file_name,
       detectedType: docType,
-    })
+    });
 
-    if (docType === 'invoice') {
+    if (docType === "invoice") {
       const result = await extractInvoiceWithVision(
         fileBuffer,
         mimeType,
-        file.file_name
-      )
+        file.file_name,
+      );
       return {
         invoices: [result.invoice],
         usage: result.usage,
-      }
-    } else if (docType === 'haul-log') {
+      };
+    } else if (docType === "haul-log") {
       const result = await extractHaulLogWithVision(
         fileBuffer,
         mimeType,
-        file.file_name
-      )
+        file.file_name,
+      );
       return {
         haulLogs: result.haulLogs,
         usage: result.usage,
-      }
+      };
     } else {
       // Default to invoice extraction if type is unknown
-      executionLogger.warn('Unknown document type, defaulting to invoice extraction', {
-        fileName: file.file_name,
-      })
+      executionLogger.warn(
+        "Unknown document type, defaulting to invoice extraction",
+        {
+          fileName: file.file_name,
+        },
+      );
       const result = await extractInvoiceWithVision(
         fileBuffer,
         mimeType,
-        file.file_name
-      )
+        file.file_name,
+      );
       return {
         invoices: [result.invoice],
         usage: result.usage,
-      }
+      };
     }
   }
 
@@ -427,54 +458,54 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
    */
   private validateInvoiceData(
     invoice: InvoiceData,
-    executionLogger: any
+    executionLogger: any,
   ): InvoiceData | null {
     try {
       // Required fields
       if (!invoice.propertyName) {
-        throw new Error('Missing property name')
+        throw new Error("Missing property name");
       }
 
       if (!invoice.vendorName) {
-        throw new Error('Missing vendor name')
+        throw new Error("Missing vendor name");
       }
 
       if (!invoice.lineItems || invoice.lineItems.length === 0) {
-        throw new Error('No line items found')
+        throw new Error("No line items found");
       }
 
       // Validate container types
       for (const item of invoice.lineItems) {
         if (!VALID_CONTAINER_TYPES.includes(item.containerType)) {
-          executionLogger.warn('Invalid container type, defaulting to OTHER', {
+          executionLogger.warn("Invalid container type, defaulting to OTHER", {
             original: item.containerType,
             fileName: invoice.sourceFile,
-          })
-          item.containerType = 'OTHER'
+          });
+          item.containerType = "OTHER";
         }
       }
 
       // Validate totals (warn if mismatch, don't fail)
       const calculatedSubtotal = invoice.lineItems.reduce(
         (sum, item) => sum + item.totalPrice,
-        0
-      )
+        0,
+      );
 
       if (Math.abs(calculatedSubtotal - invoice.subtotal) > 0.01) {
-        executionLogger.warn('Subtotal mismatch', {
+        executionLogger.warn("Subtotal mismatch", {
           calculated: calculatedSubtotal,
           extracted: invoice.subtotal,
           fileName: invoice.sourceFile,
-        })
+        });
       }
 
-      return invoice
+      return invoice;
     } catch (error) {
       executionLogger.error(
         `Invoice validation failed: ${invoice.sourceFile}`,
-        error as Error
-      )
-      return null
+        error as Error,
+      );
+      return null;
     }
   }
 
@@ -483,43 +514,46 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
    */
   private validateHaulLogEntry(
     log: HaulLogEntry,
-    executionLogger: any
+    executionLogger: any,
   ): HaulLogEntry | null {
     try {
       // Required fields
       if (!log.date) {
-        throw new Error('Missing date')
+        throw new Error("Missing date");
       }
 
       // Validate container type
       if (!VALID_CONTAINER_TYPES.includes(log.containerType)) {
-        executionLogger.warn('Invalid container type, defaulting to OTHER', {
+        executionLogger.warn("Invalid container type, defaulting to OTHER", {
           original: log.containerType,
           fileName: log.sourceFile,
-        })
-        log.containerType = 'OTHER'
+        });
+        log.containerType = "OTHER";
       }
 
       // Validate service type
       if (!VALID_SERVICE_TYPES.includes(log.serviceType)) {
-        executionLogger.warn('Invalid service type, defaulting to OTHER', {
+        executionLogger.warn("Invalid service type, defaulting to OTHER", {
           original: log.serviceType,
           fileName: log.sourceFile,
-        })
-        log.serviceType = 'OTHER'
+        });
+        log.serviceType = "OTHER";
       }
 
       // Ensure at least weight or volume is present
       if (!log.weight && !log.volume) {
-        executionLogger.warn('Missing both weight and volume', {
+        executionLogger.warn("Missing both weight and volume", {
           fileName: log.sourceFile,
-        })
+        });
       }
 
-      return log
+      return log;
     } catch (error) {
-      executionLogger.error(`Haul log validation failed: ${log.sourceFile}`, error as Error)
-      return null
+      executionLogger.error(
+        `Haul log validation failed: ${log.sourceFile}`,
+        error as Error,
+      );
+      return null;
     }
   }
 
@@ -534,17 +568,17 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
     invoices: InvoiceData[],
     haulLogs: HaulLogEntry[],
     supabase: any,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<void> {
-    executionLogger.info('Saving extracted data to database', {
+    executionLogger.info("Saving extracted data to database", {
       invoiceCount: invoices.length,
       haulLogCount: haulLogs.length,
-    })
+    });
 
     try {
       // Initialize repositories with Supabase client
-      const invoiceRepo = new InvoiceRepository(supabase)
-      const haulLogRepo = new HaulLogRepository(supabase)
+      const invoiceRepo = new InvoiceRepository(supabase);
+      const haulLogRepo = new HaulLogRepository(supabase);
 
       // Convert and save invoices
       if (invoices.length > 0) {
@@ -557,78 +591,107 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
             contamination: 0,
             bulk_service: 0,
             other: 0,
-          }
+          };
 
-          let totalTonnage = 0
-          let totalHauls = 0
+          let totalTonnage = 0;
+          let totalHauls = 0;
 
           // Parse line items to extract charges and metrics
           inv.lineItems.forEach((item) => {
-            const desc = item.description.toLowerCase()
+            const desc = item.description.toLowerCase();
 
             // Categorize charges by description keywords
-            if (desc.includes('disposal') || desc.includes('landfill') || desc.includes('dump')) {
-              charges.disposal! += item.totalPrice
-            } else if (desc.includes('pickup') || desc.includes('haul') || desc.includes('collection')) {
-              charges.pickup_fees! += item.totalPrice
-            } else if (desc.includes('rental') || desc.includes('lease')) {
-              charges.rental! += item.totalPrice
-            } else if (desc.includes('contamination') || desc.includes('contam')) {
-              charges.contamination! += item.totalPrice
-            } else if (desc.includes('bulk') || desc.includes('on-call') || desc.includes('extra')) {
-              charges.bulk_service! += item.totalPrice
+            if (
+              desc.includes("disposal") ||
+              desc.includes("landfill") ||
+              desc.includes("dump")
+            ) {
+              charges.disposal! += item.totalPrice;
+            } else if (
+              desc.includes("pickup") ||
+              desc.includes("haul") ||
+              desc.includes("collection")
+            ) {
+              charges.pickup_fees! += item.totalPrice;
+            } else if (desc.includes("rental") || desc.includes("lease")) {
+              charges.rental! += item.totalPrice;
+            } else if (
+              desc.includes("contamination") ||
+              desc.includes("contam")
+            ) {
+              charges.contamination! += item.totalPrice;
+            } else if (
+              desc.includes("bulk") ||
+              desc.includes("on-call") ||
+              desc.includes("extra")
+            ) {
+              charges.bulk_service! += item.totalPrice;
             } else {
-              charges.other! += item.totalPrice
+              charges.other! += item.totalPrice;
             }
 
             // Extract tonnage and hauls from line items
             // Tonnage: look for weight-based items (compactor services)
-            if (desc.includes('ton') || desc.includes('weight') || item.containerType === 'COMPACTOR') {
+            if (
+              desc.includes("ton") ||
+              desc.includes("weight") ||
+              item.containerType === "COMPACTOR"
+            ) {
               // For compactors, quantity often represents tons
-              if (item.quantity && item.quantity < 50) { // Sanity check (50 tons per line item max)
-                totalTonnage += item.quantity
+              if (item.quantity && item.quantity < 50) {
+                // Sanity check (50 tons per line item max)
+                totalTonnage += item.quantity;
               }
             }
 
             // Hauls: count pickup/service events
-            if (desc.includes('haul') || desc.includes('pickup') || desc.includes('service')) {
-              totalHauls += item.quantity || 1 // Default to 1 if quantity not specified
+            if (
+              desc.includes("haul") ||
+              desc.includes("pickup") ||
+              desc.includes("service")
+            ) {
+              totalHauls += item.quantity || 1; // Default to 1 if quantity not specified
             }
-          })
+          });
 
           return {
             project_id: projectId,
             invoice_number: inv.invoiceNumber,
             invoice_date: inv.billingDate, // Use billingDate from InvoiceData
             vendor_name: inv.vendorName,
-            service_type: inv.servicePeriodStart && inv.servicePeriodEnd
-              ? `${inv.servicePeriodStart} to ${inv.servicePeriodEnd}`
-              : undefined,
+            service_type:
+              inv.servicePeriodStart && inv.servicePeriodEnd
+                ? `${inv.servicePeriodStart} to ${inv.servicePeriodEnd}`
+                : undefined,
             total_amount: inv.total, // Use total from InvoiceData
             tonnage: totalTonnage > 0 ? totalTonnage : undefined,
             hauls: totalHauls > 0 ? totalHauls : undefined,
             charges,
             notes: inv.vendorContact || undefined,
-          }
-        })
+          };
+        });
 
-        const invoiceResult = await invoiceRepo.batchInsert(invoiceRecords)
+        const invoiceResult = await invoiceRepo.batchInsert(invoiceRecords);
 
-        executionLogger.info('Invoices saved to database', {
+        executionLogger.info("Invoices saved to database", {
           inserted: invoiceResult.inserted,
           failed: invoiceResult.failed,
-        })
+        });
 
         if (invoiceResult.failed > 0) {
-          executionLogger.warn('Some invoices failed to save', {
+          executionLogger.warn("Some invoices failed to save", {
             failed: invoiceResult.failed,
             errors: invoiceResult.errors.slice(0, 3), // Log first 3 errors
-          })
+          });
         }
 
-        metrics.increment('batch_extractor.db.invoices_saved', invoiceResult.inserted, {
-          projectId,
-        })
+        metrics.increment(
+          "batch_extractor.db.invoices_saved",
+          invoiceResult.inserted,
+          {
+            projectId,
+          },
+        );
       }
 
       // Convert and save haul logs (compactor projects only)
@@ -637,40 +700,44 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
           project_id: projectId,
           haul_date: log.date, // Use date from HaulLogEntry
           tonnage: log.weight || 0, // Use weight as tonnage
-          status: log.weight && log.weight < 6.0 ? 'low_utilization' : 'normal',
-        }))
+          status: log.weight && log.weight < 6.0 ? "low_utilization" : "normal",
+        }));
 
-        const haulLogResult = await haulLogRepo.batchInsert(haulLogRecords)
+        const haulLogResult = await haulLogRepo.batchInsert(haulLogRecords);
 
-        executionLogger.info('Haul logs saved to database', {
+        executionLogger.info("Haul logs saved to database", {
           inserted: haulLogResult.inserted,
           failed: haulLogResult.failed,
-        })
+        });
 
         if (haulLogResult.failed > 0) {
-          executionLogger.warn('Some haul logs failed to save', {
+          executionLogger.warn("Some haul logs failed to save", {
             failed: haulLogResult.failed,
             errors: haulLogResult.errors.slice(0, 3), // Log first 3 errors
-          })
+          });
         }
 
-        metrics.increment('batch_extractor.db.haul_logs_saved', haulLogResult.inserted, {
-          projectId,
-        })
+        metrics.increment(
+          "batch_extractor.db.haul_logs_saved",
+          haulLogResult.inserted,
+          {
+            projectId,
+          },
+        );
       }
 
-      executionLogger.info('Database save completed successfully')
+      executionLogger.info("Database save completed successfully");
     } catch (error) {
       // Log error but don't fail the entire extraction
-      executionLogger.error('Failed to save data to database', error as Error, {
+      executionLogger.error("Failed to save data to database", error as Error, {
         projectId,
         invoiceCount: invoices.length,
         haulLogCount: haulLogs.length,
-      })
+      });
 
-      metrics.increment('batch_extractor.db.save_failed', 1, {
+      metrics.increment("batch_extractor.db.save_failed", 1, {
         projectId,
-      })
+      });
 
       // Don't throw - we want to return extracted data even if DB save fails
     }
@@ -683,98 +750,102 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
   private async processExcelFile(
     file: any,
     fileBuffer: Buffer,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<{
-    invoices?: InvoiceData[]
-    haulLogs?: HaulLogEntry[]
-    usage?: { input_tokens: number; output_tokens: number }
+    invoices?: InvoiceData[];
+    haulLogs?: HaulLogEntry[];
+    usage?: { input_tokens: number; output_tokens: number };
   }> {
     try {
       // Validate file size (max 10MB for spreadsheets)
-      const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
       if (fileBuffer.length > MAX_FILE_SIZE) {
-        throw new Error(`Excel file too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`)
+        throw new Error(
+          `Excel file too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`,
+        );
       }
 
-      executionLogger.info('Parsing Excel file', {
+      executionLogger.info("Parsing Excel file", {
         fileName: file.file_name,
         sizeBytes: fileBuffer.length,
-      })
+      });
 
       // Load workbook
-      const workbook = new ExcelJS.Workbook()
-      await workbook.xlsx.load(fileBuffer as any)
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(fileBuffer as any);
 
       // Find first non-empty worksheet
-      let targetWorksheet: ExcelJS.Worksheet | null = null
+      let targetWorksheet: ExcelJS.Worksheet | null = null;
       for (const worksheet of workbook.worksheets) {
         if (worksheet.rowCount > 0) {
-          targetWorksheet = worksheet
-          break
+          targetWorksheet = worksheet;
+          break;
         }
       }
 
       if (!targetWorksheet) {
-        throw new Error('No data found in Excel file (all sheets are empty)')
+        throw new Error("No data found in Excel file (all sheets are empty)");
       }
 
-      executionLogger.debug('Processing worksheet', {
+      executionLogger.debug("Processing worksheet", {
         sheetName: targetWorksheet.name,
         rowCount: targetWorksheet.rowCount,
         columnCount: targetWorksheet.columnCount,
-      })
+      });
 
       // Extract data from worksheet
-      const rows: any[][] = []
-      const MAX_ROWS = 100 // Limit to first 100 rows to control token usage
-      let rowsProcessed = 0
+      const rows: any[][] = [];
+      const MAX_ROWS = 100; // Limit to first 100 rows to control token usage
+      let rowsProcessed = 0;
 
       targetWorksheet.eachRow((row, rowNumber) => {
         if (rowsProcessed >= MAX_ROWS) {
-          return
+          return;
         }
 
         // Convert row to array of values, handling various cell types
-        const rowValues: any[] = []
+        const rowValues: any[] = [];
         row.eachCell({ includeEmpty: true }, (cell) => {
           // Sanitize cell values (remove formulas for security)
           if (cell.type === ExcelJS.ValueType.Formula) {
-            rowValues.push(cell.result?.toString() || '')
+            rowValues.push(cell.result?.toString() || "");
           } else {
-            rowValues.push(cell.value?.toString() || '')
+            rowValues.push(cell.value?.toString() || "");
           }
-        })
+        });
 
-        rows.push(rowValues)
-        rowsProcessed++
-      })
+        rows.push(rowValues);
+        rowsProcessed++;
+      });
 
       if (rows.length === 0) {
-        throw new Error('No data rows found in Excel file')
+        throw new Error("No data rows found in Excel file");
       }
 
       // Format data for LLM extraction
-      const formattedData = this.formatTableDataForLLM(rows, file.file_name)
+      const formattedData = this.formatTableDataForLLM(rows, file.file_name);
 
       if (rows.length >= MAX_ROWS) {
-        executionLogger.warn('Excel file truncated to control token usage', {
+        executionLogger.warn("Excel file truncated to control token usage", {
           fileName: file.file_name,
           totalRows: targetWorksheet.rowCount,
           processedRows: rows.length,
-        })
+        });
       }
 
       // Send to Claude for structured extraction
       return this.extractStructuredDataWithClaude(
         formattedData,
         file.file_name,
-        executionLogger
-      )
+        executionLogger,
+      );
     } catch (error) {
-      executionLogger.error('Excel parsing failed', error as Error, {
+      executionLogger.error("Excel parsing failed", error as Error, {
         fileName: file.file_name,
-      })
-      throw new Error(`Failed to parse Excel file: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      });
+      throw new Error(
+        `Failed to parse Excel file: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   }
 
@@ -785,72 +856,79 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
   private async processCSVFile(
     file: any,
     fileBuffer: Buffer,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<{
-    invoices?: InvoiceData[]
-    haulLogs?: HaulLogEntry[]
-    usage?: { input_tokens: number; output_tokens: number }
+    invoices?: InvoiceData[];
+    haulLogs?: HaulLogEntry[];
+    usage?: { input_tokens: number; output_tokens: number };
   }> {
     try {
       // Validate file size (max 10MB for CSVs)
-      const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
       if (fileBuffer.length > MAX_FILE_SIZE) {
-        throw new Error(`CSV file too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`)
+        throw new Error(
+          `CSV file too large: ${Math.round(fileBuffer.length / 1024 / 1024)}MB (max 10MB)`,
+        );
       }
 
-      executionLogger.info('Parsing CSV file', {
+      executionLogger.info("Parsing CSV file", {
         fileName: file.file_name,
         sizeBytes: fileBuffer.length,
-      })
+      });
 
       // Convert buffer to string
-      const csvContent = fileBuffer.toString('utf-8')
+      const csvContent = fileBuffer.toString("utf-8");
 
       // Parse CSV with PapaParse
       const parseResult = Papa.parse<string[]>(csvContent, {
         skipEmptyLines: true,
         header: false, // We'll handle headers manually
-        delimiter: '', // Auto-detect delimiter
-      })
+        delimiter: "", // Auto-detect delimiter
+      });
 
       if (parseResult.errors.length > 0) {
-        executionLogger.warn('CSV parsing errors', {
+        executionLogger.warn("CSV parsing errors", {
           fileName: file.file_name,
           errors: parseResult.errors.slice(0, 3), // Log first 3 errors
-        })
+        });
       }
 
-      const rows = parseResult.data
+      const rows = parseResult.data;
       if (rows.length === 0) {
-        throw new Error('No data rows found in CSV file')
+        throw new Error("No data rows found in CSV file");
       }
 
       // Truncate to first 100 rows to control token usage
-      const MAX_ROWS = 100
-      const truncatedRows = rows.slice(0, MAX_ROWS)
+      const MAX_ROWS = 100;
+      const truncatedRows = rows.slice(0, MAX_ROWS);
 
       if (rows.length > MAX_ROWS) {
-        executionLogger.warn('CSV file truncated to control token usage', {
+        executionLogger.warn("CSV file truncated to control token usage", {
           fileName: file.file_name,
           totalRows: rows.length,
           processedRows: truncatedRows.length,
-        })
+        });
       }
 
       // Format data for LLM extraction
-      const formattedData = this.formatTableDataForLLM(truncatedRows, file.file_name)
+      const formattedData = this.formatTableDataForLLM(
+        truncatedRows,
+        file.file_name,
+      );
 
       // Send to Claude for structured extraction
       return this.extractStructuredDataWithClaude(
         formattedData,
         file.file_name,
-        executionLogger
-      )
+        executionLogger,
+      );
     } catch (error) {
-      executionLogger.error('CSV parsing failed', error as Error, {
+      executionLogger.error("CSV parsing failed", error as Error, {
         fileName: file.file_name,
-      })
-      throw new Error(`Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      });
+      throw new Error(
+        `Failed to parse CSV file: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   }
 
@@ -859,27 +937,27 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
    */
   private formatTableDataForLLM(rows: any[][], fileName: string): string {
     if (rows.length === 0) {
-      return 'Empty table'
+      return "Empty table";
     }
 
-    const rowCount = rows.length
-    const colCount = Math.max(...rows.map(r => r.length))
+    const rowCount = rows.length;
+    const colCount = Math.max(...rows.map((r) => r.length));
 
     // Assume first row is header
-    const header = rows[0]
-    const dataRows = rows.slice(1)
+    const header = rows[0];
+    const dataRows = rows.slice(1);
 
-    let formatted = `Spreadsheet: ${fileName}\n`
-    formatted += `Table with ${dataRows.length} data rows and ${colCount} columns\n\n`
-    formatted += `Header: ${header.join(' | ')}\n`
-    formatted += `${'-'.repeat(80)}\n`
+    let formatted = `Spreadsheet: ${fileName}\n`;
+    formatted += `Table with ${dataRows.length} data rows and ${colCount} columns\n\n`;
+    formatted += `Header: ${header.join(" | ")}\n`;
+    formatted += `${"-".repeat(80)}\n`;
 
     // Add data rows
     dataRows.forEach((row, idx) => {
-      formatted += `Row ${idx + 1}: ${row.join(' | ')}\n`
-    })
+      formatted += `Row ${idx + 1}: ${row.join(" | ")}\n`;
+    });
 
-    return formatted
+    return formatted;
   }
 
   /**
@@ -888,28 +966,29 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
   private async extractStructuredDataWithClaude(
     formattedData: string,
     fileName: string,
-    executionLogger: any
+    executionLogger: any,
   ): Promise<{
-    invoices?: InvoiceData[]
-    haulLogs?: HaulLogEntry[]
-    usage?: { input_tokens: number; output_tokens: number }
+    invoices?: InvoiceData[];
+    haulLogs?: HaulLogEntry[];
+    usage?: { input_tokens: number; output_tokens: number };
   }> {
     // Detect document type from filename
-    const docType = detectDocumentType(fileName)
+    const docType = detectDocumentType(fileName);
 
-    executionLogger.debug('Extracting structured data with Claude', {
+    executionLogger.debug("Extracting structured data with Claude", {
       fileName,
       detectedType: docType,
       dataLength: formattedData.length,
-    })
+    });
 
     // Use Anthropic SDK to extract structured data
-    const anthropic = new (await import('@anthropic-ai/sdk')).default({
+    const anthropic = new (await import("@anthropic-ai/sdk")).default({
       apiKey: process.env.ANTHROPIC_API_KEY,
-    })
+    });
 
-    const systemPrompt = docType === 'haul-log'
-      ? `Extract waste haul log data from this spreadsheet. Return JSON array with fields:
+    const systemPrompt =
+      docType === "haul-log"
+        ? `Extract waste haul log data from this spreadsheet. Return JSON array with fields:
 - date (YYYY-MM-DD)
 - time (HH:MM, optional)
 - container_type (COMPACTOR, DUMPSTER, OPEN_TOP, or OTHER)
@@ -918,7 +997,7 @@ export class BatchExtractorSkill extends BaseSkill<BatchExtractorResult> {
 - notes (string, optional)
 
 Return only valid JSON array, no markdown.`
-      : `Extract invoice data from this spreadsheet. Return JSON object with fields:
+        : `Extract invoice data from this spreadsheet. Return JSON object with fields:
 - invoice_number (string)
 - invoice_date (YYYY-MM-DD)
 - service_period_start (YYYY-MM-DD, optional)
@@ -928,57 +1007,63 @@ Return only valid JSON array, no markdown.`
 - service_type (string, e.g. "Waste Collection")
 - charges (array of {description, amount, quantity, unit_price})
 
-Return only valid JSON object, no markdown.`
+Return only valid JSON object, no markdown.`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 4096,
       system: systemPrompt,
       messages: [
         {
-          role: 'user',
+          role: "user",
           content: formattedData,
         },
       ],
-    })
+    });
 
     // Extract JSON from response
-    const textContent = response.content.find((c) => c.type === 'text')
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('No text response from Claude')
+    const textContent = response.content.find((c) => c.type === "text");
+    if (!textContent || textContent.type !== "text") {
+      throw new Error("No text response from Claude");
     }
 
-    let extractedText = textContent.text.trim()
+    let extractedText = textContent.text.trim();
     // Remove markdown code blocks if present
-    extractedText = extractedText.replace(/^```json\n?/i, '').replace(/\n?```$/i, '')
+    extractedText = extractedText
+      .replace(/^```json\n?/i, "")
+      .replace(/\n?```$/i, "");
 
     const usage = {
       input_tokens: response.usage.input_tokens,
       output_tokens: response.usage.output_tokens,
-    }
+    };
 
     try {
-      if (docType === 'haul-log') {
-        const haulLogs = JSON.parse(extractedText) as HaulLogEntry[]
-        executionLogger.info('Extracted haul logs from spreadsheet', {
+      if (docType === "haul-log") {
+        const haulLogs = JSON.parse(extractedText) as HaulLogEntry[];
+        executionLogger.info("Extracted haul logs from spreadsheet", {
           fileName,
           count: haulLogs.length,
-        })
-        return { haulLogs, usage }
+        });
+        return { haulLogs, usage };
       } else {
-        const invoice = JSON.parse(extractedText) as InvoiceData
-        executionLogger.info('Extracted invoice from spreadsheet', {
+        const invoice = JSON.parse(extractedText) as InvoiceData;
+        executionLogger.info("Extracted invoice from spreadsheet", {
           fileName,
           invoiceNumber: invoice.invoiceNumber,
-        })
-        return { invoices: [invoice], usage }
+        });
+        return { invoices: [invoice], usage };
       }
     } catch (error) {
-      executionLogger.error('Failed to parse Claude response as JSON', error as Error, {
-        fileName,
-        response: extractedText.substring(0, 200),
-      })
-      throw new Error('Failed to parse extracted data as JSON')
+      executionLogger.error(
+        "Failed to parse Claude response as JSON",
+        error as Error,
+        {
+          fileName,
+          response: extractedText.substring(0, 200),
+        },
+      );
+      throw new Error("Failed to parse extracted data as JSON");
     }
   }
 }

@@ -69,17 +69,17 @@ interface RateLimitConfig {
   /**
    * Number of requests allowed within the window
    */
-  limit: number
+  limit: number;
 
   /**
    * Window duration in milliseconds
    */
-  windowMs: number
+  windowMs: number;
 }
 
 interface RequestRecord {
-  count: number
-  resetTime: number
+  count: number;
+  resetTime: number;
 }
 
 /**
@@ -94,29 +94,32 @@ interface RequestRecord {
  *
  * For production, migrate to distributed storage (Redis/Upstash) before Phase 4.
  */
-const store = new Map<string, RequestRecord>()
+const store = new Map<string, RequestRecord>();
 
 // Log warning on first import (development only)
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   console.warn(
-    '⚠️ [RATE LIMIT] Using in-memory rate limiter in production! ' +
-    'This is not suitable for multi-instance deployments. ' +
-    'Migrate to Upstash/Redis before scaling. ' +
-    'See lib/api/rate-limit.ts for migration guide.'
-  )
+    "⚠️ [RATE LIMIT] Using in-memory rate limiter in production! " +
+      "This is not suitable for multi-instance deployments. " +
+      "Migrate to Upstash/Redis before scaling. " +
+      "See lib/api/rate-limit.ts for migration guide.",
+  );
 }
 
 /**
  * Clean up expired entries every 10 minutes
  */
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, record] of store.entries()) {
-    if (now > record.resetTime) {
-      store.delete(key)
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, record] of store.entries()) {
+      if (now > record.resetTime) {
+        store.delete(key);
+      }
     }
-  }
-}, 10 * 60 * 1000)
+  },
+  10 * 60 * 1000,
+);
 
 /**
  * Check if request is rate limited
@@ -127,39 +130,41 @@ setInterval(() => {
  */
 export function checkRateLimit(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): {
-  isLimited: boolean
-  remaining: number
-  resetTime: number
-  retryAfter?: number
+  isLimited: boolean;
+  remaining: number;
+  resetTime: number;
+  retryAfter?: number;
 } {
-  const now = Date.now()
-  let record = store.get(identifier)
+  const now = Date.now();
+  let record = store.get(identifier);
 
   // Initialize or reset if window expired
   if (!record || now > record.resetTime) {
     record = {
       count: 0,
       resetTime: now + config.windowMs,
-    }
-    store.set(identifier, record)
+    };
+    store.set(identifier, record);
   }
 
   // Increment count
-  record.count++
+  record.count++;
 
   // Check if limit exceeded
-  const isLimited = record.count > config.limit
-  const remaining = Math.max(0, config.limit - record.count)
-  const retryAfter = isLimited ? Math.ceil((record.resetTime - now) / 1000) : undefined
+  const isLimited = record.count > config.limit;
+  const remaining = Math.max(0, config.limit - record.count);
+  const retryAfter = isLimited
+    ? Math.ceil((record.resetTime - now) / 1000)
+    : undefined;
 
   return {
     isLimited,
     remaining,
     resetTime: record.resetTime,
     retryAfter,
-  }
+  };
 }
 
 /**
@@ -175,7 +180,7 @@ export function checkRateLimit(
  * ```
  */
 export function rateLimitMiddleware(config: RateLimitConfig) {
-  return (identifier: string) => checkRateLimit(identifier, config)
+  return (identifier: string) => checkRateLimit(identifier, config);
 }
 
 /**
@@ -208,14 +213,14 @@ export const rateLimiters = {
     limit: 100,
     windowMs: 60 * 1000, // 1 minute
   }),
-}
+};
 
 /**
  * Reset rate limit for a specific identifier
  * Useful for testing or manual intervention
  */
 export function resetRateLimit(identifier: string): void {
-  store.delete(identifier)
+  store.delete(identifier);
 }
 
 /**
@@ -223,26 +228,26 @@ export function resetRateLimit(identifier: string): void {
  */
 export function getRateLimitStatus(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): {
-  count: number
-  remaining: number
-  resetTime: number
+  count: number;
+  remaining: number;
+  resetTime: number;
 } {
-  const record = store.get(identifier)
-  const now = Date.now()
+  const record = store.get(identifier);
+  const now = Date.now();
 
   if (!record || now > record.resetTime) {
     return {
       count: 0,
       remaining: config.limit,
       resetTime: now + config.windowMs,
-    }
+    };
   }
 
   return {
     count: record.count,
     remaining: Math.max(0, config.limit - record.count),
     resetTime: record.resetTime,
-  }
+  };
 }

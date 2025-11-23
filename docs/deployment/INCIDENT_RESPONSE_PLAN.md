@@ -19,6 +19,7 @@ This document defines the procedures for responding to production incidents in t
 **Impact**: Complete service outage or data loss
 
 **Examples**:
+
 - Entire application down (502/503 errors)
 - Database inaccessible
 - Data corruption or loss detected
@@ -36,6 +37,7 @@ This document defines the procedures for responding to production incidents in t
 **Impact**: Major functionality broken for all/most users
 
 **Examples**:
+
 - Analysis jobs failing (>50% failure rate)
 - Worker not processing jobs
 - File uploads completely broken
@@ -53,6 +55,7 @@ This document defines the procedures for responding to production incidents in t
 **Impact**: Degraded performance or partial functionality loss
 
 **Examples**:
+
 - Slow page loads (>3 seconds)
 - Intermittent job failures (10-50% failure rate)
 - Some users experiencing issues
@@ -70,6 +73,7 @@ This document defines the procedures for responding to production incidents in t
 **Impact**: Minor issues, workarounds available
 
 **Examples**:
+
 - UI glitches (not blocking workflows)
 - Non-critical feature broken
 - Cosmetic issues
@@ -84,8 +88,10 @@ This document defines the procedures for responding to production incidents in t
 ## 👥 Roles and Responsibilities
 
 ### Incident Commander (IC)
+
 **Who**: On-call engineer or tech lead
 **Responsibilities**:
+
 - Declare incident severity
 - Coordinate response efforts
 - Make rollback/mitigation decisions
@@ -93,8 +99,10 @@ This document defines the procedures for responding to production incidents in t
 - Lead post-mortem
 
 ### Technical Responder
+
 **Who**: On-call engineer + available team members
 **Responsibilities**:
+
 - Investigate root cause
 - Implement fixes
 - Test solutions
@@ -102,8 +110,10 @@ This document defines the procedures for responding to production incidents in t
 - Monitor recovery
 
 ### Communications Lead
+
 **Who**: Product manager or designated team member
 **Responsibilities**:
+
 - Update status page
 - Notify affected users
 - Provide regular updates
@@ -115,16 +125,19 @@ This document defines the procedures for responding to production incidents in t
 ## 📞 On-Call Schedule
 
 ### Primary On-Call
-**Current**: _______________
-**Slack**: @_______________
-**Phone**: _______________
+
+**Current**: ******\_\_\_******
+**Slack**: @******\_\_\_******
+**Phone**: ******\_\_\_******
 
 ### Backup On-Call
-**Current**: _______________
-**Slack**: @_______________
-**Phone**: _______________
+
+**Current**: ******\_\_\_******
+**Slack**: @******\_\_\_******
+**Phone**: ******\_\_\_******
 
 ### Escalation Path
+
 1. Primary On-Call (page)
 2. Backup On-Call (after 10 minutes no response)
 3. Technical Lead (after 20 minutes)
@@ -135,12 +148,14 @@ This document defines the procedures for responding to production incidents in t
 ## 🔔 Alert Channels
 
 ### Monitoring Systems
+
 - **Sentry**: Critical errors → Slack #production-alerts
 - **Uptime Robot**: Downtime detected → SMS + Slack
 - **Supabase**: Database alerts → Email
 - **Custom Alerts**: Job failures, worker crashes → Slack
 
 ### Communication Channels
+
 - **Slack**: #production-alerts (real-time updates)
 - **Email**: devops@wastewise.io (summaries)
 - **SMS**: Critical P0 incidents only
@@ -154,11 +169,13 @@ This document defines the procedures for responding to production incidents in t
 ### Phase 1: Detection & Triage (0-5 minutes)
 
 **1. Alert Received**
+
 - Monitor detects issue and sends alert
 - On-call engineer acknowledges within 5 minutes
 - Begin initial investigation
 
 **2. Assess Severity**
+
 ```
 Is the entire site down? → P0
 Is a core workflow broken? → P1
@@ -167,6 +184,7 @@ Is it a minor issue? → P3
 ```
 
 **3. Declare Incident**
+
 ```
 Post in #production-alerts:
 🚨 INCIDENT DECLARED
@@ -184,6 +202,7 @@ Investigating...
 ### Phase 2: Investigation (5-30 minutes)
 
 **1. Gather Information**
+
 ```bash
 # Check application health
 curl https://app.wastewise.io/api/health
@@ -208,24 +227,28 @@ aws logs tail /aws/ecs/wastewise-worker --since 1h
 Common investigation paths:
 
 **Application Down (502/503)**:
+
 - Check Vercel deployment status
 - Check worker status (is it running?)
 - Check database connectivity
 - Check external API status (Anthropic, search providers)
 
 **High Error Rate**:
+
 - Review Sentry for error patterns
 - Check recent deployments (did we just deploy?)
 - Check database query performance
 - Check external API errors
 
 **Performance Degradation**:
+
 - Check database query times
 - Check worker job queue depth
 - Check CDN/caching issues
 - Check resource utilization (CPU, memory)
 
 **3. Update Incident**
+
 ```
 Update in #production-alerts:
 
@@ -246,29 +269,32 @@ ETA: [Estimate for fix/update]
 
 **Decision Matrix**:
 
-| Situation | Action |
-|-----------|--------|
-| Recent deployment caused issue | Rollback immediately |
-| Database migration failed | Rollback migration (with caution) |
-| External API down | Enable fallback/cached results |
-| Worker crashed | Restart worker, check logs |
-| Performance issue | Scale resources, enable caching |
-| Security issue | Isolate affected systems, patch |
+| Situation                      | Action                            |
+| ------------------------------ | --------------------------------- |
+| Recent deployment caused issue | Rollback immediately              |
+| Database migration failed      | Rollback migration (with caution) |
+| External API down              | Enable fallback/cached results    |
+| Worker crashed                 | Restart worker, check logs        |
+| Performance issue              | Scale resources, enable caching   |
+| Security issue                 | Isolate affected systems, patch   |
 
 **Rollback Decision Criteria**:
 
 Rollback if:
+
 - [ ] Issue started immediately after deployment
 - [ ] Users significantly impacted
 - [ ] No quick fix available
 - [ ] Previous version was stable
 
 Do NOT rollback if:
+
 - [ ] Issue is database-related (data loss risk)
 - [ ] Root cause unclear (may not fix issue)
 - [ ] Fix is simple and quick (<15 minutes)
 
 **Execute Rollback** (if decided):
+
 ```bash
 # Frontend rollback
 vercel rollback <previous-deployment-url>
@@ -286,12 +312,14 @@ npx supabase migration repair <migration> --status reverted
 ```
 
 **Alternative Mitigations**:
+
 - Hot-patch specific issue
 - Enable feature flags to disable broken feature
 - Scale resources (more workers, larger database)
 - Enable maintenance mode (if fixing requires downtime)
 
 **4. Update Incident**
+
 ```
 Update in #production-alerts:
 
@@ -307,6 +335,7 @@ Expected recovery: [Time estimate]
 ### Phase 4: Recovery & Verification (60-90 minutes)
 
 **1. Deploy Fix**
+
 ```bash
 # If hot-patching
 git commit -m "hotfix: [issue description]"
@@ -317,6 +346,7 @@ vercel logs --prod --follow
 ```
 
 **2. Verify Recovery**
+
 ```bash
 # Run smoke tests
 STAGING_URL=https://app.wastewise.io pnpm smoke-tests
@@ -328,6 +358,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 ```
 
 **3. Monitor Closely**
+
 - Watch error logs for 30 minutes
 - Check job success rate
 - Verify worker processing normally
@@ -335,6 +366,7 @@ STAGING_URL=https://app.wastewise.io pnpm smoke-tests
 - Check user reports
 
 **4. Update Incident**
+
 ```
 Update in #production-alerts:
 
@@ -353,6 +385,7 @@ Post-mortem scheduled for [Date/Time]
 ### Phase 5: Post-Incident Review (Within 24 hours)
 
 **1. Update Status Page**
+
 ```
 RESOLVED - [Issue description]
 
@@ -368,6 +401,7 @@ We apologize for any inconvenience. We're implementing [preventive measures] to 
 ```
 
 **2. Schedule Post-Mortem**
+
 - Schedule within 24-48 hours
 - Invite all responders
 - Prepare timeline of events
@@ -386,36 +420,44 @@ Template: `INCIDENT_YYYY-MM-DD_brief-description.md`
 **Impact**: [Users affected, functionality lost]
 
 ## Summary
+
 [2-3 sentence summary of what happened]
 
 ## Timeline (All times UTC)
+
 - HH:MM - [Event]
 - HH:MM - [Event]
 - HH:MM - [Event]
 
 ## Root Cause
+
 [Detailed explanation of what caused the incident]
 
 ## Impact
+
 - Users affected: [Number or percentage]
 - Duration: [Total downtime]
 - Data loss: [None / Description]
 - Revenue impact: [If applicable]
 
 ## Resolution
+
 [What was done to resolve the incident]
 
 ## Preventive Measures
+
 1. [Action item 1] - Owner: [Name] - Due: [Date]
 2. [Action item 2] - Owner: [Name] - Due: [Date]
 3. [Action item 3] - Owner: [Name] - Due: [Date]
 
 ## Lessons Learned
+
 - [What went well]
 - [What could be improved]
 - [What we'll do differently]
 
 ## Action Items
+
 - [ ] [Task 1] - @owner - Due date
 - [ ] [Task 2] - @owner - Due date
 ```
@@ -427,15 +469,18 @@ Template: `INCIDENT_YYYY-MM-DD_brief-description.md`
 ### Playbook 1: Complete Site Outage (502/503 errors)
 
 **Symptoms**:
+
 - Users see "Bad Gateway" or "Service Unavailable"
 - Health check endpoint returns 502/503
 
 **Immediate Actions**:
+
 1. Check Vercel deployment status
 2. Check if recent deployment occurred
 3. Check application logs for errors
 
 **Resolution Steps**:
+
 ```bash
 # Check deployment
 vercel ls --prod
@@ -454,6 +499,7 @@ curl https://app.wastewise.io/api/health/worker
 ```
 
 **Prevention**:
+
 - Enable staging-to-production promotion (not direct deploy)
 - Implement blue-green deployments
 - Add pre-deployment smoke tests
@@ -463,16 +509,19 @@ curl https://app.wastewise.io/api/health/worker
 ### Playbook 2: Worker Not Processing Jobs
 
 **Symptoms**:
+
 - Jobs stuck in "pending" status
 - No jobs completing
 - Worker health check failing
 
 **Immediate Actions**:
+
 1. Check worker logs
 2. Check worker is running
 3. Check database connectivity from worker
 
 **Resolution Steps**:
+
 ```bash
 # Check worker status (AWS ECS)
 aws ecs describe-services \
@@ -497,6 +546,7 @@ curl https://app.wastewise.io/api/health/worker
 ```
 
 **Prevention**:
+
 - Implement worker health auto-restart
 - Add worker redundancy (multiple tasks)
 - Monitor worker uptime actively
@@ -506,16 +556,19 @@ curl https://app.wastewise.io/api/health/worker
 ### Playbook 3: High Job Failure Rate
 
 **Symptoms**:
-- >10% of jobs failing
+
+- > 10% of jobs failing
 - Specific error pattern in logs
 - Users reporting analysis failures
 
 **Immediate Actions**:
+
 1. Check Sentry for error patterns
 2. Review recent failed jobs
 3. Identify common factor (file type, property type, etc.)
 
 **Resolution Steps**:
+
 ```bash
 # Query failed jobs
 # Use admin dashboard or database query
@@ -540,6 +593,7 @@ psql $DATABASE_URL -c "
 ```
 
 **Prevention**:
+
 - Implement better input validation
 - Add retry logic with exponential backoff
 - Monitor job success rate actively
@@ -549,16 +603,19 @@ psql $DATABASE_URL -c "
 ### Playbook 4: Database Performance Degradation
 
 **Symptoms**:
+
 - Slow API responses
 - Database connection pool exhausted
 - Query timeouts
 
 **Immediate Actions**:
+
 1. Check Supabase dashboard for slow queries
 2. Check connection pool utilization
 3. Check recent data growth
 
 **Resolution Steps**:
+
 ```bash
 # Check active queries
 # Via Supabase SQL editor:
@@ -579,6 +636,7 @@ ON analysis_jobs(status, created_at DESC);
 ```
 
 **Prevention**:
+
 - Regular database performance reviews
 - Implement query result caching
 - Monitor query performance
@@ -589,17 +647,20 @@ ON analysis_jobs(status, created_at DESC);
 ### Playbook 5: Security Incident
 
 **Symptoms**:
+
 - Unauthorized access detected
 - Unusual API traffic patterns
 - Data breach suspected
 
 **Immediate Actions** (CRITICAL):
+
 1. **DO NOT** discuss publicly
 2. Notify security team immediately
 3. Preserve all logs
 4. Document everything
 
 **Resolution Steps**:
+
 1. **Contain**:
    - Isolate affected systems
    - Revoke compromised credentials
@@ -621,6 +682,7 @@ ON analysis_jobs(status, created_at DESC);
    - Update security policies
 
 **Prevention**:
+
 - Regular security audits
 - Penetration testing
 - Security training for team
@@ -631,18 +693,21 @@ ON analysis_jobs(status, created_at DESC);
 ## 📊 Incident Metrics
 
 ### Track for Each Incident
+
 - **MTTD** (Mean Time To Detect): Alert → Acknowledgment
 - **MTTI** (Mean Time To Investigate): Acknowledgment → Root cause identified
 - **MTTR** (Mean Time To Resolve): Root cause → Resolution
 - **Impact**: Users affected, duration, data loss
 
 ### Monthly Review
+
 - Total incidents by severity
 - Average MTTR by severity
 - Common root causes
 - Preventive measures implemented
 
 ### Goals
+
 - P0 MTTR: <30 minutes
 - P1 MTTR: <2 hours
 - P2 MTTR: <4 hours
@@ -653,6 +718,7 @@ ON analysis_jobs(status, created_at DESC);
 ## 📝 Communication Templates
 
 ### Status Page Update (Investigating)
+
 ```
 INVESTIGATING - [Brief Description]
 
@@ -666,6 +732,7 @@ We apologize for any inconvenience.
 ```
 
 ### Status Page Update (Monitoring)
+
 ```
 MONITORING - [Brief Description]
 
@@ -679,6 +746,7 @@ Thank you for your patience.
 ```
 
 ### Status Page Update (Resolved)
+
 ```
 RESOLVED - [Brief Description]
 
@@ -699,17 +767,20 @@ We apologize for the inconvenience and appreciate your patience.
 ## 🔗 Quick Reference Links
 
 ### Dashboards
+
 - Sentry: https://sentry.io/wastewise-production
 - Uptime: https://uptimerobot.com
 - Supabase: https://supabase.com/dashboard
 - Vercel: https://vercel.com/wastewise/production
 
 ### Documentation
+
 - Deployment Runbook: `docs/deployment/staging-deployment.md`
 - Rollback Procedures: `docs/deployment/ROLLBACK_PROCEDURES.md`
 - Database Backup: `docs/DATABASE_BACKUP_COMPLIANCE.md`
 
 ### Tools
+
 - Health Check: `curl https://app.wastewise.io/api/health`
 - Worker Health: `curl https://app.wastewise.io/api/health/worker`
 - Smoke Tests: `pnpm smoke-tests`

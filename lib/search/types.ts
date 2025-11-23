@@ -6,41 +6,41 @@
  */
 
 export interface SearchResult {
-  title: string
-  url: string
-  snippet: string
-  publishedDate?: string
-  score?: number
+  title: string;
+  url: string;
+  snippet: string;
+  publishedDate?: string;
+  score?: number;
 }
 
 export interface SearchResponse {
-  query: string
-  results: SearchResult[]
-  provider: string
-  cached: boolean
-  executionTime: number
+  query: string;
+  results: SearchResult[];
+  provider: string;
+  cached: boolean;
+  executionTime: number;
 }
 
 export interface SearchOptions {
-  maxResults?: number
-  dateFilter?: 'day' | 'week' | 'month' | 'year'
-  domains?: string[] // Filter by specific domains
-  excludeDomains?: string[]
+  maxResults?: number;
+  dateFilter?: "day" | "week" | "month" | "year";
+  domains?: string[]; // Filter by specific domains
+  excludeDomains?: string[];
 }
 
 export interface SearchProvider {
-  name: string
-  search(query: string, options?: SearchOptions): Promise<SearchResult[]>
-  isAvailable(): Promise<boolean>
+  name: string;
+  search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+  isAvailable(): Promise<boolean>;
 }
 
 export interface ProviderHealth {
-  [provider: string]: boolean
+  [provider: string]: boolean;
 }
 
 export interface CacheStats {
-  size: number
-  maxSize: number
-  maxAge: number
-  hitRate?: number
+  size: number;
+  maxSize: number;
+  maxAge: number;
+  hitRate?: number;
 }

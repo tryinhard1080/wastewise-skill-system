@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * New Project Creation Page
@@ -6,20 +6,20 @@
  * Multi-step wizard for creating a new waste analysis project
  */
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -28,63 +28,66 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Loader2, ChevronLeft, Building2 } from 'lucide-react'
-import { toast } from 'sonner'
+} from "@/components/ui/select";
+import { Loader2, ChevronLeft, Building2 } from "lucide-react";
+import { toast } from "sonner";
 
 // Form validation schema
 const projectSchema = z.object({
-  property_name: z.string().min(1, 'Property name is required'),
-  city: z.string().min(1, 'City is required'),
-  state: z.string().min(2, 'State is required').max(2, 'Use 2-letter state code'),
-  units: z.coerce.number().int().min(1, 'Must have at least 1 unit'),
+  property_name: z.string().min(1, "Property name is required"),
+  city: z.string().min(1, "City is required"),
+  state: z
+    .string()
+    .min(2, "State is required")
+    .max(2, "Use 2-letter state code"),
+  units: z.coerce.number().int().min(1, "Must have at least 1 unit"),
   property_type: z.string().optional(),
   equipment_type: z.string().optional(),
   analysis_period_months: z.coerce.number().int().min(1).max(12).optional(),
-})
+});
 
-type ProjectFormData = z.infer<typeof projectSchema>
+type ProjectFormData = z.infer<typeof projectSchema>;
 
 export default function NewProjectPage() {
-  const router = useRouter()
-  const supabase = createClient()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const supabase = createClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
-      property_name: '',
-      city: '',
-      state: '',
+      property_name: "",
+      city: "",
+      state: "",
       units: 0,
-      property_type: '',
-      equipment_type: '',
+      property_type: "",
+      equipment_type: "",
       analysis_period_months: 6,
     },
-  })
+  });
 
   const onSubmit = async (data: ProjectFormData) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const {
         data: { user },
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getUser();
 
       if (!user) {
-        throw new Error('Not authenticated')
+        throw new Error("Not authenticated");
       }
 
       // Create project in database
       const { data: project, error } = await supabase
-        .from('projects')
+        .from("projects")
         .insert({
           user_id: user.id,
           property_name: data.property_name,
@@ -94,30 +97,30 @@ export default function NewProjectPage() {
           property_type: data.property_type || null,
           equipment_type: data.equipment_type || null,
           analysis_period_months: data.analysis_period_months || null,
-          status: 'draft',
+          status: "draft",
         })
         .select()
-        .single()
+        .single();
 
       if (error) {
-        throw error
+        throw error;
       }
 
       // Show success toast and redirect
-      toast.success('Project created successfully!')
-      router.push(`/projects/${project.id}`)
-      router.refresh()
+      toast.success("Project created successfully!");
+      router.push(`/projects/${project.id}`);
+      router.refresh();
     } catch (error) {
-      console.error('Error creating project:', error)
+      console.error("Error creating project:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Failed to create project. Please try again.'
-      )
+          : "Failed to create project. Please try again.",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -126,12 +129,14 @@ export default function NewProjectPage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.push('/projects')}
+          onClick={() => router.push("/projects")}
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create New Project</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Create New Project
+          </h1>
           <p className="text-muted-foreground">
             Add a new property for waste management analysis
           </p>
@@ -251,7 +256,9 @@ export default function NewProjectPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Garden-Style">Garden-Style</SelectItem>
+                        <SelectItem value="Garden-Style">
+                          Garden-Style
+                        </SelectItem>
                         <SelectItem value="Mid-Rise">Mid-Rise</SelectItem>
                         <SelectItem value="High-Rise">High-Rise</SelectItem>
                       </SelectContent>
@@ -279,7 +286,9 @@ export default function NewProjectPage() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="COMPACTOR">Compactor</SelectItem>
-                        <SelectItem value="DUMPSTER">Open Top (Dumpster)</SelectItem>
+                        <SelectItem value="DUMPSTER">
+                          Open Top (Dumpster)
+                        </SelectItem>
                         <SelectItem value="MIXED">Both (Mixed)</SelectItem>
                       </SelectContent>
                     </Select>
@@ -320,7 +329,7 @@ export default function NewProjectPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => router.push('/projects')}
+                  onClick={() => router.push("/projects")}
                   disabled={isSubmitting}
                 >
                   Cancel
@@ -337,5 +346,5 @@ export default function NewProjectPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

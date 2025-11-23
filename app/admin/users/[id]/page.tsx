@@ -4,14 +4,14 @@
  * View detailed information about a specific user
  */
 
-'use client'
+"use client";
 
-import { use } from 'react'
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+import { use } from "react";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -19,40 +19,46 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useUser, useJobs, useAuditLogs, disableUser, enableUser } from '@/lib/hooks/useAdminData'
-import { toast } from 'sonner'
-import { formatDistanceToNow } from 'date-fns'
-import { ArrowLeft, Ban, CheckCircle } from 'lucide-react'
+} from "@/components/ui/table";
+import {
+  useUser,
+  useJobs,
+  useAuditLogs,
+  disableUser,
+  enableUser,
+} from "@/lib/hooks/useAdminData";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
+import { ArrowLeft, Ban, CheckCircle } from "lucide-react";
 
 export default function UserDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params)
-  const { data: userData, isLoading: userLoading, mutate } = useUser(id)
-  const { data: jobsData, isLoading: jobsLoading } = useJobs({ userId: id })
-  const { data: auditData, isLoading: auditLoading } = useAuditLogs()
+  const { id } = use(params);
+  const { data: userData, isLoading: userLoading, mutate } = useUser(id);
+  const { data: jobsData, isLoading: jobsLoading } = useJobs({ userId: id });
+  const { data: auditData, isLoading: auditLoading } = useAuditLogs();
 
-  const user = userData?.user
+  const user = userData?.user;
 
   const handleToggleStatus = async () => {
-    if (!user) return
+    if (!user) return;
 
     try {
       if (user.is_active) {
-        await disableUser(id)
-        toast.success('User disabled successfully')
+        await disableUser(id);
+        toast.success("User disabled successfully");
       } else {
-        await enableUser(id)
-        toast.success('User enabled successfully')
+        await enableUser(id);
+        toast.success("User enabled successfully");
       }
-      mutate()
+      mutate();
     } catch (error) {
-      toast.error('Failed to update user status')
+      toast.error("Failed to update user status");
     }
-  }
+  };
 
   if (userLoading) {
     return (
@@ -60,7 +66,7 @@ export default function UserDetailPage({
         <Skeleton className="h-12" />
         <Skeleton className="h-64" />
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -68,7 +74,7 @@ export default function UserDetailPage({
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900">User not found</h2>
         <p className="text-gray-500 mt-2">
-          The user you're looking for doesn't exist.
+          The user you&apos;re looking for doesn&apos;t exist.
         </p>
         <Button variant="outline" className="mt-4" asChild>
           <Link href="/admin/users">
@@ -77,7 +83,7 @@ export default function UserDetailPage({
           </Link>
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -97,16 +103,18 @@ export default function UserDetailPage({
             <div>
               <CardTitle className="text-2xl">{user.email}</CardTitle>
               <div className="flex items-center gap-2 mt-2">
-                <Badge variant={user.role === 'admin' ? 'destructive' : 'secondary'}>
+                <Badge
+                  variant={user.role === "admin" ? "destructive" : "secondary"}
+                >
                   {user.role}
                 </Badge>
-                <Badge variant={user.is_active ? 'default' : 'outline'}>
-                  {user.is_active ? 'Active' : 'Disabled'}
+                <Badge variant={user.is_active ? "default" : "outline"}>
+                  {user.is_active ? "Active" : "Disabled"}
                 </Badge>
               </div>
             </div>
             <Button
-              variant={user.is_active ? 'destructive' : 'default'}
+              variant={user.is_active ? "destructive" : "default"}
               onClick={handleToggleStatus}
             >
               {user.is_active ? (
@@ -132,15 +140,21 @@ export default function UserDetailPage({
             <div>
               <div className="text-sm font-medium text-gray-500">Created</div>
               <div className="text-sm mt-1">
-                {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                {formatDistanceToNow(new Date(user.created_at), {
+                  addSuffix: true,
+                })}
               </div>
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-500">Total Projects</div>
+              <div className="text-sm font-medium text-gray-500">
+                Total Projects
+              </div>
               <div className="text-sm mt-1">{user.project_count || 0}</div>
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-500">Total Jobs</div>
+              <div className="text-sm font-medium text-gray-500">
+                Total Jobs
+              </div>
               <div className="text-sm mt-1">{jobsData?.jobs?.length || 0}</div>
             </div>
           </div>
@@ -166,7 +180,9 @@ export default function UserDetailPage({
               <TableBody>
                 {user.projects.map((project: any) => (
                   <TableRow key={project.id}>
-                    <TableCell className="font-medium">{project.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {project.name}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline">{project.property_type}</Badge>
                     </TableCell>
@@ -212,16 +228,16 @@ export default function UserDetailPage({
                 {jobsData.jobs.slice(0, 10).map((job: any) => (
                   <TableRow key={job.id}>
                     <TableCell className="font-medium">
-                      {job.job_type.replace(/_/g, ' ')}
+                      {job.job_type.replace(/_/g, " ")}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant={
-                          job.status === 'completed'
-                            ? 'default'
-                            : job.status === 'failed'
-                            ? 'destructive'
-                            : 'outline'
+                          job.status === "completed"
+                            ? "default"
+                            : job.status === "failed"
+                              ? "destructive"
+                              : "outline"
                         }
                       >
                         {job.status}
@@ -237,9 +253,9 @@ export default function UserDetailPage({
                         ? `${Math.round(
                             (new Date(job.completed_at).getTime() -
                               new Date(job.created_at).getTime()) /
-                              1000
+                              1000,
                           )}s`
-                        : '-'}
+                        : "-"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -253,5 +269,5 @@ export default function UserDetailPage({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

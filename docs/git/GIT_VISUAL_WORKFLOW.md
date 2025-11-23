@@ -36,7 +36,7 @@
     ┌──────────────┐
     │ 2. CREATE    │
     │              │ → git checkout -b feat/new-feature
-    │ New Branch   │   
+    │ New Branch   │
     └──────────────┘
            │
            ▼
@@ -117,7 +117,7 @@
 
 
     Format: <type>(<scope>): <subject>
-    
+
     ┌────────┬──────────┬─────────────────────────────────────┐
     │  TYPE  │  SCOPE   │           DESCRIPTION               │
     ├────────┼──────────┼─────────────────────────────────────┤
@@ -135,7 +135,7 @@
     fix(worker): resolve race condition in job polling
     docs(readme): update deployment instructions
     test(compactor): add edge case validation
-    
+
     ❌ BAD Examples:
     updated stuff
     fixed bug
@@ -208,41 +208,41 @@
 
     1. PUSH BRANCH
        └─→ git push -u origin feat/branch-name
-    
+
     2. OPEN GITHUB
        └─→ Navigate to repository
-    
+
     3. CREATE PR
        ├─→ Click "Pull requests"
        ├─→ Click "New pull request"
        ├─→ Select base: main, compare: your-branch
        └─→ Click "Create pull request"
-    
+
     4. FILL TEMPLATE
        ├─→ Add descriptive title
        ├─→ Complete PR template sections
        ├─→ Link related issues
        └─→ Add labels (if applicable)
-    
+
     5. REQUEST REVIEW
        └─→ Select reviewers (if team)
-    
+
     6. AUTOMATED CHECKS
        ├─→ Tests run automatically
        ├─→ TypeScript compilation
        └─→ Linting (if configured)
-    
+
     7. ADDRESS FEEDBACK
        ├─→ Make requested changes
        ├─→ Push to same branch
        └─→ Re-request review
-    
+
     8. MERGE
        ├─→ All checks pass ✅
        ├─→ Approved by reviewer ✅
        ├─→ Click "Squash and merge"
        └─→ Delete branch ✅
-    
+
     9. SYNC LOCAL
        ├─→ git checkout main
        ├─→ git pull origin main
@@ -258,30 +258,30 @@
 
     1. Git pauses and shows:
        CONFLICT (content): Merge conflict in file.ts
-    
+
     2. Open conflicted file, look for:
        <<<<<<< HEAD
        Your changes
        =======
        Their changes (from main)
        >>>>>>> branch-name
-    
+
     3. Edit file to resolve conflict:
        - Keep your version, OR
        - Keep their version, OR
        - Combine both
-    
+
     4. Remove conflict markers (<<<, ===, >>>)
-    
+
     5. Stage resolved file:
        git add file.ts
-    
+
     6. Continue rebase:
        git rebase --continue
-    
+
     7. Force push (if rebasing):
        git push --force-with-lease
-    
+
     ABORT if stuck:
        git rebase --abort
 
@@ -380,15 +380,15 @@
     When you run `git status`, you'll see:
 
     Untracked files:      ❓  New files Git doesn't know about
-    
+
     Changes not staged:   🔴  Modified files not added yet
-    
+
     Changes staged:       🟢  Files ready to commit
-    
+
     Committed:            ✅  Changes saved to history
-    
+
     Pushed:               ☁️  Changes on GitHub
-    
+
     Merged:               🎉  Changes in main branch
 
 
@@ -401,12 +401,12 @@
 
     Phase 7 (Integration Testing):
     └─→ feat(test): add E2E workflow validation
-    
+
     Phase 8 (Additional Skills):
     ├─→ feat(skills): implement invoice extraction
     ├─→ feat(skills): add regulatory research
     └─→ feat(api): integrate Claude Vision
-    
+
     Use labels on GitHub:
     - phase-7
     - phase-8

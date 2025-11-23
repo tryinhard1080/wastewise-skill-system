@@ -16,7 +16,7 @@ The Waste Batch Extractor is a comprehensive Claude Skill designed for processin
 ✅ **Multi-Tab Excel Output** - Separate sheets for each location  
 ✅ **Built-in Validation** - Confidence scoring and quality reports  
 ✅ **Cross-Validation** - Consistency checks across properties  
-✅ **Flexible Input** - Supports PDFs, images, Excel files, CSVs  
+✅ **Flexible Input** - Supports PDFs, images, Excel files, CSVs
 
 ## What This Skill Does
 
@@ -44,21 +44,25 @@ This skill is the **first step** in a waste management document processing workf
 ### 1. Install the Skill
 
 **Claude.ai (Browser)**:
+
 - Download and zip the `waste-batch-extractor` folder
 - Go to Project Settings → Skills → Upload Skill
 
 **Claude Code**:
+
 ```bash
 cp -r waste-batch-extractor ~/.claude/skills/
 pip install anthropic pandas xlsxwriter PyPDF2 openpyxl --break-system-packages
 ```
 
 **Claude Desktop**:
+
 - Settings → Capabilities → Skills → Upload Skill folder
 
 ### 2. Prepare Your Documents
 
 Organize your waste documents in a folder:
+
 ```
 my_documents/
 ├── ColumbiaSquare_WM_Invoice_Sep2024.pdf
@@ -70,12 +74,14 @@ my_documents/
 ### 3. Extract the Data
 
 **Using Claude.ai or Desktop**:
+
 ```
-I have 15 waste invoices and 3 contracts from different properties. 
+I have 15 waste invoices and 3 contracts from different properties.
 Can you extract all the data, organize by location, and validate accuracy?
 ```
 
 **Using Claude Code**:
+
 ```bash
 python batch_extractor.py --input ./my_documents --output ./results --validate
 ```
@@ -83,6 +89,7 @@ python batch_extractor.py --input ./my_documents --output ./results --validate
 ### 4. Review the Output
 
 Check the generated files:
+
 - `waste_extraction_by_location.xlsx` - Multi-tab Excel with Summary and property tabs
 - `validation_report.md` - Quality assessment with flagged issues
 - `extraction_data.json` - Raw structured data
@@ -118,8 +125,9 @@ Each property gets its own sheet with all invoices, contracts, and expenses
 
 **Validation Sheet**:
 Quality report with color-coded flags:
+
 - 🟢 Green: High confidence (≥0.85)
-- 🟡 Yellow: Medium confidence (0.70-0.84)  
+- 🟡 Yellow: Medium confidence (0.70-0.84)
 - 🔴 Red: Needs review (<0.70)
 
 ### JSON Output
@@ -152,12 +160,14 @@ Quality report with color-coded flags:
 ### Confidence Scoring
 
 The skill calculates confidence scores based on:
+
 - Completeness of critical fields
 - Data consistency (totals match, dates valid)
 - Cross-document validation
 - Format correctness
 
 **Scoring Levels**:
+
 - **0.85-1.00**: ✅ High confidence, ready to use
 - **0.70-0.84**: ⚠️ Medium confidence, review recommended
 - **<0.70**: ❌ Low confidence, manual review required
@@ -170,7 +180,7 @@ The skill calculates confidence scores based on:
 ✅ Cross-property vendor consistency  
 ✅ Address consistency per property  
 ✅ Negative amount detection  
-✅ Invalid category detection  
+✅ Invalid category detection
 
 ### Running Standalone Validation
 
@@ -250,8 +260,8 @@ The skill uses the **same schema** as the existing `waste-contract-extractor` sk
 ### Example 1: Monthly Invoice Processing
 
 ```
-"I have 25 waste invoices from September for all our properties. 
-Extract the data, organize by property, and flag any with 
+"I have 25 waste invoices from September for all our properties.
+Extract the data, organize by property, and flag any with
 contamination or overage charges."
 ```
 
@@ -260,7 +270,7 @@ contamination or overage charges."
 ### Example 2: Contract Renewal Analysis
 
 ```
-"Extract all contract terms from these 10 agreements. 
+"Extract all contract terms from these 10 agreements.
 Show me which contracts expire in the next 6 months."
 ```
 
@@ -269,7 +279,7 @@ Show me which contracts expire in the next 6 months."
 ### Example 3: Expense Report Validation
 
 ```
-"Validate this Excel file with expenses for 50 properties. 
+"Validate this Excel file with expenses for 50 properties.
 Identify any properties with missing vendor information."
 ```
 
@@ -278,7 +288,7 @@ Identify any properties with missing vendor information."
 ### Example 4: Multi-Vendor Comparison
 
 ```
-"Compare pricing from these WM, Republic, and Waste Connections 
+"Compare pricing from these WM, Republic, and Waste Connections
 invoices for the same property."
 ```
 
@@ -295,6 +305,7 @@ pip install anthropic pandas xlsxwriter PyPDF2 openpyxl --break-system-packages
 ### API Configuration
 
 **Claude Code**:
+
 ```bash
 export ANTHROPIC_API_KEY="your-api-key-here"
 ```
@@ -313,19 +324,23 @@ export ANTHROPIC_API_KEY="your-api-key-here"
 ### Common Issues
 
 **"No documents found"**
+
 - Check file extensions are supported
 - Verify folder path is correct
 
 **Low confidence scores**
+
 - Ensure scanned documents are 300 DPI or higher
 - Check document text is clearly readable
 - Verify critical fields are present
 
 **"API key not found"**
+
 - Set `ANTHROPIC_API_KEY` environment variable
 - Or use Claude Desktop/claude.ai (handles auth automatically)
 
 **Excel file won't open**
+
 - Install `xlsxwriter`: `pip install xlsxwriter --break-system-packages`
 
 ### Getting Help
@@ -349,9 +364,11 @@ This skill is part of the Advantage Waste document processing pipeline:
 This skill is actively maintained by the Advantage Waste team at Greystar.
 
 **Version History**:
+
 - v1.0.0 (2025-01-25): Initial release with Claude Vision API integration
 
 **Planned Features**:
+
 - Automated detection of contamination patterns
 - Cost per unit analysis
 - Automatic hauler identification

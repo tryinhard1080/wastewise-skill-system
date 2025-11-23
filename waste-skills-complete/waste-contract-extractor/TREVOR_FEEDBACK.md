@@ -17,17 +17,20 @@ This document explains how we addressed operational feedback from Trevor (proper
 ## 📋 Priority 1: Granular Expense Tracking
 
 ### Trevor's Feedback
+
 > "Historical Expense Analysis is too high-level. I need month-by-month with account-level detail so I can trace back to source invoices when questioning spikes."
 
 ### What We Changed
 
 **BEFORE (v2.0)**:
+
 - Single "Invoice Detail" sheet
 - Property-level aggregation
 - No variance tracking
 - No investigation tools
 
 **AFTER (v2.1)**:
+
 - "Historical Expense Detail" sheet with granular breakdown
 - **Columns added**:
   - Month (Jan 2025, Feb 2025)
@@ -48,6 +51,7 @@ This document explains how we addressed operational feedback from Trevor (proper
 ### Real-World Use Case
 
 **Trevor's Scenario**:
+
 1. Boss asks: "Why did we spend $2,756 on Pickup Service in March vs. $1,176 in February?"
 2. Trevor opens "Historical Expense Detail"
 3. Sees flag: "🚩 INVESTIGATE - 134% increase"
@@ -63,20 +67,24 @@ This document explains how we addressed operational feedback from Trevor (proper
 ## 📊 Priority 2: Transparent Optimization Calculations
 
 ### Trevor's Feedback
+
 > "Difficult to follow logic on how we're getting to estimated Savings with Monitors. I need to explain this to my CFO and can't defend the numbers."
 
 ### What We Changed
 
 **BEFORE (v2.0)**:
+
 - "Optimization" sheet with recommendations
 - Showed final savings numbers
 - Didn't explain the math
 - No breakdown of assumptions
 
 **AFTER (v2.1)**:
+
 - "Optimization Analysis" sheet with **4 clear sections**:
 
 #### Section 1: Current State
+
 ```
 Current Annual Hauls: 36 hauls/year (extrapolated from 7 months)
 Current Cost Per Haul: $343 (pickup fee)
@@ -84,6 +92,7 @@ Current Annual Pickup Cost: $12,348 (36 hauls × $343)
 ```
 
 #### Section 2: With Monitors - Target State
+
 ```
 Target Annual Hauls: 18 hauls/year (50% reduction)
 Cost Per Haul: $343 (same rate)
@@ -91,6 +100,7 @@ Projected Annual Pickup Cost: $6,174 (18 hauls × $343)
 ```
 
 #### Section 3: Savings Calculation
+
 ```
 Annual Pickup Savings: $6,174
 (Current $12,348 - Optimized $6,174)
@@ -102,6 +112,7 @@ NET ANNUAL SAVINGS: $3,174
 ```
 
 #### Section 4: Visual Formula
+
 ```
 Haul Reduction = (36 current hauls - 18 optimized hauls) = 18 fewer hauls
 18 fewer hauls × $343 per haul = $6,174 in avoided pickup fees
@@ -111,6 +122,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 ### Real-World Use Case
 
 **Trevor's Scenario**:
+
 1. CFO asks: "How did you calculate $3,174 in savings?"
 2. Trevor opens "Optimization Analysis"
 3. Points to Section 1: "We're currently doing 36 hauls per year"
@@ -126,11 +138,13 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 ## 🗂️ Priority 3: Streamline "Too General" Tabs
 
 ### Trevor's Feedback
+
 > "The 2025 Summary, Monthly Analysis, and Container Analysis tabs don't add value for my operational focus. They feel duplicative."
 
 ### What We Changed
 
 **BEFORE (v2.0)**:
+
 - 2025 Summary (property-level overview)
 - Monthly Analysis (aggregated spending)
 - Container Analysis (general metrics)
@@ -139,6 +153,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 **Result**: 4 tabs showing similar information at different levels → confusion
 
 **AFTER (v2.1)**:
+
 - **Single "Executive Overview"** tab clearly labeled "For Leadership Briefings"
 - **Removed** redundant Monthly Analysis and Container Analysis
 - **Enhanced** Historical Expense Detail as the primary operational tool
@@ -169,12 +184,14 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 **Trevor's Use Case**: "Helpful when I need to ask vendors about mid-contract price changes"
 
 **What We Added**:
+
 - Service Quality metrics (on-time rate, missed pickups, response time)
 - Billing Accuracy metrics (error rate, disputed charges)
 - Cost Management metrics (contract vs. market, price increase history)
 - Communication metrics (notifications, account manager responsiveness)
 
 **Real-World Application**:
+
 - Trevor: "Your on-time pickup rate dropped to 87% this quarter. Let's discuss."
 - Vendor: [more accountable with documented metrics]
 
@@ -185,6 +202,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 **Trevor's Use Case**: "The 30-365 day roadmap helps with Asset Business Plans, but I need quarterly budget impacts"
 
 **What We Added**:
+
 - **IMMEDIATE (0-30 DAYS) - Budget Impact: Q1 2025**
   - Tasks with owners
   - Estimated Q1 savings: $525
@@ -199,6 +217,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
   - 2026 Annual Budget Impact: $25,000 reduction
 
 **Real-World Application**:
+
 - Trevor builds 2026 Asset Business Plan
 - Finance: "What's the Q2 savings impact?"
 - Trevor: "Implementation Roadmap shows $6,800 in Q2"
@@ -210,6 +229,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 **Trevor's Use Case**: "I'll start a conversation with preferred vendor"
 
 **What We Added**:
+
 - Advantage Waste curated vendor list
 - **Compactor Monitors**: DSQ Technologies - Pioneer Monitors
   - Keith Conrad (VP of Business Development)
@@ -219,6 +239,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
   - Multiple service capabilities
 
 **Real-World Application**:
+
 - Trevor gets board approval for monitors
 - Opens "Recommended Vendors" tab
 - Contacts Keith Conrad at DSQ Technologies
@@ -229,6 +250,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 ## 📊 Sheet Structure Comparison
 
 ### v2.0 (Original) - 11 Sheets
+
 1. ~~2025 Summary~~ (removed as "too general")
 2. ~~Monthly Analysis~~ (removed as "too general")
 3. Invoice Detail (basic)
@@ -242,6 +264,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 11. ~~Container Analysis~~ (removed as "too general")
 
 ### v2.1 (Updated) - 12 Sheets
+
 1. **Executive Overview** (single high-level summary for leadership)
 2. **Historical Expense Detail** (granular month/account tracking + Investigation Tracker)
 3. **Optimization Analysis** (transparent 4-section calculations)
@@ -260,30 +283,35 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 ## 🎓 Design Principles from Trevor's Feedback
 
 ### 1. Detail-First Design
+
 **Old**: Summary → Detail
 **New**: Detail → Summary (if needed)
 
 **Rationale**: Operational users need to investigate variances. High-level summaries don't help when answering "Why did X change?"
 
 ### 2. Traceable to Source
+
 **Old**: Aggregated numbers without context
 **New**: Every amount links to Invoice #, Account, Month
 
 **Rationale**: Trevor's boss asks "Where did this come from?" - Trevor needs to cite the source invoice.
 
 ### 3. Transparent Calculations
+
 **Old**: "Estimated savings: $3,174"
 **New**: "36 hauls → 18 hauls = 18 × $343 = $6,174 - $3,000 = $3,174"
 
 **Rationale**: Trevor needs to defend assumptions to CFO. Show every step.
 
 ### 4. Budget-Cycle Aligned
+
 **Old**: Generic "Short-term, Long-term"
 **New**: Q1 2025, Q2 2025, Q3 2025, Q4 2025, 2026
 
 **Rationale**: Asset Business Plans are built on fiscal quarters. Match their calendar.
 
 ### 5. Investigation-Friendly
+
 **Old**: Data with no follow-up mechanism
 **New**: Variance flags + Investigation Tracker
 
@@ -296,6 +324,7 @@ $6,174 pickup savings - $3,000 monitor cost = $3,174 net savings
 If you're upgrading from v2.0:
 
 ### What Changed
+
 - ✅ Historical Expense Detail: More columns (Account, Haul Count, % Change, Flag)
 - ✅ Optimization Analysis: Completely redesigned with 4 sections
 - ✅ Implementation Roadmap: Added quarterly budget impacts
@@ -304,6 +333,7 @@ If you're upgrading from v2.0:
 - ✅ Renamed: "Invoice Detail" → "Historical Expense Detail"
 
 ### What Stayed Same
+
 - ✅ Contract Summary
 - ✅ Service Schedule
 - ✅ On-Call Services
@@ -312,6 +342,7 @@ If you're upgrading from v2.0:
 - ✅ Red Flags
 
 ### Action Required
+
 1. Update any integrations that referenced old sheet names
 2. Train users on new "Historical Expense Detail" columns
 3. Emphasize "Executive Overview" is for leadership only
@@ -322,16 +353,19 @@ If you're upgrading from v2.0:
 ## 📈 Expected Impact
 
 ### Time Savings
+
 - **Expense investigation**: 30 minutes → 2 minutes (auto-flagged variances)
 - **Optimization explanation**: 15 minutes → 5 minutes (transparent calculations)
 - **Budget planning**: 1 hour → 10 minutes (quarterly impacts pre-calculated)
 
 ### Better Decisions
+
 - **Variance investigation**: 60% of anomalies caught → 95% (auto-flagging)
 - **Contract negotiation**: Generic talking points → Vendor performance scorecards
 - **Stakeholder confidence**: "I think" → "Here's Invoice #0615-002318893"
 
 ### Operational Excellence
+
 - **Traceability**: Every number links to source document
 - **Transparency**: Every calculation shows the math
 - **Alignment**: Budget impacts match fiscal calendar

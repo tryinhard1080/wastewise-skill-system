@@ -1,81 +1,99 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, useRef } from "react"
-import SmartSimpleBrilliant from "../components/smart-simple-brilliant"
-import YourWorkInSync from "../components/your-work-in-sync"
-import EffortlessIntegration from "../components/effortless-integration-updated"
-import NumbersThatSpeak from "../components/numbers-that-speak"
-import DocumentationSection from "../components/documentation-section"
-import TestimonialsSection from "../components/testimonials-section"
-import FAQSection from "../components/faq-section"
-import PricingSection from "../components/pricing-section"
-import CTASection from "../components/cta-section"
-import FooterSection from "../components/footer-section"
+import { useState, useEffect, useRef } from "react";
+import SmartSimpleBrilliant from "../components/smart-simple-brilliant";
+import YourWorkInSync from "../components/your-work-in-sync";
+import EffortlessIntegration from "../components/effortless-integration-updated";
+import NumbersThatSpeak from "../components/numbers-that-speak";
+import DocumentationSection from "../components/documentation-section";
+import TestimonialsSection from "../components/testimonials-section";
+import FAQSection from "../components/faq-section";
+import PricingSection from "../components/pricing-section";
+import CTASection from "../components/cta-section";
+import FooterSection from "../components/footer-section";
 
 // Reusable Badge Component
 function Badge({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className="px-[14px] py-[6px] bg-white shadow-[0px_0px_0px_4px_rgba(55,50,47,0.05)] overflow-hidden rounded-[90px] flex justify-start items-center gap-[8px] border border-[rgba(2,6,23,0.08)] shadow-xs">
-      <div className="w-[14px] h-[14px] relative overflow-hidden flex items-center justify-center">{icon}</div>
+      <div className="w-[14px] h-[14px] relative overflow-hidden flex items-center justify-center">
+        {icon}
+      </div>
       <div className="text-center flex justify-center flex-col text-[#37322F] text-xs font-medium leading-3 font-sans">
         {text}
       </div>
     </div>
-  )
+  );
 }
 
 export default function LandingPage() {
-  const [activeCard, setActiveCard] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const mountedRef = useRef(true)
+  const [activeCard, setActiveCard] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     const progressInterval = setInterval(() => {
-      if (!mountedRef.current) return
+      if (!mountedRef.current) return;
 
       setProgress((prev) => {
         if (prev >= 100) {
           if (mountedRef.current) {
-            setActiveCard((current) => (current + 1) % 3)
+            setActiveCard((current) => (current + 1) % 3);
           }
-          return 0
+          return 0;
         }
-        return prev + 2 // 2% every 100ms = 5 seconds total
-      })
-    }, 100)
+        return prev + 2; // 2% every 100ms = 5 seconds total
+      });
+    }, 100);
 
     return () => {
-      clearInterval(progressInterval)
-      mountedRef.current = false
-    }
-  }, [])
+      clearInterval(progressInterval);
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
-      mountedRef.current = false
-    }
-  }, [])
+      mountedRef.current = false;
+    };
+  }, []);
 
   const handleCardClick = (index: number) => {
-    if (!mountedRef.current) return
-    setActiveCard(index)
-    setProgress(0)
-  }
+    if (!mountedRef.current) return;
+    setActiveCard(index);
+    setProgress(0);
+  };
 
   const getDashboardContent = () => {
     switch (activeCard) {
       case 0:
-        return <div className="text-[#828387] text-sm">Customer Subscription Status and Details</div>
+        return (
+          <div className="text-[#828387] text-sm">
+            Customer Subscription Status and Details
+          </div>
+        );
       case 1:
-        return <div className="text-[#828387] text-sm">Analytics Dashboard - Real-time Insights</div>
+        return (
+          <div className="text-[#828387] text-sm">
+            Analytics Dashboard - Real-time Insights
+          </div>
+        );
       case 2:
-        return <div className="text-[#828387] text-sm">Data Visualization - Charts and Metrics</div>
+        return (
+          <div className="text-[#828387] text-sm">
+            Data Visualization - Charts and Metrics
+          </div>
+        );
       default:
-        return <div className="text-[#828387] text-sm">Customer Subscription Status and Details</div>
+        return (
+          <div className="text-[#828387] text-sm">
+            Customer Subscription Status and Details
+          </div>
+        );
     }
-  }
+  };
 
   return (
     <div className="w-full min-h-screen relative bg-[#F7F5F3] overflow-x-hidden flex flex-col justify-start items-center">
@@ -119,7 +137,10 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="h-6 sm:h-7 md:h-8 flex justify-start items-start gap-2 sm:gap-3">
-                  <a href="/login" className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center no-underline hover:bg-gray-50 transition-colors">
+                  <a
+                    href="/login"
+                    className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center no-underline hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex flex-col justify-center text-[#37322F] text-xs md:text-[13px] font-medium leading-5 font-sans">
                       Log in
                     </div>
@@ -138,7 +159,8 @@ export default function LandingPage() {
                     by Up to 30%
                   </div>
                   <div className="w-full max-w-[506.08px] lg:w-[506.08px] text-center flex justify-center flex-col text-[rgba(55,50,47,0.80)] sm:text-lg md:text-xl leading-[1.4] sm:leading-[1.45] md:leading-[1.5] lg:leading-7 font-sans px-2 sm:px-4 md:px-0 lg:text-lg font-medium text-sm">
-                    Data-driven waste management analysis for multifamily properties.
+                    Data-driven waste management analysis for multifamily
+                    properties.
                     <br className="hidden sm:block" />
                     Upload invoices, get insights in minutes.
                   </div>
@@ -147,15 +169,29 @@ export default function LandingPage() {
 
               <div className="w-full max-w-[497px] lg:w-[497px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12">
                 <div className="backdrop-blur-[8.25px] flex justify-start items-center gap-4 flex-col sm:flex-row">
-                  <a href="/login" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#22C55E] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center hover:bg-[#16A34A] transition-colors cursor-pointer no-underline">
+                  <a
+                    href="/login"
+                    className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#22C55E] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center hover:bg-[#16A34A] transition-colors cursor-pointer no-underline"
+                  >
                     <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0.1)] to-[rgba(0,0,0,0.05)] mix-blend-multiply"></div>
                     <div className="flex flex-col justify-center text-white text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
                       START FREE ANALYSIS →
                     </div>
                   </a>
-                  <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-transparent border-2 border-[#37322F] overflow-hidden rounded-full flex justify-center items-center hover:bg-[rgba(55,50,47,0.05)] transition-colors cursor-pointer no-underline">
+                  <a
+                    href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-transparent border-2 border-[#37322F] overflow-hidden rounded-full flex justify-center items-center hover:bg-[rgba(55,50,47,0.05)] transition-colors cursor-pointer no-underline"
+                  >
                     <div className="flex flex-row justify-center items-center gap-2 text-[#37322F] text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
                         <path d="M3 2L13 8L3 14V2Z" />
                       </svg>
                       Watch 2-Min Demo
@@ -184,8 +220,11 @@ export default function LandingPage() {
                       <div className="relative w-full h-full overflow-hidden">
                         {/* Product Image 1 - Plan your schedules */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                            }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                            activeCard === 0
+                              ? "opacity-100 scale-100 blur-0"
+                              : "opacity-0 scale-95 blur-sm"
+                          }`}
                         >
                           <img
                             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dsadsadsa.jpg-xTHS4hGwCWp2H5bTj8np6DXZUyrxX7.jpeg"
@@ -196,8 +235,11 @@ export default function LandingPage() {
 
                         {/* Product Image 2 - Data to insights */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                            }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                            activeCard === 1
+                              ? "opacity-100 scale-100 blur-0"
+                              : "opacity-0 scale-95 blur-sm"
+                          }`}
                         >
                           <img
                             src="/analytics-dashboard-with-charts-graphs-and-data-vi.jpg"
@@ -208,8 +250,11 @@ export default function LandingPage() {
 
                         {/* Product Image 3 - Data visualization */}
                         <div
-                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                            }`}
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                            activeCard === 2
+                              ? "opacity-100 scale-100 blur-0"
+                              : "opacity-0 scale-95 blur-sm"
+                          }`}
                         >
                           <img
                             src="/data-visualization-dashboard-with-interactive-char.jpg"
@@ -280,19 +325,101 @@ export default function LandingPage() {
                   <div className="w-full max-w-[586px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4 shadow-none">
                     <Badge
                       icon={
-                        <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect x="1" y="3" width="4" height="6" stroke="#37322F" strokeWidth="1" fill="none" />
-                          <rect x="7" y="1" width="4" height="8" stroke="#37322F" strokeWidth="1" fill="none" />
-                          <rect x="2" y="4" width="1" height="1" fill="#37322F" />
-                          <rect x="3.5" y="4" width="1" height="1" fill="#37322F" />
-                          <rect x="2" y="5.5" width="1" height="1" fill="#37322F" />
-                          <rect x="3.5" y="5.5" width="1" height="1" fill="#37322F" />
-                          <rect x="8" y="2" width="1" height="1" fill="#37322F" />
-                          <rect x="9.5" y="2" width="1" height="1" fill="#37322F" />
-                          <rect x="8" y="3.5" width="1" height="1" fill="#37322F" />
-                          <rect x="9.5" y="3.5" width="1" height="1" fill="#37322F" />
-                          <rect x="8" y="5" width="1" height="1" fill="#37322F" />
-                          <rect x="9.5" y="5" width="1" height="1" fill="#37322F" />
+                        <svg
+                          width="12"
+                          height="10"
+                          viewBox="0 0 12 10"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <rect
+                            x="1"
+                            y="3"
+                            width="4"
+                            height="6"
+                            stroke="#37322F"
+                            strokeWidth="1"
+                            fill="none"
+                          />
+                          <rect
+                            x="7"
+                            y="1"
+                            width="4"
+                            height="8"
+                            stroke="#37322F"
+                            strokeWidth="1"
+                            fill="none"
+                          />
+                          <rect
+                            x="2"
+                            y="4"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="3.5"
+                            y="4"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="2"
+                            y="5.5"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="3.5"
+                            y="5.5"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="8"
+                            y="2"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="9.5"
+                            y="2"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="8"
+                            y="3.5"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="9.5"
+                            y="3.5"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="8"
+                            y="5"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
+                          <rect
+                            x="9.5"
+                            y="5"
+                            width="1"
+                            height="1"
+                            fill="#37322F"
+                          />
                         </svg>
                       }
                       text="Social Proof"
@@ -303,16 +430,26 @@ export default function LandingPage() {
                     <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
                       <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12 mt-4">
                         <div className="flex flex-col items-center">
-                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">$2.4M+</div>
+                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">
+                            $2.4M+
+                          </div>
                           <div className="text-sm text-[#605A57]">Saved</div>
                         </div>
                         <div className="flex flex-col items-center">
-                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">850+</div>
-                          <div className="text-sm text-[#605A57]">Properties Analyzed</div>
+                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">
+                            850+
+                          </div>
+                          <div className="text-sm text-[#605A57]">
+                            Properties Analyzed
+                          </div>
                         </div>
                         <div className="flex flex-col items-center">
-                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">95%</div>
-                          <div className="text-sm text-[#605A57]">Client Satisfaction</div>
+                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">
+                            95%
+                          </div>
+                          <div className="text-sm text-[#605A57]">
+                            Client Satisfaction
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -336,13 +473,13 @@ export default function LandingPage() {
                   <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-0 border-l border-r border-[rgba(55,50,47,0.12)]">
                     {/* Logo Grid - Responsive grid */}
                     {Array.from({ length: 8 }).map((_, index) => {
-                      const isMobileFirstColumn = index % 2 === 0
-                      const isMobileLastColumn = index % 2 === 1
-                      const isDesktopFirstColumn = index % 4 === 0
-                      const isDesktopLastColumn = index % 4 === 3
-                      const isMobileBottomRow = index >= 6
-                      const isDesktopTopRow = index < 4
-                      const isDesktopBottomRow = index >= 4
+                      const isMobileFirstColumn = index % 2 === 0;
+                      const isMobileLastColumn = index % 2 === 1;
+                      const isDesktopFirstColumn = index % 4 === 0;
+                      const isDesktopLastColumn = index % 4 === 3;
+                      const isMobileBottomRow = index >= 6;
+                      const isDesktopTopRow = index < 4;
+                      const isDesktopBottomRow = index >= 4;
 
                       return (
                         <div
@@ -362,13 +499,17 @@ export default function LandingPage() {
                           `}
                         >
                           <div className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 relative shadow-[0px_-4px_8px_rgba(255,255,255,0.64)_inset] overflow-hidden rounded-full">
-                            <img src="/horizon-icon.svg" alt="Horizon" className="w-full h-full object-contain" />
+                            <img
+                              src="/horizon-icon.svg"
+                              alt="Horizon"
+                              className="w-full h-full object-contain"
+                            />
                           </div>
                           <div className="text-center flex justify-center flex-col text-[#37322F] text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl font-medium leading-tight md:leading-9 font-sans">
                             Acute
                           </div>
                         </div>
-                      )
+                      );
                     })}
                   </div>
 
@@ -393,11 +534,49 @@ export default function LandingPage() {
                   <div className="w-full max-w-[616px] lg:w-[616px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4 shadow-none">
                     <Badge
                       icon={
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect x="1" y="1" width="4" height="4" stroke="#37322F" strokeWidth="1" fill="none" />
-                          <rect x="7" y="1" width="4" height="4" stroke="#37322F" strokeWidth="1" fill="none" />
-                          <rect x="1" y="7" width="4" height="4" stroke="#37322F" strokeWidth="1" fill="none" />
-                          <rect x="7" y="7" width="4" height="4" stroke="#37322F" strokeWidth="1" fill="none" />
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <rect
+                            x="1"
+                            y="1"
+                            width="4"
+                            height="4"
+                            stroke="#37322F"
+                            strokeWidth="1"
+                            fill="none"
+                          />
+                          <rect
+                            x="7"
+                            y="1"
+                            width="4"
+                            height="4"
+                            stroke="#37322F"
+                            strokeWidth="1"
+                            fill="none"
+                          />
+                          <rect
+                            x="1"
+                            y="7"
+                            width="4"
+                            height="4"
+                            stroke="#37322F"
+                            strokeWidth="1"
+                            fill="none"
+                          />
+                          <rect
+                            x="7"
+                            y="7"
+                            width="4"
+                            height="4"
+                            stroke="#37322F"
+                            strokeWidth="1"
+                            fill="none"
+                          />
                         </svg>
                       }
                       text="How It Works"
@@ -432,21 +611,37 @@ export default function LandingPage() {
                     <div className="border-b border-r-0 md:border-r border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">1</div>
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">
+                            1
+                          </div>
                           <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
                             Upload Files
                           </h3>
                         </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Drag and drop invoices, contracts, or haul logs. We support PDF, Excel, and CSV formats.
+                          Drag and drop invoices, contracts, or haul logs. We
+                          support PDF, Excel, and CSV formats.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg border-2 border-dashed border-[rgba(55,50,47,0.2)] bg-white flex items-center justify-center flex-col gap-4">
-                        <svg className="w-16 h-16 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        <svg
+                          className="w-16 h-16 text-[#22C55E]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
                         </svg>
                         <div className="text-[#605A57] text-sm text-center">
-                          <span className="font-medium text-[#22C55E]">Click to browse</span> or drag files here
+                          <span className="font-medium text-[#22C55E]">
+                            Click to browse
+                          </span>{" "}
+                          or drag files here
                         </div>
                       </div>
                     </div>
@@ -455,31 +650,40 @@ export default function LandingPage() {
                     <div className="border-b border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">2</div>
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">
+                            2
+                          </div>
                           <h3 className="text-[#37322F] font-semibold leading-tight font-sans text-lg sm:text-xl">
                             Enter Property Info
                           </h3>
                         </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Property name, units, location, and equipment type help us tailor the analysis.
+                          Property name, units, location, and equipment type
+                          help us tailor the analysis.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg bg-white p-6 flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
-                          <div className="text-xs font-medium text-[#605A57]">Property Name</div>
+                          <div className="text-xs font-medium text-[#605A57]">
+                            Property Name
+                          </div>
                           <div className="h-10 rounded border border-[rgba(55,50,47,0.2)] bg-[#F7F5F3] px-3 flex items-center text-sm text-[#37322F]">
                             Columbia Square Apartments
                           </div>
                         </div>
                         <div className="flex gap-3">
                           <div className="flex-1 flex flex-col gap-2">
-                            <div className="text-xs font-medium text-[#605A57]">Units</div>
+                            <div className="text-xs font-medium text-[#605A57]">
+                              Units
+                            </div>
                             <div className="h-10 rounded border border-[rgba(55,50,47,0.2)] bg-[#F7F5F3] px-3 flex items-center text-sm text-[#37322F]">
                               308
                             </div>
                           </div>
                           <div className="flex-1 flex flex-col gap-2">
-                            <div className="text-xs font-medium text-[#605A57]">City</div>
+                            <div className="text-xs font-medium text-[#605A57]">
+                              City
+                            </div>
                             <div className="h-10 rounded border border-[rgba(55,50,47,0.2)] bg-[#F7F5F3] px-3 flex items-center text-sm text-[#37322F]">
                               McKinney, TX
                             </div>
@@ -492,33 +696,50 @@ export default function LandingPage() {
                     <div className="border-r-0 md:border-r border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6 bg-transparent">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">3</div>
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">
+                            3
+                          </div>
                           <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
                             AI Analysis
                           </h3>
                         </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Claude Vision extracts data, analyzes patterns, and calculates savings opportunities.
+                          Claude Vision extracts data, analyzes patterns, and
+                          calculates savings opportunities.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg bg-white p-6 flex flex-col gap-3">
                         <div className="flex items-center gap-3">
                           <div className="w-6 h-6 rounded-full bg-[#22C55E] flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            <svg
+                              className="w-4 h-4 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </div>
-                          <span className="text-sm text-[#37322F]">Processing Invoices</span>
+                          <span className="text-sm text-[#37322F]">
+                            Processing Invoices
+                          </span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="w-6 h-6 rounded-full border-2 border-[#22C55E] flex items-center justify-center">
                             <div className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></div>
                           </div>
-                          <span className="text-sm text-[#37322F]">Regulatory Research</span>
+                          <span className="text-sm text-[#37322F]">
+                            Regulatory Research
+                          </span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="w-6 h-6 rounded-full border-2 border-[rgba(55,50,47,0.2)]"></div>
-                          <span className="text-sm text-[#605A57]">Generating Reports</span>
+                          <span className="text-sm text-[#605A57]">
+                            Generating Reports
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -527,32 +748,59 @@ export default function LandingPage() {
                     <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">4</div>
+                          <div className="w-10 h-10 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-xl font-bold">
+                            4
+                          </div>
                           <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
                             Download Reports
                           </h3>
                         </div>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Get Excel workbooks and interactive HTML dashboards with actionable recommendations.
+                          Get Excel workbooks and interactive HTML dashboards
+                          with actionable recommendations.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg bg-white p-6 flex flex-col gap-4">
                         <div className="flex items-center gap-3 p-3 rounded border border-[rgba(55,50,47,0.1)] hover:border-[#22C55E] transition-colors cursor-pointer">
-                          <svg className="w-8 h-8 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                          <svg
+                            className="w-8 h-8 text-[#22C55E]"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-[#37322F]">Excel Workbook</div>
-                            <div className="text-xs text-[#605A57]">Complete analysis spreadsheet</div>
+                            <div className="text-sm font-medium text-[#37322F]">
+                              Excel Workbook
+                            </div>
+                            <div className="text-xs text-[#605A57]">
+                              Complete analysis spreadsheet
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 p-3 rounded border border-[rgba(55,50,47,0.1)] hover:border-[#22C55E] transition-colors cursor-pointer">
-                          <svg className="w-8 h-8 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                          <svg
+                            className="w-8 h-8 text-[#22C55E]"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-[#37322F]">HTML Dashboard</div>
-                            <div className="text-xs text-[#605A57]">Interactive charts & graphs</div>
+                            <div className="text-sm font-medium text-[#37322F]">
+                              HTML Dashboard
+                            </div>
+                            <div className="text-xs text-[#605A57]">
+                              Interactive charts & graphs
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -595,7 +843,7 @@ export default function LandingPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // FeatureCard component definition inline to fix import error
@@ -606,18 +854,19 @@ function FeatureCard({
   progress,
   onClick,
 }: {
-  title: string
-  description: string
-  isActive: boolean
-  progress: number
-  onClick: () => void
+  title: string;
+  description: string;
+  isActive: boolean;
+  progress: number;
+  onClick: () => void;
 }) {
   return (
     <div
-      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${isActive
-        ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
-        : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
-        }`}
+      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${
+        isActive
+          ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
+          : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
+      }`}
       onClick={onClick}
     >
       {isActive && (
@@ -636,5 +885,5 @@ function FeatureCard({
         {description}
       </div>
     </div>
-  )
+  );
 }

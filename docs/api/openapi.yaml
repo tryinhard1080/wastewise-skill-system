@@ -406,7 +406,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error: Authentication required
             code: UNAUTHORIZED
@@ -415,7 +415,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error: Insufficient permissions
             code: FORBIDDEN
@@ -424,7 +424,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error: Resource not found
             code: NOT_FOUND
@@ -433,25 +433,25 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ValidationError'
+            $ref: "#/components/schemas/ValidationError"
     RateLimitError:
       description: Rate limit exceeded
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error: Rate limit exceeded
             code: RATE_LIMIT_EXCEEDED
             details:
               limit: 100
-              reset: '2025-01-15T12:00:00Z'
+              reset: "2025-01-15T12:00:00Z"
     InternalServerError:
       description: Internal server error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error: Internal server error
             code: INTERNAL_ERROR
@@ -563,7 +563,7 @@ paths:
                   jobType: invoice_extraction
                   priority: 3
       responses:
-        '201':
+        "201":
           description: Job created successfully
           content:
             application/json:
@@ -586,19 +586,19 @@ paths:
                 jobId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 status: pending
                 message: Analysis job created. Poll /api/jobs/a1b2c3d4-e5f6-7890-abcd-ef1234567890 for status updates.
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
           description: Project not found or access denied
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 error: Project not found or access denied
-        '429':
+        "429":
           description: Rate limit exceeded (10 requests/minute)
           headers:
             Retry-After:
@@ -629,8 +629,8 @@ paths:
               example:
                 error: Rate limit exceeded. Please try again later.
                 retryAfter: 45
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /api/health:
     get:
       summary: API health check
@@ -639,7 +639,7 @@ paths:
         - Health
       security: []
       responses:
-        '200':
+        "200":
           description: API is healthy
           content:
             application/json:
@@ -663,7 +663,7 @@ paths:
         - Health
       security: []
       responses:
-        '200':
+        "200":
           description: Worker health status
           content:
             application/json:
@@ -704,14 +704,14 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/JobIdParam'
+        - $ref: "#/components/parameters/JobIdParam"
       responses:
-        '200':
+        "200":
           description: Job status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalysisJob'
+                $ref: "#/components/schemas/AnalysisJob"
               examples:
                 pending:
                   summary: Job pending in queue
@@ -723,7 +723,7 @@ paths:
                     status: pending
                     progress_percent: 0
                     current_step: Waiting in queue
-                    created_at: '2025-01-15T10:00:00Z'
+                    created_at: "2025-01-15T10:00:00Z"
                 processing:
                   summary: Job in progress
                   value:
@@ -734,8 +734,8 @@ paths:
                     status: processing
                     progress_percent: 45
                     current_step: Extracting invoice data (3/6 files)
-                    started_at: '2025-01-15T10:01:00Z'
-                    created_at: '2025-01-15T10:00:00Z'
+                    started_at: "2025-01-15T10:01:00Z"
+                    created_at: "2025-01-15T10:00:00Z"
                 completed:
                   summary: Job completed successfully
                   value:
@@ -746,8 +746,8 @@ paths:
                     status: completed
                     progress_percent: 100
                     current_step: Completed
-                    started_at: '2025-01-15T10:01:00Z'
-                    completed_at: '2025-01-15T10:04:30Z'
+                    started_at: "2025-01-15T10:01:00Z"
+                    completed_at: "2025-01-15T10:04:30Z"
                     result_data:
                       yardsPerDoor: 0.12
                       costPerDoor: 18.5
@@ -758,7 +758,7 @@ paths:
                       input_tokens: 15000
                       output_tokens: 3000
                       total_cost: 0.45
-                    created_at: '2025-01-15T10:00:00Z'
+                    created_at: "2025-01-15T10:00:00Z"
                 failed:
                   summary: Job failed with error
                   value:
@@ -769,17 +769,17 @@ paths:
                     status: failed
                     progress_percent: 30
                     current_step: Failed during invoice extraction
-                    error_message: 'Invalid invoice format: missing required fields'
+                    error_message: "Invalid invoice format: missing required fields"
                     error_code: EXTRACTION_ERROR
-                    started_at: '2025-01-15T10:01:00Z'
-                    completed_at: '2025-01-15T10:02:00Z'
-                    created_at: '2025-01-15T10:00:00Z'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    started_at: "2025-01-15T10:01:00Z"
+                    completed_at: "2025-01-15T10:02:00Z"
+                    created_at: "2025-01-15T10:00:00Z"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /api/jobs:
     get:
       summary: List user's jobs
@@ -789,8 +789,8 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
         - name: status
           in: query
           description: Filter by job status
@@ -812,37 +812,37 @@ paths:
               - complete_analysis
               - report_generation
       responses:
-        '200':
+        "200":
           description: Jobs list retrieved successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - $ref: "#/components/schemas/PaginatedResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/AnalysisJob'
+                          $ref: "#/components/schemas/AnalysisJob"
               example:
                 data:
                   - id: job1
                     status: completed
                     job_type: complete_analysis
-                    created_at: '2025-01-15T10:00:00Z'
+                    created_at: "2025-01-15T10:00:00Z"
                   - id: job2
                     status: processing
                     job_type: invoice_extraction
-                    created_at: '2025-01-15T11:00:00Z'
+                    created_at: "2025-01-15T11:00:00Z"
                 total: 15
                 page: 1
                 limit: 20
                 totalPages: 1
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /api/projects/{id}/analyze:
     post:
       summary: Analyze specific project
@@ -853,7 +853,7 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/ProjectIdParam'
+        - $ref: "#/components/parameters/ProjectIdParam"
       requestBody:
         content:
           application/json:
@@ -869,7 +869,7 @@ paths:
                   description: Generate Excel and HTML reports
                   default: true
       responses:
-        '201':
+        "201":
           description: Analysis job created
           content:
             application/json:
@@ -882,10 +882,10 @@ paths:
                   status:
                     type: string
                     example: pending
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   /api/admin/jobs:
     get:
       summary: List all jobs (admin)
@@ -895,8 +895,8 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
         - name: status
           in: query
           schema:
@@ -913,23 +913,23 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Jobs list retrieved
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - $ref: "#/components/schemas/PaginatedResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/AnalysisJob'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                          $ref: "#/components/schemas/AnalysisJob"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/jobs/{id}:
     get:
       summary: Get job details (admin)
@@ -939,20 +939,20 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/JobIdParam'
+        - $ref: "#/components/parameters/JobIdParam"
       responses:
-        '200':
+        "200":
           description: Job details retrieved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalysisJob'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/AnalysisJob"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   /api/admin/jobs/{id}/retry:
     post:
       summary: Retry failed job (admin)
@@ -962,9 +962,9 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/JobIdParam'
+        - $ref: "#/components/parameters/JobIdParam"
       responses:
-        '201':
+        "201":
           description: Retry job created
           content:
             application/json:
@@ -980,12 +980,12 @@ paths:
                   status:
                     type: string
                     example: pending
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   /api/admin/jobs/monitoring:
     get:
       summary: Get job queue metrics (admin)
@@ -995,7 +995,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Queue metrics retrieved
           content:
             application/json:
@@ -1049,10 +1049,10 @@ paths:
                 performance:
                   jobs_per_minute: 0.5
                   avg_wait_time_seconds: 15.3
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/jobs/stats:
     get:
       summary: Get job statistics (admin)
@@ -1074,7 +1074,7 @@ paths:
               - month
             default: day
       responses:
-        '200':
+        "200":
           description: Job statistics retrieved
           content:
             application/json:
@@ -1128,10 +1128,10 @@ paths:
                     count: 5
                   - hour: 1
                     count: 3
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/workers/health:
     get:
       summary: Get worker health status (admin)
@@ -1141,7 +1141,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Worker health retrieved
           content:
             application/json:
@@ -1186,17 +1186,17 @@ paths:
                     current_job_id: job123
                     uptime_seconds: 3600
                     jobs_processed: 25
-                    last_heartbeat: '2025-01-15T10:00:00Z'
+                    last_heartbeat: "2025-01-15T10:00:00Z"
                   - id: worker-2
                     status: idle
                     current_job_id: null
                     uptime_seconds: 3600
                     jobs_processed: 30
-                    last_heartbeat: '2025-01-15T10:00:00Z'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                    last_heartbeat: "2025-01-15T10:00:00Z"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/system/health:
     get:
       summary: Get system health (admin)
@@ -1206,16 +1206,16 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: System health retrieved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SystemHealth'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                $ref: "#/components/schemas/SystemHealth"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/system/metrics:
     get:
       summary: Get system metrics (admin)
@@ -1225,7 +1225,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: System metrics retrieved
           content:
             application/json:
@@ -1274,7 +1274,7 @@ paths:
                       total_cost_last_hour:
                         type: number
               example:
-                timestamp: '2025-01-15T10:00:00Z'
+                timestamp: "2025-01-15T10:00:00Z"
                 api:
                   requests_per_minute: 45.2
                   avg_response_time_ms: 125.5
@@ -1291,10 +1291,10 @@ paths:
                   requests_last_hour: 120
                   total_tokens_last_hour: 250000
                   total_cost_last_hour: 7.5
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/users:
     get:
       summary: List all users (admin)
@@ -1304,8 +1304,8 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
         - name: search
           in: query
           description: Search by email or name
@@ -1320,23 +1320,23 @@ paths:
               - admin
               - user
       responses:
-        '200':
+        "200":
           description: Users list retrieved
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - $ref: "#/components/schemas/PaginatedResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                          $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/users/{id}:
     get:
       summary: Get user details (admin)
@@ -1353,13 +1353,13 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: User details retrieved
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/User'
+                  - $ref: "#/components/schemas/User"
                   - type: object
                     properties:
                       projects_count:
@@ -1368,12 +1368,12 @@ paths:
                         type: integer
                       total_ai_cost:
                         type: number
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
     patch:
       summary: Update user (admin)
       description: Update user role or status. Admin only.
@@ -1402,18 +1402,18 @@ paths:
                 is_active:
                   type: boolean
       responses:
-        '200':
+        "200":
           description: User updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   /api/admin/skills:
     get:
       summary: List all skills (admin)
@@ -1423,7 +1423,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Skills list retrieved
           content:
             application/json:
@@ -1459,10 +1459,10 @@ paths:
                       dumpsterYPD: 4.33
                     thresholds:
                       optimizationThreshold: 6
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /api/admin/skills/{id}:
     patch:
       summary: Update skill configuration (admin)
@@ -1494,7 +1494,7 @@ paths:
                   type: boolean
                   description: Enable/disable skill
       responses:
-        '200':
+        "200":
           description: Skill updated successfully
           content:
             application/json:
@@ -1511,12 +1511,12 @@ paths:
                     type: object
                   thresholds:
                     type: object
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   /api/admin/audit:
     get:
       summary: Get audit log (admin)
@@ -1526,8 +1526,8 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
         - name: action
           in: query
           description: Filter by action type
@@ -1540,13 +1540,13 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Audit log retrieved
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - $ref: "#/components/schemas/PaginatedResponse"
                   - type: object
                     properties:
                       data:
@@ -1571,7 +1571,7 @@ paths:
                             timestamp:
                               type: string
                               format: date-time
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"

@@ -16,63 +16,74 @@ import type {
   ProjectRow,
   InvoiceDataRow,
   HaulLogRow,
-} from '@/lib/skills/types'
-import { logger } from '@/lib/observability/logger'
+} from "@/lib/skills/types";
+import { logger } from "@/lib/observability/logger";
 
 export interface HtmlGeneratorInput {
-  result: WasteWiseAnalyticsCompleteResult
-  project: ProjectRow
-  invoices: InvoiceDataRow[]
-  haulLogs?: HaulLogRow[]
+  result: WasteWiseAnalyticsCompleteResult;
+  project: ProjectRow;
+  invoices: InvoiceDataRow[];
+  haulLogs?: HaulLogRow[];
 }
 
 export interface HtmlGeneratorOutput {
-  html: string
-  size: number
-  filename: string
+  html: string;
+  size: number;
+  filename: string;
   metadata: {
-    generatedAt: string
-    tabsIncluded: string[]
-  }
+    generatedAt: string;
+    tabsIncluded: string[];
+  };
 }
 
 /**
  * Generate interactive HTML dashboard
  */
 export async function generateHtmlDashboard(
-  input: HtmlGeneratorInput
+  input: HtmlGeneratorInput,
 ): Promise<HtmlGeneratorOutput> {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
-  logger.info('Starting HTML dashboard generation', {
+  logger.info("Starting HTML dashboard generation", {
     projectId: input.project.id,
     propertyName: input.project.property_name,
-  })
+  });
 
   try {
-    const tabsIncluded: string[] = ['Dashboard', 'Expense Analysis', 'Optimization']
+    const tabsIncluded: string[] = [
+      "Dashboard",
+      "Expense Analysis",
+      "Optimization",
+    ];
 
     // Add haul log tab for compactor projects
-    if (input.project.equipment_type === 'COMPACTOR' && input.haulLogs && input.haulLogs.length > 0) {
-      tabsIncluded.push('Haul Log')
+    if (
+      input.project.equipment_type === "COMPACTOR" &&
+      input.haulLogs &&
+      input.haulLogs.length > 0
+    ) {
+      tabsIncluded.push("Haul Log");
     }
 
     // Add contract tab if available
-    if (input.result.contractTerms && input.result.contractTerms.contracts.length > 0) {
-      tabsIncluded.push('Contract Terms')
+    if (
+      input.result.contractTerms &&
+      input.result.contractTerms.contracts.length > 0
+    ) {
+      tabsIncluded.push("Contract Terms");
     }
 
     // Generate HTML content
-    const html = generateHtmlContent(input, tabsIncluded)
+    const html = generateHtmlContent(input, tabsIncluded);
 
-    const executionTime = Date.now() - startTime
-    const filename = generateFilename(input.project)
+    const executionTime = Date.now() - startTime;
+    const filename = generateFilename(input.project);
 
-    logger.info('HTML dashboard generation complete', {
+    logger.info("HTML dashboard generation complete", {
       projectId: input.project.id,
       size: html.length,
       executionTime,
-    })
+    });
 
     return {
       html,
@@ -82,22 +93,25 @@ export async function generateHtmlDashboard(
         generatedAt: new Date().toISOString(),
         tabsIncluded,
       },
-    }
+    };
   } catch (error) {
-    logger.error('HTML dashboard generation failed', error as Error, {
+    logger.error("HTML dashboard generation failed", error as Error, {
       projectId: input.project.id,
-    })
+    });
     throw new Error(
-      `Failed to generate HTML dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+      `Failed to generate HTML dashboard: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 }
 
 /**
  * Generate complete HTML content
  */
-function generateHtmlContent(input: HtmlGeneratorInput, tabsIncluded: string[]): string {
-  const { result, project, invoices, haulLogs } = input
+function generateHtmlContent(
+  input: HtmlGeneratorInput,
+  tabsIncluded: string[],
+): string {
+  const { result, project, invoices, haulLogs } = input;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -121,11 +135,14 @@ function generateHtmlContent(input: HtmlGeneratorInput, tabsIncluded: string[]):
             <div class="header-content">
                 <h1>WasteWise Analysis</h1>
                 <p class="subtitle">${escapeHtml(project.property_name)}</p>
-                <p class="date">Generated on ${new Date().toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}</p>
+                <p class="date">Generated on ${new Date().toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  },
+                )}</p>
             </div>
             <div class="header-actions">
                 <button onclick="window.print()" class="btn-print">Print Report</button>
@@ -137,19 +154,19 @@ function generateHtmlContent(input: HtmlGeneratorInput, tabsIncluded: string[]):
             ${tabsIncluded
               .map(
                 (tab, index) => `
-                <button class="tab-btn ${index === 0 ? 'active' : ''}" onclick="showTab('${tab.toLowerCase().replace(/\s+/g, '-')}')">${tab}</button>
-            `
+                <button class="tab-btn ${index === 0 ? "active" : ""}" onclick="showTab('${tab.toLowerCase().replace(/\s+/g, "-")}')">${tab}</button>
+            `,
               )
-              .join('')}
+              .join("")}
         </nav>
 
         <!-- Tab Content -->
         <div class="tab-content">
             ${generateDashboardTab(result, project)}
             ${generateExpenseAnalysisTab(result, invoices)}
-            ${input.project.equipment_type === 'COMPACTOR' && haulLogs && haulLogs.length > 0 ? generateHaulLogTab(haulLogs, project) : ''}
+            ${input.project.equipment_type === "COMPACTOR" && haulLogs && haulLogs.length > 0 ? generateHaulLogTab(haulLogs, project) : ""}
             ${generateOptimizationTab(result)}
-            ${result.contractTerms && result.contractTerms.contracts.length > 0 ? generateContractTermsTab(result.contractTerms) : ''}
+            ${result.contractTerms && result.contractTerms.contracts.length > 0 ? generateContractTermsTab(result.contractTerms) : ""}
         </div>
 
         <!-- Footer -->
@@ -163,7 +180,7 @@ function generateHtmlContent(input: HtmlGeneratorInput, tabsIncluded: string[]):
         ${generateJavaScript(result, invoices, haulLogs || [])}
     </script>
 </body>
-</html>`
+</html>`;
 }
 
 /**
@@ -537,15 +554,18 @@ function generateCSS(): string {
                 grid-template-columns: 1fr;
             }
         }
-    `
+    `;
 }
 
 /**
  * Generate Dashboard tab (Executive Summary)
  */
-function generateDashboardTab(result: WasteWiseAnalyticsCompleteResult, project: ProjectRow): string {
-  const costPerDoor = result.summary.currentMonthlyCost / project.units
-  const yardsPerDoor = 2.0 // Placeholder - would calculate from actual data
+function generateDashboardTab(
+  result: WasteWiseAnalyticsCompleteResult,
+  project: ProjectRow,
+): string {
+  const costPerDoor = result.summary.currentMonthlyCost / project.units;
+  const yardsPerDoor = 2.0; // Placeholder - would calculate from actual data
 
   return `
         <div id="dashboard" class="tab-panel active">
@@ -574,8 +594,8 @@ function generateDashboardTab(result: WasteWiseAnalyticsCompleteResult, project:
                         <tbody>
                             <tr><td><strong>Property</strong></td><td>${escapeHtml(project.property_name)}</td></tr>
                             <tr><td><strong>Units</strong></td><td>${project.units}</td></tr>
-                            <tr><td><strong>Type</strong></td><td>${escapeHtml(project.property_type || 'N/A')}</td></tr>
-                            <tr><td><strong>Equipment</strong></td><td>${escapeHtml(project.equipment_type || 'N/A')}</td></tr>
+                            <tr><td><strong>Type</strong></td><td>${escapeHtml(project.property_type || "N/A")}</td></tr>
+                            <tr><td><strong>Equipment</strong></td><td>${escapeHtml(project.equipment_type || "N/A")}</td></tr>
                             <tr><td><strong>Analysis Period</strong></td><td>${result.summary.dateRange.start} to ${result.summary.dateRange.end}</td></tr>
                         </tbody>
                     </table>
@@ -597,18 +617,18 @@ function generateDashboardTab(result: WasteWiseAnalyticsCompleteResult, project:
                   .slice(0, 3)
                   .map(
                     (rec) => `
-                    <div class="recommendation ${rec.priority === 1 ? 'high-priority' : ''}">
+                    <div class="recommendation ${rec.priority === 1 ? "high-priority" : ""}">
                         <div class="recommendation-title">${escapeHtml(rec.title)}</div>
                         <div class="recommendation-description">${escapeHtml(rec.description)}</div>
-                        ${rec.savings ? `<div class="recommendation-savings">Annual Savings: $${formatNumber(rec.savings)}</div>` : ''}
+                        ${rec.savings ? `<div class="recommendation-savings">Annual Savings: $${formatNumber(rec.savings)}</div>` : ""}
                     </div>
-                `
+                `,
                   )
-                  .join('')}
-                ${result.recommendations.filter((r) => r.recommend).length === 0 ? '<p>No optimization recommendations at this time.</p>' : ''}
+                  .join("")}
+                ${result.recommendations.filter((r) => r.recommend).length === 0 ? "<p>No optimization recommendations at this time.</p>" : ""}
             </div>
         </div>
-    `
+    `;
 }
 
 /**
@@ -616,7 +636,7 @@ function generateDashboardTab(result: WasteWiseAnalyticsCompleteResult, project:
  */
 function generateExpenseAnalysisTab(
   result: WasteWiseAnalyticsCompleteResult,
-  invoices: InvoiceDataRow[]
+  invoices: InvoiceDataRow[],
 ): string {
   return `
         <div id="expense-analysis" class="tab-panel">
@@ -663,35 +683,42 @@ function generateExpenseAnalysisTab(
                         </thead>
                         <tbody>
                             ${invoices
-                              .sort((a, b) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime())
+                              .sort(
+                                (a, b) =>
+                                  new Date(b.invoice_date).getTime() -
+                                  new Date(a.invoice_date).getTime(),
+                              )
                               .map(
                                 (inv) => `
                                 <tr>
                                     <td>${new Date(inv.invoice_date).toLocaleDateString()}</td>
-                                    <td>${escapeHtml(inv.invoice_number || 'N/A')}</td>
+                                    <td>${escapeHtml(inv.invoice_number || "N/A")}</td>
                                     <td>${escapeHtml(inv.vendor_name)}</td>
-                                    <td>${inv.tonnage ? formatNumber(inv.tonnage) : '-'}</td>
-                                    <td>${inv.hauls || '-'}</td>
+                                    <td>${inv.tonnage ? formatNumber(inv.tonnage) : "-"}</td>
+                                    <td>${inv.hauls || "-"}</td>
                                     <td>$${formatNumber(inv.total_amount)}</td>
                                 </tr>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    `
+    `;
 }
 
 /**
  * Generate Haul Log tab (compactor only)
  */
-function generateHaulLogTab(haulLogs: HaulLogRow[], project: ProjectRow): string {
+function generateHaulLogTab(
+  haulLogs: HaulLogRow[],
+  project: ProjectRow,
+): string {
   const avgTonnage =
-    haulLogs.reduce((sum, h) => sum + (h.tonnage || 0), 0) / haulLogs.length
-  const targetCapacity = 8.5
+    haulLogs.reduce((sum, h) => sum + (h.tonnage || 0), 0) / haulLogs.length;
+  const targetCapacity = 8.5;
 
   return `
         <div id="haul-log" class="tab-panel">
@@ -700,7 +727,7 @@ function generateHaulLogTab(haulLogs: HaulLogRow[], project: ProjectRow): string
                     <div class="metric-label">Total Hauls</div>
                     <div class="metric-value">${haulLogs.length}</div>
                 </div>
-                <div class="metric-card ${avgTonnage >= 6.0 ? 'success' : 'warning'}">
+                <div class="metric-card ${avgTonnage >= 6.0 ? "success" : "warning"}">
                     <div class="metric-label">Avg Tons/Haul</div>
                     <div class="metric-value">${formatNumber(avgTonnage)}</div>
                     <div class="metric-subtitle">Target: ${targetCapacity} tons</div>
@@ -733,39 +760,54 @@ function generateHaulLogTab(haulLogs: HaulLogRow[], project: ProjectRow): string
                         </thead>
                         <tbody>
                             ${haulLogs
-                              .sort((a, b) => new Date(b.haul_date).getTime() - new Date(a.haul_date).getTime())
+                              .sort(
+                                (a, b) =>
+                                  new Date(b.haul_date).getTime() -
+                                  new Date(a.haul_date).getTime(),
+                              )
                               .map((haul) => {
-                                const tonnage = haul.tonnage || 0
-                                const utilization = (tonnage / targetCapacity) * 100
+                                const tonnage = haul.tonnage || 0;
+                                const utilization =
+                                  (tonnage / targetCapacity) * 100;
                                 const status =
-                                  utilization >= 85 ? 'success' : utilization >= 70 ? 'info' : 'warning'
+                                  utilization >= 85
+                                    ? "success"
+                                    : utilization >= 70
+                                      ? "info"
+                                      : "warning";
                                 const statusText =
-                                  utilization >= 85 ? 'Optimal' : utilization >= 70 ? 'Good' : 'Low'
+                                  utilization >= 85
+                                    ? "Optimal"
+                                    : utilization >= 70
+                                      ? "Good"
+                                      : "Low";
 
                                 return `
                                 <tr>
                                     <td>${new Date(haul.haul_date).toLocaleDateString()}</td>
                                     <td>${formatNumber(tonnage)} tons</td>
-                                    <td>${haul.days_since_last || '-'} days</td>
+                                    <td>${haul.days_since_last || "-"} days</td>
                                     <td>${formatNumber(utilization)}%</td>
                                     <td><span class="badge ${status}">${statusText}</span></td>
                                 </tr>
-                            `
+                            `;
                               })
-                              .join('')}
+                              .join("")}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    `
+    `;
 }
 
 /**
  * Generate Optimization tab
  */
-function generateOptimizationTab(result: WasteWiseAnalyticsCompleteResult): string {
-  const recommended = result.recommendations.filter((r) => r.recommend)
+function generateOptimizationTab(
+  result: WasteWiseAnalyticsCompleteResult,
+): string {
+  const recommended = result.recommendations.filter((r) => r.recommend);
 
   return `
         <div id="optimization" class="tab-panel">
@@ -791,36 +833,40 @@ function generateOptimizationTab(result: WasteWiseAnalyticsCompleteResult): stri
                   .sort((a, b) => a.priority - b.priority)
                   .map(
                     (rec) => `
-                    <div class="recommendation ${rec.priority <= 2 ? 'high-priority' : ''}">
+                    <div class="recommendation ${rec.priority <= 2 ? "high-priority" : ""}">
                         <div style="display: flex; justify-content: space-between; align-items: start;">
                             <div style="flex: 1;">
                                 <div class="recommendation-title">
                                     ${escapeHtml(rec.title)}
                                     <span class="badge info">Priority ${rec.priority}</span>
-                                    ${rec.confidence ? `<span class="badge ${rec.confidence === 'HIGH' ? 'success' : rec.confidence === 'MEDIUM' ? 'warning' : 'info'}">${rec.confidence}</span>` : ''}
+                                    ${rec.confidence ? `<span class="badge ${rec.confidence === "HIGH" ? "success" : rec.confidence === "MEDIUM" ? "warning" : "info"}">${rec.confidence}</span>` : ""}
                                 </div>
                                 <div class="recommendation-description">${escapeHtml(rec.description)}</div>
-                                ${rec.implementation ? `<p style="margin-top: 8px; font-size: 0.9rem;"><strong>Implementation:</strong> ${escapeHtml(rec.implementation)}</p>` : ''}
+                                ${rec.implementation ? `<p style="margin-top: 8px; font-size: 0.9rem;"><strong>Implementation:</strong> ${escapeHtml(rec.implementation)}</p>` : ""}
                             </div>
-                            ${rec.savings ? `<div class="recommendation-savings" style="margin-left: 20px; text-align: right; white-space: nowrap;">$${formatNumber(rec.savings)}/yr</div>` : ''}
+                            ${rec.savings ? `<div class="recommendation-savings" style="margin-left: 20px; text-align: right; white-space: nowrap;">$${formatNumber(rec.savings)}/yr</div>` : ""}
                         </div>
                     </div>
-                `
+                `,
                   )
-                  .join('')}
-                ${recommended.length === 0 ? '<p>No optimization recommendations at this time.</p>' : ''}
+                  .join("")}
+                ${recommended.length === 0 ? "<p>No optimization recommendations at this time.</p>" : ""}
             </div>
 
-            ${result.compactorOptimization && result.compactorOptimization.recommend ? generateCompactorOptimizationDetails(result.compactorOptimization) : ''}
+            ${result.compactorOptimization && result.compactorOptimization.recommend ? generateCompactorOptimizationDetails(result.compactorOptimization) : ""}
 
-            ${result.leaseUpDetected ? `
+            ${
+              result.leaseUpDetected
+                ? `
             <div class="card" style="background: #FEF3C7; border-left: 4px solid var(--warning);">
                 <h3 style="color: var(--warning); margin-bottom: 12px;">⚠️ Lease-Up Property Detected</h3>
                 <p>This property appears to be in lease-up (waste generation significantly below benchmarks). Optimization recommendations should be re-evaluated once occupancy stabilizes.</p>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
         </div>
-    `
+    `;
 }
 
 /**
@@ -851,14 +897,14 @@ function generateCompactorOptimizationDetails(optimization: any): string {
                 </table>
             </div>
         </div>
-    `
+    `;
 }
 
 /**
  * Generate Contract Terms tab
  */
 function generateContractTermsTab(contractResult: any): string {
-  const contract = contractResult.contracts[0]
+  const contract = contractResult.contracts[0];
 
   return `
         <div id="contract-terms" class="tab-panel">
@@ -872,23 +918,25 @@ function generateContractTermsTab(contractResult: any): string {
                             <tr><td><strong>Effective Date</strong></td><td>${new Date(contract.contractDates.effectiveDate).toLocaleDateString()}</td></tr>
                             <tr><td><strong>Expiration Date</strong></td><td>${new Date(contract.contractDates.expirationDate).toLocaleDateString()}</td></tr>
                             <tr><td><strong>Term Length</strong></td><td>${contract.contractDates.termMonths} months</td></tr>
-                            <tr><td><strong>Auto-Renewal</strong></td><td>${contract.contractDates.autoRenew ? 'Yes' : 'No'}</td></tr>
+                            <tr><td><strong>Auto-Renewal</strong></td><td>${contract.contractDates.autoRenew ? "Yes" : "No"}</td></tr>
                         </tbody>
                     </table>
                     <table>
                         <tbody>
-                            ${contract.pricing.monthlyBase ? `<tr><td><strong>Monthly Base</strong></td><td>$${formatNumber(contract.pricing.monthlyBase)}</td></tr>` : ''}
-                            ${contract.pricing.perPickup ? `<tr><td><strong>Per Pickup</strong></td><td>$${formatNumber(contract.pricing.perPickup)}</td></tr>` : ''}
-                            ${contract.pricing.perTon ? `<tr><td><strong>Per Ton</strong></td><td>$${formatNumber(contract.pricing.perTon)}</td></tr>` : ''}
+                            ${contract.pricing.monthlyBase ? `<tr><td><strong>Monthly Base</strong></td><td>$${formatNumber(contract.pricing.monthlyBase)}</td></tr>` : ""}
+                            ${contract.pricing.perPickup ? `<tr><td><strong>Per Pickup</strong></td><td>$${formatNumber(contract.pricing.perPickup)}</td></tr>` : ""}
+                            ${contract.pricing.perTon ? `<tr><td><strong>Per Ton</strong></td><td>$${formatNumber(contract.pricing.perTon)}</td></tr>` : ""}
                             <tr><td><strong>Termination Notice</strong></td><td>${contract.terms.terminationNoticeDays} days</td></tr>
                             <tr><td><strong>Payment Terms</strong></td><td>${escapeHtml(contract.terms.paymentTerms)}</td></tr>
-                            <tr><td><strong>Insurance Required</strong></td><td>${contract.terms.insuranceRequired ? 'Yes' : 'No'}</td></tr>
+                            <tr><td><strong>Insurance Required</strong></td><td>${contract.terms.insuranceRequired ? "Yes" : "No"}</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            ${contract.services && contract.services.length > 0 ? `
+            ${
+              contract.services && contract.services.length > 0
+                ? `
             <div class="card">
                 <h2 class="card-header">Service Details</h2>
                 <table>
@@ -901,18 +949,24 @@ function generateContractTermsTab(contractResult: any): string {
                         </tr>
                     </thead>
                     <tbody>
-                        ${contract.services.map((svc: any) => `
+                        ${contract.services
+                          .map(
+                            (svc: any) => `
                         <tr>
                             <td>${escapeHtml(svc.containerType)}</td>
                             <td>${svc.containerSize} yards</td>
                             <td>${escapeHtml(svc.frequency)}</td>
-                            <td>${escapeHtml(svc.serviceDays || 'N/A')}</td>
+                            <td>${escapeHtml(svc.serviceDays || "N/A")}</td>
                         </tr>
-                        `).join('')}
+                        `,
+                          )
+                          .join("")}
                     </tbody>
                 </table>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
 
             <div class="card">
                 <h2 class="card-header">⏰ Important Reminders</h2>
@@ -927,7 +981,7 @@ function generateContractTermsTab(contractResult: any): string {
                 </div>
             </div>
         </div>
-    `
+    `;
 }
 
 /**
@@ -936,7 +990,7 @@ function generateContractTermsTab(contractResult: any): string {
 function generateJavaScript(
   result: WasteWiseAnalyticsCompleteResult,
   invoices: InvoiceDataRow[],
-  haulLogs: HaulLogRow[]
+  haulLogs: HaulLogRow[],
 ): string {
   return `
         // Tab switching
@@ -1002,11 +1056,15 @@ function generateJavaScript(
             if (expenseCtx) {
                 const sortedInvoices = ${safeJsonStringify(
                   invoices
-                    .sort((a, b) => new Date(a.invoice_date).getTime() - new Date(b.invoice_date).getTime())
+                    .sort(
+                      (a, b) =>
+                        new Date(a.invoice_date).getTime() -
+                        new Date(b.invoice_date).getTime(),
+                    )
                     .map((inv) => ({
                       date: inv.invoice_date,
                       amount: inv.total_amount,
-                    }))
+                    })),
                 )};
 
                 new Chart(expenseCtx, {
@@ -1108,11 +1166,15 @@ function generateJavaScript(
             if (haulCtx) {
                 const sortedHauls = ${safeJsonStringify(
                   haulLogs
-                    .sort((a, b) => new Date(a.haul_date).getTime() - new Date(b.haul_date).getTime())
+                    .sort(
+                      (a, b) =>
+                        new Date(a.haul_date).getTime() -
+                        new Date(b.haul_date).getTime(),
+                    )
                     .map((h) => ({
                       date: h.haul_date,
                       tonnage: h.tonnage || 0,
-                    }))
+                    })),
                 )};
 
                 new Chart(haulCtx, {
@@ -1163,7 +1225,7 @@ function generateJavaScript(
                 });
             }
         }
-    `
+    `;
 }
 
 /**
@@ -1171,13 +1233,13 @@ function generateJavaScript(
  */
 function generateFilename(project: ProjectRow): string {
   const propertyName = project.property_name
-    .replace(/[^a-zA-Z0-9]/g, '_')
-    .replace(/_+/g, '_')
-    .substring(0, 50)
+    .replace(/[^a-zA-Z0-9]/g, "_")
+    .replace(/_+/g, "_")
+    .substring(0, 50);
 
-  const date = new Date().toISOString().split('T')[0]
+  const date = new Date().toISOString().split("T")[0];
 
-  return `WasteWise_Dashboard_${propertyName}_${date}.html`
+  return `WasteWise_Dashboard_${propertyName}_${date}.html`;
 }
 
 /**
@@ -1185,13 +1247,13 @@ function generateFilename(project: ProjectRow): string {
  */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  }
-  return text.replace(/[&<>"']/g, (m) => map[m])
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
 /**
@@ -1200,25 +1262,26 @@ function escapeHtml(text: string): string {
  */
 function safeJsonStringify(data: unknown): string {
   return JSON.stringify(data)
-    .replace(/</g, '\\u003c')
-    .replace(/>/g, '\\u003e')
-    .replace(/\//g, '\\u002f')
-    .replace(/\u2028/g, '\\u2028')
-    .replace(/\u2029/g, '\\u2029')
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/\//g, "\\u002f")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
 }
 
 function formatNumber(num: number): string {
-  return num.toLocaleString('en-US', {
+  return num.toLocaleString("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  })
+  });
 }
 
 function calculateMonths(startDate: string, endDate: string): number {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
+  const start = new Date(startDate);
+  const end = new Date(endDate);
   return Math.max(
-    (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()),
-    1
-  )
+    (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth()),
+    1,
+  );
 }

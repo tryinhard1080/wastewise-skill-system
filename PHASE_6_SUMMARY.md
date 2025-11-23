@@ -14,12 +14,15 @@ Phase 6 integrated Phase 5's reporting infrastructure into a complete, productio
 ## Objectives Completed
 
 ### ✅ Task 1: Analytics Skill Report Integration
+
 **Goal**: Replace placeholder report generation in wastewise-analytics with actual Excel and HTML generation
 
 **Files Modified**:
+
 - `lib/skills/skills/wastewise-analytics.ts` (lines 516-665, +150 lines)
 
 **Implementation**:
+
 ```typescript
 private async generateReports(context, analysisData) {
   // 1. Build complete result object
@@ -70,6 +73,7 @@ private async generateReports(context, analysisData) {
 ```
 
 **Features**:
+
 - ✅ Real Excel and HTML report generation (replaces placeholders)
 - ✅ Supabase Storage upload with signed URLs (365-day expiry)
 - ✅ Graceful error handling (report failures don't fail entire analysis)
@@ -79,9 +83,11 @@ private async generateReports(context, analysisData) {
 ---
 
 ### ✅ Task 2: API Routes for Analysis
+
 **Goal**: Create REST endpoints for starting analysis jobs and checking their status
 
 **Files Created**:
+
 1. `app/api/projects/[id]/analyze/route.ts` (143 lines)
 2. `app/api/jobs/[id]/route.ts` (204 lines)
 
@@ -90,12 +96,14 @@ private async generateReports(context, analysisData) {
 **POST /api/projects/[id]/analyze**
 
 **Request**:
+
 ```bash
 curl -X POST http://localhost:3000/api/projects/abc-123/analyze \
   -H "Authorization: Bearer <token>"
 ```
 
 **Response**:
+
 ```json
 {
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
@@ -105,6 +113,7 @@ curl -X POST http://localhost:3000/api/projects/abc-123/analyze \
 ```
 
 **Features**:
+
 - ✅ Authentication with Supabase (verifies user owns project)
 - ✅ Invoice data validation (ensures data exists before analysis)
 - ✅ Duplicate job prevention (blocks if job already pending/processing)
@@ -116,12 +125,14 @@ curl -X POST http://localhost:3000/api/projects/abc-123/analyze \
 **GET /api/jobs/[id]**
 
 **Request**:
+
 ```bash
 curl http://localhost:3000/api/jobs/550e8400-e29b-41d4-a716-446655440000 \
   -H "Authorization: Bearer <token>"
 ```
 
 **Response**:
+
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -151,6 +162,7 @@ curl http://localhost:3000/api/jobs/550e8400-e29b-41d4-a716-446655440000 \
 ```
 
 **Features**:
+
 - ✅ Real-time progress tracking
 - ✅ Structured timing information
 - ✅ Result data (when completed)
@@ -161,6 +173,7 @@ curl http://localhost:3000/api/jobs/550e8400-e29b-41d4-a716-446655440000 \
 **DELETE /api/jobs/[id]**
 
 **Features**:
+
 - ✅ Cancel running jobs (pending or processing status only)
 - ✅ Prevents cancellation of completed/failed jobs
 - ✅ Updates status to 'cancelled' with timestamp
@@ -168,14 +181,17 @@ curl http://localhost:3000/api/jobs/550e8400-e29b-41d4-a716-446655440000 \
 ---
 
 ### ✅ Task 3: Async Job Queue System
+
 **Goal**: Create background worker that processes pending analysis jobs
 
 **Files Created**:
+
 1. `lib/workers/job-processor.ts` (293 lines)
 2. `lib/workers/analysis-worker.ts` (153 lines)
 3. `scripts/start-worker.ts` (168 lines)
 
 **Files Modified**:
+
 - `package.json` (added `"worker": "tsx scripts/start-worker.ts"`)
 
 #### 3.1: Job Processor
@@ -183,6 +199,7 @@ curl http://localhost:3000/api/jobs/550e8400-e29b-41d4-a716-446655440000 \
 **Class**: `JobProcessor`
 
 **Responsibilities**:
+
 - Fetches job details from database
 - Marks jobs as processing using `start_analysis_job` RPC
 - Routes to appropriate handler based on `job_type`
@@ -245,10 +262,12 @@ private async processCompleteAnalysis(job: any): Promise<void> {
 **Class**: `AnalysisWorker`
 
 **Configuration**:
+
 - `pollInterval`: 2000ms (check for new jobs every 2 seconds)
 - `maxConcurrentJobs`: 1 (process one job at a time)
 
 **Polling Loop**:
+
 ```typescript
 private async run(): Promise<void> {
   while (this.isRunning) {
@@ -280,6 +299,7 @@ private async run(): Promise<void> {
 #### 3.3: Worker Startup Script
 
 **Usage**:
+
 ```bash
 # Start with default configuration
 pnpm worker
@@ -292,6 +312,7 @@ pnpm worker --concurrent=3
 ```
 
 **Features**:
+
 - ✅ Environment variable validation
 - ✅ Command-line argument parsing
 - ✅ Graceful shutdown (SIGINT, SIGTERM)
@@ -301,9 +322,11 @@ pnpm worker --concurrent=3
 ---
 
 ### ✅ Task 4: Frontend Results Page
+
 **Goal**: Build results page that displays analysis and provides download buttons
 
 **Files Created**:
+
 1. `app/projects/[id]/results/page.tsx` (72 lines)
 2. `components/results/analysis-summary.tsx` (116 lines)
 3. `components/results/recommendations-list.tsx` (216 lines)
@@ -315,6 +338,7 @@ pnpm worker --concurrent=3
 **Route**: `/projects/[id]/results`
 
 **Server Component** that:
+
 - Fetches project data from database
 - Fetches latest completed analysis job
 - Redirects if project/job not found
@@ -369,14 +393,15 @@ export default async function ResultsPage({ params }: { params: { id: string } }
 
 **Display**: 4 metric cards in responsive grid
 
-| Metric | Value | Icon |
-|--------|-------|------|
+| Metric                  | Value        | Icon               |
+| ----------------------- | ------------ | ------------------ |
 | Total Savings Potential | $42,500/year | TrendingUp (green) |
-| Current Monthly Cost | $3,200/month | DollarSign (blue) |
-| Optimized Monthly Cost | $2,500/month | Target (teal) |
-| Savings Percentage | 22% | Percent (amber) |
+| Current Monthly Cost    | $3,200/month | DollarSign (blue)  |
+| Optimized Monthly Cost  | $2,500/month | Target (teal)      |
+| Savings Percentage      | 22%          | Percent (amber)    |
 
 **Features**:
+
 - ✅ Responsive grid (1 → 2 → 4 columns)
 - ✅ Color-coded icons
 - ✅ Formatted currency and percentages
@@ -387,6 +412,7 @@ export default async function ResultsPage({ params }: { params: { id: string } }
 **Display**: Collapsible accordion with priority-sorted recommendations
 
 **Each recommendation shows**:
+
 - Priority badge (Critical/High/Medium/Low with colors)
 - Title and description
 - Annual savings amount
@@ -394,6 +420,7 @@ export default async function ResultsPage({ params }: { params: { id: string } }
 - Confidence level badge (HIGH/MEDIUM/LOW)
 
 **Features**:
+
 - ✅ Collapsible accordion (expand/collapse details)
 - ✅ Sorted by priority (1 → 2 → 3)
 - ✅ Empty state for no recommendations
@@ -402,10 +429,12 @@ export default async function ResultsPage({ params }: { params: { id: string } }
 #### 4.4: Download Buttons Component
 
 **Buttons**:
+
 1. **Download Excel Report** (teal background, FileSpreadsheet icon)
 2. **View HTML Dashboard** (teal outline, Globe icon)
 
 **Features**:
+
 - ✅ Excel downloads file
 - ✅ HTML opens in new tab
 - ✅ Responsive layout (stack on mobile, side-by-side on desktop)
@@ -420,6 +449,7 @@ export default async function ResultsPage({ params }: { params: { id: string } }
 **Decision**: Use database-backed job queue with polling worker instead of in-memory queue
 
 **Rationale**:
+
 - **Reliability**: Jobs persist across server restarts
 - **Scalability**: Can run multiple workers in parallel
 - **Visibility**: Job status visible to users in real-time
@@ -435,23 +465,25 @@ export default async function ResultsPage({ params }: { params: { id: string } }
 **Decision**: Pass `onProgress` callback in SkillContext instead of skill returning progress updates
 
 **Rationale**:
+
 - **Real-time updates**: Progress saved to database as skill executes
 - **User experience**: Frontend can poll `/api/jobs/[id]` for live progress
 - **Decoupling**: Skill doesn't need to know about job processing infrastructure
 - **Flexibility**: Same skill can run with or without progress tracking
 
 **Implementation**:
+
 ```typescript
 const context: SkillContext = {
   // ... other fields
   onProgress: async (progress) => {
-    await supabase.rpc('update_job_progress', {
+    await supabase.rpc("update_job_progress", {
       job_id: jobId,
       new_progress: progress.percent,
       step_name: progress.step,
-    })
+    });
   },
-}
+};
 ```
 
 ---
@@ -461,11 +493,13 @@ const context: SkillContext = {
 **Decision**: Report generation failures do NOT fail entire analysis
 
 **Rationale**:
+
 - **User experience**: Analysis results (recommendations, savings) are more valuable than downloadable reports
 - **Reliability**: One component failure shouldn't break entire workflow
 - **Debugging**: Errors logged for investigation but workflow continues
 
 **Implementation**:
+
 ```typescript
 try {
   const reports = await generateReports(...)
@@ -483,10 +517,12 @@ try {
 **Decision**: Use Server Components for data fetching, Client Components for interactivity
 
 **Pattern**:
+
 - **Server**: `app/projects/[id]/results/page.tsx` (fetches data)
 - **Client**: `components/results/*.tsx` (interactive UI)
 
 **Benefits**:
+
 - **Performance**: Data fetched on server (no client waterfall)
 - **Security**: Database queries never exposed to client
 - **SEO**: Server-rendered content
@@ -537,16 +573,19 @@ try {
 ### Database RPC Functions Used
 
 **start_analysis_job(job_id)**
+
 - Sets status = 'processing'
 - Sets started_at = now()
 - Only if current status = 'pending'
 
 **update_job_progress(job_id, new_progress, step_name, step_num)**
+
 - Updates progress_percent
 - Updates current_step
 - Updates steps_completed
 
 **complete_analysis_job(job_id, result, ai_usage)**
+
 - Sets status = 'completed'
 - Sets progress_percent = 100
 - Sets completed_at = now()
@@ -555,6 +594,7 @@ try {
 - Saves AI usage metrics
 
 **fail_analysis_job(job_id, error_msg, error_cd)**
+
 - If retries remaining: status = 'pending', retry_count++
 - If no retries: status = 'failed', saves error details
 
@@ -572,27 +612,27 @@ try {
 
 **New Files Created**: 11
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `lib/skills/skills/wastewise-analytics.ts` | +150 | Report generation integration |
-| `app/api/projects/[id]/analyze/route.ts` | 143 | Start analysis endpoint |
-| `app/api/jobs/[id]/route.ts` | 204 | Job status/cancellation endpoint |
-| `lib/workers/job-processor.ts` | 293 | Job execution orchestration |
-| `lib/workers/analysis-worker.ts` | 153 | Background polling worker |
-| `scripts/start-worker.ts` | 168 | Worker startup script |
-| `app/projects/[id]/results/page.tsx` | 72 | Results page |
-| `components/results/analysis-summary.tsx` | 116 | Summary metrics cards |
-| `components/results/recommendations-list.tsx` | 216 | Recommendations accordion |
-| `components/results/download-buttons.tsx` | 52 | Download buttons |
-| `components/results/README.md` | - | Component documentation |
-| **TOTAL** | **~1,567** | |
+| File                                          | Lines      | Purpose                          |
+| --------------------------------------------- | ---------- | -------------------------------- |
+| `lib/skills/skills/wastewise-analytics.ts`    | +150       | Report generation integration    |
+| `app/api/projects/[id]/analyze/route.ts`      | 143        | Start analysis endpoint          |
+| `app/api/jobs/[id]/route.ts`                  | 204        | Job status/cancellation endpoint |
+| `lib/workers/job-processor.ts`                | 293        | Job execution orchestration      |
+| `lib/workers/analysis-worker.ts`              | 153        | Background polling worker        |
+| `scripts/start-worker.ts`                     | 168        | Worker startup script            |
+| `app/projects/[id]/results/page.tsx`          | 72         | Results page                     |
+| `components/results/analysis-summary.tsx`     | 116        | Summary metrics cards            |
+| `components/results/recommendations-list.tsx` | 216        | Recommendations accordion        |
+| `components/results/download-buttons.tsx`     | 52         | Download buttons                 |
+| `components/results/README.md`                | -          | Component documentation          |
+| **TOTAL**                                     | **~1,567** |                                  |
 
 **Modified Files**: 2
 
-| File | Lines Changed | Purpose |
-|------|---------------|---------|
-| `package.json` | +1 | Added worker script |
-| `PHASE_6_PLAN.md` | +800 | Implementation plan |
+| File              | Lines Changed | Purpose             |
+| ----------------- | ------------- | ------------------- |
+| `package.json`    | +1            | Added worker script |
+| `PHASE_6_PLAN.md` | +800          | Implementation plan |
 
 ---
 
@@ -601,6 +641,7 @@ try {
 ### Manual Testing (Before Deployment)
 
 **Worker System**:
+
 - [ ] Worker starts successfully with valid environment variables
 - [ ] Worker fails gracefully with missing environment variables
 - [ ] Worker polls database at configured interval
@@ -613,6 +654,7 @@ try {
 - [ ] Worker stops cleanly on Ctrl+C
 
 **API Endpoints**:
+
 - [ ] POST /api/projects/:id/analyze creates job
 - [ ] POST returns 401 if not authenticated
 - [ ] POST returns 404 if project not found
@@ -626,6 +668,7 @@ try {
 - [ ] DELETE only works on pending/processing jobs
 
 **Frontend**:
+
 - [ ] Results page redirects if no completed job
 - [ ] Results page displays all metrics correctly
 - [ ] Recommendations sorted by priority
@@ -638,6 +681,7 @@ try {
 ## Dependencies
 
 **Environment Variables Required**:
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -646,6 +690,7 @@ ANTHROPIC_API_KEY=your-api-key
 ```
 
 **Database Tables**:
+
 - ✅ `analysis_jobs` (created in Phase 4)
 - ✅ `projects` (existing)
 - ✅ `invoice_data` (existing)
@@ -653,12 +698,14 @@ ANTHROPIC_API_KEY=your-api-key
 - ✅ `contract_terms` (existing)
 
 **Database RPC Functions**:
+
 - ✅ `start_analysis_job(job_id)`
 - ✅ `update_job_progress(job_id, new_progress, step_name, step_num)`
 - ✅ `complete_analysis_job(job_id, result, ai_usage)`
 - ✅ `fail_analysis_job(job_id, error_msg, error_cd)`
 
 **Phase 5 Infrastructure**:
+
 - ✅ Excel generation (`lib/reports/excel-generator.ts`)
 - ✅ HTML generation (`lib/reports/html-generator.ts`)
 - ✅ Report storage (`lib/reports/storage.ts`)
@@ -670,6 +717,7 @@ ANTHROPIC_API_KEY=your-api-key
 ### Running the Worker
 
 **Development**:
+
 ```bash
 # Terminal 1: Next.js dev server
 pnpm dev
@@ -681,12 +729,14 @@ pnpm worker
 **Production Options**:
 
 **Option 1: Separate Process**
+
 ```bash
 # Start worker as separate process
 pm2 start "pnpm worker" --name wastewise-worker
 ```
 
 **Option 2: Docker Container**
+
 ```dockerfile
 # Dockerfile.worker
 FROM node:20-alpine
@@ -698,6 +748,7 @@ CMD ["npm", "run", "worker"]
 ```
 
 **Option 3: Serverless Functions** (Future)
+
 - Move to Supabase Edge Functions or Vercel Functions
 - Use queue trigger instead of polling
 
@@ -706,25 +757,29 @@ CMD ["npm", "run", "worker"]
 ### Health Monitoring
 
 **Worker Health Check**:
+
 ```typescript
 // GET /api/worker/health
 export async function GET() {
   // Check if worker has processed jobs recently
   const { data } = await supabase
-    .from('analysis_jobs')
-    .select('updated_at')
-    .eq('status', 'processing')
-    .single()
+    .from("analysis_jobs")
+    .select("updated_at")
+    .eq("status", "processing")
+    .single();
 
-  const lastUpdate = new Date(data?.updated_at || 0)
-  const now = new Date()
-  const minutesSinceUpdate = (now.getTime() - lastUpdate.getTime()) / 60000
+  const lastUpdate = new Date(data?.updated_at || 0);
+  const now = new Date();
+  const minutesSinceUpdate = (now.getTime() - lastUpdate.getTime()) / 60000;
 
   if (minutesSinceUpdate > 5) {
-    return NextResponse.json({ status: 'unhealthy', minutesSinceUpdate }, { status: 503 })
+    return NextResponse.json(
+      { status: "unhealthy", minutesSinceUpdate },
+      { status: 503 },
+    );
   }
 
-  return NextResponse.json({ status: 'healthy', minutesSinceUpdate })
+  return NextResponse.json({ status: "healthy", minutesSinceUpdate });
 }
 ```
 
@@ -733,21 +788,25 @@ export async function GET() {
 ## Next Steps (Phase 7)
 
 ### Immediate (Week 1)
+
 1. **Integration Testing**: End-to-end workflow testing with real project data
 2. **Error Handling**: Add retry logic for transient failures
 3. **Monitoring**: Add Sentry or similar for error tracking
 
 ### Short-term (Week 2-3)
+
 4. **Processing Page**: Create /projects/[id]/processing with progress bar
 5. **Email Notifications**: Send email when analysis completes
 6. **Job Cancellation UI**: Add cancel button to processing page
 
 ### Medium-term (Month 2)
+
 7. **Multiple Workers**: Support running 2-3 workers in parallel
 8. **Job Prioritization**: High-priority users get faster processing
 9. **Caching**: Cache analysis results for 24 hours
 
 ### Long-term (Month 3+)
+
 10. **Regulatory Research Skill**: Implement ordinance search
 11. **Performance Optimization**: Profile and optimize slow queries
 12. **Production Deployment**: Deploy to Vercel/Railway/Render
@@ -761,6 +820,7 @@ export async function GET() {
 **Lesson**: Long-running AI operations (2-10 minutes) cannot run in API routes
 
 **Impact**: Phase 6 architecture enables:
+
 - No timeout errors
 - Real-time progress tracking
 - Graceful error handling
@@ -773,6 +833,7 @@ export async function GET() {
 **Lesson**: Users want to see what's happening during long operations
 
 **Impact**: `onProgress` callback allows:
+
 - Live progress updates in database
 - Frontend can poll for status
 - User knows analysis is progressing
@@ -785,6 +846,7 @@ export async function GET() {
 **Lesson**: One failure shouldn't break entire workflow
 
 **Impact**:
+
 - Report generation failures logged but don't fail analysis
 - Users still get recommendations and savings data
 - Better reliability and user experience
@@ -796,6 +858,7 @@ export async function GET() {
 **Lesson**: Next.js 14 Server Components eliminate client-side data fetching complexity
 
 **Impact**:
+
 - No useState, useEffect, or SWR needed
 - Faster page loads (no client waterfall)
 - Better SEO
@@ -815,6 +878,7 @@ Phase 6 successfully integrated Phase 5's reporting infrastructure into a comple
 ✅ **Complete end-to-end workflow** from button click to results display
 
 **Quality Metrics**:
+
 - Zero TypeScript errors in Phase 6 code
 - Comprehensive error handling throughout
 - Production-ready architecture

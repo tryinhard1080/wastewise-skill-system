@@ -20,6 +20,7 @@ Successfully implemented the **Regulatory Research Skill**, completing the first
 **Purpose**: Semantic web search for municipal ordinances
 
 **Features**:
+
 - Neural semantic search (understands meaning, not just keywords)
 - Full content extraction from web pages
 - Domain filtering (.gov, municode.com, etc.)
@@ -28,23 +29,24 @@ Successfully implemented the **Regulatory Research Skill**, completing the first
 - Helper method specifically for ordinance search
 
 **Usage**:
+
 ```typescript
-const exaClient = getExaClient()
+const exaClient = getExaClient();
 
 // Search for ordinances
 const results = await exaClient.searchOrdinances(
-  'Austin',
-  'TX',
+  "Austin",
+  "TX",
   undefined,
-  'waste management recycling'
-)
+  "waste management recycling",
+);
 
 // Get full content
 const contents = await exaClient.getContents({
-  ids: results.results.map(r => r.url),
+  ids: results.results.map((r) => r.url),
   text: { maxCharacters: 50000 },
-  highlights: { numSentences: 10 }
-})
+  highlights: { numSentences: 10 },
+});
 ```
 
 **Cost**: $5 per 1,000 searches (~$0.005 per search)
@@ -56,6 +58,7 @@ const contents = await exaClient.getContents({
 **Purpose**: Complete ordinance research and compliance assessment
 
 **Workflow**:
+
 1. ✅ **Search** for municipal ordinances using Exa
 2. ✅ **Extract** full ordinance text and relevant excerpts
 3. ✅ **Analyze** with Claude to extract compliance requirements
@@ -64,37 +67,40 @@ const contents = await exaClient.getContents({
 6. ✅ **Return** comprehensive compliance report
 
 **Key Methods**:
+
 - `searchOrdinances()` - Find relevant municipal codes
 - `extractRequirements()` - Use Claude to extract requirements
 - `assessCompliance()` - Compare requirements to current service
 - `saveToDatabase()` - Persist results for caching
 
 **Result Structure**:
+
 ```typescript
 interface RegulatoryResearchResult {
-  location: { city, state, county? }
-  ordinances: OrdinanceInfo[]
+  location: { city; state; county? };
+  ordinances: OrdinanceInfo[];
   requirements: {
-    waste: WasteRequirement[]
-    recycling: RecyclingRequirement[]
-    composting: CompostingRequirement[]
-  }
+    waste: WasteRequirement[];
+    recycling: RecyclingRequirement[];
+    composting: CompostingRequirement[];
+  };
   compliance: {
-    status: 'COMPLIANT' | 'NON_COMPLIANT' | 'UNKNOWN'
-    issues: ComplianceIssue[]
-    recommendations: string[]
-  }
-  penalties: Penalty[]
-  licensedHaulers: LicensedHauler[]
-  contacts: RegulatoryContact[]
-  confidence: 'HIGH' | 'MEDIUM' | 'LOW'
-  sources: Source[]
-  researchDate: string
-  expirationDate: string // 90 days from research
+    status: "COMPLIANT" | "NON_COMPLIANT" | "UNKNOWN";
+    issues: ComplianceIssue[];
+    recommendations: string[];
+  };
+  penalties: Penalty[];
+  licensedHaulers: LicensedHauler[];
+  contacts: RegulatoryContact[];
+  confidence: "HIGH" | "MEDIUM" | "LOW";
+  sources: Source[];
+  researchDate: string;
+  expirationDate: string; // 90 days from research
 }
 ```
 
 **Example Output**:
+
 ```json
 {
   "location": { "city": "Austin", "state": "TX" },
@@ -154,6 +160,7 @@ interface RegulatoryResearchResult {
 ### 3. Type Definitions (`lib/skills/types.ts`)
 
 **New Types Added**:
+
 - `RegulatoryResearchResult` - Main skill result type
 - `OrdinanceInfo` - Individual ordinance details
 - `WasteRequirement` - Waste service requirements
@@ -162,6 +169,7 @@ interface RegulatoryResearchResult {
 - `ComplianceIssue` - Compliance problems found
 
 **Updates**:
+
 - Added `'regulatory_compliance'` to recommendation type enum
 - Removed duplicate RegulatoryResearchResult definition
 - Added regulatory compliance to WasteWiseAnalyticsCompleteResult
@@ -173,31 +181,33 @@ interface RegulatoryResearchResult {
 **Integration Point**: Step 2 (Optimization Analysis) at 55% progress
 
 **Logic**:
+
 ```typescript
 // Only runs if location data available
 if (context.project?.city && context.project?.state) {
-  const regulatorySkill = skillRegistry.get('regulatory-research')
-  const result = await regulatorySkill.execute(context)
+  const regulatorySkill = skillRegistry.get("regulatory-research");
+  const result = await regulatorySkill.execute(context);
 
   // Add compliance issues as recommendations
-  if (result.data.compliance.status === 'NON_COMPLIANT') {
-    complianceIssues.forEach(issue => {
-      if (issue.severity === 'HIGH' || issue.severity === 'MEDIUM') {
+  if (result.data.compliance.status === "NON_COMPLIANT") {
+    complianceIssues.forEach((issue) => {
+      if (issue.severity === "HIGH" || issue.severity === "MEDIUM") {
         recommendations.push({
-          type: 'regulatory_compliance',
-          priority: issue.severity === 'HIGH' ? 2 : 3,
+          type: "regulatory_compliance",
+          priority: issue.severity === "HIGH" ? 2 : 3,
           title: `Compliance Issue: ${issue.issue}`,
           description: issue.recommendation,
           recommend: true,
-          confidence: result.confidence === 'HIGH' ? 'HIGH' : 'MEDIUM'
-        })
+          confidence: result.confidence === "HIGH" ? "HIGH" : "MEDIUM",
+        });
       }
-    })
+    });
   }
 }
 ```
 
 **Benefits**:
+
 - Automatic compliance checking during analysis
 - Non-blocking (continues if research fails)
 - Progress tracking visible to user
@@ -209,11 +219,13 @@ if (context.project?.city && context.project?.state) {
 ### 5. Skill Registry (`lib/skills/skills/index.ts`)
 
 **Updates**:
+
 - Imported RegulatoryResearchSkill
 - Registered as 5th skill in registry
 - Exported for direct use if needed
 
 **Total Skills**: 5
+
 1. CompactorOptimizationSkill
 2. WasteWiseAnalyticsSkill (orchestrator)
 3. BatchExtractorSkill
@@ -227,6 +239,7 @@ if (context.project?.city && context.project?.state) {
 ### Environment Variables Required
 
 Add to `.env.local`:
+
 ```bash
 # Exa API (semantic search)
 EXA_API_KEY=your-exa-key-here
@@ -240,6 +253,7 @@ Get Exa API key: https://exa.ai
 ### Claude Prompt Engineering
 
 **Extraction Prompt Structure**:
+
 ```
 You are a waste management compliance expert analyzing municipal ordinances.
 
@@ -268,6 +282,7 @@ that apply to multifamily properties with 250+ units.
 ```
 
 **Key Instructions**:
+
 - Focus on multifamily/commercial properties (not residential)
 - Extract specific, actionable requirements
 - Identify mandatory vs. recommended
@@ -279,21 +294,25 @@ that apply to multifamily properties with 250+ units.
 ## 📊 Performance & Cost
 
 ### Search Performance
+
 - **Exa search**: 15-60 seconds per query
 - **Claude extraction**: 5-10 seconds (4,000 max tokens)
 - **Total execution**: 30-90 seconds per property
 
 ### Cost Breakdown (per analysis)
+
 - **Exa searches**: ~5 searches × $0.005 = **$0.025**
 - **Claude extraction**: ~4,000 tokens × $0.003/1K = **$0.012**
 - **Total**: **~$0.037 per property**
 
 ### Caching Strategy
+
 - Results cached in `regulatory_compliance` table
 - 90-day expiration (ordinances change infrequently)
 - Reduces repeat costs by 97%
 
 **Example**:
+
 - First analysis: $0.037
 - Repeat analyses (within 90 days): $0.001 (database read only)
 - **Savings**: $0.036 per repeat (97% reduction)
@@ -303,12 +322,14 @@ that apply to multifamily properties with 250+ units.
 ## 🧪 Validation & Testing
 
 ### TypeScript Validation ✅
+
 ```bash
 $ pnpm tsc --noEmit
 # 0 errors - All types valid
 ```
 
 ### Build Validation ✅
+
 ```bash
 $ pnpm build
 # ✓ Compiled successfully
@@ -317,6 +338,7 @@ $ pnpm build
 ```
 
 ### Manual Testing (To Do)
+
 - [ ] Test with Austin, TX ordinances
 - [ ] Test with different property types
 - [ ] Test with cities that have no ordinances found
@@ -325,6 +347,7 @@ $ pnpm build
 - [ ] Test database persistence
 
 ### Unit Tests (To Do)
+
 - [ ] Test ordinance search with mocked Exa responses
 - [ ] Test requirement extraction with sample ordinances
 - [ ] Test compliance assessment logic
@@ -336,6 +359,7 @@ $ pnpm build
 ## 🎯 Success Criteria
 
 ### Functionality ✅
+
 - [x] Searches municipal ordinances using Exa
 - [x] Extracts full content from search results
 - [x] Uses Claude to extract requirements
@@ -346,6 +370,7 @@ $ pnpm build
 - [x] Adds compliance issues as recommendations
 
 ### Code Quality ✅
+
 - [x] TypeScript strict mode (0 errors)
 - [x] Follows BaseSkill pattern
 - [x] Comprehensive error handling
@@ -355,6 +380,7 @@ $ pnpm build
 - [x] Database persistence
 
 ### Integration ✅
+
 - [x] Registered in skill registry
 - [x] Called by WasteWise Analytics orchestrator
 - [x] AI usage tracked and aggregated
@@ -362,6 +388,7 @@ $ pnpm build
 - [x] Results included in final analysis
 
 ### Documentation ✅
+
 - [x] Comprehensive type definitions
 - [x] Inline code comments
 - [x] Usage examples
@@ -392,6 +419,7 @@ $ pnpm build
 ### Future Enhancements
 
 **Phase 9.2** (Near-term):
+
 - [ ] Add actual service comparison for compliance
 - [ ] Integrate Municode API as primary source
 - [ ] Add ordinance caching in `ordinance_database` table
@@ -399,6 +427,7 @@ $ pnpm build
 - [ ] Add confidence scoring for extracted requirements
 
 **Phase 10+** (Long-term):
+
 - [ ] Multi-jurisdiction support (city, county, state)
 - [ ] Automatic ordinance change detection
 - [ ] Compliance deadline tracking
@@ -414,32 +443,34 @@ $ pnpm build
 ### Direct Skill Execution
 
 ```typescript
-import { RegulatoryResearchSkill } from '@/lib/skills/skills/regulatory-research'
-import type { SkillContext } from '@/lib/skills/types'
+import { RegulatoryResearchSkill } from "@/lib/skills/skills/regulatory-research";
+import type { SkillContext } from "@/lib/skills/types";
 
-const skill = new RegulatoryResearchSkill()
+const skill = new RegulatoryResearchSkill();
 
 const context: SkillContext = {
-  projectId: 'proj_123',
-  userId: 'user_456',
+  projectId: "proj_123",
+  userId: "user_456",
   project: {
-    city: 'Austin',
-    state: 'TX',
-    property_type: 'Garden-Style',
+    city: "Austin",
+    state: "TX",
+    property_type: "Garden-Style",
     units: 250,
-    equipment_type: 'COMPACTOR',
+    equipment_type: "COMPACTOR",
     // ... other project fields
   },
   invoices: [],
-  config: { /* ... */ }
-}
+  config: {
+    /* ... */
+  },
+};
 
-const result = await skill.execute(context)
+const result = await skill.execute(context);
 
 if (result.success) {
-  console.log('Ordinances found:', result.data.ordinances.length)
-  console.log('Compliance status:', result.data.compliance.status)
-  console.log('Issues:', result.data.compliance.issues)
+  console.log("Ordinances found:", result.data.ordinances.length);
+  console.log("Compliance status:", result.data.compliance.status);
+  console.log("Issues:", result.data.compliance.issues);
 }
 ```
 
@@ -447,30 +478,31 @@ if (result.success) {
 
 ```typescript
 // Just run WasteWise Analytics - regulatory research runs automatically
-const wastewiseSkill = skillRegistry.get('wastewise-analytics')
-const result = await wastewiseSkill.execute(context)
+const wastewiseSkill = skillRegistry.get("wastewise-analytics");
+const result = await wastewiseSkill.execute(context);
 
 // Regulatory results included in complete analysis
-const regulatory = result.data.regulatoryCompliance
-const complianceRecommendations = result.data.recommendations
-  .filter(r => r.type === 'regulatory_compliance')
+const regulatory = result.data.regulatoryCompliance;
+const complianceRecommendations = result.data.recommendations.filter(
+  (r) => r.type === "regulatory_compliance",
+);
 ```
 
 ### Database Query
 
 ```typescript
 // Retrieve cached regulatory research
-const supabase = createServiceClient()
+const supabase = createServiceClient();
 
 const { data } = await supabase
-  .from('regulatory_compliance')
-  .select('*')
-  .eq('project_id', projectId)
-  .single()
+  .from("regulatory_compliance")
+  .select("*")
+  .eq("project_id", projectId)
+  .single();
 
 // Check if research is still valid (< 90 days old)
-const isValid = new Date(data.last_updated) >
-  new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+const isValid =
+  new Date(data.last_updated) > new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 ```
 
 ---
@@ -478,6 +510,7 @@ const isValid = new Date(data.last_updated) >
 ## 🔄 Next Steps
 
 ### Immediate (This Week)
+
 1. **Test with Real Data**
    - [ ] Test with Austin, TX property
    - [ ] Test with Chicago, IL property
@@ -497,12 +530,14 @@ const isValid = new Date(data.last_updated) >
    - [ ] Run evals as part of CI/CD
 
 ### Phase 9.2 (Next 2 Weeks)
+
 1. User Settings Page
 2. Team Management
 3. Stripe Integration
 4. Admin Dashboard (basic)
 
 ### Phase 9.3+ (Following Weeks)
+
 See `PHASE_9_COMPLETION_PLAN.md` for full roadmap
 
 ---
@@ -513,11 +548,13 @@ See `PHASE_9_COMPLETION_PLAN.md` for full roadmap
 **After Phase 9.1**: **92% production ready** (+2%)
 
 **What Changed**:
+
 - ✅ +1% Complete skill suite (5/5 core skills)
 - ✅ +1% Enhanced value proposition (compliance checking)
 - ⏳ Still missing: billing, admin tools, full testing
 
 **Remaining for 100%**:
+
 - User settings & team management (2%)
 - Subscription billing with Stripe (2%)
 - Admin dashboard & monitoring (2%)
@@ -536,6 +573,7 @@ Phase 9.1 successfully delivers a **production-ready regulatory research skill**
 5. ✅ **Scales efficiently** (< $0.04 per property)
 
 **WasteWise now offers**:
+
 - Compactor optimization
 - Batch invoice extraction
 - Contract analysis
