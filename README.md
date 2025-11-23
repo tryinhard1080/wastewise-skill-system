@@ -12,6 +12,8 @@
 
 **Current Status:** Phase 7 In Progress - Integration Testing & Production Deployment (85% Complete) 🚀
 
+**Automation Status:** ✨ Fully automated PR workflow active - feature branches auto-merge when checks pass
+
 ## Overview
 
 WasteWise Skill System is an extensible platform for analyzing multifamily property waste management and providing data-driven optimization recommendations. Built for Greystar and similar property management companies, it uses AI-powered skills to analyze invoices, haul logs, and contracts to identify cost savings opportunities.
