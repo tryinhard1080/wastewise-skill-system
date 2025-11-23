@@ -1,6 +1,8 @@
 # WasteWise Skill System
 
 [![PR Checks](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml)
+[![Auto-Merge](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/auto-merge.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/auto-merge.yml)
+[![Branch Cleanup](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/cleanup-branches.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/cleanup-branches.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
 [![Phase](https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg)](#development-phases)

@@ -1,0 +1,175 @@
+name: Cleanup Merged Branches
+
+on:
+  schedule:
+    # Run every Monday at 2am UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    # Allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Delete Merged Branches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history to check merged branches
+
+      - name: Find and Delete Merged Branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            // Get all branches
+            const { data: branches } = await github.rest.repos.listBranches({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            console.log(`Found ${branches.length} total branches`);
+
+            const deletedBranches = [];
+            const skippedBranches = [];
+
+            for (const branch of branches) {
+              // Skip master and any protected branches
+              if (branch.name === 'master' || branch.protected) {
+                console.log(`Skipping protected branch: ${branch.name}`);
+                continue;
+              }
+
+              // Get branch details
+              const { data: branchData } = await github.rest.repos.getBranch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: branch.name
+              });
+
+              // Check if branch is merged
+              try {
+                const { data: comparison } = await github.rest.repos.compareCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  base: 'master',
+                  head: branch.name
+                });
+
+                // Branch is merged if ahead_by is 0 (no commits ahead of master)
+                if (comparison.ahead_by === 0) {
+                  // Check if branch is older than 7 days
+                  const lastCommitDate = new Date(branchData.commit.commit.committer.date);
+
+                  if (lastCommitDate < sevenDaysAgo) {
+                    console.log(`Deleting merged branch: ${branch.name} (last commit: ${lastCommitDate.toISOString()})`);
+
+                    await github.rest.git.deleteRef({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      ref: `heads/${branch.name}`
+                    });
+
+                    deletedBranches.push({
+                      name: branch.name,
+                      lastCommit: lastCommitDate.toISOString()
+                    });
+                  } else {
+                    console.log(`Skipping recently merged branch: ${branch.name} (last commit: ${lastCommitDate.toISOString()})`);
+                    skippedBranches.push({
+                      name: branch.name,
+                      reason: 'merged_recently',
+                      lastCommit: lastCommitDate.toISOString()
+                    });
+                  }
+                } else {
+                  console.log(`Skipping unmerged branch: ${branch.name} (${comparison.ahead_by} commits ahead)`);
+                  skippedBranches.push({
+                    name: branch.name,
+                    reason: 'not_merged',
+                    commitsAhead: comparison.ahead_by
+                  });
+                }
+              } catch (error) {
+                console.log(`Error checking branch ${branch.name}: ${error.message}`);
+                skippedBranches.push({
+                  name: branch.name,
+                  reason: 'error',
+                  error: error.message
+                });
+              }
+            }
+
+            // Create summary
+            const summary = {
+              totalBranches: branches.length,
+              deletedCount: deletedBranches.length,
+              skippedCount: skippedBranches.length,
+              deleted: deletedBranches,
+              skipped: skippedBranches
+            };
+
+            console.log('\n=== CLEANUP SUMMARY ===');
+            console.log(`Total branches checked: ${summary.totalBranches}`);
+            console.log(`Branches deleted: ${summary.deletedCount}`);
+            console.log(`Branches skipped: ${summary.skippedCount}`);
+
+            if (deletedBranches.length > 0) {
+              console.log('\nDeleted branches:');
+              deletedBranches.forEach(b => console.log(`  - ${b.name} (last commit: ${b.lastCommit})`));
+            }
+
+            return summary;
+
+      - name: Create Summary Issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = JSON.parse(process.env.CLEANUP_SUMMARY || '{}');
+
+            if (summary.deletedCount === 0) {
+              console.log('No branches deleted, skipping issue creation');
+              return;
+            }
+
+            const issueBody = `## Branch Cleanup Report
+
+**Run Date:** ${new Date().toISOString()}
+
+### Summary
+- **Total branches checked:** ${summary.totalBranches}
+- **Branches deleted:** ${summary.deletedCount}
+- **Branches skipped:** ${summary.skippedCount}
+
+### Deleted Branches
+${summary.deleted.map(b => `- \`${b.name}\` (last commit: ${b.lastCommit})`).join('\n')}
+
+### Skipped Branches
+${summary.skipped.slice(0, 10).map(b => {
+  const reason = b.reason === 'merged_recently' ? 'merged recently' :
+                 b.reason === 'not_merged' ? `not merged (${b.commitsAhead} commits ahead)` :
+                 `error: ${b.error}`;
+  return `- \`${b.name}\` - ${reason}`;
+}).join('\n')}
+${summary.skipped.length > 10 ? `\n*... and ${summary.skipped.length - 10} more*` : ''}
+
+---
+*Automated by WasteWise Branch Cleanup workflow*`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Branch Cleanup Report - ${new Date().toISOString().split('T')[0]}`,
+              body: issueBody,
+              labels: ['automated', 'maintenance']
+            });
+        env:
+          CLEANUP_SUMMARY: ${{ steps.find-and-delete.outputs.result }}
