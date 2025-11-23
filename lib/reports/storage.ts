@@ -48,22 +48,34 @@ export interface UploadReportOutput {
  */
 export async function uploadReport(input: UploadReportInput): Promise<UploadReportOutput> {
   const { content, filename, projectId, contentType } = input
+  const buffer = typeof content === 'string' ? Buffer.from(content, 'utf-8') : content
+  const supabaseConfigured =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY)
+  const storagePath = `reports/${projectId}/${filename}`
 
   logger.info('Uploading report to storage', {
     filename,
     projectId,
     contentType,
-    size: typeof content === 'string' ? content.length : content.byteLength,
+    size: buffer.byteLength,
   })
+
+  if (!supabaseConfigured) {
+    logger.warn('Supabase credentials missing - returning placeholder report URL', {
+      filename,
+      projectId,
+    })
+
+    return {
+      storagePath,
+      downloadUrl: `https://example.com/${storagePath}`,
+      size: buffer.byteLength,
+      filename,
+    }
+  }
 
   try {
     const supabase = createServiceClient()
-
-    // Generate storage path: reports/{projectId}/{filename}
-    const storagePath = `reports/${projectId}/${filename}`
-
-    // Convert content to Buffer if it's a string
-    const buffer = typeof content === 'string' ? Buffer.from(content, 'utf-8') : content
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -170,6 +182,14 @@ export async function uploadReports(
  */
 export async function deleteOldReports(projectId: string): Promise<void> {
   logger.info('Deleting old reports', { projectId })
+
+  const supabaseConfigured =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY)
+
+  if (!supabaseConfigured) {
+    logger.warn('Supabase credentials missing - skipping report cleanup', { projectId })
+    return
+  }
 
   try {
     const supabase = createServiceClient()
