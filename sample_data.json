@@ -1,0 +1,79 @@
+{
+  "property_profile": {
+    "property_name": "Summit Gardens",
+    "address": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "property_type": "garden",
+    "units": 250,
+    "occupancy_pct": 92,
+    "status": "stabilized",
+    "has_compactor": true,
+    "has_valet": true,
+    "avg_tons_per_haul": 5.6,
+    "max_days_between_pickups": 10,
+    "dumpster_qty": 0,
+    "dumpster_size": 0,
+    "dumpster_freq_per_week": 0,
+    "avg_monthly_bulk": 820,
+    "avg_monthly_contamination": 620,
+    "avg_monthly_overage": 320,
+    "overages_present": true,
+    "location": "Austin, TX"
+  },
+  "invoices": [
+    {
+      "invoice_number": "INV-0001",
+      "invoice_date": "01/15/2025",
+      "service_month": "01/2025",
+      "hauler": "HaulerCo",
+      "pickup_fees": 550,
+      "disposal": 420,
+      "rental": 75,
+      "contamination": 0,
+      "bulk": 0,
+      "overages": 0,
+      "other": 0,
+      "units": 250,
+      "equipment_type": "compactor"
+    },
+    {
+      "invoice_number": "INV-0002",
+      "invoice_date": "02/15/2025",
+      "service_month": "02/2025",
+      "hauler": "HaulerCo",
+      "pickup_fees": 550,
+      "disposal": 400,
+      "rental": 75,
+      "contamination": 50,
+      "bulk": 100,
+      "overages": 75,
+      "other": 0,
+      "units": 250,
+      "equipment_type": "compactor"
+    }
+  ],
+  "haul_log": [
+    {
+      "pickup_date": "01/05/2025",
+      "tons": 6.2,
+      "avg_tons_per_haul": 6.2,
+      "max_days_between_pickups": 10,
+      "yards_per_door": 1.8
+    }
+  ],
+  "contract_meta": {
+    "contract_provided": "YES",
+    "expiration_date": "12/31/2026",
+    "auto_renewal": "Yes, 12 months",
+    "termination_notice_days": 90,
+    "rate_increase_terms": "4% annual cap",
+    "force_majeure_text": "...",
+    "indemnification_text": "...",
+    "service_level_text": "...",
+    "liability_text": "...",
+    "renewal_terms": "...",
+    "termination_clause": "Termination for cause..."
+  }
+}

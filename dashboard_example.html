@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WasteWise by THE Trash Hub — Dashboard Example</title>
+  <style>
+    :root {
+      --bg: #0e1726;
+      --panel: #111b2f;
+      --accent: #4fd1c5;
+      --accent-2: #a855f7;
+      --text: #e8ecf5;
+      --muted: #9fb0c5;
+      --danger: #f97316;
+      --success: #10b981;
+    }
+    body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); }
+    header { padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-weight: 700; letter-spacing: 0.4px; }
+    nav a { color: var(--muted); margin-left: 16px; text-decoration: none; font-size: 14px; }
+    nav a.active { color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding: 0 28px 28px; }
+    .card { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+    .card h3 { margin: 0 0 8px; font-size: 16px; letter-spacing: 0.2px; }
+    .kpi { font-size: 24px; font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; margin-left: 8px; }
+    .pill.success { background: rgba(16,185,129,0.15); color: var(--success); }
+    .pill.danger { background: rgba(249,115,22,0.15); color: var(--danger); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text); }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    th { color: var(--muted); font-weight: 600; }
+    .tabs { display: flex; gap: 10px; padding: 0 28px 16px; }
+    .tab { padding: 10px 14px; background: var(--panel); color: var(--muted); border-radius: 10px; text-decoration: none; font-size: 13px; border: 1px solid rgba(255,255,255,0.06); }
+    .tab.active { color: var(--accent); border-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">WasteWise by THE Trash Hub</div>
+    <nav>
+      <a class="active" href="#">Dashboard</a>
+      <a href="#expense">Expense Analysis</a>
+      <a href="#haul">Haul Log</a>
+      <a href="#opt">Optimization</a>
+      <a href="#contract">Contract Terms</a>
+      <a href="#reg">Regulatory</a>
+    </nav>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active">Dashboard</div>
+    <div class="tab">Expense Analysis</div>
+    <div class="tab">Haul Log</div>
+    <div class="tab">Optimization</div>
+    <div class="tab">Contract Terms</div>
+    <div class="tab">Regulatory</div>
+  </div>
+
+  <section class="grid">
+    <div class="card">
+      <h3>Annual Savings Opportunity <span class="pill success">+$46,800</span></h3>
+      <div class="kpi">$3,900 <span class="muted">per month</span></div>
+      <div class="muted">Based on compactor monitors, contamination reduction, and bulk subscription.</div>
+    </div>
+    <div class="card">
+      <h3>Compactor Performance</h3>
+      <div class="kpi">5.6 tons/haul <span class="pill danger">Below target</span></div>
+      <div class="muted">Target 8–9 tons; max days between pickups: 10 (OK).</div>
+    </div>
+    <div class="card">
+      <h3>Contamination Rate</h3>
+      <div class="kpi">4.8% <span class="pill danger">Action</span></div>
+      <div class="muted">>$150/mo — recommend signage + education + monitoring (50% reduction expected).</div>
+    </div>
+    <div class="card">
+      <h3>Bulk Spend</h3>
+      <div class="kpi">$820 <span class="muted">avg monthly</span></div>
+      <div class="muted">Recommend subscription at $400/mo → save ~$420/mo.</div>
+    </div>
+  </section>
+
+  <section id="expense" class="card" style="margin: 0 28px 16px;">
+    <h3>Expense Analysis (Sample)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th><th>Invoice #</th><th>Pickup</th><th>Disposal</th><th>Rental</th><th>Contam</th><th>Bulk</th><th>Overages</th><th>Total</th><th>Cost/Door</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>01/2025</td><td>INV-0001</td><td>$550</td><td>$420</td><td>$75</td><td>$0</td><td>$0</td><td>$0</td><td>$1,045</td><td>$4.18</td></tr>
+        <tr><td>02/2025</td><td>INV-0002</td><td>$550</td><td>$400</td><td>$75</td><td>$50</td><td>$100</td><td>$75</td><td>$1,250</td><td>$5.00</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="haul" class="card" style="margin: 0 28px 16px;">
+    <h3>Haul Log (Sample)</h3>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Tons</th><th>Avg Tons/Haul</th><th>Max Days Between Pickups</th><th>Yards/Door</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>01/05/2025</td><td>6.2</td><td>6.2</td><td>10</td><td>1.8</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="opt" class="card" style="margin: 0 28px 16px;">
+    <h3>Optimization Opportunities</h3>
+    <table>
+      <thead>
+        <tr><th>Priority</th><th>Recommendation</th><th>Monthly Savings</th><th>Annual</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Compactor Monitors</td><td>$800</td><td>$9,600</td><td>Avg tons/haul 5.6 < 7; interval ≤14; pickup savings exceed threshold.</td></tr>
+        <tr><td>2</td><td>Contamination Reduction</td><td>$310</td><td>$3,720</td><td>Contam 4.8% and >$150/mo; signage + education + monitoring.</td></tr>
+        <tr><td>3</td><td>Bulk Subscription</td><td>$420</td><td>$5,040</td><td>Avg bulk $820; subscription $400/mo reduces cost.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="contract" class="card" style="margin: 0 28px 16px;">
+    <h3>Contract Terms (Sample)</h3>
+    <table>
+      <thead><tr><th>Clause</th><th>Details</th><th>Risk</th></tr></thead>
+      <tbody>
+        <tr><td>Term & Renewal</td><td>Expires 12/31/2026; auto-renews 12 months.</td><td>MED</td></tr>
+        <tr><td>Rate Increases</td><td>4% annual cap.</td><td>LOW</td></tr>
+        <tr><td>Termination</td><td>90-day notice required; termination for cause allowed.</td><td>MED</td></tr>
+        <tr><td>Liability</td><td>Standard indemnity; verify coverage limits.</td><td>MED</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="reg" class="card" style="margin: 0 28px 16px;">
+    <h3>Regulatory Compliance (Sample)</h3>
+    <div class="muted">Austin, TX — Confidence: MEDIUM (official sources found; some details pending).</div>
+    <ul>
+      <li>Recycling: Universal recycling required; weekly service; signage in enclosures.</li>
+      <li>Organics: Food-scrap mandate phased for >4 cu yd/week; check thresholds.</li>
+      <li>Penalties: Fines up to $2,000/day per violation; enforceable by city code.</li>
+      <li>Licensed haulers: Example Hauler A/B/C (verify current list).</li>
+    </ul>
+  </section>
+</body>
+</html>
