@@ -1,0 +1,182 @@
+# Automated Branch Cleanup Workflow
+# Identifies and cleans up stale branches to maintain repository hygiene
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+
+name: Cleanup Stale Branches
+
+on:
+  # Run weekly on Sundays at midnight CST
+  schedule:
+    - cron: '0 6 * * 0'  # 6:00 AM UTC = 12:00 AM CST
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (preview only, no deletions)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      days_stale:
+        description: 'Days until branch is considered stale'
+        required: false
+        default: '90'
+        type: string
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Identify stale branches
+        id: identify
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
+          DAYS_STALE: ${{ github.event.inputs.days_stale || '90' }}
+        run: |
+          echo "🔍 Identifying stale branches (older than $DAYS_STALE days)..."
+
+          # Protected branches that should never be deleted
+          PROTECTED_BRANCHES="master main develop production staging"
+
+          # Get current timestamp
+          NOW=$(date +%s)
+          STALE_THRESHOLD=$((NOW - (DAYS_STALE * 86400)))
+
+          # Arrays to track branches
+          declare -a MERGED_BRANCHES=()
+          declare -a STALE_UNMERGED=()
+          declare -a DELETED_BRANCHES=()
+
+          # Get all remote branches except protected ones
+          for branch in $(git branch -r | grep -v HEAD | sed 's/origin\///'); do
+            # Skip protected branches
+            if echo "$PROTECTED_BRANCHES" | grep -wq "$branch"; then
+              echo "⏭️  Skipping protected branch: $branch"
+              continue
+            fi
+
+            # Get last commit date for branch
+            LAST_COMMIT=$(git log -1 --format=%ct origin/$branch 2>/dev/null || echo "0")
+
+            if [ "$LAST_COMMIT" -lt "$STALE_THRESHOLD" ]; then
+              # Check if branch is merged into master
+              IS_MERGED=$(git branch -r --merged origin/master | grep -w "origin/$branch" || echo "")
+
+              if [ -n "$IS_MERGED" ]; then
+                echo "✅ Merged and stale: $branch (last updated $(git log -1 --format=%ar origin/$branch))"
+                MERGED_BRANCHES+=("$branch")
+
+                # Delete merged stale branch (unless dry run)
+                if [ "$DRY_RUN" = "false" ]; then
+                  git push origin --delete "$branch" 2>/dev/null && echo "🗑️  Deleted: $branch" && DELETED_BRANCHES+=("$branch")
+                fi
+              else
+                echo "⚠️  Unmerged and stale: $branch (last updated $(git log -1 --format=%ar origin/$branch))"
+                STALE_UNMERGED+=("$branch")
+              fi
+            fi
+          done
+
+          # Output summary
+          echo ""
+          echo "📊 Summary:"
+          echo "- Merged stale branches: ${#MERGED_BRANCHES[@]}"
+          echo "- Unmerged stale branches: ${#STALE_UNMERGED[@]}"
+          if [ "$DRY_RUN" = "false" ]; then
+            echo "- Deleted branches: ${#DELETED_BRANCHES[@]}"
+          fi
+
+          # Set outputs for issue creation
+          echo "merged_count=${#MERGED_BRANCHES[@]}" >> $GITHUB_OUTPUT
+          echo "unmerged_count=${#STALE_UNMERGED[@]}" >> $GITHUB_OUTPUT
+          echo "deleted_count=${#DELETED_BRANCHES[@]}" >> $GITHUB_OUTPUT
+
+          # Save branch lists to files for issue body
+          printf "%s\n" "${MERGED_BRANCHES[@]}" > merged_branches.txt
+          printf "%s\n" "${STALE_UNMERGED[@]}" > unmerged_branches.txt
+          printf "%s\n" "${DELETED_BRANCHES[@]}" > deleted_branches.txt
+
+      - name: Create summary issue
+        if: steps.identify.outputs.unmerged_count > 0 || steps.identify.outputs.deleted_count > 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MERGED_COUNT="${{ steps.identify.outputs.merged_count }}"
+          UNMERGED_COUNT="${{ steps.identify.outputs.unmerged_count }}"
+          DELETED_COUNT="${{ steps.identify.outputs.deleted_count }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
+
+          # Build issue body
+          ISSUE_BODY="## 🧹 Stale Branch Cleanup Report\n\n"
+          ISSUE_BODY+="**Run Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')\n"
+          ISSUE_BODY+="**Mode**: $([ "$DRY_RUN" = "true" ] && echo "🔍 Dry Run (Preview Only)" || echo "🗑️ Live Deletion")\n\n"
+
+          if [ "$DELETED_COUNT" -gt 0 ]; then
+            ISSUE_BODY+="### ✅ Deleted Merged Stale Branches ($DELETED_COUNT)\n\n"
+            ISSUE_BODY+="The following merged branches were automatically deleted:\n\n"
+            while IFS= read -r branch; do
+              ISSUE_BODY+="- \`$branch\`\n"
+            done < deleted_branches.txt
+            ISSUE_BODY+="\n"
+          fi
+
+          if [ "$MERGED_COUNT" -gt 0 ] && [ "$DRY_RUN" = "true" ]; then
+            ISSUE_BODY+="### 🔍 Merged Stale Branches Found ($MERGED_COUNT)\n\n"
+            ISSUE_BODY+="These merged branches would be deleted in a live run:\n\n"
+            while IFS= read -r branch; do
+              ISSUE_BODY+="- \`$branch\`\n"
+            done < merged_branches.txt
+            ISSUE_BODY+="\n"
+          fi
+
+          if [ "$UNMERGED_COUNT" -gt 0 ]; then
+            ISSUE_BODY+="### ⚠️ Unmerged Stale Branches ($UNMERGED_COUNT)\n\n"
+            ISSUE_BODY+="These branches are stale but not merged. **Manual review required**:\n\n"
+            while IFS= read -r branch; do
+              ISSUE_BODY+="- \`$branch\` - [View commits](https://github.com/${{ github.repository }}/commits/$branch)\n"
+            done < unmerged_branches.txt
+            ISSUE_BODY+="\n"
+            ISSUE_BODY+="**Action Required**: Review these branches and either:\n"
+            ISSUE_BODY+="1. Merge them if the work is valuable\n"
+            ISSUE_BODY+="2. Delete them if they're no longer needed\n"
+            ISSUE_BODY+="3. Push a new commit to keep them active\n"
+          fi
+
+          # Create issue with GitHub CLI
+          echo -e "$ISSUE_BODY" | gh issue create \
+            --title "🧹 Stale Branch Cleanup Report - $(date -u '+%Y-%m-%d')" \
+            --body-file - \
+            --label "maintenance" \
+            --label "automated"
+
+      - name: Summary
+        run: |
+          echo "✅ Branch cleanup workflow completed"
+          echo "📊 Results:"
+          echo "   - Merged stale branches: ${{ steps.identify.outputs.merged_count }}"
+          echo "   - Unmerged stale branches: ${{ steps.identify.outputs.unmerged_count }}"
+          echo "   - Deleted branches: ${{ steps.identify.outputs.deleted_count }}"
+
+          if [ "${{ github.event.inputs.dry_run || 'true' }}" = "true" ]; then
+            echo ""
+            echo "ℹ️  This was a dry run. To actually delete branches, run with dry_run=false"
+          fi
