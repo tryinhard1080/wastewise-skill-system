@@ -327,7 +327,7 @@ describe('RegulatoryResearchSkill', () => {
       expect(compliance.status).toBe('UNKNOWN')
       expect(compliance.issues).toHaveLength(1)
       expect(compliance.issues[0].severity).toBe('MEDIUM')
-      expect(compliance.recommendations.some(r => r.includes('cardboard, plastic'))).toBe(true)
+      expect(compliance.recommendations.some((r: string) => r.includes('cardboard, plastic'))).toBe(true)
     })
 
     it('should flag composting requirements as LOW severity', async () => {
@@ -403,7 +403,7 @@ describe('RegulatoryResearchSkill', () => {
     })
 
     it('should return LOW confidence with few results', () => {
-      const mockOrdinances = []
+      const mockOrdinances: any[] = []
       const mockRequirements = {
         waste: [],
         recycling: [],

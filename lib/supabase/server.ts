@@ -36,6 +36,7 @@ export async function createClient() {
     cookieStore = await cookies()
   } catch (error) {
     // Called outside request context (e.g. worker)
+    console.error('Failed to access cookies (expected in worker context):', error)
     // Return client without cookie handling
     return createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -66,6 +67,7 @@ export async function createClient() {
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
+            console.error('Failed to set cookies from Server Component:', error)
           }
         },
       },

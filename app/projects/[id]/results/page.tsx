@@ -1,9 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AnalysisSummary } from '@/components/results/analysis-summary'
-import { RecommendationsList } from '@/components/results/recommendations-list'
-import { DownloadButtons } from '@/components/results/download-buttons'
 import type { WasteWiseAnalyticsCompleteResult } from '@/lib/skills/types'
+import { DashboardClient } from './dashboard-client'
 
 export default async function ResultsPage({
   params,
@@ -53,29 +51,10 @@ export default async function ResultsPage({
   const result = job.result_data as unknown as WasteWiseAnalyticsCompleteResult
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{project.property_name}</h1>
-        <p className="text-muted-foreground">
-          Analysis completed{' '}
-          {new Date(job.completed_at!).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </p>
-      </header>
-
-      <div className="space-y-8">
-        <DownloadButtons
-          excelUrl={result.reports.excelWorkbook.downloadUrl}
-          htmlUrl={result.reports.htmlDashboard.downloadUrl}
-        />
-
-        <AnalysisSummary summary={result.summary} />
-
-        <RecommendationsList recommendations={result.recommendations} />
-      </div>
-    </div>
+    <DashboardClient
+      project={project}
+      result={result}
+      completedAt={job.completed_at!}
+    />
   )
 }

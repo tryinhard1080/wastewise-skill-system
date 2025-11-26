@@ -13,6 +13,11 @@
  *   - SUPABASE_SERVICE_ROLE_KEY
  */
 
+
+import fs from 'fs'
+fs.appendFileSync('debug-worker.txt', '!!! LOADING START-WORKER.TS - ' + new Date().toISOString() + ' !!!\n')
+console.log('!!! LOADING START-WORKER.TS - ' + new Date().toISOString() + ' !!!')
+
 import { AnalysisWorker } from '../lib/workers/analysis-worker'
 import { logger } from '../lib/observability/logger'
 import { registerAllSkills } from '../lib/skills/skills'

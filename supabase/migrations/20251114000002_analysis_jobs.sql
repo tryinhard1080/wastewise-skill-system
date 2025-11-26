@@ -16,6 +16,7 @@ create table analysis_jobs (
   project_id uuid references projects(id) on delete cascade not null,
 
   -- Job metadata
+  -- IMPORTANT: job_type values must match lib/constants/job-types.ts (canonical source)
   job_type text not null check (
     job_type in (
       'invoice_extraction',

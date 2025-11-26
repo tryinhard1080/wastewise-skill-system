@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WasteWise Dashboard - Orion Prosper Lakes</title>
+  
+  <!-- External Libraries -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: Inter, system-ui, Arial, sans-serif; 
+      background: #f7f7f7; 
+      color: #1B1B1B; 
+      position: relative;
+    }
+    
+    /* Back to Top Button */
+    #backToTop {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: none;
+      z-index: 1000;
+      background: #2C5F2D;
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-size: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    #backToTop:hover {
+      background: #1f4220;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    
+    /* Export Menu */
+    .export-menu {
+      position: relative;
+      display: inline-block;
+      margin: 16px 0;
+    }
+    
+    .export-btn {
+      background: linear-gradient(135deg, #2C5F2D 0%, #1f4220 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(44, 95, 45, 0.3);
+    }
+    
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(44, 95, 45, 0.4);
+    }
+    
+    .export-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-top: 8px;
+      min-width: 180px;
+      z-index: 100;
+    }
+    
+    .export-dropdown.show {
+      display: block;
+    }
+    
+    .export-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+    }
+    
+    .export-option:last-child {
+      border-bottom: none;
+    }
+    
+    .export-option:hover {
+      background: #f8f9fa;
+    }
+    
+    .export-option i {
+      width: 20px;
+      color: #2C5F2D;
+    }
+    
+    /* Action Summary Card */
+    .action-summary {
+      background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+      border-left: 4px solid #FF8C00;
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(255, 140, 0, 0.1);
+    }
+    
+    .action-summary h2 {
+      color: #C2410C;
+      margin-bottom: 16px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .next-steps {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .next-steps li {
+      padding: 12px;
+      margin-bottom: 8px;
+      background: white;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .next-steps .step-action {
+      flex: 1;
+      font-weight: 500;
+    }
+    
+    .next-steps .contact-btn {
+      background: #2C5F2D;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    
+    .next-steps .contact-btn:hover {
+      background: #1f4220;
+    }
+    
+    /* Progress Bars */
+    .progress-container {
+      margin: 8px 0;
+    }
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .progress-bar-bg {
+      background: #e0e0e0;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      transition: width 1s ease;
+      border-radius: 4px;
+    }
+    
+    .progress-bar.excellent { background: linear-gradient(90deg, #22C55E, #16A34A); }
+    .progress-bar.good { background: linear-gradient(90deg, #90EE90, #22C55E); }
+    .progress-bar.warning { background: linear-gradient(90deg, #FFD700, #FF8C00); }
+    .progress-bar.danger { background: linear-gradient(90deg, #FF8C00, #DC2626); }
+    
+    .dashboard-header { 
+      padding: 24px; 
+      background: linear-gradient(135deg, #2C5F2D 0%, #1f4220 100%);
+      color: white; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .property-title { 
+      font-size: 28px; 
+      font-weight: 700; 
+      margin-bottom: 4px;
+    }
+    
+    .analysis-date { 
+      opacity: 0.9; 
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .kpi-row { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+      gap: 12px; 
+      margin-bottom: 20px; 
+    }
+    
+    .kpi-card { 
+      background: rgba(255, 255, 255, 0.1); 
+      border-radius: 12px; 
+      padding: 16px; 
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .kpi-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .kpi-card.primary { 
+      background: #4A7C4E; 
+      border: 2px solid #90EE90; 
+      box-shadow: 0 4px 12px rgba(144, 238, 144, 0.3);
+    }
+    
+    .kpi-label { 
+      font-size: 11px; 
+      opacity: 0.85; 
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .kpi-value { 
+      font-size: 24px; 
+      font-weight: 700; 
+    }
+    
+    .kpi-card.primary .kpi-value {
+      color: #90EE90;
+    }
+    
+    .tab-navigation { 
+      display: flex; 
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .tab-btn { 
+      background: rgba(255, 255, 255, 0.15); 
+      color: white; 
+      border: 0; 
+      padding: 12px 20px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 14px; 
+      font-weight: 500;
+      transition: all 0.2s; 
+      backdrop-filter: blur(10px);
+    }
+    
+    .tab-btn:hover { 
+      background: rgba(255, 255, 255, 0.25); 
+      transform: translateY(-1px);
+    }
+    
+    .tab-btn.active { 
+      background: #90EE90; 
+      color: #1B1B1B; 
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(144, 238, 144, 0.3);
+    }
+    
+    .container { 
+      padding: 24px; 
+      max-width: 1400px; 
+      margin: 0 auto; 
+    }
+    
+    .tab-content { 
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tab-content.active { 
+      display: block; 
+    }
+    
+    .card { 
+      background: white; 
+      border-radius: 12px; 
+      padding: 24px; 
+      margin-bottom: 20px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    
+    .card h2 { 
+      margin: 0 0 20px 0; 
+      color: #2C5F2D; 
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .card h2 i {
+      font-size: 18px;
+      opacity: 0.7;
+    }
+    
+    .grid-2 { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 20px; 
+    }
+    
+    .grid-3 { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+      gap: 16px; 
+      margin-bottom: 20px; 
+    }
+    
+    .metric-card { 
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-left: 4px solid #2C5F2D; 
+      padding: 20px; 
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(44, 95, 45, 0.15);
+    }
+    
+    .metric-card strong { 
+      display: block; 
+      color: #1C3F60; 
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .metric-card .value { 
+      font-size: 28px; 
+      font-weight: 700; 
+      color: #2C5F2D; 
+    }
+    
+    .metric-card .subtext {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    /* DataTables Customization */
+    .dataTables_wrapper {
+      padding: 20px 0;
+    }
+    
+    .dataTables_filter input {
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-left: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    .dataTables_filter input:focus {
+      border-color: #2C5F2D;
+      outline: none;
+    }
+    
+    .dataTables_length select {
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px 30px 6px 10px;
+      margin: 0 8px;
+      font-size: 14px;
+    }
+    
+    .data-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 13px; 
+    }
+    
+    .data-table th, 
+    .data-table td { 
+      border: 1px solid #e5e5e5; 
+      padding: 12px; 
+      text-align: left; 
+    }
+    
+    .data-table thead th { 
+      background: #2C5F2D; 
+      color: white; 
+      font-weight: 600; 
+      position: sticky; 
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+    }
+    
+    .data-table thead th:hover {
+      background: #1f4220;
+    }
+    
+    .data-table tbody tr:nth-child(even) { 
+      background: #f9f9f9; 
+    }
+    
+    .data-table tbody tr:hover { 
+      background: #e8f5e9;
+      cursor: pointer;
+    }
+    
+    .opportunity-badge { 
+      display: inline-block; 
+      padding: 6px 12px; 
+      border-radius: 16px; 
+      font-size: 12px; 
+      font-weight: 600;
+    }
+    
+    .priority-1 { background: #DC2626; color: white; }
+    .priority-2 { background: #FF8C00; color: white; }
+    .priority-3 { background: #FFD700; color: #333; }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-low { background: #FEE2E2; color: #DC2626; }
+    .status-normal { background: #D1FAE5; color: #059669; }
+    .status-high { background: #DBEAFE; color: #1D4ED8; }
+    
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .summary-box h3 {
+      color: #2C5F2D;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .summary-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .summary-stat:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-stat .label {
+      color: #64748b;
+      font-size: 14px;
+    }
+    
+    .summary-stat .value {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 14px;
+    }
+    
+    @media(max-width: 768px) { 
+      .kpi-row { 
+        grid-template-columns: 1fr; 
+      }
+      .grid-2, .grid-3 { 
+        grid-template-columns: 1fr; 
+      }
+      .tab-navigation { 
+        overflow-x: auto; 
+      }
+      .dashboard-header {
+        padding: 16px;
+        position: relative;
+      }
+      .property-title {
+        font-size: 20px;
+      }
+      #backToTop {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+      }
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: #64748b;
+      font-size: 13px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 40px;
+    }
+    
+    .footer strong {
+      color: #2C5F2D;
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+      }
+      .dashboard-header {
+        position: relative;
+        page-break-after: avoid;
+      }
+      .tab-navigation,
+      #backToTop,
+      .export-menu {
+        display: none !important;
+      }
+      .tab-content {
+        display: block !important;
+        page-break-inside: avoid;
+      }
+      .card {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+      }
+      .dataTables_wrapper .dataTables_filter,
+      .dataTables_wrapper .dataTables_length,
+      .dataTables_wrapper .dataTables_info,
+      .dataTables_wrapper .dataTables_paginate {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Top Button -->
+  <button id="backToTop" title="Back to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <header class="dashboard-header">
+    <div class="property-title">Orion Prosper Lakes</div>
+    <div class="analysis-date">WasteWise Complete Analysis | January 2024 - July 2024</div>
+    
+    <div class="kpi-row">
+      <div class="kpi-card primary">
+        <div class="kpi-label">Avg Tons/Haul</div>
+        <div class="kpi-value">6.1</div>
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar warning" style="width: 72%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-card primary">
+        <div class="kpi-label">Cost Per Door</div>
+        <div class="kpi-value">$24.12</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Spend (7mo)</div>
+        <div class="kpi-value">$42,110</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Projected Annual</div>
+        <div class="kpi-value">$72,189</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Compactor Util %</div>
+        <div class="kpi-value">72%</div>
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar warning" style="width: 72%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Cost Per Ton</div>
+        <div class="kpi-value">$42.50</div>
+      </div>
+      <div class="kpi-card primary">
+        <div class="kpi-label">Yards Per Door</div>
+        <div class="kpi-value">2.21</div>
+      </div>
+    </div>
+    
+    <nav class="tab-navigation">
+      <button class="tab-btn active" onclick="openTab('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</button>
+      <button class="tab-btn" onclick="openTab('expenses', this)"><i class="fas fa-file-invoice-dollar"></i> Expense Detail</button>
+      <button class="tab-btn" onclick="openTab('haul-log', this)"><i class="fas fa-truck"></i> Haul Log</button>
+      <button class="tab-btn" onclick="openTab('optimization', this)"><i class="fas fa-lightbulb"></i> Optimization</button>
+      <button class="tab-btn" onclick="openTab('compliance', this)"><i class="fas fa-clipboard-check"></i> Compliance</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <!-- Action Summary -->
+    <div class="action-summary">
+      <h2><i class="fas fa-tasks"></i> Action Required - Potential Savings: $14,750/year</h2>
+      <ul class="next-steps">
+        <li>
+          <span class="step-action"><strong>Priority 1:</strong> Install DSQ Compactor Monitors ($10,200 savings)</span>
+          <a href="mailto:keith.conrad@dsqtech.com?subject=Orion Prosper Lakes - Compactor Monitoring" class="contact-btn">
+            <i class="fas fa-envelope"></i> Contact Keith
+          </a>
+        </li>
+        <li>
+          <span class="step-action"><strong>Priority 2:</strong> Reduce Contamination Fees ($2,050 savings)</span>
+          <a href="mailto:cole@allywaste.com?subject=Orion Prosper Lakes - Contamination Reduction" class="contact-btn">
+            <i class="fas fa-envelope"></i> Contact Cole
+          </a>
+        </li>
+        <li>
+          <span class="step-action"><strong>Priority 3:</strong> Subscribe to Bulk Trash Service ($2,500 savings)</span>
+          <a href="mailto:cole@allywaste.com?subject=Orion Prosper Lakes - Bulk Subscription" class="contact-btn">
+            <i class="fas fa-envelope"></i> Contact Cole
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab 1: Dashboard -->
+    <div id="dashboard" class="tab-content active">
+      <!-- Export Menu -->
+      <div class="export-menu">
+        <button class="export-btn" onclick="toggleExportMenu()">
+          <i class="fas fa-download"></i> Export Data
+        </button>
+        <div class="export-dropdown" id="exportDropdown">
+          <div class="export-option" onclick="exportCSV()">
+            <i class="fas fa-file-csv"></i>
+            <span>Export as CSV</span>
+          </div>
+          <div class="export-option" onclick="exportPDF()">
+            <i class="fas fa-file-pdf"></i>
+            <span>Export as PDF</span>
+          </div>
+          <div class="export-option" onclick="window.print()">
+            <i class="fas fa-print"></i>
+            <span>Print Report</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="metric-card">
+          <strong>Total Compactor Hauls</strong>
+          <div class="value">47</div>
+          <div class="subtext">6.7 hauls per month avg</div>
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Target: 58 hauls/year</span>
+              <span>81%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar good" style="width: 81%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <strong>Avg Days Between Service</strong>
+          <div class="value">4.2 days</div>
+          <div class="subtext">Target: 5-7 days optimal</div>
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Frequency Status</span>
+              <span>Too Frequent</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar warning" style="width: 60%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <strong>Potential Annual Savings</strong>
+          <div class="value">$14,750</div>
+          <div class="subtext">3 optimization opportunities</div>
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Savings vs Current Spend</span>
+              <span>20%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar excellent" style="width: 20%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2><i class="fas fa-chart-line"></i> Monthly Expense Trend</h2>
+          <canvas id="expenseTrendChart" height="280"></canvas>
+        </div>
+        
+        <div class="card">
+          <h2><i class="fas fa-weight"></i> Monthly Tonnage Trend</h2>
+          <canvas id="tonnageTrendChart" height="280"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><i class="fas fa-lightbulb"></i> Top Optimization Opportunities</h2>
+        <table class="data-table" id="opportunitiesTable">
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Opportunity</th>
+              <th>Annual Savings</th>
+              <th>ROI</th>
+              <th>Complexity</th>
+              <th>Timeline</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="opportunity-badge priority-1">1</span></td>
+              <td><strong>Install Compactor Monitoring System</strong><br><small>Current: 6.1 tons/haul → Target: 8.5 tons/haul</small></td>
+              <td><strong>$10,200</strong></td>
+              <td><span class="status-badge status-high">680%</span></td>
+              <td>Medium</td>
+              <td>30-45 days</td>
+            </tr>
+            <tr>
+              <td><span class="opportunity-badge priority-2">2</span></td>
+              <td><strong>Reduce Contamination Charges</strong><br><small>Current fees: $1,195 (3.5% of spend)</small></td>
+              <td><strong>$2,050</strong></td>
+              <td><span class="status-badge status-high">Immediate</span></td>
+              <td>Low</td>
+              <td>15-30 days</td>
+            </tr>
+            <tr>
+              <td><span class="opportunity-badge priority-3">3</span></td>
+              <td><strong>Subscribe to Bulk Trash Service</strong><br><small>Current avg: $1,290/month vs $400 subscription</small></td>
+              <td><strong>$2,500</strong></td>
+              <td><span class="status-badge status-high">Immediate</span></td>
+              <td>Low</td>
+              <td>7-14 days</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Other tabs... (continuing in next file due to length) -->
+    
+  </div>
+
+  <div class="footer">
+    <p><strong>WasteWise Complete Analysis</strong> by <strong>THE Trash Hub</strong></p>
+    <p>Report generated for Orion Prosper Lakes | 250 units | Garden-Style Property</p>
+    <p style="margin-top: 8px;">Analysis Period: January 2024 - July 2024</p>
+  </div>
+
+<script>
+// Back to Top functionality
+const backToTopBtn = document.getElementById('backToTop');
+
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset > 300) {
+    backToTopBtn.style.display = 'block';
+  } else {
+    backToTopBtn.style.display = 'none';
+  }
+});
+
+backToTopBtn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Tab functionality with URL hash
+function openTab(tabId, btnElement) {
+  // Update URL hash
+  window.location.hash = tabId;
+  
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  document.getElementById(tabId).classList.add('active');
+  btnElement.classList.add('active');
+  
+  // Scroll to top smoothly
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Handle initial hash on page load
+window.addEventListener('load', () => {
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    const tabBtn = document.querySelector(`[onclick*="${hash}"]`);
+    if (tabBtn) {
+      openTab(hash, tabBtn);
+    }
+  }
+});
+
+// Export Menu Toggle
+function toggleExportMenu() {
+  const dropdown = document.getElementById('exportDropdown');
+  dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+window.addEventListener('click', (e) => {
+  if (!e.target.matches('.export-btn') && !e.target.closest('.export-btn')) {
+    const dropdown = document.getElementById('exportDropdown');
+    if (dropdown.classList.contains('show')) {
+      dropdown.classList.remove('show');
+    }
+  }
+});
+
+// Export to CSV
+function exportCSV() {
+  const table = document.getElementById('opportunitiesTable');
+  let csv = [];
+  
+  // Headers
+  const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+  csv.push(headers.join(','));
+  
+  // Rows
+  const rows = table.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const cols = Array.from(row.querySelectorAll('td')).map(td => {
+      return `"${td.textContent.trim().replace(/"/g, '""')}"`;
+    });
+    csv.push(cols.join(','));
+  });
+  
+  // Download
+  const csvContent = csv.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'wastewise-analysis.csv';
+  link.click();
+}
+
+// Export to PDF (simplified version)
+function exportPDF() {
+  alert('PDF export functionality would integrate with jsPDF library.\nFor now, please use Print to save as PDF.');
+  window.print();
+}
+
+// Initialize DataTables
+$(document).ready(function() {
+  $('#opportunitiesTable').DataTable({
+    pageLength: 10,
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    order: [[0, 'asc']],
+    language: {
+      search: "Search opportunities:",
+      lengthMenu: "Show _MENU_ opportunities",
+      info: "Showing _START_ to _END_ of _TOTAL_ opportunities"
+    }
+  });
+});
+
+// Charts
+const expenseCtx = document.getElementById('expenseTrendChart').getContext('2d');
+new Chart(expenseCtx, {
+  type: 'line',
+  data: {
+    labels: ['Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024', 'Jun 2024', 'Jul 2024'],
+    datasets: [{
+      label: 'Total Monthly Cost',
+      data: [4525, 5875, 5130, 5245, 5845, 5250, 4760],
+      borderColor: '#2C5F2D',
+      backgroundColor: 'rgba(44, 95, 45, 0.1)',
+      fill: true,
+      tension: 0.4,
+      borderWidth: 3,
+      pointRadius: 5,
+      pointHoverRadius: 7,
+      pointBackgroundColor: '#2C5F2D',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        callbacks: {
+          label: ctx => 'Total: $' + ctx.parsed.y.toLocaleString()
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { callback: value => '$' + value.toLocaleString() }
+      }
+    }
+  }
+});
+
+const tonnageCtx = document.getElementById('tonnageTrendChart').getContext('2d');
+new Chart(tonnageCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    datasets: [{
+      label: 'Total Tons',
+      data: [37.2, 39.8, 36.4, 38.1, 39.7, 39.5, 36.6],
+      backgroundColor: 'rgba(74, 124, 78, 0.8)',
+      borderColor: '#4A7C4E',
+      borderWidth: 2,
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+        label: ctx => 'Tonnage: ' + ctx.parsed.y.toFixed(1) + ' tons'
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { callback: value => value.toFixed(1) + ' tons' }
+      }
+    }
+  }
+});
+
+// Animate progress bars on load
+window.addEventListener('load', () => {
+  const bars = document.querySelectorAll('.progress-bar');
+  bars.forEach(bar => {
+    const width = bar.style.width;
+    bar.style.width = '0%';
+    setTimeout(() => {
+      bar.style.width = width;
+    }, 100);
+  });
+});
+</script>
+</body>
+</html>

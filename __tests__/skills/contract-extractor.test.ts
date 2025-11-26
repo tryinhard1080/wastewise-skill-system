@@ -8,6 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ContractExtractorSkill } from '@/lib/skills/skills/contract-extractor'
 import type { SkillContext, ContractData } from '@/lib/skills/types'
 import Anthropic from '@anthropic-ai/sdk'
+import { extractContractData, calculateAnthropicCost } from '@/lib/ai/vision-extractor'
 
 // Mock dependencies
 vi.mock('@/lib/supabase/server', () => ({
@@ -62,23 +63,29 @@ vi.mock('@/lib/observability/metrics', () => ({
 }))
 
 // Mock Anthropic API
-vi.mock('@anthropic-ai/sdk', () => {
-  const mockCreate = vi.fn()
-  return {
-    default: vi.fn(() => ({
-      messages: {
-        create: mockCreate,
-      },
-    })),
-    __mockCreate: mockCreate,
-  }
-})
+vi.mock('@anthropic-ai/sdk')
+
+// Mock vision-extractor functions
+vi.mock('@/lib/ai/vision-extractor', () => ({
+  extractContractData: vi.fn(),
+  calculateAnthropicCost: vi.fn(),
+}))
+
+// Mock database repository
+vi.mock('@/lib/db', () => ({
+  ContractRepository: vi.fn(() => ({
+    saveContract: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
 
 describe('ContractExtractorSkill', () => {
   let skill: ContractExtractorSkill
   let mockContext: SkillContext
+  let mockCreate: any
 
-  const mockContractData = {
+  const mockContractData: ContractData = {
+    sourceFile: 'contract.pdf',
+    extractionDate: '2024-02-01T10:00:00Z',
     property: {
       name: 'Oak Ridge Apartments',
       address: '123 Main St, Austin, TX 78701',
@@ -125,7 +132,7 @@ describe('ContractExtractorSkill', () => {
     },
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     skill = new ContractExtractorSkill()
 
     mockContext = {
@@ -169,6 +176,38 @@ describe('ContractExtractorSkill', () => {
 
     // Set up API key
     process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key'
+
+    // Set up Anthropic mock with default response
+    const Anthropic = (await import('@anthropic-ai/sdk')).default as any
+    mockCreate = vi.fn().mockResolvedValue({
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(mockContractData),
+        },
+      ],
+      usage: {
+        input_tokens: 2500,
+        output_tokens: 1200,
+      },
+    })
+
+    vi.mocked(Anthropic).mockImplementation(() => ({
+      messages: {
+        create: mockCreate,
+      },
+    }))
+
+    // Set up vision-extractor mock
+    vi.mocked(extractContractData).mockResolvedValue({
+      contract: mockContractData,
+      usage: {
+        input_tokens: 2500,
+        output_tokens: 1200,
+      },
+    })
+
+    vi.mocked(calculateAnthropicCost).mockReturnValue(0.05)
   })
 
   describe('Basic Properties', () => {
@@ -225,25 +264,6 @@ describe('ContractExtractorSkill', () => {
   })
 
   describe('Contract Extraction', () => {
-    beforeEach(() => {
-      // Mock Anthropic API response
-      const Anthropic = require('@anthropic-ai/sdk')
-      const mockCreate = Anthropic.__mockCreate
-
-      mockCreate.mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(mockContractData),
-          },
-        ],
-        usage: {
-          input_tokens: 2500,
-          output_tokens: 1200,
-        },
-      })
-    })
-
     it('should extract contract data from PDF', async () => {
       const result = await skill.execute(mockContext)
 
@@ -286,25 +306,18 @@ describe('ContractExtractorSkill', () => {
 
     it('should validate and normalize container types', async () => {
       // Mock response with lowercase container type
-      const Anthropic = require('@anthropic-ai/sdk')
-      const mockCreate = Anthropic.__mockCreate
 
-      mockCreate.mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              ...mockContractData,
-              services: [
-                {
-                  containerType: 'compactor', // lowercase - should be normalized
-                  containerSize: 30,
-                  frequency: '2x/week',
-                },
-              ],
-            }),
-          },
-        ],
+      vi.mocked(extractContractData).mockResolvedValueOnce({
+        contract: {
+          ...mockContractData,
+          services: [
+            {
+              containerType: 'compactor', // lowercase - should be normalized
+              containerSize: 30,
+              frequency: '2x/week',
+            },
+          ],
+        } as any,
         usage: { input_tokens: 2500, output_tokens: 1200 },
       })
 
@@ -322,28 +335,21 @@ describe('ContractExtractorSkill', () => {
 
   describe('Error Handling', () => {
     it('should handle missing required fields gracefully', async () => {
-      const Anthropic = require('@anthropic-ai/sdk')
-      const mockCreate = Anthropic.__mockCreate
 
       // Mock response with missing property name
-      mockCreate.mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              property: { address: '123 Main St' }, // Missing name
-              vendor: { name: 'WM' },
-              contractDates: {
-                effectiveDate: '2024-01-01',
-                expirationDate: '2026-12-31',
-                termMonths: 36,
-              },
-              services: [],
-              pricing: {},
-              terms: {},
-            }),
+      vi.mocked(extractContractData).mockResolvedValueOnce({
+        contract: {
+          property: { address: '123 Main St' }, // Missing name
+          vendor: { name: 'WM' },
+          contractDates: {
+            effectiveDate: '2024-01-01',
+            expirationDate: '2026-12-31',
+            termMonths: 36,
           },
-        ],
+          services: [],
+          pricing: {},
+          terms: {},
+        } as any,
         usage: { input_tokens: 2500, output_tokens: 1200 },
       })
 
@@ -356,20 +362,18 @@ describe('ContractExtractorSkill', () => {
     })
 
     it('should continue processing after individual file failures', async () => {
-      const Anthropic = require('@anthropic-ai/sdk')
-      const mockCreate = Anthropic.__mockCreate
 
       // First call fails, second succeeds
-      mockCreate
+      vi.mocked(extractContractData)
         .mockRejectedValueOnce(new Error('Vision API error'))
         .mockResolvedValueOnce({
-          content: [{ type: 'text', text: JSON.stringify(mockContractData) }],
+          contract: mockContractData,
           usage: { input_tokens: 2500, output_tokens: 1200 },
         })
 
-      // Mock multiple files
+      // Mock multiple files - need to mock for both validate() and executeInternal() calls
       const { createClient } = await import('@/lib/supabase/server')
-      vi.mocked(createClient).mockReturnValueOnce({
+      const twoFilesClient = {
         from: vi.fn(() => ({
           select: vi.fn(() => ({
             eq: vi.fn(() => ({
@@ -403,7 +407,12 @@ describe('ContractExtractorSkill', () => {
             })),
           })),
         },
-      } as any)
+      } as any
+
+      // Mock for both validate() and executeInternal() calls
+      vi.mocked(createClient)
+        .mockReturnValueOnce(twoFilesClient)
+        .mockReturnValueOnce(twoFilesClient)
 
       const result = await skill.execute(mockContext)
 
@@ -421,24 +430,17 @@ describe('ContractExtractorSkill', () => {
 
   describe('Data Validation', () => {
     it('should validate contract dates', async () => {
-      const Anthropic = require('@anthropic-ai/sdk')
-      const mockCreate = Anthropic.__mockCreate
 
       // Mock response with invalid dates
-      mockCreate.mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              ...mockContractData,
-              contractDates: {
-                effectiveDate: 'invalid-date',
-                expirationDate: '2026-12-31',
-                termMonths: 36,
-              },
-            }),
+      vi.mocked(extractContractData).mockResolvedValueOnce({
+        contract: {
+          ...mockContractData,
+          contractDates: {
+            effectiveDate: 'invalid-date',
+            expirationDate: '2026-12-31',
+            termMonths: 36,
           },
-        ],
+        } as any,
         usage: { input_tokens: 2500, output_tokens: 1200 },
       })
 
@@ -450,28 +452,21 @@ describe('ContractExtractorSkill', () => {
     })
 
     it('should provide defaults for missing optional fields', async () => {
-      const Anthropic = require('@anthropic-ai/sdk')
-      const mockCreate = Anthropic.__mockCreate
 
       // Mock response with minimal data
-      mockCreate.mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              property: { name: 'Test Property', address: '123 Main St' },
-              vendor: { name: 'Test Vendor' },
-              contractDates: {
-                effectiveDate: '2024-01-01',
-                expirationDate: '2026-12-31',
-                termMonths: 36,
-              },
-              services: [],
-              pricing: {},
-              terms: {}, // Missing all term details
-            }),
+      vi.mocked(extractContractData).mockResolvedValueOnce({
+        contract: {
+          property: { name: 'Test Property', address: '123 Main St' },
+          vendor: { name: 'Test Vendor' },
+          contractDates: {
+            effectiveDate: '2024-01-01',
+            expirationDate: '2026-12-31',
+            termMonths: 36,
           },
-        ],
+          services: [],
+          pricing: {},
+          terms: {}, // Missing all term details
+        } as any,
         usage: { input_tokens: 2500, output_tokens: 1200 },
       })
 

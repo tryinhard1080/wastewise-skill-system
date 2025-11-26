@@ -1,0 +1,9 @@
+All Sheets: Executive Summary, Property_Reference, Property Overview, Orion Prosper, McCord Park FL, Orion McKinney, The Club at Millenia, Bella Mirage, Orion Prosper Lakes, Mandarina, Pavilions at Arrowhead, Springs at Alta Mesa, Tempe Vista, Spend Summary, Yards Per Door, Service Details, Contract Terms, Spend by Category
+
+--- Sheet: Property Overview ---
+Headers: [1] Property Name | [2] State | [3] Units | [4] Property Type | [5] Service Type | [6] Vendor | [7] Container Count | [8] Container Size | [9] Service Frequency | [10] Monthly Yards | [11] YPD | [12] Monthly Cost | [13] Cost Per Door
+Row 2: [1] Bella Mirage | [2] AZ | [3] 715 | [4] Garden Style | [5] Dumpster | [6] Waste Management | [7] 6 | [8] 8 YD | [9] 3x/week | [10] 623.52 | [11] 0.87 | [12] 6732.417000000001 | [13] 9.415967832167834
+
+--- Sheet: Orion Prosper ---
+Headers: [1] Property | [2] Source File | [3] Vendor | [4] Account Number | [5] Invoice Number | [6] Invoice Date | [7] Invoice Amount | [8] Service Date | [9] Billing Period | [10] Description | [11] Category | [12] Quantity | [13] Unit Rate | [14] Extended Amount | [15] Container Count | [16] Container Size | [17] Container Type | [18] Service Frequency | [19] Service Days | [20] Total Yards
+Row 2: [1] Orion Prosper | [2] Republic Services-16282934_01-2025.pdf | [3] Republic Services | [4] 3-0615-0156865 | [5] 0615-002262594 | [6] 2025-01-25 | [7] 2655.07 | [9] 12-2030 | [10] Payment - Thank You 01/06 | [11] other | [14] -2791.48 | [15] 2 | [16] 10 | [17] Front Loader | [18] 6 | [19] 6x per week | [20] 519.6

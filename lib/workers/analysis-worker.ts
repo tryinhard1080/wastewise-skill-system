@@ -12,6 +12,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
 import { JobProcessor } from './job-processor'
 import { logger } from '@/lib/observability/logger'
+import fs from 'fs'
 
 export interface AnalysisWorkerConfig {
   /** How often to poll for new jobs (milliseconds) */
@@ -107,7 +108,9 @@ export class AnalysisWorker {
             break
           }
 
-          if (!claimedJob) {
+          // Check if job is null or has null id (no jobs available)
+          // Note: RPC returns an object with null fields when no rows match, not null itself
+          if (!claimedJob || !claimedJob.id) {
             // No more pending jobs available
             break
           }
@@ -121,6 +124,11 @@ export class AnalysisWorker {
                 jobType: claimedJob.job_type,
                 projectId: claimedJob.project_id,
               })
+
+              jobLogger.info('Claimed job', { jobId: claimedJob.id, type: claimedJob.job_type })
+
+              try { fs.appendFileSync('debug-worker.txt', `DEBUG: AnalysisWorker calling processJob for ${claimedJob.id}\n`) } catch (e) { }
+              console.log(`DEBUG: AnalysisWorker calling processJob for ${claimedJob.id}`)
 
               await this.processor.processJob(claimedJob.id)
 

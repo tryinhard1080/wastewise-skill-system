@@ -247,6 +247,9 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
       .map((contract) => this.validateContractData(contract, executionLogger))
       .filter((contract): contract is ContractData => contract !== null)
 
+    // Count validation failures (contracts extracted but failed validation)
+    const validationFailures = contracts.length - validatedContracts.length
+
     // Calculate total cost
     const totalCostUsd = calculateAnthropicCost({
       input_tokens: totalTokensInput,
@@ -266,6 +269,7 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
       totalFiles: files.length,
       successfulFiles: processingDetails.filter((d) => d.status === 'success').length,
       failedFiles: processingDetails.filter((d) => d.status === 'failed').length,
+      validationFailures,
       contractsExtracted: validatedContracts.length,
       termsExtracted,
       totalCostUsd,
@@ -297,7 +301,7 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
       summary: {
         contractsProcessed: files.length,
         termsExtracted,
-        failedExtractions: processingDetails.filter((d) => d.status === 'failed').length,
+        failedExtractions: processingDetails.filter((d) => d.status === 'failed').length + validationFailures,
       },
       contracts: validatedContracts,
       processingDetails,
@@ -424,6 +428,21 @@ export class ContractExtractorSkill extends BaseSkill<ContractExtractorResult> {
           fileName: contract.sourceFile,
         })
         contract.terms.paymentTerms = 'Net 30'
+      }
+
+      // Ensure optional boolean defaults
+      if (contract.terms.insuranceRequired === undefined) {
+        contract.terms.insuranceRequired = false
+      }
+
+      // Ensure pricing defaults
+      if (contract.pricing.cpiAdjustment === undefined) {
+        contract.pricing.cpiAdjustment = false
+      }
+
+      // Ensure contract dates defaults
+      if (contract.contractDates.autoRenew === undefined) {
+        contract.contractDates.autoRenew = false
       }
 
       return contract

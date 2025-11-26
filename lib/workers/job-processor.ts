@@ -11,14 +11,98 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database, Tables } from '@/types/database.types'
 import { logger } from '@/lib/observability/logger'
+
+import fs from 'fs'
+try { fs.appendFileSync('debug-worker.txt', '!!! LOADING JOB-PROCESSOR.TS !!!\n') } catch (e) { }
+console.log('!!! LOADING JOB-PROCESSOR.TS !!!')
+
 import { executeSkillWithProgress } from '@/lib/skills/executor'
 import type { SkillResult } from '@/lib/skills/types'
+import { JOB_TYPES } from '@/lib/constants/job-types'
+import {
+  TimeoutError,
+  RateLimitError,
+  ExternalServiceError,
+  AIServiceError,
+  ValidationError,
+  AuthenticationError,
+  NotFoundError,
+} from '@/lib/types/errors'
 
 type AnalysisJob = Tables<'analysis_jobs'>
 
 interface AnalysisJobInput {
   projectId: string
   [key: string]: any
+}
+
+/**
+ * Classify error as transient (retry-able) vs permanent
+ *
+ * Transient errors should be retried (network issues, rate limits, external service failures).
+ * Permanent errors should fail immediately (validation errors, not found, authentication).
+ *
+ * @param error - Error to classify
+ * @returns True if error is transient and should be retried
+ */
+function isTransientError(error: Error): boolean {
+  // Transient: Timeout errors
+  if (error instanceof TimeoutError) {
+    return true
+  }
+
+  // Transient: Rate limit errors (AI API, external services)
+  if (error instanceof RateLimitError) {
+    return true
+  }
+
+  // Transient: External service errors (502, 503, 504)
+  if (error instanceof ExternalServiceError) {
+    return true
+  }
+
+  // Transient: AI service errors (Claude API failures)
+  if (error instanceof AIServiceError) {
+    return true
+  }
+
+  // Permanent: Validation errors (bad input data)
+  if (error instanceof ValidationError) {
+    return false
+  }
+
+  // Permanent: Authentication errors (invalid credentials)
+  if (error instanceof AuthenticationError) {
+    return false
+  }
+
+  // Permanent: Not found errors (project, skill, etc.)
+  if (error instanceof NotFoundError) {
+    return false
+  }
+
+  // Check error messages for network issues (transient)
+  const message = error.message.toLowerCase()
+  if (
+    message.includes('econnreset') ||
+    message.includes('etimedout') ||
+    message.includes('network error') ||
+    message.includes('socket hang up') ||
+    message.includes('enotfound')
+  ) {
+    return true
+  }
+
+  // Check for database connection errors (transient)
+  if (
+    message.includes('connection') &&
+    (message.includes('refused') || message.includes('timeout'))
+  ) {
+    return true
+  }
+
+  // Default: treat as permanent to avoid infinite retries
+  return false
 }
 
 export class JobProcessor {
@@ -40,6 +124,8 @@ export class JobProcessor {
    */
   async processJob(jobId: string): Promise<void> {
     const jobLogger = logger.child({ jobId })
+    try { fs.appendFileSync('debug-worker.txt', `DEBUG: processJob called for ${jobId}\n`) } catch (e) { }
+    console.log(`DEBUG: processJob called for ${jobId}`)
 
     try {
       jobLogger.info('Fetching job details')
@@ -61,39 +147,30 @@ export class JobProcessor {
         status: job.status,
       })
 
-      // Skip if job is not in pending status
-      if (job.status !== 'pending') {
-        jobLogger.warn('Job is not pending, skipping', { status: job.status })
+      // Job should already be marked as 'processing' by claim_next_analysis_job()
+      // If it's not in 'processing' status, something went wrong
+      if (job.status !== 'processing') {
+        jobLogger.warn('Job is not in processing status, skipping', { status: job.status })
         return
-      }
-
-      // Mark job as processing
-      jobLogger.info('Marking job as processing')
-      const { error: startError } = await this.supabase.rpc('start_analysis_job', {
-        job_id: jobId,
-      })
-
-      if (startError) {
-        throw new Error(`Failed to start job: ${startError.message}`)
       }
 
       // Route to appropriate handler based on job type
       jobLogger.info('Routing to job handler', { jobType: job.job_type })
 
       switch (job.job_type) {
-        case 'complete_analysis':
+        case JOB_TYPES.COMPLETE_ANALYSIS:
           await this.processCompleteAnalysis(job)
           break
 
-        case 'invoice_extraction':
+        case JOB_TYPES.INVOICE_EXTRACTION:
           // TODO: Implement invoice extraction job
           throw new Error('Invoice extraction not yet implemented')
 
-        case 'regulatory_research':
+        case JOB_TYPES.REGULATORY_RESEARCH:
           // TODO: Implement regulatory research job
           throw new Error('Regulatory research not yet implemented')
 
-        case 'report_generation':
+        case JOB_TYPES.REPORT_GENERATION:
           // TODO: Implement report-only generation job
           throw new Error('Report generation not yet implemented')
 
@@ -103,16 +180,40 @@ export class JobProcessor {
 
       jobLogger.info('Job completed successfully')
     } catch (error) {
-      jobLogger.error('Job processing failed', error as Error)
+      const err = error as Error
+      jobLogger.error('Job processing failed', err)
 
-      // Mark job as failed with error details
-      const errorMessage = (error as Error).message
-      const errorCode =
-        (error as any).code ||
-        (errorMessage.includes('not found') ? 'NOT_FOUND' : 'PROCESSING_ERROR')
+      try {
+        const fs = require('fs')
+        fs.appendFileSync('debug-worker.txt', `DEBUG: JobProcessor caught error: ${err.message}\n`)
+      } catch (e) { }
 
-      jobLogger.info('Marking job as failed', { errorCode, errorMessage })
+      // Classify error to determine retry strategy
+      const isTransient = isTransientError(err)
 
+      // Extract error details
+      const errorMessage = err.message
+      const errorCode = (err as any).code || this.getErrorCode(err, errorMessage)
+
+      if (isTransient) {
+        // Transient error: let database retry logic handle it
+        jobLogger.warn('Transient error detected - will retry', undefined, {
+          errorCode,
+          errorMessage,
+          errorType: err.constructor.name,
+        })
+      } else {
+        // Permanent error: mark as failed immediately
+        jobLogger.error('Permanent error detected - marking as failed', err, {
+          errorCode,
+          errorType: err.constructor.name,
+        })
+      }
+
+      // Call fail_analysis_job RPC function
+      // - If transient + retries remain: Sets status back to 'pending' and increments retry_count
+      // - If transient + no retries: Sets status to 'failed'
+      // - If permanent: Sets status to 'failed' immediately
       const { error: failError } = await this.supabase.rpc('fail_analysis_job', {
         job_id: jobId,
         error_msg: errorMessage,
@@ -120,11 +221,40 @@ export class JobProcessor {
       })
 
       if (failError) {
-        jobLogger.error('Failed to mark job as failed', failError as Error)
+        jobLogger.error('Failed to update job status', failError as Error)
       }
 
       throw error
     }
+  }
+
+  /**
+   * Extract error code from error instance or message
+   *
+   * @param error - Error instance
+   * @param message - Error message
+   * @returns Error code for database storage
+   */
+  private getErrorCode(error: Error, message: string): string {
+    // Check if error has explicit error type
+    if (error instanceof ValidationError) return 'VALIDATION_ERROR'
+    if (error instanceof AuthenticationError) return 'AUTHENTICATION_ERROR'
+    if (error instanceof NotFoundError) return 'NOT_FOUND'
+    if (error instanceof TimeoutError) return 'TIMEOUT'
+    if (error instanceof RateLimitError) return 'RATE_LIMIT'
+    if (error instanceof AIServiceError) return 'AI_SERVICE_ERROR'
+    if (error instanceof ExternalServiceError) return 'EXTERNAL_SERVICE_ERROR'
+
+    // Infer from message
+    const lowerMessage = message.toLowerCase()
+    if (lowerMessage.includes('not found')) return 'NOT_FOUND'
+    if (lowerMessage.includes('validation')) return 'VALIDATION_ERROR'
+    if (lowerMessage.includes('timeout')) return 'TIMEOUT'
+    if (lowerMessage.includes('rate limit')) return 'RATE_LIMIT'
+    if (lowerMessage.includes('network')) return 'NETWORK_ERROR'
+
+    // Default
+    return 'PROCESSING_ERROR'
   }
 
   /**
@@ -184,11 +314,11 @@ export class JobProcessor {
       result: result.data as any, // JSONB
       ai_usage: result.metadata.aiUsage
         ? {
-            requests: result.metadata.aiUsage.requests,
-            tokens_input: result.metadata.aiUsage.tokensInput,
-            tokens_output: result.metadata.aiUsage.tokensOutput,
-            cost_usd: result.metadata.aiUsage.costUsd,
-          }
+          requests: result.metadata.aiUsage.requests,
+          tokens_input: result.metadata.aiUsage.tokensInput,
+          tokens_output: result.metadata.aiUsage.tokensOutput,
+          cost_usd: result.metadata.aiUsage.costUsd,
+        }
         : null,
     })
 

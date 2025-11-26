@@ -1,35 +1,24 @@
-/**
- * Project Detail Page
- *
- * Shows project details, uploaded files, and analysis jobs
- * Allows file uploads and job creation
- */
-
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Building2,
-  MapPin,
-  Users,
-  Package,
-  FileText,
-  PlayCircle,
-  ChevronLeft,
-} from 'lucide-react'
+import { ChevronLeft, Home } from 'lucide-react'
 import Link from 'next/link'
 import { FileUploadSection } from '@/components/project/file-upload-section'
 import { JobsList } from '@/components/project/jobs-list'
 import { StartAnalysisButton } from '@/components/project/start-analysis-button'
+import { ExecutiveSummary } from '@/components/dashboard/executive-summary'
+import { ExpenseAnalysis } from '@/components/dashboard/expense-analysis'
+import { OptimizationOpportunities } from '@/components/dashboard/optimization-opportunities'
+import { BudgetProjection } from '@/components/dashboard/budget-projection'
+import { RegulatoryCompliance } from '@/components/dashboard/regulatory-compliance'
+import {
+  transformExecutiveData,
+  transformExpenseData,
+  transformOptimizations,
+  transformBudgetData
+} from '@/lib/transformers/dashboard-data'
 
 interface ProjectDetailPageProps {
   params: {
@@ -72,14 +61,16 @@ export default async function ProjectDetailPage({
     redirect('/login')
   }
 
-  // Fetch project with files and jobs
+  // Fetch project with files, jobs, and analysis data
   const { data: project, error } = await supabase
     .from('projects')
     .select(
       `
       *,
       project_files(*),
-      analysis_jobs(*)
+      analysis_jobs(*),
+      invoice_data(*),
+      optimizations(*)
     `
     )
     .eq('id', params.id)
@@ -96,182 +87,111 @@ export default async function ProjectDetailPage({
     project.analysis_jobs?.filter((job: any) => job.status === 'completed')
       .length || 0
 
+  // Transform real data
+  const executiveData = transformExecutiveData(project, project.invoice_data || [], project.optimizations || [])
+  const expenseData = transformExpenseData(project.invoice_data || [], project.units)
+  const opportunitiesData = transformOptimizations(project.optimizations || [])
+  const budgetData = transformBudgetData(project.invoice_data || [])
+
+  // Calculate optimization totals
+  const totalSavings = opportunitiesData.reduce((sum, opp) => sum + opp.annualSavings, 0)
+  const totalInvestment = opportunitiesData.reduce((sum, opp) => {
+    const cost = typeof opp.implementationCost === 'number' ? opp.implementationCost : 0
+    return sum + cost
+  }, 0)
+  const roi = totalInvestment > 0 ? `${Math.round((totalSavings / totalInvestment) * 100)}%` : '0%'
+
+  // Calculate budget totals
+  const baselineTotal = budgetData.reduce((sum, item) => sum + item.current, 0)
+  const projectedTotal = budgetData.reduce((sum, item) => sum + item.projected, 0)
+  const budgetSavings = baselineTotal - projectedTotal
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/projects">
-          <Button variant="ghost" size="icon">
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {project.property_name}
-          </h1>
-          <p className="text-muted-foreground">
-            {project.city}, {project.state}
-          </p>
-        </div>
-        <StartAnalysisButton projectId={project.id} />
-      </div>
-
-      {/* Property Overview */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Location</CardTitle>
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {project.city}, {project.state}
-            </div>
-            <p className="text-xs text-muted-foreground">Property location</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Units</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{project.units}</div>
-            <p className="text-xs text-muted-foreground">Residential units</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Equipment</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold capitalize">
-              {project.equipment_type || 'N/A'}
-            </div>
-            <p className="text-xs text-muted-foreground">Equipment type</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Files</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalFiles}</div>
-            <p className="text-xs text-muted-foreground">Uploaded documents</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="files" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="files">
-            Files <Badge variant="secondary" className="ml-2">{totalFiles}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="jobs">
-            Analysis Jobs{' '}
-            <Badge variant="secondary" className="ml-2">
-              {completedJobs}/{totalJobs}
+      <div className="border-b border-slate-300 pb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <Link href="/dashboard">
+            <Button variant="ghost" size="icon" title="Go to Dashboard">
+              <Home className="h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/projects">
+            <Button variant="ghost" size="icon" title="Back to Projects">
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800">
+              {project.property_name}
+            </h1>
+            <p className="text-slate-500">
+              {project.city}, {project.state} • {project.units} Units
+            </p>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
+              {project.status}
             </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="details">Details</TabsTrigger>
+          </div>
+        </div>
+      </div>
+
+      <Tabs defaultValue="dashboard" className="space-y-6">
+        <TabsList className="bg-slate-100 p-1">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="expense">Expense Analysis</TabsTrigger>
+          <TabsTrigger value="optimization">Optimization</TabsTrigger>
+          <TabsTrigger value="budget">Budget</TabsTrigger>
+          <TabsTrigger value="regulatory">Regulatory</TabsTrigger>
+          <TabsTrigger value="files">Files ({totalFiles})</TabsTrigger>
+          <TabsTrigger value="jobs">Analysis Jobs ({completedJobs}/{totalJobs})</TabsTrigger>
         </TabsList>
 
-        {/* Files Tab */}
-        <TabsContent value="files" className="space-y-4">
-          <FileUploadSection
-            projectId={project.id}
-            existingFiles={project.project_files || []}
+        <TabsContent value="dashboard">
+          <ExecutiveSummary data={executiveData} />
+        </TabsContent>
+
+        <TabsContent value="expense">
+          <ExpenseAnalysis data={expenseData} />
+        </TabsContent>
+
+        <TabsContent value="optimization">
+          <OptimizationOpportunities
+            opportunities={opportunitiesData}
+            totalSavings={totalSavings}
+            roi={roi}
           />
         </TabsContent>
 
-        {/* Jobs Tab */}
-        <TabsContent value="jobs" className="space-y-4">
-          <JobsList
-            projectId={project.id}
-            jobs={transformJobsForDisplay(project.analysis_jobs || [])}
+        <TabsContent value="budget">
+          <BudgetProjection
+            data={budgetData}
+            baselineTotal={baselineTotal}
+            projectedTotal={projectedTotal}
+            savings={budgetSavings}
           />
         </TabsContent>
 
-        {/* Details Tab */}
-        <TabsContent value="details" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Property Information</CardTitle>
-              <CardDescription>
-                Detailed information about this property
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Property Name
-                  </p>
-                  <p className="text-base font-medium">
-                    {project.property_name}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Property Type
-                  </p>
-                  <p className="text-base font-medium capitalize">
-                    {project.property_type || 'Not specified'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    City
-                  </p>
-                  <p className="text-base font-medium">{project.city}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    State
-                  </p>
-                  <p className="text-base font-medium">{project.state}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Units
-                  </p>
-                  <p className="text-base font-medium">{project.units}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Equipment Type
-                  </p>
-                  <p className="text-base font-medium capitalize">
-                    {project.equipment_type || 'Not specified'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Analysis Period
-                  </p>
-                  <p className="text-base font-medium">
-                    {project.analysis_period_months
-                      ? `${project.analysis_period_months} months`
-                      : 'Not specified'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Status
-                  </p>
-                  <Badge variant="secondary" className="capitalize">
-                    {project.status || 'Active'}
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="regulatory">
+          <RegulatoryCompliance />
+        </TabsContent>
+
+        <TabsContent value="files">
+          <FileUploadSection projectId={project.id} existingFiles={project.project_files || []} />
+        </TabsContent>
+
+        <TabsContent value="jobs">
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Analysis History</h2>
+              <StartAnalysisButton projectId={project.id} />
+            </div>
+            <JobsList
+              jobs={transformJobsForDisplay(project.analysis_jobs || [])}
+              projectId={project.id}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

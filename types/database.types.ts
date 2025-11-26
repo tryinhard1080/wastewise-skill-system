@@ -617,6 +617,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_next_analysis_job: {
+        Args: never
+        Returns: {
+          ai_cost_usd: number | null
+          ai_requests: number | null
+          ai_tokens_input: number | null
+          ai_tokens_output: number | null
+          completed_at: string | null
+          created_at: string | null
+          current_step: string | null
+          duration_seconds: number | null
+          error_code: string | null
+          error_details: Json | null
+          error_message: string | null
+          estimated_completion: string | null
+          failed_at: string | null
+          id: string
+          input_data: Json
+          job_type: string
+          max_retries: number | null
+          progress_percent: number | null
+          project_id: string
+          result_data: Json | null
+          retry_count: number | null
+          started_at: string | null
+          status: string
+          steps_completed: number | null
+          total_steps: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "analysis_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       cleanup_old_analysis_jobs: {
         Args: { days_to_keep?: number }
         Returns: number

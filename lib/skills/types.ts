@@ -19,7 +19,7 @@ export type HaulLogRow = Database['public']['Tables']['haul_log']['Row']
  * All skills must return this shape to maintain consistency across
  * the skill system.
  */
-export interface SkillResult<TData = any> {
+export interface SkillResult<TData = unknown> {
   /** Indicates if skill execution was successful */
   success: boolean
 
@@ -30,7 +30,7 @@ export interface SkillResult<TData = any> {
   error?: {
     message: string
     code: string
-    details?: any
+    details?: Record<string, unknown>
   }
 
   /** Execution metadata */
@@ -150,7 +150,7 @@ export interface SkillConfig {
  * - Progress tracking
  * - Metadata collection
  */
-export interface Skill<TResult = any> {
+export interface Skill<TResult = unknown> {
   /** Unique skill identifier (matches skills_config.skill_name) */
   name: string
 
@@ -243,7 +243,7 @@ export interface AnalysisRequest {
   confidence: number
 
   /** Extracted parameters for skill execution */
-  parameters?: Record<string, any>
+  parameters?: Record<string, unknown>
 }
 
 /**
@@ -278,7 +278,7 @@ export interface WastewiseAnalyticsResult {
     type: string
     recommend: boolean
     savings?: number
-    details?: any
+    details?: Record<string, unknown>
   }>
   leaseUp: boolean
   totalSavings: number

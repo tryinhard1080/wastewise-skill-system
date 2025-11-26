@@ -1,0 +1,5 @@
+All Sheets: Executive Summary, Property_Reference, Property Overview, Orion Prosper, McCord Park FL, Orion McKinney, The Club at Millenia, Bella Mirage, Orion Prosper Lakes, Mandarina, Pavilions at Arrowhead, Springs at Alta Mesa, Tempe Vista, Spend Summary, Yards Per Door, Service Details, Contract Terms, Spend by Category
+
+--- Sheet: Spend Summary ---
+Headers: [1] Property | [2] Total Spend | [3] Monthly Average | [4] Cost Per Door | [5] Invoice Count | [6] Period | [7] Primary Vendor
+Row 2: [1] Bella Mirage | [2] 40394.50200000001 | [3] 6732.417000000001 | [4] 9.415967832167834 | [5] 102 | [6] Apr-Sep 2025 | [7] Waste Management

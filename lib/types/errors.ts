@@ -15,7 +15,7 @@ export class AppError extends Error {
     message: string,
     public code: string,
     public statusCode: number = 500,
-    public details?: any
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = this.constructor.name
@@ -40,7 +40,7 @@ export class AppError extends Error {
  * Authentication errors (401)
  */
 export class AuthenticationError extends AppError {
-  constructor(message: string = 'Authentication required', details?: any) {
+  constructor(message: string = 'Authentication required', details?: Record<string, unknown>) {
     super(message, 'AUTHENTICATION_ERROR', 401, details)
   }
 }
@@ -49,7 +49,7 @@ export class AuthenticationError extends AppError {
  * Authorization errors (403)
  */
 export class AuthorizationError extends AppError {
-  constructor(message: string = 'Access denied', details?: any) {
+  constructor(message: string = 'Access denied', details?: Record<string, unknown>) {
     super(message, 'AUTHORIZATION_ERROR', 403, details)
   }
 }
@@ -58,7 +58,7 @@ export class AuthorizationError extends AppError {
  * Not found errors (404)
  */
 export class NotFoundError extends AppError {
-  constructor(resource: string, id?: string, details?: any) {
+  constructor(resource: string, id?: string, details?: Record<string, unknown>) {
     const message = id ? `${resource} '${id}' not found` : `${resource} not found`
     super(message, 'NOT_FOUND', 404, { resource, id, ...details })
   }
@@ -75,7 +75,7 @@ export class ValidationError extends AppError {
       message: string
       code?: string
     }>,
-    details?: any
+    details?: Record<string, unknown>
   ) {
     super(message, 'VALIDATION_ERROR', 400, {
       validationErrors,
@@ -88,7 +88,7 @@ export class ValidationError extends AppError {
  * Business logic errors (422)
  */
 export class BusinessLogicError extends AppError {
-  constructor(message: string, code: string = 'BUSINESS_LOGIC_ERROR', details?: any) {
+  constructor(message: string, code: string = 'BUSINESS_LOGIC_ERROR', details?: Record<string, unknown>) {
     super(message, code, 422, details)
   }
 }
@@ -97,7 +97,7 @@ export class BusinessLogicError extends AppError {
  * External service errors (502)
  */
 export class ExternalServiceError extends AppError {
-  constructor(service: string, message: string, details?: any) {
+  constructor(service: string, message: string, details?: Record<string, unknown>) {
     super(`External service error: ${service}`, 'EXTERNAL_SERVICE_ERROR', 502, {
       service,
       originalMessage: message,
@@ -110,7 +110,7 @@ export class ExternalServiceError extends AppError {
  * Rate limit errors (429)
  */
 export class RateLimitError extends AppError {
-  constructor(message: string = 'Rate limit exceeded', retryAfter?: number, details?: any) {
+  constructor(message: string = 'Rate limit exceeded', retryAfter?: number, details?: Record<string, unknown>) {
     super(message, 'RATE_LIMIT_EXCEEDED', 429, {
       retryAfter,
       ...details,
@@ -122,7 +122,7 @@ export class RateLimitError extends AppError {
  * Timeout errors (408)
  */
 export class TimeoutError extends AppError {
-  constructor(operation: string, timeoutMs: number, details?: any) {
+  constructor(operation: string, timeoutMs: number, details?: Record<string, unknown>) {
     super(`Operation '${operation}' timed out after ${timeoutMs}ms`, 'TIMEOUT_ERROR', 408, {
       operation,
       timeoutMs,
@@ -136,13 +136,13 @@ export class TimeoutError extends AppError {
  */
 
 export class SkillExecutionError extends AppError {
-  constructor(skillName: string, message: string, code: string = 'SKILL_EXECUTION_ERROR', details?: any) {
+  constructor(skillName: string, message: string, code: string = 'SKILL_EXECUTION_ERROR', details?: Record<string, unknown>) {
     super(message, code, 500, { skillName, ...details })
   }
 }
 
 export class InsufficientDataError extends SkillExecutionError {
-  constructor(skillName: string, requiredData: string[], details?: any) {
+  constructor(skillName: string, requiredData: string[], details?: Record<string, unknown>) {
     super(
       skillName,
       `Insufficient data for ${skillName}`,
@@ -153,13 +153,13 @@ export class InsufficientDataError extends SkillExecutionError {
 }
 
 export class FormulaValidationError extends SkillExecutionError {
-  constructor(skillName: string, message: string, details?: any) {
+  constructor(skillName: string, message: string, details?: Record<string, unknown>) {
     super(skillName, message, 'FORMULA_VALIDATION_ERROR', details)
   }
 }
 
 export class SkillCancelledError extends SkillExecutionError {
-  constructor(skillName: string, details?: any) {
+  constructor(skillName: string, details?: Record<string, unknown>) {
     super(skillName, `${skillName} execution was cancelled`, 'SKILL_CANCELLED', details)
   }
 }
@@ -169,13 +169,13 @@ export class SkillCancelledError extends SkillExecutionError {
  */
 
 export class AIServiceError extends ExternalServiceError {
-  constructor(provider: string, message: string, cost?: number, details?: any) {
+  constructor(provider: string, message: string, cost?: number, details?: Record<string, unknown>) {
     super(`AI-${provider}`, message, { cost, ...details })
   }
 }
 
 export class AIQuotaExceededError extends RateLimitError {
-  constructor(provider: string, quotaType: string, details?: any) {
+  constructor(provider: string, quotaType: string, details?: Record<string, unknown>) {
     super(`AI quota exceeded for ${provider}: ${quotaType}`, undefined, {
       provider,
       quotaType,
@@ -189,7 +189,7 @@ export class AIQuotaExceededError extends RateLimitError {
  */
 
 export class DatabaseError extends AppError {
-  constructor(operation: string, message: string, details?: any) {
+  constructor(operation: string, message: string, details?: Record<string, unknown>) {
     super(`Database error during ${operation}`, 'DATABASE_ERROR', 500, {
       operation,
       originalMessage: message,
@@ -203,13 +203,13 @@ export class DatabaseError extends AppError {
  */
 
 export class FileProcessingError extends AppError {
-  constructor(fileName: string, message: string, code: string = 'FILE_PROCESSING_ERROR', details?: any) {
+  constructor(fileName: string, message: string, code: string = 'FILE_PROCESSING_ERROR', details?: Record<string, unknown>) {
     super(message, code, 422, { fileName, ...details })
   }
 }
 
 export class InvalidFileTypeError extends FileProcessingError {
-  constructor(fileName: string, expectedTypes: string[], actualType?: string, details?: any) {
+  constructor(fileName: string, expectedTypes: string[], actualType?: string, details?: Record<string, unknown>) {
     super(
       fileName,
       `Invalid file type for ${fileName}. Expected: ${expectedTypes.join(', ')}`,
@@ -220,7 +220,7 @@ export class InvalidFileTypeError extends FileProcessingError {
 }
 
 export class FileTooLargeError extends FileProcessingError {
-  constructor(fileName: string, maxSizeBytes: number, actualSizeBytes: number, details?: any) {
+  constructor(fileName: string, maxSizeBytes: number, actualSizeBytes: number, details?: Record<string, unknown>) {
     super(
       fileName,
       `File ${fileName} exceeds maximum size of ${maxSizeBytes} bytes`,

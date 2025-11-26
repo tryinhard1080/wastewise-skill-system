@@ -11,15 +11,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { rateLimiters } from '@/lib/api/rate-limit'
+import { VALID_JOB_TYPES } from '@/lib/constants/job-types'
+import type { Database } from '@/types/database.types'
+
+type AnalysisJob = Database['public']['Tables']['analysis_jobs']['Row']
 
 const createJobSchema = z.object({
   projectId: z.string().uuid(),
-  jobType: z.enum([
-    'invoice_extraction',
-    'regulatory_research',
-    'complete_analysis',
-    'report_generation',
-  ]),
+  jobType: z.enum(VALID_JOB_TYPES),
   inputData: z.record(z.any()).optional(),
 })
 
@@ -98,11 +97,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Return job ID for polling
+    const jobData = job as AnalysisJob
     return NextResponse.json(
       {
-        jobId: job.id,
-        status: job.status,
-        message: 'Analysis job created. Poll /api/jobs/' + job.id + ' for status updates.',
+        jobId: jobData.id,
+        status: jobData.status,
+        message: `Analysis job created. Poll /api/jobs/${jobData.id} for status updates.`,
       },
       { status: 201 }
     )

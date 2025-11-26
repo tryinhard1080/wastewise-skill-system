@@ -43,7 +43,7 @@ export default async function ProjectsPage() {
         result_data
       )
     `)
-    .eq('user_id', user?.id!)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -91,7 +91,7 @@ export default async function ProjectsPage() {
           {projects.map((project) => {
             const latestAnalysis = project.analysis_jobs?.[0]
             const completedAnalyses = project.analysis_jobs?.filter(
-              (job: any) => job.status === 'completed'
+              (job) => job.status === 'completed'
             ).length || 0
 
             return (

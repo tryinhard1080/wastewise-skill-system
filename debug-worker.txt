@@ -1,0 +1,460 @@
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-25T12:59:30.594Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["skills"]
+DEBUG: skillRegistry prototype keys: ["constructor","register","get","getAll","getConfig","has","count","list"]
+!!! LOADING JOB-PROCESSOR.TS !!!
+!!! LOADING START-WORKER.TS - 2025-11-25T12:59:30.787Z !!!
+DEBUG: AnalysisWorker calling processJob for b305f714-fdce-4da4-b285-5d9f2793e85e
+DEBUG: processJob called for b305f714-fdce-4da4-b285-5d9f2793e85e
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: getConfig called for 'wastewise-analytics'
+DEBUG: Querying supabase for 'wastewise-analytics'
+DEBUG: AnalysisWorker calling processJob for f25db9f8-05ca-4d2b-be32-8c8281a11f0b
+DEBUG: processJob called for f25db9f8-05ca-4d2b-be32-8c8281a11f0b
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: getConfig called for 'wastewise-analytics'
+DEBUG: Querying supabase for 'wastewise-analytics'
+DEBUG: AnalysisWorker calling processJob for e9663b09-5572-4824-a93c-36e5dba50714
+DEBUG: processJob called for e9663b09-5572-4824-a93c-36e5dba50714
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: getConfig called for 'wastewise-analytics'
+DEBUG: Querying supabase for 'wastewise-analytics'
+DEBUG: AnalysisWorker calling processJob for a826365e-a67d-4fce-a758-32526bbc3f14
+DEBUG: processJob called for a826365e-a67d-4fce-a758-32526bbc3f14
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: getConfig called for 'wastewise-analytics'
+DEBUG: Querying supabase for 'wastewise-analytics'
+DEBUG: AnalysisWorker calling processJob for 34f0531e-5f30-4bba-853a-4548c8e1798d
+DEBUG: processJob called for 34f0531e-5f30-4bba-853a-4548c8e1798d
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: getConfig called for 'wastewise-analytics'
+DEBUG: Querying supabase for 'wastewise-analytics'
+DEBUG: AnalysisWorker calling processJob for 62469467-8151-4305-aa13-1cbb0298f225
+DEBUG: processJob called for 62469467-8151-4305-aa13-1cbb0298f225
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: getConfig called for 'wastewise-analytics'
+DEBUG: Querying supabase for 'wastewise-analytics'
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-25T23:39:42.137Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-25T23:50:30.592Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-25T23:50:42.939Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T11:19:22.743Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T11:23:23.370Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T11:50:55.313Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Executor imported skillRegistry
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:05:16.147Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:14:51.685Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:16:19.021Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:16:34.620Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:16:44.974Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:17:54.587Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:18:12.211Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:19:24.642Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: Executor imported skillRegistry
+DEBUG: Executor imported skillRegistry
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry keys: ["get","getConfig"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: skillRegistry prototype keys: ["constructor","__defineGetter__","__defineSetter__","hasOwnProperty","__lookupGetter__","__lookupSetter__","isPrototypeOf","propertyIsEnumerable","toString","valueOf","__proto__","toLocaleString"]
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+!!! LOADING REGISTRY.TS - VERSION WITH FIX - 2025-11-26T12:26:04.402Z !!!
+DEBUG: SkillRegistry constructor called
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: Calling getConfig for 'wastewise-analytics'
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called
+DEBUG: SkillRegistry constructor called

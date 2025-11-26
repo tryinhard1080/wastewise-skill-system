@@ -22,7 +22,7 @@ import { executeSkillWithProgress } from '@/lib/skills/executor'
 import { registerAllSkills } from '@/lib/skills/skills'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
-import type { Database } from '@/types/database.types'
+import type { Database, Json } from '@/types/database.types'
 
 type AnalysisJob = Database['public']['Tables']['analysis_jobs']['Row']
 
@@ -132,7 +132,7 @@ async function processJob(job: AnalysisJob): Promise<void> {
           status: 'completed',
           progress_percent: 100,
           current_step: 'Completed',
-          result_data: result.data,
+          result_data: result.data as Json,
           ai_requests: result.metadata.aiUsage?.requests || 0,
           ai_tokens_input: result.metadata.aiUsage?.tokensInput || 0,
           ai_tokens_output: result.metadata.aiUsage?.tokensOutput || 0,
@@ -158,7 +158,7 @@ async function processJob(job: AnalysisJob): Promise<void> {
         .update({
           status: 'failed',
           error_message: errorMessage,
-          error_details: result.error?.details,
+          error_details: result.error?.details as Json | undefined,
           failed_at: new Date().toISOString(),
         })
         .eq('id', job.id)

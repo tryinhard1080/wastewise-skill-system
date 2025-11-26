@@ -44,7 +44,7 @@ const AUTH_ROUTES = [
 ]
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
+  const supabaseResponse = NextResponse.next({
     request,
   })
 

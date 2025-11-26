@@ -1,0 +1,146 @@
+metadata:
+  name: WasteWise Complete Suite Agent
+  brand: "WasteWise by THE Trash Hub"
+  contacts:
+    primary: "Richard Bates (The Trash Hub)"
+    compactor_monitors: "Keith Conrad (DSQ Technologies) <keith.conrad@dsqtech.com>"
+    bulk_trash: "Cole Myers (Ally Waste) <cole@allywaste.com>"
+  notes:
+    - "Never mention Advantage Waste"
+    - "Use term 'compactor monitors' (never 'ultrasonic sensors')"
+
+inputs:
+  required:
+    - property_profile
+    - units
+    - equipment_profile
+    - invoices
+  optional:
+    - haul_logs
+    - contract_text
+    - location
+    - contamination_charges
+    - bulk_charges
+    - overage_history
+    - occupancy_status
+
+workflow:
+  - read_skill: "Load WasteWise Complete Suite rules"
+  - ingest_data:
+      - property_info
+      - invoices_and_haul_logs
+      - contract_text_if_provided
+  - regulatory_research:
+      searches:
+        - "[city] [state] waste recycling ordinance"
+        - "[city] universal recycling multifamily"
+        - "[city] composting mandate commercial (if applicable)"
+      max_searches: 3
+      priority: ".gov and official sources"
+  - validations: "40+ checks; run once before recommendations"
+  - calculations:
+      yards_per_door:
+        compactor: "(total_tons * 14.49) / units"
+        compactor_alt: "((tons * 2000) / 138) / units"
+        dumpster: "(qty * size * frequency * 4.33) / units"
+      cost_per_door: "total_monthly_cost / units"
+      annual_savings: "monthly_savings * 12"
+  - outputs:
+      excel_tabs: [SUMMARY, SUMMARY_FULL, EXPENSE_ANALYSIS, HAUL_LOG, OPTIMIZATION, CONTRACT_TERMS, REGULATORY_COMPLIANCE, INSTRUCTIONS]
+      html_tabs: [Dashboard, Expense Analysis, Haul Log, Optimization, Contract Terms, Regulatory Compliance]
+  - delivery:
+      summary: "3-5 key findings, total annual savings, regulatory status"
+      links: ["computer://excel_workbook", "computer://html_dashboard"]
+
+logic:
+  compactor_optimization:
+    eligibility:
+      avg_tons_per_haul: "< 7"
+      max_interval_days: "<= 14"
+    savings_threshold: "pickup savings >= $300/month (pickup fees only)"
+    roi: "net monthly savings > 0 after install + monitoring"
+    target: "8-9 tons per haul with monitors"
+  lease_up_vs_stabilized:
+    lease_up:
+      occupancy: "< 90%"
+      budget_projection: "(current_cost / current_occupancy) * target_occupancy"
+      note: "No savings projection if yards/door far below benchmark"
+    stabilized:
+      occupancy: ">= 90%"
+      action: "Use actuals for projections"
+    value_add:
+      note: "Flag service disruption; review post-renovation"
+  overages:
+    presence_required: true
+    classification:
+      consistent: "> 75% months ⇒ add permanent service if extra_day_cost < avg_overages"
+      seasonal: "limit increases to peak months"
+      sporadic: "investigate ops/valet distribution; consider larger equipment"
+    compare_costs:
+      - status_quo: "avg_monthly_overage * 12"
+      - added_service: "extra_service_cost * 12"
+  contamination:
+    rate: "(contamination_charges / total_spend) * 100"
+    thresholds:
+      high: "> 5%"
+      elevated: "> 3% and <= 5%"
+    recommend:
+      high_and_gt_150: "full program (signage $500, education $300, monitoring $50/month, expect 50% reduction)"
+      elevated_and_gt_150: "light intervention (signage refresh, reminders)"
+  bulk_subscription:
+    average_monthly: "mean of 6-12 months bulk charges"
+    thresholds:
+      subscribe: "> $500 ⇒ recommend subscription ($400/month)"
+      monitor: ">= $300 and <= $500 ⇒ monitor 3 months; prep for subscription if trend increases"
+      on_demand: "< $300 ⇒ keep on-demand"
+  service_level:
+    rules:
+      - condition: "avg_tons_per_haul >= 8 AND overages_present"
+        recommendation: "Add service day (prevent overflow)"
+      - condition: "avg_tons_per_haul < 6 AND NOT overages_present"
+        recommendation: "Reduce pickup frequency"
+      - condition: "6 <= avg_tons_per_haul < 8"
+        recommendation: "Maintain current service"
+    guardrail: "If contamination_or_overages_present, never recommend reduction"
+  valet:
+    distribution: "If overages concentrated at one bin ⇒ enforce even distribution (no cost)"
+    schedule: "If 5-day valet ⇒ consider weekend valet or Monday pickup; if 7-day ⇒ check compliance"
+    volume_trend: "If volume rose after valet start ⇒ note 'success tax' and consider capacity increase"
+  multi_opportunity_priority:
+    rank:
+      - "Savings amount (highest first)"
+      - "Implementation complexity (easiest first)"
+      - "Payback period (fastest first)"
+    output_format:
+      - "Priority 1: Highest $ impact with < 12 month payback"
+      - "Priority 2: Medium $ impact with low complexity"
+      - "Priority 3: Lower $ impact or longer payback"
+
+benchmarks:
+  garden:
+    yards_per_door_target: "2.0-2.5"
+  mid_rise:
+    yards_per_door_target: "1.8-2.3"
+  high_rise:
+    yards_per_door_target: "1.5-2.0"
+  performance_rating:
+    variance_formula: "((actual - benchmark_midpoint) / benchmark_midpoint) * 100"
+    thresholds:
+      excellent: "< -15%"
+      at_benchmark: ">= -15% and <= +15%"
+      above_benchmark: "> +15%"
+
+validation:
+  required_tabs:
+    excel: 8
+    html: 6
+  summary_full_first_line: "Potential to Reduce 2026 Trash Expense by $XX,XXX"
+  contract_tab_only_if_contract_provided: true
+  regulatory_confidence_required: true
+  compactor_thresholds:
+    avg_tons_per_haul: "< 7"
+    max_interval_days: "<= 14"
+  annual_savings_formula: "monthly * 12"
+  dual_compactors_separate: true
+  invoices_must_include_numbers_and_dates: true
+  min_licensed_haulers_listed: 3

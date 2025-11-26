@@ -1,471 +1,102 @@
-# WasteWise Skill System
-
-[![PR Checks](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/pr-checks.yml)
-[![Auto-Merge](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/auto-merge.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/auto-merge.yml)
-[![Branch Cleanup](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/cleanup-branches.yml/badge.svg)](https://github.com/tryinhard1080/wastewise-skill-system/actions/workflows/cleanup-branches.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
-[![Phase](https://img.shields.io/badge/Phase-7%20(85%25)-yellow.svg)](#development-phases)
-[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
-
-> Intelligent skill execution platform for multifamily waste optimization
-
-**Current Status:** Phase 7 In Progress - Integration Testing & Production Deployment (85% Complete) 🚀
-
-## Overview
-
-WasteWise Skill System is an extensible platform for analyzing multifamily property waste management and providing data-driven optimization recommendations. Built for Greystar and similar property management companies, it uses AI-powered skills to analyze invoices, haul logs, and contracts to identify cost savings opportunities.
-
-### Key Features
-
-- **Skill-Based Architecture**: Modular, extensible design for different analysis types
-- **Async Job Processing**: Background workers handle long-running AI operations
-- **Formula Compliance**: All calculations aligned with canonical waste management formulas
-- **Database-Driven Configuration**: Threshold management via Supabase
-- **Type-Safe**: Full TypeScript with generated database types
-
----
-
-## Architecture
-
-### System Components
-
-```
-┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
-│   Next.js App   │         │  Background      │         │   Supabase      │
-│                 │         │  Worker          │         │   PostgreSQL    │
-│  - API Routes   │────────▶│  (scripts/       │────────▶│                 │
-│  - UI (Phase 3) │         │   worker.ts)     │         │  - Projects     │
-│                 │         │                  │         │  - Analysis Jobs│
-└─────────────────┘         └──────────────────┘         │  - Haul Logs    │
-        │                            │                    │  - Skill Config │
-        │                            │                    └─────────────────┘
-        ▼                            ▼
-┌─────────────────────────────────────────────────────────┐
-│              Skill Execution Layer                      │
-│                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │  Skill       │  │  Executor    │  │  BaseSkill   │ │
-│  │  Registry    │  │              │  │  (Abstract)  │ │
-│  └──────────────┘  └──────────────┘  └──────────────┘ │
-│                                                          │
-│  Skills:                                                │
-│  ├─ compactor-optimization (Phase 2.1) ✅              │
-│  ├─ invoice-extraction (Phase 2.2+) 🚧                 │
-│  ├─ regulatory-research (Phase 2.2+) 🚧                │
-│  └─ complete-analysis (Phase 3) ⏳                     │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Data Flow
-
-1. **Job Creation**: API endpoint creates `analysis_job` record (status: pending)
-2. **Worker Polling**: Background worker queries pending jobs every 5 seconds
-3. **Skill Execution**: Worker loads skill, validates data, executes analysis
-4. **Progress Updates**: Real-time progress written to `analysis_jobs` table
-5. **Results**: Completed jobs store results in `result_data` JSONB field
-6. **Client Polling**: Frontend polls `/api/jobs/[id]` for status updates
-
----
-
-## Tech Stack
-
-### Core Framework
-- **Next.js 14** - App Router, Server Components, API Routes
-- **React 19** - UI layer (Phase 3)
-- **TypeScript 5** - Strict mode, full type safety
-
-### Database & Auth
-- **Supabase** - PostgreSQL, Authentication, Row-Level Security
-- **Supabase CLI** - Local development, migrations, type generation
-
-### AI & Analytics (Phase 2.2+)
-- **Anthropic Claude API** - Invoice extraction, regulatory research
-- **Custom Formulas** - Waste management calculations (YPD, capacity, ROI)
-
-### UI & Styling (Phase 3)
-- **Tailwind CSS** - Utility-first styling
-- **shadcn/ui** - Component library
-- **Recharts** - Data visualization
-
-### Testing & Quality
-- **Vitest** - Unit and integration testing
-- **TypeScript Compiler** - Type checking, strict mode
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js**: v18+ (v20+ recommended)
-- **pnpm**: v8+ (install via `npm install -g pnpm`)
-- **Supabase CLI**: Install via `npm install -g supabase`
-- **Git**: For version control
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd wastewise-skill-system
-   ```
-
-2. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Edit `.env.local` and configure:
-   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Public anon key
-   - `SUPABASE_SERVICE_ROLE_KEY` - Service role key (for workers)
-
-4. **Start Supabase locally**
-   ```bash
-   npx supabase start
-   ```
-
-   This will:
-   - Start PostgreSQL database
-   - Apply all migrations
-   - Generate TypeScript types
-   - Display connection details
-
-5. **Verify database setup**
-   ```bash
-   # Check migrations are applied
-   npx supabase db diff --schema public
-
-   # Generate/update TypeScript types
-   npx supabase gen types typescript --local > types/database.types.ts
-   ```
-
-6. **Start the development server**
-   ```bash
-   pnpm dev
-   ```
-
-   App will be available at `http://localhost:3000`
-
-7. **Start the background worker** (in a separate terminal)
-   ```bash
-   pnpm worker
-   ```
-
-   Worker will poll for pending analysis jobs every 5 seconds
-
----
-
-## Development Workflow
-
-### Running Tests
-
-```bash
-# Run all unit tests
-pnpm test
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Run tests with UI
-pnpm test:ui
-```
-
-### Database Management
-
-```bash
-# Create a new migration
-npx supabase migration new <migration-name>
-
-# Apply migrations
-npx supabase db reset  # Drops and recreates
-
-# Generate TypeScript types
-npx supabase gen types typescript --local > types/database.types.ts
-
-# Open database GUI
-npx supabase db inspect
-```
-
-### Type Checking
-
-```bash
-# Check all TypeScript files
-npx tsc --noEmit
-
-# Watch mode
-npx tsc --noEmit --watch
-```
-
-### Worker Development
-
-```bash
-# Start worker with auto-reload (via tsx)
-pnpm worker
-
-# Test worker with sample job
-npx tsx scripts/test-e2e.ts
-```
-
-### API Development
-
-```bash
-# Test API endpoints
-curl http://localhost:3000/api/jobs
-
-# Create analysis job
-curl -X POST http://localhost:3000/api/analyze \
-  -H "Content-Type: application/json" \
-  -d '{"projectId": "uuid", "jobType": "complete_analysis"}'
-
-# Check job status
-curl http://localhost:3000/api/jobs/[job-id]
-```
-
-**Full API Documentation:** See [docs/API.md](docs/API.md)
-
----
-
-## Formula Compliance
-
-All waste calculations follow canonical formulas defined in `lib/constants/formulas.ts`:
-
-### Compactor Optimization Thresholds
-
-| Metric | Value | Description |
-|--------|-------|-------------|
-| `COMPACTOR_OPTIMIZATION_THRESHOLD` | **6.0 tons** | Average tons/haul below which monitoring is recommended |
-| `COMPACTOR_TARGET_TONS` | **8.5 tons** | Target capacity utilization with monitoring |
-| `COMPACTOR_MAX_DAYS_BETWEEN` | **14 days** | Maximum pickup interval for optimization eligibility |
-| `TONS_TO_YARDS` | **14.49** | Conversion ratio (1 ton = 14.49 cubic yards) |
-| `DUMPSTER_YPD` | **4.33** | Yards per door per week (open top containers) |
-| `DSQ_MONITOR_INSTALL` | **$800** | One-time installation cost |
-| `DSQ_MONITOR_MONTHLY` | **$149** | Monthly monitoring fee |
-
-**Critical Criteria** (ALL must be true for recommendation):
-1. Average tons per haul < 6.0
-2. Max days between pickups ≤ 14
-3. Property has compactor equipment
-
----
-
-## Project Roadmap
-
-### ✅ Phase 0: Foundation (Complete)
-- Next.js 14 project setup
-- Supabase integration
-- Authentication system
-- Database migrations
-
-### ✅ Phase 1: Core Infrastructure (Complete)
-- Error handling framework
-- Logging and metrics
-- Database schema (projects, skill_config, benchmark_standards)
-- Formula constants
-
-### ✅ Phase 2.1: Compactor Optimization Vertical Slice (Complete)
-**Goal**: End-to-end skill execution with background processing
-
-- ✅ Skill infrastructure (BaseSkill, registry, executor)
-- ✅ CompactorOptimizationSkill with ROI calculations
-- ✅ Background worker script
-- ✅ `analysis_jobs` table with progress tracking
-- ✅ Test coverage (unit + E2E script)
-- ✅ TypeScript compilation passing
-
-### ✅ Phase 2.2: API Endpoints (Complete)
-**Goal**: Production-ready REST API with enhanced error handling and rate limiting
-
-- ✅ `POST /api/projects/[id]/analyze` - Start analysis jobs
-- ✅ `GET /api/jobs/[id]` - Poll job status (enhanced error details)
-- ✅ `DELETE /api/jobs/[id]` - Cancel running jobs
-- ✅ Standardized error handling
-- ✅ Rate limiting (10 jobs/min, 60 polls/min)
-- ✅ UUID validation
-- ✅ Comprehensive API documentation
-
-### ✅ Phase 3-5: Reports & Async Jobs (Complete)
-**Goal**: Excel/HTML report generation and background job processing
-
-- ✅ Excel report generator (ExcelJS)
-- ✅ HTML dashboard generator (interactive charts)
-- ✅ Supabase Storage integration
-- ✅ Background worker with polling
-- ✅ RPC functions for job management
-- ✅ Progress tracking system
-
-### ✅ Phase 6: Complete Analytics Integration (Complete)
-**Goal**: Full end-to-end analytics workflow
-
-- ✅ WasteWiseAnalyticsSkill with real report generation
-- ✅ API routes for job creation and status checking
-- ✅ Background worker processing
-- ✅ Frontend results page with downloads
-- ✅ Job cancellation support
-- ✅ Real-time progress updates
-
-### 🔄 Phase 7: Integration Testing & Production Deployment (In Progress - 85%)
-**Goal**: Validate entire system and prepare for production
-
-**Completed**:
-- ✅ Worker startup validation
-- ✅ Test data seed script
-- ✅ All systems running (Supabase, dev server, worker)
-- ✅ Automated test framework setup
-- ✅ Comprehensive API documentation
-- ✅ Deployment guide (3 deployment options)
-
-**In Progress**:
-- 🔄 Manual E2E workflow testing
-- ⏳ API endpoint integration tests
-- ⏳ Frontend responsiveness validation
-- ⏳ Performance & load testing
-
-**Remaining**:
-- Security validation (auth, RLS, input validation)
-- Production deployment configuration
-- Monitoring & health checks setup
-
-### ⏳ Phase 8: Production Launch (Planned)
-**Goal**: Deploy to production and monitor real users
-
-- Deploy to production environment
-- Monitor first 10 real user analyses
-- Collect user feedback
-- Fix any production-specific issues
-
-### ⏳ Phase 9: Feature Enhancements (Planned)
-**Goal**: Add additional features and skills
-
-- Processing page with live progress bar
-- Email notifications on completion
-- Regulatory research skill integration
-- Batch analysis for multiple properties
-- Invoice extraction (Claude Vision API)
-
----
-
-## Configuration
-
-### Skill Configuration
-
-Skills are configured via the `skill_config` table in Supabase:
-
-```sql
--- Example: Compactor optimization thresholds
-{
-  "skill_name": "compactor-optimization",
-  "conversion_rates": {
-    "compactorYpd": 14.49,
-    "dumpsterYpd": 4.33,
-    "targetCapacity": 8.5
-  },
-  "thresholds": {
-    "compactorTons": 6.0,
-    "maxDaysBetween": 14
-  },
-  "costs": {
-    "dsqMonitorInstall": 800,
-    "dsqMonitorMonthly": 149
-  }
-}
-```
-
-### Worker Configuration
-
-Set via environment variables:
-
-- `WORKER_POLL_INTERVAL_MS` - Polling frequency (default: 5000)
-- `WORKER_CONCURRENCY` - Max concurrent jobs (default: 1)
-
----
-
-## Testing
-
-### Unit Tests
-
-Located in `__tests__/` directory, following the source structure:
-
-```bash
-__tests__/
-├── skills/
-│   ├── compactor-optimization.test.ts
-│   ├── executor.test.ts
-│   └── registry.test.ts
-└── unit/
-    └── constants/
-        └── formulas.test.ts
-```
-
-Run with `pnpm test`
-
-### E2E Test Script
-
-`scripts/test-e2e.ts` provides a full workflow test:
-
-1. Creates test project
-2. Adds haul log data
-3. Creates analysis job
-4. Waits for worker to process
-5. Verifies results
-
-**Note**: Requires worker to be running in separate terminal
-
----
-
-## Documentation
-
-### Core Documentation
-- **[.claude/CLAUDE.md](.claude/CLAUDE.md)** - Complete project instructions and architecture
-- **[API Documentation](docs/API.md)** - REST API reference with examples
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment options (Vercel, VPS, Docker)
-
-### Phase Documentation
-- **[PHASE_7_PLAN.md](PHASE_7_PLAN.md)** - Integration testing plan and checklist
-- **[PHASE_7_TEST_RESULTS.md](PHASE_7_TEST_RESULTS.md)** - Current test results and status
-- **[PHASE_6_SUMMARY.md](PHASE_6_SUMMARY.md)** - Complete analytics integration summary
-
-### Key Files
-- **Formula Reference**: `lib/constants/formulas.ts` - Canonical waste calculation formulas
-- **Database Schema**: `supabase/migrations/` - All database migrations
-- **Seed Data**: `scripts/seed-test-data.ts` - Generate test data for development
-- **E2E Test**: `scripts/test-e2e.ts` - End-to-end workflow test
-
----
-
-## License
-
-**Private Repository** - All rights reserved
-
-This codebase contains proprietary business logic for Greystar waste management optimization. Unauthorized copying, distribution, or use is strictly prohibited.
-
----
-
-## Contributing
-
-This is a private repository. For development guidelines:
-
-1. **Branch Naming**: `<type>/<description>` (e.g., `feat/regulatory-research`)
-2. **Commit Messages**: Follow Conventional Commits (e.g., `feat:`, `fix:`, `docs:`)
-3. **Testing**: All new skills must include unit tests
-4. **Type Safety**: All code must pass `npx tsc --noEmit`
-5. **Formulas**: Ensure calculations match `lib/constants/formulas.ts`
-
----
-
-## Support
-
-For questions or issues:
-- **Technical Issues**: Check `lib/observability/logger.ts` for error logs
-- **Database Issues**: Run `npx supabase db inspect` for diagnostics
-- **Formula Questions**: Refer to WASTE_FORMULAS_REFERENCE.md (if available)
-
----
-
-**Generated with [Claude Code](https://claude.com/claude-code)**
+WasteWise Complete Suite Agent
+==============================
+
+This agent codifies the WasteWise Complete Suite protocol to deliver consistent, expert-grade waste consulting outputs. It works from property data, invoices, and contracts to produce an Excel workbook (8 tabs) and an HTML dashboard (6 tabs), along with a concise executive summary.
+
+Workflow
+--------
+1) Read the WasteWise Complete Suite skill and load all rules.  
+2) Ingest property inputs: profile, units/doors, equipment, occupancy status, hauler invoices, contract text (if provided), haul logs, contamination/bulk charges, overage history, and location (for ordinance research).  
+3) Run 40+ validations before any recommendations.  
+4) Conduct targeted regulatory research (max 2-3 searches; prioritize .gov).  
+5) Compute benchmarks and KPIs (yards/door, cost/door, tons/haul, overage and contamination rates).  
+6) Generate outputs in a single session: Excel (8 tabs) and HTML dashboard (6 tabs).  
+7) Deliver files with an executive summary: key findings, annual savings, regulatory status, and download links.
+
+Branding & Contacts
+-------------------
+- Brand: “WasteWise by THE Trash Hub” (never mention Advantage Waste).  
+- Main contact: Richard Bates (The Trash Hub).  
+- Compactor monitors: Keith Conrad (DSQ Technologies) — keith.conrad@dsqtech.com.  
+- Bulk trash: Cole Myers (Ally Waste) — cole@allywaste.com.
+
+Critical thresholds & rules
+---------------------------
+- Compactor monitors: recommend when avg tons/haul < 7 **and** max interval ≤ 14 days; target 8–9 tons/haul.  
+- Contamination reduction: only recommend if contamination > 3% of total spend.  
+- Bulk subscription: only recommend when average bulk > $500/month.  
+- Yards per door:  
+  - Compactor: (total tons × 14.49) ÷ units (or (tons × 2,000 ÷ 138) ÷ units).  
+  - Dumpster: (qty × size × freq × 4.33) ÷ units.  
+- Cost per door: total monthly cost ÷ units.  
+- Annual savings: monthly savings × 12 (never × 24).  
+- Dual compactors: calculate each separately; do not double savings.  
+- Benchmarks (yards/door targets): garden 2.0–2.5, mid-rise 1.8–2.3, high-rise 1.5–2.0. Dumpster benchmarks are for comparison only (no service change recommendations).  
+- Compactor optimization is actionable; Energy Star references must be removed.  
+- Lease-up properties with very low yards/door (e.g., 0.87 vs 2.0–2.5) ⇒ no cost savings projected.
+
+Required Excel tabs (8)
+-----------------------
+1) SUMMARY — executive overview.  
+2) SUMMARY_FULL — first line: “Potential to Reduce 2026 Trash Expense by $XX,XXX”.  
+3) EXPENSE_ANALYSIS — month-by-month columns; include all invoice numbers; cost/door by month.  
+4) HAUL_LOG — pickups with dates, tons, yards/door (only if compactor).  
+5) OPTIMIZATION — three opportunities with full calculation breakdowns.  
+6) CONTRACT_TERMS — only if contract provided; 7 clause categories, verbatim text, reminders (90/60/30 days), risk severity.  
+7) REGULATORY_COMPLIANCE — ordinance research (8 sections) with confidence score.  
+8) INSTRUCTIONS — how to use the workbook.
+
+Required HTML tabs (6)
+----------------------
+1) Dashboard — executive gauges and KPIs.  
+2) Expense Analysis — charts and month-over-month trends.  
+3) Haul Log — filterable data tables.  
+4) Optimization — savings opportunities with visuals.  
+5) Contract Terms — risk analysis and action items.  
+6) Regulatory Compliance — ordinance requirements and checklist.
+
+Regulatory research (8 sections)
+--------------------------------
+1) Ordinance Summary; 2) Waste Collection Requirements; 3) Recycling Requirements; 4) Composting/Organics; 5) Penalties & Enforcement; 6) Licensed Haulers (3–5 with contacts); 7) Regulatory Contacts; 8) Research Confidence (HIGH/MEDIUM/LOW).  
+Search protocol: “[City] [State] waste recycling ordinance”; “[City] universal recycling multifamily”; “[City] composting mandate commercial”. Prioritize official sources; extract numerical requirements and penalties. Confidence: HIGH (official + penalties), MEDIUM (core info but gaps), LOW (insufficient — flag HUMAN REVIEW REQUIRED).
+
+Decision logic highlights
+-------------------------
+- Compactor optimization gate: avg tons/haul < 7 and max interval ≤ 14 days; savings based only on pickup fees; require ≥ $300/month pickup savings; net monthly savings must be positive after install/monitoring.  
+- Lease-up vs stabilized vs value-add: project to target occupancy for lease-up; use actuals for stabilized; flag disruption for renovation.  
+- Overages: classify consistent/seasonal/sporadic; compare added service cost vs overage spend; recommend lowest annual cost.  
+- Contamination: act if > 3% spend; full program if > 5% and > $150/month.  
+- Bulk: subscription if average bulk > $500/month; monitor 300–500; on-demand below 300.  
+- Service level: add service if ≥ 8 tons/haul and overages; reduce only if < 6 tons/haul and no overages; maintain at 6–8; never reduce when contamination/overages present.  
+- Valet: enforce even distribution; adjust weekend coverage if 5-day schedule; note “success tax” if volume rises post-valet.  
+- Multi-opportunity prioritization: rank by savings, then complexity, then payback; present top 3 with totals.
+
+Validation before output
+------------------------
+- All tabs present and correctly named (Excel 8, HTML 6).  
+- SUMMARY_FULL first line exact.  
+- Contract tab only if contract provided.  
+- Regulatory tab includes confidence score.  
+- Compactor thresholds updated (<7 tons/haul, interval ≤ 14 days).  
+- Annual savings = monthly × 12.  
+- Dual compactors separately calculated.  
+- Invoice numbers and dates included.  
+- Contacts and branding correct.  
+- Expense analysis includes maximum detail and cost/door per month.  
+- Minimum 3 licensed haulers when research is done.
+
+Output format to user
+---------------------
+1) Brief executive summary (3–5 findings).  
+2) Total annual savings opportunity.  
+3) Regulatory compliance status (if researched).  
+4) Download links to Excel and HTML (computer://...).
+
+Implementation notes
+--------------------
+- Read skill once at start; minimize tool calls.  
+- Perform comprehensive validation once.  
+- Generate both outputs in one session.  
+- Currency: $ with 2 decimals; percentages: 1 decimal; dates: MM/DD/YYYY.  
+- Use the term “compactor monitors” (never “ultrasonic sensors”).  
+- Professional, data-driven tone; do not project savings for lease-up with very low yards/door or already optimized sites.

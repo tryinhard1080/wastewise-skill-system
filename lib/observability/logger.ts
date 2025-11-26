@@ -32,7 +32,7 @@ export interface LogContext {
   requestId?: string
 
   /** Additional context fields */
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface LogEntry {
@@ -40,7 +40,7 @@ export interface LogEntry {
   message: string
   timestamp: string
   context?: LogContext
-  data?: any
+  data?: Record<string, unknown>
   error?: {
     message: string
     stack?: string
@@ -74,7 +74,7 @@ class Logger {
     level: LogLevel,
     message: string,
     context?: LogContext,
-    data?: any,
+    data?: Record<string, unknown>,
     error?: Error
   ): LogEntry {
     const entry: LogEntry = {
@@ -95,7 +95,7 @@ class Logger {
       entry.error = {
         message: error.message,
         stack: error.stack,
-        code: (error as any).code,
+        code: 'code' in error && typeof error.code === 'string' ? error.code : undefined,
       }
     }
 
@@ -142,7 +142,7 @@ class Logger {
   /**
    * Debug-level logging
    */
-  debug(message: string, context?: LogContext, data?: any): void {
+  debug(message: string, context?: LogContext, data?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.DEBUG, message, context, data)
     this.output(entry)
   }
@@ -150,7 +150,7 @@ class Logger {
   /**
    * Info-level logging
    */
-  info(message: string, context?: LogContext, data?: any): void {
+  info(message: string, context?: LogContext, data?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.INFO, message, context, data)
     this.output(entry)
   }
@@ -158,7 +158,7 @@ class Logger {
   /**
    * Warning-level logging
    */
-  warn(message: string, context?: LogContext, data?: any): void {
+  warn(message: string, context?: LogContext, data?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.WARN, message, context, data)
     this.output(entry)
   }
@@ -166,7 +166,7 @@ class Logger {
   /**
    * Error-level logging
    */
-  error(message: string, error?: Error, context?: LogContext, data?: any): void {
+  error(message: string, error?: Error, context?: LogContext, data?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.ERROR, message, context, data, error)
     this.output(entry)
   }
@@ -199,19 +199,19 @@ class ChildLogger {
     return { ...this.baseContext, ...context }
   }
 
-  debug(message: string, context?: LogContext, data?: any): void {
+  debug(message: string, context?: LogContext, data?: Record<string, unknown>): void {
     this.parent.debug(message, this.mergeContext(context), data)
   }
 
-  info(message: string, context?: LogContext, data?: any): void {
+  info(message: string, context?: LogContext, data?: Record<string, unknown>): void {
     this.parent.info(message, this.mergeContext(context), data)
   }
 
-  warn(message: string, context?: LogContext, data?: any): void {
+  warn(message: string, context?: LogContext, data?: Record<string, unknown>): void {
     this.parent.warn(message, this.mergeContext(context), data)
   }
 
-  error(message: string, error?: Error, context?: LogContext, data?: any): void {
+  error(message: string, error?: Error, context?: LogContext, data?: Record<string, unknown>): void {
     this.parent.error(message, error, this.mergeContext(context), data)
   }
 }

@@ -143,49 +143,55 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="hover:shadow-md transition-shadow cursor-pointer">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <FileText className="h-5 w-5 mr-2 text-green-600" />
-              Upload Invoices
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Upload waste service invoices for AI-powered extraction and
-              analysis.
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/projects/new">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <FileText className="h-5 w-5 mr-2 text-green-600" />
+                Upload Invoices
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Upload waste service invoices for AI-powered extraction and
+                analysis.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="hover:shadow-md transition-shadow cursor-pointer">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
-              View Analytics
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Explore cost trends, optimization opportunities, and performance
-              metrics.
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/analytics">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+                View Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Explore cost trends, optimization opportunities, and performance
+                metrics.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="hover:shadow-md transition-shadow cursor-pointer">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <DollarSign className="h-5 w-5 mr-2 text-green-600" />
-              Generate Reports
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Download comprehensive Excel and HTML reports for stakeholders.
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/reports">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <DollarSign className="h-5 w-5 mr-2 text-green-600" />
+                Generate Reports
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Download comprehensive Excel and HTML reports for stakeholders.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   )

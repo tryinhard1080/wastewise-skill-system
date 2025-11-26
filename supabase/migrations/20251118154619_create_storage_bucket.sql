@@ -16,8 +16,8 @@ VALUES (
   ]
 );
 
--- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Note: RLS is already enabled on storage.objects by default in Supabase
+-- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can upload files to their own projects
 CREATE POLICY "Users can upload to own projects"

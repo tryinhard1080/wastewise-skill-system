@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Analysis Dashboard - Orion McKinney</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gauge-container {
+            position: relative;
+            width: 100%;
+            height: 240px;
+        }
+        .gauge-text {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .gauge-label {
+            position: absolute;
+            top: 88%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #64748b;
+            text-align: center;
+            width: 80%;
+        }
+        .tab-button.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+        }
+        .tab-button {
+            border-bottom-width: 3px;
+            border-bottom-color: transparent;
+        }
+        .table-sticky-header th {
+            position: sticky;
+            top: 0;
+            background-color: #f1f5f9;
+            z-index: 10;
+        }
+        @media print {
+            .tab-button { display: none; }
+            .tab-content { display: block !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans">
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <!-- Header -->
+        <header class="mb-6 border-b border-slate-300 pb-4">
+            <h1 class="text-3xl font-bold text-slate-800">Waste Analysis Dashboard</h1>
+            <p class="text-lg text-slate-600">Orion McKinney (453 Units)</p>
+            <p class="text-sm text-slate-500">2580 Collin McKinney Pkwy, McKinney, TX 75070</p>
+            <p class="text-sm text-slate-500">Analysis Period: January 2025 - September 2025</p>
+            
+            <!-- 2026 Savings Banner -->
+            <div class="mt-4 p-4 bg-white rounded-lg shadow-md border-l-4 border-green-600">
+                <h2 class="text-lg font-semibold text-slate-800">
+                    Potential to Reduce 2026 Trash Expense by 
+                    <span class="text-green-600">$2,592</span>
+                </h2>
+                <p class="text-sm text-slate-600 mt-1">
+                    Two validated optimization opportunities: contamination reduction and enclosure fee review.
+                </p>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="mb-6 border-b border-slate-300">
+            <div class="flex space-x-4 overflow-x-auto">
+                <button id="tab-btn-dashboard" class="tab-button px-4 py-2 text-sm font-medium active" 
+                        onclick="showTab('dashboard')">Dashboard</button>
+                <button id="tab-btn-expense" class="tab-button px-4 py-2 text-sm font-medium" 
+                        onclick="showTab('expense')">Expense Analysis</button>
+                <button id="tab-btn-optimization" class="tab-button px-4 py-2 text-sm font-medium" 
+                        onclick="showTab('optimization')">Optimization</button>
+                <button id="tab-btn-budget" class="tab-button px-4 py-2 text-sm font-medium" 
+                        onclick="showTab('budget')">2026 Budget</button>
+                <button id="tab-btn-regulatory" class="tab-button px-4 py-2 text-sm font-medium" 
+                        onclick="showTab('regulatory')">Regulatory</button>
+            </div>
+        </nav>
+
+        <!-- TAB 1: Dashboard (Executive Summary) -->
+        <div id="dashboard" class="tab-content">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Executive Dashboard</h2>
+            
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-sm font-medium text-slate-600 mb-2">2025 Annual Spend</h3>
+                    <p class="text-3xl font-bold text-slate-900">$54,553</p>
+                    <p class="text-xs text-slate-500 mt-1">9 months of data</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-sm font-medium text-slate-600 mb-2">Monthly Average</h3>
+                    <p class="text-3xl font-bold text-slate-900">$6,061</p>
+                    <p class="text-xs text-slate-500 mt-1">Includes all fees</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-sm font-medium text-slate-600 mb-2">Cost Per Door</h3>
+                    <p class="text-3xl font-bold text-slate-900">$13.38</p>
+                    <p class="text-xs text-slate-500 mt-1">Monthly average</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-sm font-medium text-slate-600 mb-2">2026 Savings</h3>
+                    <p class="text-3xl font-bold text-green-600">$2,592</p>
+                    <p class="text-xs text-slate-500 mt-1">Annual opportunity</p>
+                </div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">Yards Per Door Performance</h3>
+                    <div class="gauge-container">
+                        <canvas id="ypdGauge"></canvas>
+                        <div class="gauge-text">2.41</div>
+                        <div class="gauge-label">Target: 2.0-2.5 YPD</div>
+                    </div>
+                    <div class="mt-4 p-3 bg-green-50 rounded">
+                        <p class="text-sm font-semibold text-green-800">✓ WITHIN TARGET</p>
+                        <p class="text-xs text-green-700 mt-1">Property is generating waste at industry benchmark levels for garden-style multifamily.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">2026 Budget Impact</h3>
+                    <div class="gauge-container">
+                        <canvas id="budgetGauge"></canvas>
+                        <div class="gauge-text">11.8%</div>
+                        <div class="gauge-label">Projected increase vs 2025</div>
+                    </div>
+                    <div class="mt-4 p-3 bg-yellow-50 rounded">
+                        <p class="text-sm font-semibold text-yellow-800">⚠ CPI INCREASE</p>
+                        <p class="text-xs text-yellow-700 mt-1">5% CPI increase + new enclosure fees ($520/month since July 2025).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor & Property Info -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">Property Details</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-sm text-slate-600">Vendor</p>
+                        <p class="font-semibold text-slate-900">Frontier Waste Solutions</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Account #</p>
+                        <p class="font-semibold text-slate-900">239522</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Property Type</p>
+                        <p class="font-semibold text-slate-900">Garden-Style</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Units</p>
+                        <p class="font-semibold text-slate-900">453</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Expense Analysis -->
+        <div id="expense" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Monthly Expense Trends</h2>
+            
+            <!-- Cost Trend Chart -->
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">Cost Per Door Trend</h3>
+                <canvas id="costPerDoorChart" height="80"></canvas>
+            </div>
+
+            <!-- Monthly Breakdown Chart -->
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">Monthly Total Costs</h3>
+                <canvas id="monthlyTotalChart" height="80"></canvas>
+            </div>
+
+            <!-- Detailed Expense Table -->
+            <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">2025 Expense Detail</h3>
+                <table class="w-full table-auto text-sm">
+                    <thead class="bg-slate-100 table-sticky-header">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Month</th>
+                            <th class="px-4 py-2 text-left">Invoice #</th>
+                            <th class="px-4 py-2 text-right">Subtotal</th>
+                            <th class="px-4 py-2 text-right">Tax</th>
+                            <th class="px-4 py-2 text-right">Total</th>
+                            <th class="px-4 py-2 text-right">$/Door</th>
+                            <th class="px-4 py-2 text-left">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody">
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-2">January 2025</td>
+                            <td class="px-4 py-2">4741394</td>
+                            <td class="px-4 py-2 text-right">$5,393.11</td>
+                            <td class="px-4 py-2 text-right">$445.03</td>
+                            <td class="px-4 py-2 text-right font-semibold">$5,839.14</td>
+                            <td class="px-4 py-2 text-right">$12.89</td>
+                            <td class="px-4 py-2 text-slate-600">Regular monthly service</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-2">February 2025</td>
+                            <td class="px-4 py-2">4970200</td>
+                            <td class="px-4 py-2 text-right">$5,393.11</td>
+                            <td class="px-4 py-2 text-right">$445.03</td>
+                            <td class="px-4 py-2 text-right font-semibold">$5,839.14</td>
+                            <td class="px-4 py-2 text-right">$12.89</td>
+                            <td class="px-4 py-2 text-slate-600">Regular monthly service</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-2">March 2025</td>
+                            <td class="px-4 py-2">5290736</td>
+                            <td class="px-4 py-2 text-right">$5,393.11</td>
+                            <td class="px-4 py-2 text-right">$445.03</td>
+                            <td class="px-4 py-2 text-right font-semibold">$5,839.14</td>
+                            <td class="px-4 py-2 text-right">$12.89</td>
+                            <td class="px-4 py-2 text-slate-600">Regular monthly service</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-2">April 2025</td>
+                            <td class="px-4 py-2">5636037</td>
+                            <td class="px-4 py-2 text-right">$5,393.11</td>
+                            <td class="px-4 py-2 text-right">$445.03</td>
+                            <td class="px-4 py-2 text-right font-semibold">$5,839.14</td>
+                            <td class="px-4 py-2 text-right">$12.89</td>
+                            <td class="px-4 py-2 text-slate-600">Regular monthly service</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-2">May 2025</td>
+                            <td class="px-4 py-2">5900586</td>
+                            <td class="px-4 py-2 text-right">$5,393.11</td>
+                            <td class="px-4 py-2 text-right">$445.03</td>
+                            <td class="px-4 py-2 text-right font-semibold">$5,839.14</td>
+                            <td class="px-4 py-2 text-right">$12.89</td>
+                            <td class="px-4 py-2 text-slate-600">Regular monthly service</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-2">June 2025</td>
+                            <td class="px-4 py-2">6231838</td>
+                            <td class="px-4 py-2 text-right">$5,393.11</td>
+                            <td class="px-4 py-2 text-right">$445.03</td>
+                            <td class="px-4 py-2 text-right font-semibold">$5,839.14</td>
+                            <td class="px-4 py-2 text-right">$12.89</td>
+                            <td class="px-4 py-2 text-slate-600">Regular monthly service</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50 bg-yellow-50">
+                            <td class="px-4 py-2">July 2025</td>
+                            <td class="px-4 py-2">6731304</td>
+                            <td class="px-4 py-2 text-right">$5,939.11</td>
+                            <td class="px-4 py-2 text-right">$490.08</td>
+                            <td class="px-4 py-2 text-right font-semibold">$6,430.19</td>
+                            <td class="px-4 py-2 text-right">$14.19</td>
+                            <td class="px-4 py-2 text-slate-600">Includes $520.00 enclosures</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50 bg-red-50">
+                            <td class="px-4 py-2">Jul Overage 1</td>
+                            <td class="px-4 py-2">6582950</td>
+                            <td class="px-4 py-2 text-right">$105.00</td>
+                            <td class="px-4 py-2 text-right">$8.68</td>
+                            <td class="px-4 py-2 text-right font-semibold">$113.68</td>
+                            <td class="px-4 py-2 text-right">$0.25</td>
+                            <td class="px-4 py-2 text-red-600">Overage charge: $100.00</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50 bg-red-50">
+                            <td class="px-4 py-2">Jul Overage 2</td>
+                            <td class="px-4 py-2">6921049</td>
+                            <td class="px-4 py-2 text-right">$105.00</td>
+                            <td class="px-4 py-2 text-right">$8.68</td>
+                            <td class="px-4 py-2 text-right font-semibold">$113.68</td>
+                            <td class="px-4 py-2 text-right">$0.25</td>
+                            <td class="px-4 py-2 text-red-600">Overage charge: $100.00</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50 bg-yellow-50">
+                            <td class="px-4 py-2">August 2025</td>
+                            <td class="px-4 py-2">7013249</td>
+                            <td class="px-4 py-2 text-right">$5,939.11</td>
+                            <td class="px-4 py-2 text-right">$490.08</td>
+                            <td class="px-4 py-2 text-right font-semibold">$6,430.19</td>
+                            <td class="px-4 py-2 text-right">$14.19</td>
+                            <td class="px-4 py-2 text-slate-600">Includes $520.00 enclosures</td>
+                        </tr>
+                        <tr class="border-b hover:bg-slate-50 bg-yellow-50">
+                            <td class="px-4 py-2">September 2025</td>
+                            <td class="px-4 py-2">7380673</td>
+                            <td class="px-4 py-2 text-right">$5,939.11</td>
+                            <td class="px-4 py-2 text-right">$490.08</td>
+                            <td class="px-4 py-2 text-right font-semibold">$6,430.19</td>
+                            <td class="px-4 py-2 text-right">$14.19</td>
+                            <td class="px-4 py-2 text-slate-600">Includes $520.00 enclosures</td>
+                        </tr>
+                        <tr class="bg-slate-100 font-bold">
+                            <td class="px-4 py-3" colspan="2">TOTAL (9 months)</td>
+                            <td class="px-4 py-3 text-right">$50,385.99</td>
+                            <td class="px-4 py-3 text-right">$4,157.78</td>
+                            <td class="px-4 py-3 text-right">$54,552.77</td>
+                            <td class="px-4 py-3 text-right">$13.38</td>
+                            <td class="px-4 py-3"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: Optimization -->
+        <div id="optimization" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Optimization Opportunities</h2>
+
+            <!-- Optimization 1: Contamination Reduction -->
+            <div class="bg-white p-6 rounded-lg shadow mb-4">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">1. Contamination Reduction</h3>
+                        <p class="text-sm text-slate-600 mt-2">$100 in overage charges detected (June/July 2025). Implement resident education and signage to prevent future contamination.</p>
+                    </div>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        Priority 1
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="bg-green-50 p-4 rounded">
+                        <p class="text-sm text-slate-600">Annual Savings (Year 1)</p>
+                        <p class="text-2xl font-bold text-green-600">$227</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded">
+                        <p class="text-sm text-slate-600">Implementation Cost</p>
+                        <p class="text-2xl font-bold text-blue-600">$100-200</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded">
+                        <p class="text-sm text-slate-600">Payback Period</p>
+                        <p class="text-2xl font-bold text-purple-600">2 months</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-4 bg-slate-50 rounded">
+                    <p class="text-sm font-semibold text-slate-700">Action Items:</p>
+                    <ul class="mt-2 space-y-1 text-sm text-slate-600">
+                        <li>• Install contamination prevention signage at all 10 dumpster enclosures</li>
+                        <li>• Conduct quarterly resident education campaigns</li>
+                        <li>• Review waste sorting procedures with maintenance staff</li>
+                        <li>• Engage Door to Door provider to ensure monitoring compliance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Optimization 2: Enclosure Fee Review -->
+            <div class="bg-white p-6 rounded-lg shadow mb-4">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">2. Enclosure Fee Review</h3>
+                        <p class="text-sm text-slate-600 mt-2">$520/month for 10 enclosures added July 2025. Verify enclosure necessity and negotiate better terms with Frontier Waste.</p>
+                    </div>
+                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        Priority 2
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="bg-green-50 p-4 rounded">
+                        <p class="text-sm text-slate-600">Annual Savings (Year 1)</p>
+                        <p class="text-2xl font-bold text-green-600">$2,364</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded">
+                        <p class="text-sm text-slate-600">Implementation Cost</p>
+                        <p class="text-2xl font-bold text-blue-600">$0</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded">
+                        <p class="text-sm text-slate-600">Payback Period</p>
+                        <p class="text-2xl font-bold text-purple-600">Immediate</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-4 bg-slate-50 rounded">
+                    <p class="text-sm font-semibold text-slate-700">Action Items:</p>
+                    <ul class="mt-2 space-y-1 text-sm text-slate-600">
+                        <li>• Review contract terms for enclosure fees</li>
+                        <li>• Verify all 10 enclosures are operational and necessary</li>
+                        <li>• Ask Frontier if there are alternative options to avoid fee</li>
+                        <li>• Consider market check with other licensed McKinney haulers</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Total Impact -->
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg shadow">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Combined Impact</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-sm text-slate-600">Total Year 1 Savings</p>
+                        <p class="text-3xl font-bold text-green-600">$2,591</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Impact on Cost/Door</p>
+                        <p class="text-3xl font-bold text-blue-600">-$5.72</p>
+                        <p class="text-xs text-slate-500">Annual reduction</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">ROI</p>
+                        <p class="text-3xl font-bold text-purple-600">1,200%+</p>
+                        <p class="text-xs text-slate-500">Based on minimal investment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: 2026 Budget Calculator -->
+        <div id="budget" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">2026 Budget Projection</h2>
+
+            <!-- Budget Comparison -->
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">2025 vs 2026 Budget Comparison</h3>
+                <canvas id="budgetComparisonChart" height="80"></canvas>
+            </div>
+
+            <!-- Budget Details -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">2025 Baseline</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Monthly Average:</span>
+                            <span class="font-semibold">$6,061.42</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Annual Projected:</span>
+                            <span class="font-semibold">$72,737.02</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Cost Per Door:</span>
+                            <span class="font-semibold">$13.38</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">2026 Projection</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Monthly Projected:</span>
+                            <span class="font-semibold text-red-600">$6,777.17</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Annual Projected:</span>
+                            <span class="font-semibold text-red-600">$81,326.10</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Cost Per Door:</span>
+                            <span class="font-semibold text-red-600">$14.96</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Impact Analysis -->
+            <div class="bg-yellow-50 p-6 rounded-lg shadow mb-6 border-l-4 border-yellow-500">
+                <h3 class="text-lg font-semibold text-yellow-900 mb-3">Budget Impact Breakdown</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <p class="text-yellow-700 font-medium">CPI Increase (5%)</p>
+                        <p class="text-2xl font-bold text-yellow-900">$303</p>
+                        <p class="text-xs text-yellow-600">Per month</p>
+                    </div>
+                    <div>
+                        <p class="text-yellow-700 font-medium">Enclosure Fees</p>
+                        <p class="text-2xl font-bold text-yellow-900">$520</p>
+                        <p class="text-xs text-yellow-600">Per month (added July)</p>
+                    </div>
+                    <div>
+                        <p class="text-yellow-700 font-medium">Total Increase</p>
+                        <p class="text-2xl font-bold text-yellow-900">11.8%</p>
+                        <p class="text-xs text-yellow-600">Vs 2025 baseline</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimization Impact -->
+            <div class="bg-green-50 p-6 rounded-lg shadow border-l-4 border-green-500">
+                <h3 class="text-lg font-semibold text-green-900 mb-3">With Optimization Opportunities</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <p class="text-green-700 font-medium">Potential Savings</p>
+                        <p class="text-2xl font-bold text-green-900">$2,591</p>
+                        <p class="text-xs text-green-600">Annual reduction</p>
+                    </div>
+                    <div>
+                        <p class="text-green-700 font-medium">Optimized 2026 Budget</p>
+                        <p class="text-2xl font-bold text-green-900">$78,735</p>
+                        <p class="text-xs text-green-600">Annual projected</p>
+                    </div>
+                    <div>
+                        <p class="text-green-700 font-medium">Net Increase</p>
+                        <p class="text-2xl font-bold text-green-900">8.2%</p>
+                        <p class="text-xs text-green-600">Vs 2025 (down from 11.8%)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Regulatory Compliance -->
+        <div id="regulatory" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Local Ordinance Compliance</h2>
+            
+            <!-- Compliance Score -->
+            <div class="bg-white p-6 rounded-lg shadow mb-4">
+                <h3 class="text-lg font-bold text-slate-800 mb-2">Compliance Overview</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-sm text-slate-600">Overall Score</p>
+                        <p class="text-3xl font-bold text-green-600">95%</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Risk Level</p>
+                        <p class="text-3xl font-bold text-green-600">LOW</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Research Confidence</p>
+                        <p class="text-3xl font-bold text-green-600">HIGH</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">Ordinances Reviewed</p>
+                        <p class="text-3xl font-bold text-slate-900">5</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Checklist -->
+            <div class="bg-white p-6 rounded-lg shadow mb-4">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Ordinance Compliance Checklist</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left">Category</th>
+                                <th class="px-4 py-2 text-left">Requirement</th>
+                                <th class="px-4 py-2 text-center">Status</th>
+                                <th class="px-4 py-2 text-left">Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="px-4 py-3 font-medium">Hauler Licensing</td>
+                                <td class="px-4 py-3">Private haulers must hold license agreement with City of McKinney or obtain collection permit</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                        ✓ COMPLIANT
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-600">McKinney Commercial Waste Services Ordinance</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-3 font-medium">Solid Waste Standards</td>
+                                <td class="px-4 py-3">Commercial properties must comply with solid waste ordinances (Chapter 86)</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                        ✓ COMPLIANT
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-600">McKinney Code of Ordinances Chapter 86</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-3 font-medium">Enclosure Requirements</td>
+                                <td class="px-4 py-3">Dumpster enclosures must meet screening standards per ordinance</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                                        ⚠ REVIEW
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-600">McKinney Building Code Art. 2, Sec. 206</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-3 font-medium">Multifamily Classification</td>
+                                <td class="px-4 py-3">Apartment complexes classified as commercial waste generators</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                        ✓ COMPLIANT
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-600">McKinney Residential Trash Services Policy</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-3 font-medium">Recycling Programs</td>
+                                <td class="px-4 py-3">Commercial recycling available but not mandated for multifamily</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                                        ℹ OPTIONAL
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-600">McKinney Waste & Recycling Policy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Licensed Haulers -->
+            <div class="bg-white p-6 rounded-lg shadow mb-4">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Licensed Haulers in McKinney, TX</h3>
+                <div class="space-y-3">
+                    <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold text-slate-900">Frontier Waste Solutions</p>
+                                <p class="text-sm text-slate-600 mt-1">Current Vendor</p>
+                                <p class="text-sm text-slate-600">Commercial waste, recycling, bulk removal</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-slate-600">Phone</p>
+                                <p class="font-semibold">469-444-1555</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Recommendations -->
+            <div class="bg-blue-50 p-6 rounded-lg shadow border-l-4 border-blue-500">
+                <h3 class="text-lg font-bold text-blue-900 mb-3">Compliance Recommendations</h3>
+                <ul class="space-y-2 text-sm text-blue-800">
+                    <li>✓ Continue using licensed hauler (Frontier Waste Solutions)</li>
+                    <li>⚠ Verify dumpster enclosure compliance with building code</li>
+                    <li>ℹ Consider adding recycling program for sustainability goals</li>
+                    <li>ℹ Monitor for any updates to McKinney solid waste ordinances</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 pt-4 border-t border-slate-300 text-center text-sm text-slate-600">
+            <p>Report prepared by <strong>WasteWise by THE Trash Hub</strong></p>
+            <p class="mt-1">For questions, contact Richard Bates, Director of Waste and Diversion Strategies</p>
+            <p class="mt-1 text-xs">Report Generated: November 18, 2025</p>
+        </footer>
+
+    </div>
+
+    <!-- JavaScript for interactivity -->
+    <script>
+        let chartInstances = {};
+        let chartsInitialized = {
+            dashboard: false,
+            expense: false,
+            budget: false
+        };
+
+        function destroyChart(chartId) {
+            if (chartInstances[chartId]) {
+                try {
+                    chartInstances[chartId].destroy();
+                } catch(e) {
+                    console.warn('Error destroying chart:', e);
+                }
+                delete chartInstances[chartId];
+            }
+        }
+
+        function createDashboardCharts() {
+            if (chartsInitialized.dashboard) return;
+            
+            // YPD Gauge
+            const ypdCanvas = document.getElementById('ypdGauge');
+            if (ypdCanvas && !chartInstances.ypdGauge) {
+                const ypdValue = 2.41;
+                const ypdMin = 2.0;
+                const ypdMax = 2.5;
+                const ypdPercentage = ((ypdValue - ypdMin) / (ypdMax - ypdMin)) * 100;
+                
+                chartInstances.ypdGauge = new Chart(ypdCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [ypdPercentage, 100 - ypdPercentage],
+                            backgroundColor: ['#22c55e', '#e5e7eb'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        circumference: 180,
+                        rotation: -90,
+                        cutout: '80%',
+                        plugins: { 
+                            tooltip: { enabled: false },
+                            legend: { display: false }
+                        },
+                        animation: { duration: 1000 }
+                    }
+                });
+            }
+
+            // Budget Impact Gauge
+            const budgetCanvas = document.getElementById('budgetGauge');
+            if (budgetCanvas && !chartInstances.budgetGauge) {
+                const budgetIncrease = 11.8;
+                
+                chartInstances.budgetGauge = new Chart(budgetCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [budgetIncrease, 100 - budgetIncrease],
+                            backgroundColor: ['#f59e0b', '#e5e7eb'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        circumference: 180,
+                        rotation: -90,
+                        cutout: '80%',
+                        plugins: { 
+                            tooltip: { enabled: false },
+                            legend: { display: false }
+                        },
+                        animation: { duration: 1000 }
+                    }
+                });
+            }
+            
+            chartsInitialized.dashboard = true;
+        }
+
+        function createExpenseCharts() {
+            if (chartsInitialized.expense) return;
+            
+            // Cost Per Door Chart
+            const cpdCanvas = document.getElementById('costPerDoorChart');
+            if (cpdCanvas && !chartInstances.costPerDoorChart) {
+                chartInstances.costPerDoorChart = new Chart(cpdCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                        datasets: [{
+                            label: 'Cost Per Door',
+                            data: [12.89, 12.89, 12.89, 12.89, 12.89, 12.89, 14.19, 14.19, 14.19],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { 
+                            y: { 
+                                beginAtZero: false,
+                                min: 10,
+                                max: 16,
+                                title: { display: true, text: 'Cost per Door ($)' }
+                            }
+                        },
+                        plugins: { 
+                            title: { display: false },
+                            legend: { display: false }
+                        },
+                        animation: { duration: 1000 }
+                    }
+                });
+            }
+
+            // Monthly Total Chart
+            const totalCanvas = document.getElementById('monthlyTotalChart');
+            if (totalCanvas && !chartInstances.monthlyTotalChart) {
+                chartInstances.monthlyTotalChart = new Chart(totalCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                        datasets: [{
+                            label: 'Total Monthly Cost',
+                            data: [5839.14, 5839.14, 5839.14, 5839.14, 5839.14, 5839.14, 6657.55, 6430.19, 6430.19],
+                            backgroundColor: '#3b82f6',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { 
+                            y: { 
+                                beginAtZero: false,
+                                min: 5000,
+                                title: { display: true, text: 'Total Cost ($)' }
+                            }
+                        },
+                        plugins: { 
+                            legend: { display: false }
+                        },
+                        animation: { duration: 1000 }
+                    }
+                });
+            }
+            
+            chartsInitialized.expense = true;
+        }
+
+        function createBudgetCharts() {
+            if (chartsInitialized.budget) return;
+            
+            // Budget Comparison Chart
+            const budgetCanvas = document.getElementById('budgetComparisonChart');
+            if (budgetCanvas && !chartInstances.budgetComparisonChart) {
+                chartInstances.budgetComparisonChart = new Chart(budgetCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['2025 Baseline', '2026 Projected', '2026 Optimized'],
+                        datasets: [{
+                            label: 'Annual Cost',
+                            data: [72737, 81326, 78735],
+                            backgroundColor: ['#3b82f6', '#ef4444', '#22c55e'],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { 
+                            y: { 
+                                beginAtZero: false,
+                                min: 70000,
+                                title: { display: true, text: 'Annual Cost ($)' }
+                            }
+                        },
+                        plugins: { 
+                            legend: { display: false }
+                        },
+                        animation: { duration: 1000 }
+                    }
+                });
+            }
+            
+            chartsInitialized.budget = true;
+        }
+
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-blue-600');
+            });
+            
+            // Show active tab
+            const activeTabContent = document.getElementById(tabId);
+            if(activeTabContent) activeTabContent.classList.remove('hidden');
+            
+            const activeButton = document.getElementById('tab-btn-' + tabId);
+            if (activeButton) {
+                activeButton.classList.add('active', 'text-blue-600');
+            }
+
+            // Create charts for specific tabs (only once)
+            setTimeout(() => {
+                if (tabId === 'dashboard') {
+                    createDashboardCharts();
+                } else if (tabId === 'expense') {
+                    createExpenseCharts();
+                } else if (tabId === 'budget') {
+                    createBudgetCharts();
+                }
+            }, 100);
+        }
+
+        // Initialize on page load - only once
+        let initialized = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!initialized) {
+                initialized = true;
+                showTab('dashboard');
+            }
+        });
+    </script>
+</body>
+</html>

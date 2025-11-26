@@ -118,7 +118,7 @@ export abstract class BaseSkill<TResult = any> implements Skill<TResult> {
           error: {
             message: 'Validation failed',
             code: 'VALIDATION_ERROR',
-            details: validation.errors,
+            details: { errors: validation.errors },
           },
           metadata: {
             skillName: this.name,
@@ -170,7 +170,7 @@ export abstract class BaseSkill<TResult = any> implements Skill<TResult> {
         error: {
           message: errorMessage,
           code: errorCode,
-          details: error instanceof Error ? error.stack : undefined,
+          details: error instanceof Error && error.stack ? { stack: error.stack } : undefined,
         },
         metadata: {
           skillName: this.name,

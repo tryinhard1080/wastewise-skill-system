@@ -78,6 +78,11 @@ export function JobsList({ projectId, jobs: initialJobs }: JobsListProps) {
     }
   )
 
+  // Log SWR fetch errors for debugging
+  if (error) {
+    console.error('Failed to fetch jobs:', error)
+  }
+
   const jobs = data?.jobs || initialJobs
 
   const getStatusIcon = (status: string) => {

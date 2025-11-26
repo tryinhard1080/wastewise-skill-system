@@ -134,7 +134,7 @@ export class WasteWiseAnalyticsSkill extends BaseSkill<WasteWiseAnalyticsComplet
 
     // Calculate basic metrics from invoice data
     const invoiceMetrics = this.calculateInvoiceMetrics(context)
-    executionLogger.debug('Invoice metrics calculated', invoiceMetrics)
+    executionLogger.debug('Invoice metrics calculated', undefined, invoiceMetrics as unknown as Record<string, unknown>)
 
     await this.updateProgress(context, {
       percent: 20,

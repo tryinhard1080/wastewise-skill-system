@@ -78,7 +78,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="w-full min-h-screen relative bg-[#F7F5F3] overflow-x-hidden flex flex-col justify-start items-center">
+    <div className="w-full min-h-screen relative bg-white overflow-x-hidden flex flex-col justify-start items-center">
       <div className="relative flex flex-col justify-start items-center w-full">
         {/* Main container with proper margins */}
         <div className="w-full max-w-none px-4 sm:px-6 md:px-8 lg:px-0 lg:max-w-[1060px] lg:w-[1060px] relative flex flex-col justify-start items-start min-h-screen">
@@ -129,15 +129,22 @@ export default function LandingPage() {
             </div>
 
             {/* Hero Section */}
-            <div className="pt-16 sm:pt-20 md:pt-24 lg:pt-[216px] pb-8 sm:pb-12 md:pb-16 flex flex-col justify-start items-center px-2 sm:px-4 md:px-8 lg:px-0 w-full sm:pl-0 sm:pr-0 pl-0 pr-0">
-              <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            <div className="pt-16 sm:pt-20 md:pt-24 lg:pt-[216px] pb-8 sm:pb-12 md:pb-16 flex flex-col justify-start items-center px-2 sm:px-4 md:px-8 lg:px-0 w-full sm:pl-0 sm:pr-0 pl-0 pr-0 relative">
+              {/* Gradient Background Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-blue-50 opacity-60 pointer-events-none" />
+
+              <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 relative z-10">
                 <div className="self-stretch rounded-[3px] flex flex-col justify-center items-center gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-                  <div className="w-full max-w-[748.71px] lg:w-[748.71px] text-center flex justify-center flex-col text-[#37322F] text-[24px] xs:text-[28px] sm:text-[36px] md:text-[52px] lg:text-[80px] font-normal leading-[1.1] sm:leading-[1.15] md:leading-[1.2] lg:leading-24 font-serif px-2 sm:px-4 md:px-0">
-                    Reduce Waste Costs
+                  <div className="w-full max-w-[748.71px] lg:w-[748.71px] text-center flex justify-center flex-col text-[24px] xs:text-[28px] sm:text-[36px] md:text-[52px] lg:text-[80px] font-normal leading-[1.1] sm:leading-[1.15] md:leading-[1.2] lg:leading-24 font-serif px-2 sm:px-4 md:px-0">
+                    <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+                      Reduce Waste Costs
+                    </span>
                     <br />
-                    by Up to 30%
+                    <span className="bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 bg-clip-text text-transparent font-semibold">
+                      by Up to 30%
+                    </span>
                   </div>
-                  <div className="w-full max-w-[506.08px] lg:w-[506.08px] text-center flex justify-center flex-col text-[rgba(55,50,47,0.80)] sm:text-lg md:text-xl leading-[1.4] sm:leading-[1.45] md:leading-[1.5] lg:leading-7 font-sans px-2 sm:px-4 md:px-0 lg:text-lg font-medium text-sm">
+                  <div className="w-full max-w-[506.08px] lg:w-[506.08px] text-center flex justify-center flex-col text-gray-600 sm:text-lg md:text-xl leading-[1.4] sm:leading-[1.45] md:leading-[1.5] lg:leading-7 font-sans px-2 sm:px-4 md:px-0 lg:text-lg font-medium text-sm">
                     Data-driven waste management analysis for multifamily properties.
                     <br className="hidden sm:block" />
                     Upload invoices, get insights in minutes.
@@ -147,15 +154,16 @@ export default function LandingPage() {
 
               <div className="w-full max-w-[497px] lg:w-[497px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12">
                 <div className="backdrop-blur-[8.25px] flex justify-start items-center gap-4 flex-col sm:flex-row">
-                  <a href="/login" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#22C55E] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center hover:bg-[#16A34A] transition-colors cursor-pointer no-underline">
-                    <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0.1)] to-[rgba(0,0,0,0.05)] mix-blend-multiply"></div>
-                    <div className="flex flex-col justify-center text-white text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
-                      START FREE ANALYSIS →
+                  <a href="/login" className="group h-12 sm:h-12 md:h-14 px-8 sm:px-10 md:px-12 lg:px-14 py-3 relative bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg hover:shadow-xl overflow-hidden rounded-full flex justify-center items-center transition-all duration-300 transform hover:-translate-y-1 cursor-pointer no-underline">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/10" />
+                    <div className="flex flex-col justify-center text-white text-base sm:text-base md:text-[16px] font-semibold leading-5 font-sans relative z-10">
+                      START FREE ANALYSIS
+                      <span className="inline-block ml-2 transition-transform duration-300 group-hover:translate-x-1">→</span>
                     </div>
                   </a>
-                  <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-transparent border-2 border-[#37322F] overflow-hidden rounded-full flex justify-center items-center hover:bg-[rgba(55,50,47,0.05)] transition-colors cursor-pointer no-underline">
-                    <div className="flex flex-row justify-center items-center gap-2 text-[#37322F] text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" className="group h-12 sm:h-12 md:h-14 px-8 sm:px-10 md:px-12 lg:px-14 py-3 relative bg-white border-2 border-gray-900 hover:bg-gray-50 overflow-hidden rounded-full flex justify-center items-center transition-all duration-300 transform hover:-translate-y-1 cursor-pointer no-underline shadow-md hover:shadow-lg">
+                    <div className="flex flex-row justify-center items-center gap-2 text-gray-900 text-base sm:text-base md:text-[16px] font-semibold leading-5 font-sans">
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="transition-transform duration-300 group-hover:scale-110">
                         <path d="M3 2L13 8L3 14V2Z" />
                       </svg>
                       Watch 2-Min Demo
@@ -168,7 +176,7 @@ export default function LandingPage() {
                 <img
                   src="/mask-group-pattern.svg"
                   alt=""
-                  className="w-[936px] sm:w-[1404px] md:w-[2106px] lg:w-[2808px] h-auto opacity-30 sm:opacity-40 md:opacity-50 mix-blend-multiply"
+                  className="w-[936px] sm:w-[1404px] md:w-[2106px] lg:w-[2808px] h-auto opacity-20 sm:opacity-25 md:opacity-30 mix-blend-multiply"
                   style={{
                     filter: "hue-rotate(15deg) saturate(0.7) brightness(1.2)",
                   }}
@@ -277,7 +285,7 @@ export default function LandingPage() {
               {/* Social Proof Section */}
               <div className="w-full border-b border-[rgba(55,50,47,0.12)] flex flex-col justify-center items-center">
                 <div className="self-stretch px-4 sm:px-6 md:px-24 py-8 sm:py-12 md:py-16 border-b border-[rgba(55,50,47,0.12)] flex justify-center items-center gap-6">
-                  <div className="w-full max-w-[586px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4 shadow-none">
+                  <div className="w-full max-w-[586px] px-4 sm:px-6 py-6 sm:py-8 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-4 sm:gap-6 shadow-none">
                     <Badge
                       icon={
                         <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -297,22 +305,28 @@ export default function LandingPage() {
                       }
                       text="Social Proof"
                     />
-                    <div className="w-full max-w-[472.55px] text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
+                    <div className="w-full max-w-[472.55px] text-center flex justify-center flex-col text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold leading-tight md:leading-[60px] font-sans tracking-tight">
                       Trusted by 850+ Properties Nationwide
                     </div>
-                    <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
-                      <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12 mt-4">
-                        <div className="flex flex-col items-center">
-                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">$2.4M+</div>
-                          <div className="text-sm text-[#605A57]">Saved</div>
+                    <div className="self-stretch text-center text-gray-600 text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
+                      <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 mt-6">
+                        <div className="flex flex-col items-center group cursor-default">
+                          <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent transition-transform duration-300 group-hover:scale-110">
+                            $2.4M+
+                          </div>
+                          <div className="text-sm font-medium text-gray-600 mt-2">Total Saved</div>
                         </div>
-                        <div className="flex flex-col items-center">
-                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">850+</div>
-                          <div className="text-sm text-[#605A57]">Properties Analyzed</div>
+                        <div className="flex flex-col items-center group cursor-default">
+                          <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent transition-transform duration-300 group-hover:scale-110">
+                            850+
+                          </div>
+                          <div className="text-sm font-medium text-gray-600 mt-2">Properties Analyzed</div>
                         </div>
-                        <div className="flex flex-col items-center">
-                          <div className="text-2xl sm:text-3xl font-bold text-[#22C55E]">95%</div>
-                          <div className="text-sm text-[#605A57]">Client Satisfaction</div>
+                        <div className="flex flex-col items-center group cursor-default">
+                          <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent transition-transform duration-300 group-hover:scale-110">
+                            95%
+                          </div>
+                          <div className="text-sm font-medium text-gray-600 mt-2">Client Satisfaction</div>
                         </div>
                       </div>
                     </div>
@@ -612,29 +626,66 @@ function FeatureCard({
   progress: number
   onClick: () => void
 }) {
+  // Icon mapping for each feature
+  const getIcon = () => {
+    if (title.includes("Invoice")) {
+      return (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
+    } else if (title.includes("AI") || title.includes("Optimization")) {
+      return (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      )
+    } else {
+      return (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
+    }
+  }
+
   return (
     <div
-      className={`w-full md:flex-1 self-stretch px-6 py-5 overflow-hidden flex flex-col justify-start items-start gap-2 cursor-pointer relative border-b md:border-b-0 last:border-b-0 ${isActive
-        ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
-        : "border-l-0 border-r-0 md:border border-[#E0DEDB]/80"
+      className={`group w-full md:flex-1 self-stretch px-6 py-6 overflow-hidden flex flex-col justify-start items-start gap-3 cursor-pointer relative border-b md:border-b-0 last:border-b-0 transition-all duration-300 ${isActive
+        ? "bg-gradient-to-br from-emerald-50 to-green-50 shadow-lg border-2 border-emerald-200"
+        : "bg-white hover:bg-gray-50 border border-gray-200 hover:border-emerald-200"
         }`}
       onClick={onClick}
     >
       {isActive && (
-        <div className="absolute top-0 left-0 w-full h-0.5 bg-[rgba(50,45,43,0.08)]">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-500">
           <div
-            className="h-full bg-[#322D2B] transition-all duration-100 ease-linear"
+            className="h-full bg-gradient-to-r from-emerald-600 to-green-700 transition-all duration-100 ease-linear shadow-lg"
             style={{ width: `${progress}%` }}
           />
         </div>
       )}
 
-      <div className="self-stretch flex justify-center flex-col text-[#49423D] text-sm md:text-sm font-semibold leading-6 md:leading-6 font-sans">
+      {/* Icon */}
+      <div className={`transition-all duration-300 ${isActive ? "text-emerald-600 scale-110" : "text-gray-600 group-hover:text-emerald-500 group-hover:scale-105"}`}>
+        {getIcon()}
+      </div>
+
+      <div className="self-stretch flex justify-center flex-col text-gray-900 text-base md:text-base font-bold leading-6 md:leading-6 font-sans">
         {title}
       </div>
-      <div className="self-stretch text-[#605A57] text-[13px] md:text-[13px] font-normal leading-[22px] md:leading-[22px] font-sans">
+      <div className="self-stretch text-gray-600 text-sm md:text-sm font-normal leading-[22px] md:leading-[22px] font-sans">
         {description}
       </div>
+
+      {/* Hover indicator */}
+      {!isActive && (
+        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </div>
+      )}
     </div>
   )
 }

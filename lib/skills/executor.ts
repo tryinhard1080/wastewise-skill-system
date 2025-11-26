@@ -1,10 +1,21 @@
 import { skillRegistry } from './registry'
+import fs from 'fs'
+try { fs.appendFileSync('debug-worker.txt', 'DEBUG: Executor imported skillRegistry\n') } catch (e) { }
+console.log('DEBUG: Executor imported skillRegistry')
+try {
+  fs.appendFileSync('debug-worker.txt', 'DEBUG: skillRegistry keys: ' + JSON.stringify(Object.keys(skillRegistry)) + '\n')
+  fs.appendFileSync('debug-worker.txt', 'DEBUG: skillRegistry prototype keys: ' + JSON.stringify(Object.getOwnPropertyNames(Object.getPrototypeOf(skillRegistry))) + '\n')
+} catch (e) { }
+console.log('DEBUG: skillRegistry keys:', Object.keys(skillRegistry))
+
+
 import { SkillContext, SkillResult } from './types'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/observability/logger'
 import { metrics } from '@/lib/observability/metrics'
 import { NotFoundError, AppError } from '@/lib/types/errors'
 import { HaulLogRepository, InvoiceRepository } from '@/lib/db'
+import { JOB_TYPE_SKILL_MAPPING, VALID_JOB_TYPES, isValidJobType, type JobType } from '@/lib/constants/job-types'
 
 /**
  * Map job type to skill name
@@ -14,43 +25,40 @@ import { HaulLogRepository, InvoiceRepository } from '@/lib/db'
  * @throws AppError if job type is unknown
  */
 function mapJobTypeToSkill(jobType: string): string {
-  const mapping: Record<string, string> = {
-    complete_analysis: 'wastewise-analytics',
-    invoice_extraction: 'batch-extractor',
-    regulatory_research: 'regulatory-research',
-    report_generation: 'wastewise-analytics',
-  }
-
-  const skillName = mapping[jobType]
-  if (!skillName) {
+  if (!isValidJobType(jobType)) {
     throw new AppError(
-      `Unknown job type: ${jobType}`,
+      `Unknown job type: ${jobType}. Valid types: ${VALID_JOB_TYPES.join(', ')}`,
       'INVALID_JOB_TYPE',
       400
     )
   }
 
-  return skillName
+  return JOB_TYPE_SKILL_MAPPING[jobType]
 }
 
 /**
  * Build skill execution context with data from repositories
- * 
+ *
  * @param projectId - Project UUID
  * @param userId - User UUID
  * @param skillName - Name of the skill to configure
  * @param onProgress - Optional progress callback
+ * @param useServiceClient - Use service client (bypasses RLS). Required for worker context.
  * @returns Populated SkillContext
  */
 export async function buildSkillContext(
-  projectId: string, 
-  userId: string, 
+  projectId: string,
+  userId: string,
   skillName: string,
-  onProgress?: (percent: number, step: string) => Promise<void>
+  onProgress?: (percent: number, step: string) => Promise<void>,
+  useServiceClient = false
 ): Promise<SkillContext> {
-  const contextLogger = logger.child({ projectId, skillName })
-  const supabase = await createClient()
-  
+  const contextLogger = logger.child({ projectId, skillName, workerContext: useServiceClient })
+
+  // Use service client in worker context to bypass RLS (worker has no auth session)
+  // Otherwise use regular client which respects RLS and requires authenticated session
+  const supabase = useServiceClient ? createServiceClient() : await createClient()
+
   // Initialize repositories
   const haulLogRepo = new HaulLogRepository(supabase)
   const invoiceRepo = new InvoiceRepository(supabase)
@@ -83,7 +91,7 @@ export async function buildSkillContext(
 
   if (haulLogError) {
     // Log warning but don't fail - haul logs might not exist for non-compactor projects
-    contextLogger.warn('Failed to load haul log', new Error(haulLogError))
+    contextLogger.warn('Failed to load haul log', undefined, { error: haulLogError })
   }
 
   contextLogger.debug('Data loaded successfully', {
@@ -92,7 +100,9 @@ export async function buildSkillContext(
   })
 
   // Get skill config from registry (backed by database)
-  const config = await skillRegistry.getConfig(skillName)
+  try { fs.appendFileSync('debug-worker.txt', `DEBUG: Calling getConfig for '${skillName}'\n`) } catch (e) { }
+  console.log(`DEBUG: Calling getConfig for '${skillName}'`)
+  const config = await skillRegistry.getConfig(skillName, supabase)
 
   contextLogger.debug('Skill config loaded', {
     compactorYpd: config.conversionRates.compactorYpd,
@@ -225,12 +235,15 @@ export async function executeSkillWithProgress(
 
   // Get user ID: use provided userId (worker context) or get from auth session (web context)
   let currentUserId: string
+  let useServiceClient = false
+
   if (userId) {
-    // Worker context: use provided user ID
+    // Worker context: use provided user ID and service client (bypasses RLS)
     currentUserId = userId
+    useServiceClient = true
     executionLogger.info('Using provided user ID (worker context)', { userId: currentUserId })
   } else {
-    // Web context: get from authenticated session
+    // Web context: get from authenticated session, use regular client (respects RLS)
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -242,7 +255,14 @@ export async function executeSkillWithProgress(
   }
 
   // Build context with progress callback
-  const context = await buildSkillContext(projectId, currentUserId, skillName, onProgress)
+  // Use service client in worker context to bypass RLS (no auth session available)
+  const context = await buildSkillContext(
+    projectId,
+    currentUserId,
+    skillName,
+    onProgress,
+    useServiceClient
+  )
 
   const timerId = metrics.startTimer('skill.execution', { skill: skillName })
 
