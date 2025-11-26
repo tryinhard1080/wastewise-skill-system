@@ -1,0 +1,60 @@
+# Dependabot Configuration
+# Automatically checks for dependency updates and creates PRs
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Monitor npm dependencies (pnpm)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 10
+    # Group dependency updates
+    groups:
+      # Group all patch and minor updates together
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+    # Auto-merge configuration (requires GitHub Actions workflow)
+    labels:
+      - "dependencies"
+      - "automated"
+    # Security updates get highest priority
+    allow:
+      - dependency-type: "all"
+    # Commit message configuration
+    commit-message:
+      prefix: "build(deps)"
+      include: "scope"
+    # Target branch
+    target-branch: "master"
+    # Rebase strategy
+    rebase-strategy: "auto"
+    # Ignore specific dependencies (if needed)
+    ignore:
+      # Ignore major version updates for stable dependencies
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Chicago"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
