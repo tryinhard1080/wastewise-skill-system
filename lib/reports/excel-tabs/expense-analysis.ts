@@ -15,7 +15,7 @@
  * 5. Trend Charts (if applicable)
  */
 
-import type { Worksheet } from 'exceljs'
+import type { Worksheet, Font, Fill, Alignment, Borders } from 'exceljs'
 import type { WasteWiseAnalyticsCompleteResult, InvoiceData } from '@/lib/skills/types'
 import type { InvoiceDataRow } from '@/lib/skills/types'
 import type { ProjectRow } from '@/lib/skills/types'
@@ -89,24 +89,24 @@ export function generateExpenseAnalysis(
 
     formatDate(row.getCell(1), invoice.invoice_date)
     row.getCell(2).value = invoice.invoice_number
-    row.getCell(2).font = FONTS.body as any
+    row.getCell(2).font = FONTS.body as Font
 
     row.getCell(3).value = invoice.vendor_name
-    row.getCell(3).font = FONTS.body as any
+    row.getCell(3).font = FONTS.body as Font
 
     row.getCell(4).value = invoice.service_type || 'N/A'
-    row.getCell(4).font = FONTS.body as any
+    row.getCell(4).font = FONTS.body as Font
 
     if (invoice.tonnage) {
       row.getCell(5).value = invoice.tonnage
       row.getCell(5).numFmt = '#,##0.00'
-      row.getCell(5).alignment = ALIGNMENTS.right as any
+      row.getCell(5).alignment = ALIGNMENTS.right as Alignment
     }
 
     if (invoice.hauls) {
       row.getCell(6).value = invoice.hauls
       row.getCell(6).numFmt = '#,##0'
-      row.getCell(6).alignment = ALIGNMENTS.right as any
+      row.getCell(6).alignment = ALIGNMENTS.right as Alignment
     }
 
     formatCurrency(row.getCell(7), invoice.total_amount)
@@ -118,16 +118,16 @@ export function generateExpenseAnalysis(
   // Add total row
   const totalRow = worksheet.getRow(currentRow++)
   totalRow.getCell(1).value = 'TOTAL'
-  totalRow.getCell(1).font = FONTS.bodyBold as any
+  totalRow.getCell(1).font = FONTS.bodyBold as Font
 
   const totalAmount = sortedInvoices.reduce((sum, inv) => sum + inv.total_amount, 0)
   formatCurrency(totalRow.getCell(7), totalAmount)
-  totalRow.getCell(7).font = FONTS.bodyBold as any
-  totalRow.getCell(7).fill = FILLS.highlightYellow as any
+  totalRow.getCell(7).font = FONTS.bodyBold as Font
+  totalRow.getCell(7).fill = FILLS.highlightYellow as Fill
 
   // Add border to total row
   totalRow.eachCell({ includeEmpty: true }, (cell) => {
-    cell.border = BORDERS.top as any
+    cell.border = BORDERS.top as Partial<Borders>
   })
 
   currentRow += 2
@@ -216,23 +216,23 @@ export function generateExpenseAnalysis(
   // Total row
   const chargesTotalRow = worksheet.getRow(currentRow++)
   chargesTotalRow.getCell(1).value = 'TOTAL'
-  chargesTotalRow.getCell(1).font = FONTS.bodyBold as any
+  chargesTotalRow.getCell(1).font = FONTS.bodyBold as Font
 
   formatCurrency(chargesTotalRow.getCell(2), chargesSummary.total)
-  chargesTotalRow.getCell(2).font = FONTS.bodyBold as any
-  chargesTotalRow.getCell(2).fill = FILLS.highlightYellow as any
+  chargesTotalRow.getCell(2).font = FONTS.bodyBold as Font
+  chargesTotalRow.getCell(2).fill = FILLS.highlightYellow as Fill
 
   formatPercentage(chargesTotalRow.getCell(3), 100)
-  chargesTotalRow.getCell(3).font = FONTS.bodyBold as any
+  chargesTotalRow.getCell(3).font = FONTS.bodyBold as Font
 
   formatCurrency(chargesTotalRow.getCell(4), chargesSummary.total / monthsInPeriod)
-  chargesTotalRow.getCell(4).font = FONTS.bodyBold as any
+  chargesTotalRow.getCell(4).font = FONTS.bodyBold as Font
 
   formatCurrency(chargesTotalRow.getCell(5), chargesSummary.total / monthsInPeriod / project.units)
-  chargesTotalRow.getCell(5).font = FONTS.bodyBold as any
+  chargesTotalRow.getCell(5).font = FONTS.bodyBold as Font
 
   chargesTotalRow.eachCell({ includeEmpty: true }, (cell) => {
-    cell.border = BORDERS.top as any
+    cell.border = BORDERS.top as Partial<Borders>
   })
 
   currentRow += 2
@@ -245,16 +245,16 @@ export function generateExpenseAnalysis(
   const contaminationPct = (chargesSummary.contamination / chargesSummary.total) * 100
   const contaminationRow = worksheet.getRow(currentRow++)
   contaminationRow.getCell(1).value = 'Contamination as % of Total:'
-  contaminationRow.getCell(1).font = FONTS.bodyBold as any
+  contaminationRow.getCell(1).font = FONTS.bodyBold as Font
 
   formatPercentage(contaminationRow.getCell(2), contaminationPct)
   if (contaminationPct > 3) {
-    contaminationRow.getCell(2).fill = FILLS.highlightRed as any
+    contaminationRow.getCell(2).fill = FILLS.highlightRed as Fill
     contaminationRow.getCell(3).value = 'Above 3% threshold - consider contamination reduction program'
-    contaminationRow.getCell(3).font = { ...FONTS.body, italic: true } as any
+    contaminationRow.getCell(3).font = { ...FONTS.body, italic: true } as Font
     mergeCells(worksheet, currentRow - 1, 3, currentRow - 1, 7, '', 'section')
   } else {
-    contaminationRow.getCell(2).fill = FILLS.highlightGreen as any
+    contaminationRow.getCell(2).fill = FILLS.highlightGreen as Fill
   }
 
   // Bulk service analysis
@@ -262,13 +262,13 @@ export function generateExpenseAnalysis(
   if (avgBulkMonthly > 0) {
     const bulkRow = worksheet.getRow(currentRow++)
     bulkRow.getCell(1).value = 'Average Monthly Bulk Service:'
-    bulkRow.getCell(1).font = FONTS.bodyBold as any
+    bulkRow.getCell(1).font = FONTS.bodyBold as Font
 
     formatCurrency(bulkRow.getCell(2), avgBulkMonthly)
     if (avgBulkMonthly > 500) {
-      bulkRow.getCell(2).fill = FILLS.highlightYellow as any
+      bulkRow.getCell(2).fill = FILLS.highlightYellow as Fill
       bulkRow.getCell(3).value = 'Consider bulk subscription to reduce costs'
-      bulkRow.getCell(3).font = { ...FONTS.body, italic: true } as any
+      bulkRow.getCell(3).font = { ...FONTS.body, italic: true } as Font
       mergeCells(worksheet, currentRow - 1, 3, currentRow - 1, 7, '', 'section')
     }
   }
@@ -277,10 +277,10 @@ export function generateExpenseAnalysis(
   const largestCategory = getLargestCategory(chargesSummary)
   const largestRow = worksheet.getRow(currentRow++)
   largestRow.getCell(1).value = 'Largest Expense Category:'
-  largestRow.getCell(1).font = FONTS.bodyBold as any
+  largestRow.getCell(1).font = FONTS.bodyBold as Font
 
   largestRow.getCell(2).value = largestCategory.name
-  largestRow.getCell(2).font = FONTS.body as any
+  largestRow.getCell(2).font = FONTS.body as Font
 
   formatCurrency(largestRow.getCell(3), largestCategory.amount)
 
@@ -329,7 +329,7 @@ function calculateChargesSummary(invoices: InvoiceDataRow[]): ChargesSummary {
  * Add a charge category row
  */
 function addChargeRow(
-  row: any,
+  row: import('exceljs').Row,
   category: string,
   amount: number,
   total: number,
@@ -337,7 +337,7 @@ function addChargeRow(
   units: number
 ): void {
   row.getCell(1).value = category
-  row.getCell(1).font = FONTS.body as any
+  row.getCell(1).font = FONTS.body as Font
 
   formatCurrency(row.getCell(2), amount)
 

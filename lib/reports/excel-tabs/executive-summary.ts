@@ -13,7 +13,7 @@
  * 6. Savings Summary: Total potential savings
  */
 
-import type { Worksheet } from 'exceljs'
+import type { Worksheet, Font, Fill, Alignment, Borders } from 'exceljs'
 import type { WasteWiseAnalyticsCompleteResult } from '@/lib/skills/types'
 import type { ProjectRow } from '@/lib/skills/types'
 import {
@@ -77,8 +77,8 @@ export function generateExecutiveSummary(
     day: 'numeric',
     year: 'numeric',
   })}`
-  subtitleRow.getCell(1).font = FONTS.subheader as any
-  subtitleRow.getCell(1).alignment = ALIGNMENTS.left as any
+  subtitleRow.getCell(1).font = FONTS.subheader as Font
+  subtitleRow.getCell(1).alignment = ALIGNMENTS.left as Alignment
   currentRow += 2
 
   // ========== PROPERTY INFORMATION ==========
@@ -159,55 +159,55 @@ export function generateExecutiveSummary(
     // YPD Benchmark
     const ypdRow = worksheet.getRow(currentRow++)
     ypdRow.getCell(1).value = 'Yards Per Door:'
-    ypdRow.getCell(1).font = FONTS.bodyBold as any
+    ypdRow.getCell(1).font = FONTS.bodyBold as Font
 
     ypdRow.getCell(2).value = yardsPerDoor
     formatNumber(ypdRow.getCell(2), yardsPerDoor)
 
     ypdRow.getCell(3).value = 'Benchmark Range:'
-    ypdRow.getCell(3).font = FONTS.body as any
+    ypdRow.getCell(3).font = FONTS.body as Font
 
     ypdRow.getCell(4).value = `${benchmark.yardsPerDoor.min} - ${benchmark.yardsPerDoor.max}`
-    ypdRow.getCell(4).font = FONTS.body as any
+    ypdRow.getCell(4).font = FONTS.body as Font
 
     ypdRow.getCell(5).value = 'Status:'
-    ypdRow.getCell(5).font = FONTS.body as any
+    ypdRow.getCell(5).font = FONTS.body as Font
 
     const ypdStatus = getStatusText(yardsPerDoor, benchmark.yardsPerDoor.min, benchmark.yardsPerDoor.max)
     ypdRow.getCell(6).value = ypdStatus
-    ypdRow.getCell(6).font = FONTS.bodyBold as any
+    ypdRow.getCell(6).font = FONTS.bodyBold as Font
     ypdRow.getCell(6).fill =
       ypdStatus === 'Within Range'
         ? FILLS.highlightGreen
         : ypdStatus === 'Above Range'
           ? FILLS.highlightRed
-          : (FILLS.highlightYellow as any)
+          : FILLS.highlightYellow as Fill
 
     // Cost/Door Benchmark
     const costRow = worksheet.getRow(currentRow++)
     costRow.getCell(1).value = 'Cost Per Door:'
-    costRow.getCell(1).font = FONTS.bodyBold as any
+    costRow.getCell(1).font = FONTS.bodyBold as Font
 
     formatCurrency(costRow.getCell(2), costPerDoor)
 
     costRow.getCell(3).value = 'Benchmark Range:'
-    costRow.getCell(3).font = FONTS.body as any
+    costRow.getCell(3).font = FONTS.body as Font
 
     costRow.getCell(4).value = `$${benchmark.costPerDoor.min} - $${benchmark.costPerDoor.max}`
-    costRow.getCell(4).font = FONTS.body as any
+    costRow.getCell(4).font = FONTS.body as Font
 
     costRow.getCell(5).value = 'Status:'
-    costRow.getCell(5).font = FONTS.body as any
+    costRow.getCell(5).font = FONTS.body as Font
 
     const costStatus = getStatusText(costPerDoor, benchmark.costPerDoor.min, benchmark.costPerDoor.max)
     costRow.getCell(6).value = costStatus
-    costRow.getCell(6).font = FONTS.bodyBold as any
+    costRow.getCell(6).font = FONTS.bodyBold as Font
     costRow.getCell(6).fill =
       costStatus === 'Within Range'
         ? FILLS.highlightGreen
         : costStatus === 'Above Range'
           ? FILLS.highlightRed
-          : (FILLS.highlightYellow as any)
+          : FILLS.highlightYellow as Fill
 
     currentRow += 2
   }
@@ -224,15 +224,15 @@ export function generateExecutiveSummary(
   if (topRecommendations.length === 0) {
     const noRecsRow = worksheet.getRow(currentRow++)
     noRecsRow.getCell(1).value = 'No optimization recommendations at this time.'
-    noRecsRow.getCell(1).font = FONTS.body as any
-    noRecsRow.getCell(1).alignment = ALIGNMENTS.left as any
+    noRecsRow.getCell(1).font = FONTS.body as Font
+    noRecsRow.getCell(1).alignment = ALIGNMENTS.left as Alignment
 
     if (result.leaseUpDetected) {
       const leaseUpRow = worksheet.getRow(currentRow++)
       leaseUpRow.getCell(1).value =
         'Note: Property appears to be in lease-up. Optimization analysis should be performed once occupancy stabilizes.'
-      leaseUpRow.getCell(1).font = { ...FONTS.body, italic: true } as any
-      leaseUpRow.getCell(1).alignment = ALIGNMENTS.wrapText as any
+      leaseUpRow.getCell(1).font = { ...FONTS.body, italic: true } as Font
+      leaseUpRow.getCell(1).alignment = ALIGNMENTS.wrapText as Alignment
       mergeCells(worksheet, currentRow - 1, 1, currentRow - 1, 6, '', 'section')
     }
   } else {
@@ -240,14 +240,14 @@ export function generateExecutiveSummary(
       // Recommendation title
       const titleRow = worksheet.getRow(currentRow++)
       mergeCells(worksheet, currentRow - 1, 1, currentRow - 1, 6, `${index + 1}. ${rec.title}`, 'section')
-      titleRow.getCell(1).font = FONTS.sectionTitle as any
-      titleRow.getCell(1).fill = FILLS.subheader as any
+      titleRow.getCell(1).font = FONTS.sectionTitle as Font
+      titleRow.getCell(1).fill = FILLS.subheader as Fill
 
       // Description
       const descRow = worksheet.getRow(currentRow++)
       descRow.getCell(1).value = rec.description
-      descRow.getCell(1).font = FONTS.body as any
-      descRow.getCell(1).alignment = ALIGNMENTS.wrapText as any
+      descRow.getCell(1).font = FONTS.body as Font
+      descRow.getCell(1).alignment = ALIGNMENTS.wrapText as Alignment
       descRow.height = 40
       mergeCells(worksheet, currentRow - 1, 1, currentRow - 1, 6, '', 'section')
 
@@ -255,20 +255,20 @@ export function generateExecutiveSummary(
       if (rec.savings) {
         const savingsRow = worksheet.getRow(currentRow++)
         savingsRow.getCell(1).value = 'Estimated Annual Savings:'
-        savingsRow.getCell(1).font = FONTS.bodyBold as any
+        savingsRow.getCell(1).font = FONTS.bodyBold as Font
 
         formatCurrency(savingsRow.getCell(2), rec.savings)
-        savingsRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as any
+        savingsRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as Font
       }
 
       // Implementation timeline
       if (rec.implementation) {
         const implRow = worksheet.getRow(currentRow++)
         implRow.getCell(1).value = 'Implementation:'
-        implRow.getCell(1).font = FONTS.bodyBold as any
+        implRow.getCell(1).font = FONTS.bodyBold as Font
 
         implRow.getCell(2).value = rec.implementation
-        implRow.getCell(2).font = FONTS.body as any
+        implRow.getCell(2).font = FONTS.body as Font
         mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 6, '', 'section')
       }
 
@@ -327,8 +327,8 @@ export function generateExecutiveSummary(
   // Highlight savings
   for (let i = summaryStartRow; i < currentRow; i++) {
     const row = worksheet.getRow(i)
-    row.getCell(2).fill = FILLS.highlightGreen as any
-    row.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as any
+    row.getCell(2).fill = FILLS.highlightGreen as Fill
+    row.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as Font
   }
 
   // Add footer

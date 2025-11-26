@@ -14,7 +14,7 @@
  * 4. Other Opportunities Considered (not recommended, with reasoning)
  */
 
-import type { Worksheet } from 'exceljs'
+import type { Worksheet, Font, Fill, Alignment, Borders } from 'exceljs'
 import type { WasteWiseAnalyticsCompleteResult } from '@/lib/skills/types'
 import {
   applyHeaderStyle,
@@ -90,8 +90,8 @@ export function generateOptimization(
 
   // Highlight total savings
   const savingsRow = worksheet.getRow(currentRow - 2)
-  savingsRow.getCell(2).fill = FILLS.highlightGreen as any
-  savingsRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as any
+  savingsRow.getCell(2).fill = FILLS.highlightGreen as Fill
+  savingsRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as Font
 
   currentRow += 2
 
@@ -120,32 +120,32 @@ export function generateOptimization(
       // Description
       const descRow = worksheet.getRow(currentRow++)
       descRow.getCell(1).value = 'Description:'
-      descRow.getCell(1).font = FONTS.bodyBold as any
+      descRow.getCell(1).font = FONTS.bodyBold as Font
 
       descRow.getCell(2).value = rec.description
-      descRow.getCell(2).font = FONTS.body as any
-      descRow.getCell(2).alignment = ALIGNMENTS.wrapText as any
+      descRow.getCell(2).font = FONTS.body as Font
+      descRow.getCell(2).alignment = ALIGNMENTS.wrapText as Alignment
       descRow.height = 40
       mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 6, '', 'section')
 
       // Type and confidence
       const metaRow = worksheet.getRow(currentRow++)
       metaRow.getCell(1).value = 'Type:'
-      metaRow.getCell(1).font = FONTS.bodyBold as any
+      metaRow.getCell(1).font = FONTS.bodyBold as Font
       metaRow.getCell(2).value = formatOpportunityType(rec.type)
-      metaRow.getCell(2).font = FONTS.body as any
+      metaRow.getCell(2).font = FONTS.body as Font
 
       if (rec.confidence) {
         metaRow.getCell(3).value = 'Confidence:'
-        metaRow.getCell(3).font = FONTS.bodyBold as any
+        metaRow.getCell(3).font = FONTS.bodyBold as Font
         metaRow.getCell(4).value = rec.confidence
-        metaRow.getCell(4).font = FONTS.body as any
+        metaRow.getCell(4).font = FONTS.body as Font
 
         // Color code confidence
         if (rec.confidence === 'HIGH') {
-          metaRow.getCell(4).fill = FILLS.highlightGreen as any
+          metaRow.getCell(4).fill = FILLS.highlightGreen as Fill
         } else if (rec.confidence === 'MEDIUM') {
-          metaRow.getCell(4).fill = FILLS.highlightYellow as any
+          metaRow.getCell(4).fill = FILLS.highlightYellow as Fill
         }
       }
 
@@ -153,21 +153,21 @@ export function generateOptimization(
       if (rec.savings) {
         const savingsDetailRow = worksheet.getRow(currentRow++)
         savingsDetailRow.getCell(1).value = 'Annual Savings:'
-        savingsDetailRow.getCell(1).font = FONTS.bodyBold as any
+        savingsDetailRow.getCell(1).font = FONTS.bodyBold as Font
 
         formatCurrency(savingsDetailRow.getCell(2), rec.savings)
-        savingsDetailRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as any
-        savingsDetailRow.getCell(2).fill = FILLS.highlightGreen as any
+        savingsDetailRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as Font
+        savingsDetailRow.getCell(2).fill = FILLS.highlightGreen as Fill
       }
 
       // Implementation timeline
       if (rec.implementation) {
         const implRow = worksheet.getRow(currentRow++)
         implRow.getCell(1).value = 'Implementation:'
-        implRow.getCell(1).font = FONTS.bodyBold as any
+        implRow.getCell(1).font = FONTS.bodyBold as Font
 
         implRow.getCell(2).value = rec.implementation
-        implRow.getCell(2).font = FONTS.body as any
+        implRow.getCell(2).font = FONTS.body as Font
         mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 6, '', 'section')
       }
 
@@ -267,11 +267,11 @@ export function generateOptimization(
 
     // Highlight key metrics
     const netSavingsRow = worksheet.getRow(currentRow - 4)
-    netSavingsRow.getCell(2).fill = FILLS.highlightGreen as any
-    netSavingsRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as any
+    netSavingsRow.getCell(2).fill = FILLS.highlightGreen as Fill
+    netSavingsRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.success } } as Font
 
     const roiRow = worksheet.getRow(currentRow - 2)
-    roiRow.getCell(2).fill = FILLS.highlightGreen as any
+    roiRow.getCell(2).fill = FILLS.highlightGreen as Fill
 
     currentRow += 2
   }
@@ -283,8 +283,8 @@ export function generateOptimization(
 
     const noteRow = worksheet.getRow(currentRow++)
     noteRow.getCell(1).value = 'The following opportunities were evaluated but are not recommended at this time:'
-    noteRow.getCell(1).font = { ...FONTS.body, italic: true } as any
-    noteRow.getCell(1).alignment = ALIGNMENTS.wrapText as any
+    noteRow.getCell(1).font = { ...FONTS.body, italic: true } as Font
+    noteRow.getCell(1).alignment = ALIGNMENTS.wrapText as Alignment
     mergeCells(worksheet, currentRow - 1, 1, currentRow - 1, 6, '', 'section')
 
     currentRow++
@@ -292,11 +292,11 @@ export function generateOptimization(
     notRecommended.forEach((opp) => {
       const oppRow = worksheet.getRow(currentRow++)
       oppRow.getCell(1).value = `• ${opp.title}`
-      oppRow.getCell(1).font = FONTS.bodyBold as any
+      oppRow.getCell(1).font = FONTS.bodyBold as Font
 
       oppRow.getCell(2).value = opp.description
-      oppRow.getCell(2).font = FONTS.body as any
-      oppRow.getCell(2).alignment = ALIGNMENTS.wrapText as any
+      oppRow.getCell(2).font = FONTS.body as Font
+      oppRow.getCell(2).alignment = ALIGNMENTS.wrapText as Alignment
       mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 6, '', 'section')
       oppRow.height = 30
     })
@@ -313,9 +313,9 @@ export function generateOptimization(
     leaseUpRow.getCell(1).value =
       'This property appears to be in lease-up (waste generation significantly below benchmarks). ' +
       'Optimization recommendations should be re-evaluated once occupancy stabilizes to ensure accurate analysis.'
-    leaseUpRow.getCell(1).font = { ...FONTS.body, italic: true } as any
-    leaseUpRow.getCell(1).alignment = ALIGNMENTS.wrapText as any
-    leaseUpRow.getCell(1).fill = FILLS.highlightYellow as any
+    leaseUpRow.getCell(1).font = { ...FONTS.body, italic: true } as Font
+    leaseUpRow.getCell(1).alignment = ALIGNMENTS.wrapText as Alignment
+    leaseUpRow.getCell(1).fill = FILLS.highlightYellow as Fill
     leaseUpRow.height = 50
     mergeCells(worksheet, currentRow - 1, 1, currentRow - 1, 6, '', 'section')
 

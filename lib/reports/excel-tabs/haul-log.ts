@@ -16,7 +16,7 @@
  * 4. Utilization Analysis
  */
 
-import type { Worksheet } from 'exceljs'
+import type { Worksheet, Font, Fill, Alignment, Borders } from 'exceljs'
 import type { HaulLogRow } from '@/lib/skills/types'
 import type { ProjectRow } from '@/lib/skills/types'
 import {
@@ -58,13 +58,13 @@ export function generateHaulLog(
   if (project.equipment_type !== 'COMPACTOR') {
     worksheet.getRow(1).getCell(1).value =
       'Haul log tracking is only available for compactor projects.'
-    worksheet.getRow(1).getCell(1).font = FONTS.body as any
+    worksheet.getRow(1).getCell(1).font = FONTS.body as Font
     return
   }
 
   if (haulLogs.length === 0) {
     worksheet.getRow(1).getCell(1).value = 'No haul log data available for this project.'
-    worksheet.getRow(1).getCell(1).font = FONTS.body as any
+    worksheet.getRow(1).getCell(1).font = FONTS.body as Font
     return
   }
 
@@ -84,57 +84,57 @@ export function generateHaulLog(
 
   const statsRow1 = worksheet.getRow(currentRow++)
   statsRow1.getCell(1).value = 'Total Hauls:'
-  statsRow1.getCell(1).font = FONTS.bodyBold as any
+  statsRow1.getCell(1).font = FONTS.bodyBold as Font
   statsRow1.getCell(2).value = haulLogs.length
-  statsRow1.getCell(2).font = FONTS.body as any
+  statsRow1.getCell(2).font = FONTS.body as Font
 
   statsRow1.getCell(3).value = 'Average Tons/Haul:'
-  statsRow1.getCell(3).font = FONTS.bodyBold as any
+  statsRow1.getCell(3).font = FONTS.bodyBold as Font
   formatNumber(statsRow1.getCell(4), stats.avgTonnage)
 
   statsRow1.getCell(5).value = 'Target Capacity:'
-  statsRow1.getCell(5).font = FONTS.bodyBold as any
+  statsRow1.getCell(5).font = FONTS.bodyBold as Font
   formatNumber(statsRow1.getCell(6), TARGET_CAPACITY)
   statsRow1.getCell(6).value = `${TARGET_CAPACITY} tons`
-  statsRow1.getCell(6).font = FONTS.body as any
+  statsRow1.getCell(6).font = FONTS.body as Font
 
   const statsRow2 = worksheet.getRow(currentRow++)
   statsRow2.getCell(1).value = 'Min Tonnage:'
-  statsRow2.getCell(1).font = FONTS.bodyBold as any
+  statsRow2.getCell(1).font = FONTS.bodyBold as Font
   formatNumber(statsRow2.getCell(2), stats.minTonnage)
 
   statsRow2.getCell(3).value = 'Max Tonnage:'
-  statsRow2.getCell(3).font = FONTS.bodyBold as any
+  statsRow2.getCell(3).font = FONTS.bodyBold as Font
   formatNumber(statsRow2.getCell(4), stats.maxTonnage)
 
   statsRow2.getCell(5).value = 'Avg Capacity Utilization:'
-  statsRow2.getCell(5).font = FONTS.bodyBold as any
+  statsRow2.getCell(5).font = FONTS.bodyBold as Font
   formatPercentage(statsRow2.getCell(6), stats.avgUtilization)
 
   // Utilization status
   if (stats.avgTonnage < OPTIMIZATION_THRESHOLD) {
-    statsRow2.getCell(6).fill = FILLS.highlightYellow as any
+    statsRow2.getCell(6).fill = FILLS.highlightYellow as Fill
     statsRow2.getCell(7).value = '⚠️ Below optimization threshold'
-    statsRow2.getCell(7).font = { ...FONTS.body, italic: true } as any
+    statsRow2.getCell(7).font = { ...FONTS.body, italic: true } as Font
   } else if (stats.avgUtilization >= 90) {
-    statsRow2.getCell(6).fill = FILLS.highlightGreen as any
+    statsRow2.getCell(6).fill = FILLS.highlightGreen as Fill
     statsRow2.getCell(7).value = '✓ Excellent utilization'
-    statsRow2.getCell(7).font = { ...FONTS.body, italic: true, color: { argb: COLORS.success } } as any
+    statsRow2.getCell(7).font = { ...FONTS.body, italic: true, color: { argb: COLORS.success } } as Font
   } else {
-    statsRow2.getCell(6).fill = FILLS.highlightGreen as any
+    statsRow2.getCell(6).fill = FILLS.highlightGreen as Fill
   }
 
   const statsRow3 = worksheet.getRow(currentRow++)
   statsRow3.getCell(1).value = 'Date Range:'
-  statsRow3.getCell(1).font = FONTS.bodyBold as any
+  statsRow3.getCell(1).font = FONTS.bodyBold as Font
   statsRow3.getCell(2).value = `${stats.firstDate} to ${stats.lastDate}`
-  statsRow3.getCell(2).font = FONTS.body as any
+  statsRow3.getCell(2).font = FONTS.body as Font
   mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 4, '', 'section')
 
   statsRow3.getCell(5).value = 'Avg Days Between Hauls:'
-  statsRow3.getCell(5).font = FONTS.bodyBold as any
+  statsRow3.getCell(5).font = FONTS.bodyBold as Font
   statsRow3.getCell(6).value = stats.avgDaysBetween.toFixed(1)
-  statsRow3.getCell(6).font = FONTS.body as any
+  statsRow3.getCell(6).font = FONTS.body as Font
 
   currentRow += 2
 
@@ -172,15 +172,15 @@ export function generateHaulLog(
     if (haul.days_since_last) {
       row.getCell(3).value = haul.days_since_last
       row.getCell(3).numFmt = '#,##0'
-      row.getCell(3).alignment = ALIGNMENTS.center as any
+      row.getCell(3).alignment = ALIGNMENTS.center as Alignment
 
       // Highlight long intervals (>14 days)
       if (haul.days_since_last > 14) {
-        row.getCell(3).fill = FILLS.highlightYellow as any
+        row.getCell(3).fill = FILLS.highlightYellow as Fill
       }
     } else {
       row.getCell(3).value = '-'
-      row.getCell(3).alignment = ALIGNMENTS.center as any
+      row.getCell(3).alignment = ALIGNMENTS.center as Alignment
     }
 
     // Utilization %
@@ -190,20 +190,20 @@ export function generateHaulLog(
     // Status
     const status = getUtilizationStatus(tonnage, utilization)
     row.getCell(5).value = status.label
-    row.getCell(5).font = FONTS.body as any
-    row.getCell(5).fill = status.fill as any
-    row.getCell(5).alignment = ALIGNMENTS.center as any
+    row.getCell(5).font = FONTS.body as Font
+    row.getCell(5).fill = status.fill as Fill
+    row.getCell(5).alignment = ALIGNMENTS.center as Alignment
 
     // Invoice #
     if (haul.invoice_id) {
       row.getCell(6).value = haul.invoice_id
-      row.getCell(6).font = FONTS.small as any
+      row.getCell(6).font = FONTS.small as Font
     }
 
     // Notes (from status field or other metadata)
     if (haul.status) {
       row.getCell(7).value = haul.status
-      row.getCell(7).font = FONTS.small as any
+      row.getCell(7).font = FONTS.small as Font
     }
   })
 
@@ -220,29 +220,29 @@ export function generateHaulLog(
 
   const optimalRow = worksheet.getRow(currentRow++)
   optimalRow.getCell(1).value = 'Optimal Hauls (≥85% capacity):'
-  optimalRow.getCell(1).font = FONTS.bodyBold as any
+  optimalRow.getCell(1).font = FONTS.bodyBold as Font
   optimalRow.getCell(2).value = utilizationStats.optimal
-  optimalRow.getCell(2).font = FONTS.body as any
+  optimalRow.getCell(2).font = FONTS.body as Font
 
   formatPercentage(optimalRow.getCell(3), (utilizationStats.optimal / haulLogs.length) * 100)
-  optimalRow.getCell(3).fill = FILLS.highlightGreen as any
+  optimalRow.getCell(3).fill = FILLS.highlightGreen as Fill
 
   const goodRow = worksheet.getRow(currentRow++)
   goodRow.getCell(1).value = 'Good Hauls (70-84% capacity):'
-  goodRow.getCell(1).font = FONTS.bodyBold as any
+  goodRow.getCell(1).font = FONTS.bodyBold as Font
   goodRow.getCell(2).value = utilizationStats.good
-  goodRow.getCell(2).font = FONTS.body as any
+  goodRow.getCell(2).font = FONTS.body as Font
 
   formatPercentage(goodRow.getCell(3), (utilizationStats.good / haulLogs.length) * 100)
 
   const lowRow = worksheet.getRow(currentRow++)
   lowRow.getCell(1).value = 'Low Utilization (<70% capacity):'
-  lowRow.getCell(1).font = FONTS.bodyBold as any
+  lowRow.getCell(1).font = FONTS.bodyBold as Font
   lowRow.getCell(2).value = utilizationStats.low
-  lowRow.getCell(2).font = FONTS.body as any
+  lowRow.getCell(2).font = FONTS.body as Font
 
   formatPercentage(lowRow.getCell(3), (utilizationStats.low / haulLogs.length) * 100)
-  lowRow.getCell(3).fill = FILLS.highlightYellow as any
+  lowRow.getCell(3).fill = FILLS.highlightYellow as Fill
 
   currentRow += 2
 
@@ -250,16 +250,16 @@ export function generateHaulLog(
   if (stats.avgTonnage < OPTIMIZATION_THRESHOLD) {
     const recRow = worksheet.getRow(currentRow++)
     recRow.getCell(1).value = '💡 Recommendation:'
-    recRow.getCell(1).font = FONTS.bodyBold as any
+    recRow.getCell(1).font = FONTS.bodyBold as Font
 
     recRow.getCell(2).value =
       `Average tonnage (${stats.avgTonnage.toFixed(2)} tons) is below the ${OPTIMIZATION_THRESHOLD} ton threshold. ` +
       'Consider installing compactor monitors to optimize pickup frequency and reduce costs.'
-    recRow.getCell(2).font = FONTS.body as any
-    recRow.getCell(2).alignment = ALIGNMENTS.wrapText as any
+    recRow.getCell(2).font = FONTS.body as Font
+    recRow.getCell(2).alignment = ALIGNMENTS.wrapText as Alignment
     recRow.height = 40
     mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 7, '', 'section')
-    recRow.getCell(2).fill = FILLS.highlightYellow as any
+    recRow.getCell(2).fill = FILLS.highlightYellow as Fill
   }
 
   // Add footer
@@ -342,7 +342,7 @@ function calculateUtilizationStats(haulLogs: HaulLogRow[]): {
  */
 function getUtilizationStatus(tonnage: number, utilization: number): {
   label: string
-  fill: any
+  fill: Fill
 } {
   if (utilization >= 85) {
     return {

@@ -106,50 +106,55 @@ export default async function ProjectDetailPage({
   const projectedTotal = budgetData.reduce((sum, item) => sum + item.projected, 0)
   const budgetSavings = baselineTotal - projectedTotal
 
+  // Extract property details
+  // Use the first invoice for vendor/account info if available
+  const firstInvoice = project.invoice_data && project.invoice_data.length > 0 ? project.invoice_data[0] : null
+  const propertyDetails = {
+    vendor: firstInvoice?.vendor_name || "Unknown Vendor",
+    accountNumber: firstInvoice?.invoice_number || "N/A", // Using invoice number as proxy for account # if not available
+    propertyType: project.property_type || "Garden-Style",
+    units: project.units || 0
+  }
+
   return (
     <div className="space-y-6 pb-10">
       {/* Header */}
-      <div className="border-b border-slate-300 pb-6">
-        <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" title="Go to Dashboard">
-              <Home className="h-5 w-5" />
-            </Button>
-          </Link>
-          <Link href="/projects">
-            <Button variant="ghost" size="icon" title="Back to Projects">
-              <ChevronLeft className="h-5 w-5" />
+            <Button variant="outline" size="icon">
+              <Home className="h-4 w-4" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">
-              {project.property_name}
-            </h1>
-            <p className="text-slate-500">
-              {project.city}, {project.state} • {project.units} Units
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">{project.property_name}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100">
+                Analysis Complete
+              </Badge>
+              <span className="text-sm text-slate-500">Last updated: {new Date(project.updated_at || new Date()).toLocaleDateString()}</span>
+            </div>
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
-              {project.status}
-            </Badge>
-          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">Export Report</Button>
+          <Button>View Recommendations</Button>
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="bg-slate-100 p-1">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+      <Tabs defaultValue="executive" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="executive">Executive Summary</TabsTrigger>
           <TabsTrigger value="expense">Expense Analysis</TabsTrigger>
-          <TabsTrigger value="optimization">Optimization</TabsTrigger>
-          <TabsTrigger value="budget">Budget</TabsTrigger>
-          <TabsTrigger value="regulatory">Regulatory</TabsTrigger>
-          <TabsTrigger value="files">Files ({totalFiles})</TabsTrigger>
-          <TabsTrigger value="jobs">Analysis Jobs ({completedJobs}/{totalJobs})</TabsTrigger>
+          <TabsTrigger value="optimization">Optimization Opportunities</TabsTrigger>
+          <TabsTrigger value="budget">Budget Projection</TabsTrigger>
+          <TabsTrigger value="regulatory">Regulatory Compliance</TabsTrigger>
+          <TabsTrigger value="files">Project Files</TabsTrigger>
+          <TabsTrigger value="jobs">Analysis Jobs</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="dashboard">
-          <ExecutiveSummary data={executiveData} />
+        <TabsContent value="executive">
+          <ExecutiveSummary data={executiveData} propertyDetails={propertyDetails} />
         </TabsContent>
 
         <TabsContent value="expense">

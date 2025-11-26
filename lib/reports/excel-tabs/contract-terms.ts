@@ -17,7 +17,7 @@
  * 6. Calendar Reminders
  */
 
-import type { Worksheet } from 'exceljs'
+import type { Worksheet, Font, Fill, Alignment, Borders } from 'exceljs'
 import type { ContractExtractorResult } from '@/lib/skills/types'
 import {
   applyHeaderStyle,
@@ -48,7 +48,7 @@ export function generateContractTerms(
 
   if (!contractResult || contractResult.contracts.length === 0) {
     worksheet.getRow(1).getCell(1).value = 'No contract data available.'
-    worksheet.getRow(1).getCell(1).font = FONTS.body as any
+    worksheet.getRow(1).getCell(1).font = FONTS.body as Font
     return
   }
 
@@ -136,12 +136,12 @@ export function generateContractTerms(
 
   if (daysUntilExpiration < 90 && daysUntilExpiration > 0) {
     const expRow = worksheet.getRow(currentRow - 3)
-    expRow.getCell(2).fill = FILLS.highlightYellow as any
-    expRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.warning } } as any
+    expRow.getCell(2).fill = FILLS.highlightYellow as Fill
+    expRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.warning } } as Font
   } else if (daysUntilExpiration <= 0) {
     const expRow = worksheet.getRow(currentRow - 3)
-    expRow.getCell(2).fill = FILLS.highlightRed as any
-    expRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.danger } } as any
+    expRow.getCell(2).fill = FILLS.highlightRed as Fill
+    expRow.getCell(2).font = { ...FONTS.bodyBold, color: { argb: COLORS.danger } } as Font
   }
 
   currentRow++
@@ -166,19 +166,19 @@ export function generateContractTerms(
       const row = worksheet.getRow(currentRow++)
 
       row.getCell(1).value = service.containerType
-      row.getCell(1).font = FONTS.body as any
+      row.getCell(1).font = FONTS.body as Font
 
       row.getCell(2).value = service.containerSize
       row.getCell(2).numFmt = '#,##0.0'
-      row.getCell(2).alignment = ALIGNMENTS.center as any
+      row.getCell(2).alignment = ALIGNMENTS.center as Alignment
 
       row.getCell(3).value = service.frequency
-      row.getCell(3).font = FONTS.body as any
-      row.getCell(3).alignment = ALIGNMENTS.center as any
+      row.getCell(3).font = FONTS.body as Font
+      row.getCell(3).alignment = ALIGNMENTS.center as Alignment
 
       if (service.serviceDays) {
         row.getCell(4).value = service.serviceDays
-        row.getCell(4).font = FONTS.body as any
+        row.getCell(4).font = FONTS.body as Font
       }
     })
 
@@ -234,11 +234,11 @@ export function generateContractTerms(
   if (contract.pricing.escalationClause) {
     const escalationRow = worksheet.getRow(currentRow++)
     escalationRow.getCell(1).value = 'Escalation Clause:'
-    escalationRow.getCell(1).font = FONTS.bodyBold as any
+    escalationRow.getCell(1).font = FONTS.bodyBold as Font
 
     escalationRow.getCell(2).value = contract.pricing.escalationClause
-    escalationRow.getCell(2).font = FONTS.body as any
-    escalationRow.getCell(2).alignment = ALIGNMENTS.wrapText as any
+    escalationRow.getCell(2).font = FONTS.body as Font
+    escalationRow.getCell(2).alignment = ALIGNMENTS.wrapText as Alignment
     escalationRow.height = 30
     mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 6, '', 'section')
   }
@@ -254,12 +254,12 @@ export function generateContractTerms(
     currentRow++
     const otherFeesRow = worksheet.getRow(currentRow++)
     otherFeesRow.getCell(1).value = 'Other Fees:'
-    otherFeesRow.getCell(1).font = FONTS.bodyBold as any
+    otherFeesRow.getCell(1).font = FONTS.bodyBold as Font
 
     contract.pricing.otherFees.forEach((fee) => {
       const feeRow = worksheet.getRow(currentRow++)
       feeRow.getCell(1).value = `  • ${fee.description}`
-      feeRow.getCell(1).font = FONTS.body as any
+      feeRow.getCell(1).font = FONTS.body as Font
 
       formatCurrency(feeRow.getCell(2), fee.amount)
     })
@@ -281,14 +281,14 @@ export function generateContractTerms(
   if (contract.terms.earlyTerminationPenalty) {
     const penaltyRow = worksheet.getRow(currentRow++)
     penaltyRow.getCell(1).value = 'Early Termination Penalty:'
-    penaltyRow.getCell(1).font = FONTS.bodyBold as any
+    penaltyRow.getCell(1).font = FONTS.bodyBold as Font
 
     penaltyRow.getCell(2).value = contract.terms.earlyTerminationPenalty
-    penaltyRow.getCell(2).font = FONTS.body as any
-    penaltyRow.getCell(2).alignment = ALIGNMENTS.wrapText as any
+    penaltyRow.getCell(2).font = FONTS.body as Font
+    penaltyRow.getCell(2).alignment = ALIGNMENTS.wrapText as Alignment
     penaltyRow.height = 30
     mergeCells(worksheet, currentRow - 1, 2, currentRow - 1, 6, '', 'section')
-    penaltyRow.getCell(2).fill = FILLS.highlightYellow as any
+    penaltyRow.getCell(2).fill = FILLS.highlightYellow as Fill
   }
 
   addKeyValueRow(
@@ -312,41 +312,41 @@ export function generateContractTerms(
 
   const reminderRow1 = worksheet.getRow(currentRow++)
   reminderRow1.getCell(1).value = '⏰ 90 days before expiration:'
-  reminderRow1.getCell(1).font = FONTS.bodyBold as any
+  reminderRow1.getCell(1).font = FONTS.bodyBold as Font
 
   const reminder90Date = new Date(expirationDate)
   reminder90Date.setDate(reminder90Date.getDate() - 90)
   formatDate(reminderRow1.getCell(2), reminder90Date.toISOString().split('T')[0])
 
   reminderRow1.getCell(3).value = 'Begin contract renewal negotiation or vendor RFP process'
-  reminderRow1.getCell(3).font = FONTS.body as any
-  reminderRow1.getCell(3).alignment = ALIGNMENTS.wrapText as any
+  reminderRow1.getCell(3).font = FONTS.body as Font
+  reminderRow1.getCell(3).alignment = ALIGNMENTS.wrapText as Alignment
   mergeCells(worksheet, currentRow - 1, 3, currentRow - 1, 6, '', 'section')
 
   const reminderRow2 = worksheet.getRow(currentRow++)
   reminderRow2.getCell(1).value = '⏰ 30 days before expiration:'
-  reminderRow2.getCell(1).font = FONTS.bodyBold as any
+  reminderRow2.getCell(1).font = FONTS.bodyBold as Font
 
   const reminder30Date = new Date(expirationDate)
   reminder30Date.setDate(reminder30Date.getDate() - 30)
   formatDate(reminderRow2.getCell(2), reminder30Date.toISOString().split('T')[0])
 
   reminderRow2.getCell(3).value = 'Finalize contract renewal or transition plan'
-  reminderRow2.getCell(3).font = FONTS.body as any
-  reminderRow2.getCell(3).alignment = ALIGNMENTS.wrapText as any
+  reminderRow2.getCell(3).font = FONTS.body as Font
+  reminderRow2.getCell(3).alignment = ALIGNMENTS.wrapText as Alignment
   mergeCells(worksheet, currentRow - 1, 3, currentRow - 1, 6, '', 'section')
 
   const reminderRow3 = worksheet.getRow(currentRow++)
   reminderRow3.getCell(1).value = '⏰ 7 days before expiration:'
-  reminderRow3.getCell(1).font = FONTS.bodyBold as any
+  reminderRow3.getCell(1).font = FONTS.bodyBold as Font
 
   const reminder7Date = new Date(expirationDate)
   reminder7Date.setDate(reminder7Date.getDate() - 7)
   formatDate(reminderRow3.getCell(2), reminder7Date.toISOString().split('T')[0])
 
   reminderRow3.getCell(3).value = 'Confirm service transition or renewal is complete'
-  reminderRow3.getCell(3).font = FONTS.body as any
-  reminderRow3.getCell(3).alignment = ALIGNMENTS.wrapText as any
+  reminderRow3.getCell(3).font = FONTS.body as Font
+  reminderRow3.getCell(3).alignment = ALIGNMENTS.wrapText as Alignment
   mergeCells(worksheet, currentRow - 1, 3, currentRow - 1, 6, '', 'section')
 
   // Add footer
