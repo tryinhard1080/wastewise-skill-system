@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
     LayoutDashboard,
+    FolderKanban,
     BarChart3,
     FileText,
     Settings,
@@ -25,6 +26,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const navigation = [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Projects", href: "/projects", icon: FolderKanban },
         { name: "Analytics", href: "/analytics", icon: BarChart3 },
         { name: "Reports", href: "/reports", icon: FileText },
         { name: "Settings", href: "/settings", icon: Settings },

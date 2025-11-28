@@ -1,22 +1,23 @@
 "use client"
 
 import { useState } from "react"
+import { PRICING } from "@/lib/constants/landing-content"
 
 export default function PricingSection() {
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annually">("annually")
 
   const pricing = {
     starter: {
-      monthly: 0,
-      annually: 0,
+      monthly: PRICING.tiers.starter.monthlyPrice,
+      annually: PRICING.tiers.starter.annualPrice,
     },
     professional: {
-      monthly: 20,
-      annually: 16, // 20% discount for annual
+      monthly: PRICING.tiers.professional.monthlyPrice,
+      annually: PRICING.tiers.professional.annualPrice,
     },
     enterprise: {
-      monthly: 200,
-      annually: 160, // 20% discount for annual
+      monthly: PRICING.tiers.enterprise.monthlyPrice,
+      annually: PRICING.tiers.enterprise.annualPrice,
     },
   }
 
@@ -45,14 +46,12 @@ export default function PricingSection() {
 
           {/* Title */}
           <div className="self-stretch text-center flex justify-center flex-col text-[#49423D] text-3xl md:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-            Choose the perfect plan for your business
+            {PRICING.title}
           </div>
 
           {/* Description */}
           <div className="self-stretch text-center text-[#605A57] text-base font-normal leading-7 font-sans">
-            Scale your operations with flexible pricing that grows with your team.
-            <br />
-            Start free, upgrade when you're ready.
+            {PRICING.subtitle}
           </div>
         </div>
       </div>
@@ -128,9 +127,9 @@ export default function PricingSection() {
               {/* Plan Header */}
               <div className="self-stretch flex flex-col justify-start items-center gap-9">
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                  <div className="text-[rgba(55,50,47,0.90)] text-lg font-medium leading-7 font-sans">Starter</div>
+                  <div className="text-[rgba(55,50,47,0.90)] text-lg font-medium leading-7 font-sans">{PRICING.tiers.starter.name}</div>
                   <div className="w-full max-w-[242px] text-[rgba(41,37,35,0.70)] text-sm font-normal leading-5 font-sans">
-                    Perfect for individuals and small teams getting started.
+                    {PRICING.tiers.starter.description}
                   </div>
                 </div>
 
@@ -162,7 +161,7 @@ export default function PricingSection() {
                       </span>
                     </div>
                     <div className="text-[#847971] text-sm font-medium font-sans">
-                      per {billingPeriod === "monthly" ? "month" : "year"}, per user.
+                      per {billingPeriod === "monthly" ? "month" : "year"}, per property
                     </div>
                   </div>
                 </div>
@@ -176,13 +175,7 @@ export default function PricingSection() {
               </div>
 
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                {[
-                  "Up to 3 projects",
-                  "Basic documentation tools",
-                  "Community support",
-                  "Standard templates",
-                  "Basic analytics",
-                ].map((feature, index) => (
+                {PRICING.tiers.starter.features.map((feature, index) => (
                   <div key={index} className="self-stretch flex justify-start items-center gap-[13px]">
                     <div className="w-4 h-4 relative flex items-center justify-center">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -208,9 +201,9 @@ export default function PricingSection() {
               {/* Plan Header */}
               <div className="self-stretch flex flex-col justify-start items-center gap-9">
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                  <div className="text-[#FBFAF9] text-lg font-medium leading-7 font-sans">Professional</div>
+                  <div className="text-[#FBFAF9] text-lg font-medium leading-7 font-sans">{PRICING.tiers.professional.name}</div>
                   <div className="w-full max-w-[242px] text-[#B2AEA9] text-sm font-normal leading-5 font-sans">
-                    Advanced features for growing teams and businesses.
+                    {PRICING.tiers.professional.description}
                   </div>
                 </div>
 
@@ -242,7 +235,7 @@ export default function PricingSection() {
                       </span>
                     </div>
                     <div className="text-[#D2C6BF] text-sm font-medium font-sans">
-                      per {billingPeriod === "monthly" ? "month" : "year"}, per user.
+                      per {billingPeriod === "monthly" ? "month" : "year"}, per property
                     </div>
                   </div>
                 </div>
@@ -257,22 +250,13 @@ export default function PricingSection() {
               </div>
 
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                {[
-                  "Unlimited projects",
-                  "Advanced documentation tools",
-                  "Priority support",
-                  "Custom templates",
-                  "Advanced analytics",
-                  "Team collaboration",
-                  "API access",
-                  "Custom integrations",
-                ].map((feature, index) => (
+                {PRICING.tiers.professional.features.map((feature, index) => (
                   <div key={index} className="self-stretch flex justify-start items-center gap-[13px]">
                     <div className="w-4 h-4 relative flex items-center justify-center">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                           d="M10 3L4.5 8.5L2 6"
-                          stroke="#FF8000"
+                          stroke="#16A34A"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -290,9 +274,9 @@ export default function PricingSection() {
               {/* Plan Header */}
               <div className="self-stretch flex flex-col justify-start items-center gap-9">
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                  <div className="text-[rgba(55,50,47,0.90)] text-lg font-medium leading-7 font-sans">Enterprise</div>
+                  <div className="text-[rgba(55,50,47,0.90)] text-lg font-medium leading-7 font-sans">{PRICING.tiers.enterprise.name}</div>
                   <div className="w-full max-w-[242px] text-[rgba(41,37,35,0.70)] text-sm font-normal leading-5 font-sans">
-                    Complete solution for large organizations and enterprises.
+                    {PRICING.tiers.enterprise.description}
                   </div>
                 </div>
 
@@ -324,7 +308,7 @@ export default function PricingSection() {
                       </span>
                     </div>
                     <div className="text-[#847971] text-sm font-medium font-sans">
-                      per {billingPeriod === "monthly" ? "month" : "year"}, per user.
+                      per {billingPeriod === "monthly" ? "month" : "year"}, per property
                     </div>
                   </div>
                 </div>
@@ -338,16 +322,7 @@ export default function PricingSection() {
               </div>
 
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                {[
-                  "Everything in Professional",
-                  "Dedicated account manager",
-                  "24/7 phone support",
-                  "Custom onboarding",
-                  "Advanced security features",
-                  "SSO integration",
-                  "Custom contracts",
-                  "White-label options",
-                ].map((feature, index) => (
+                {PRICING.tiers.enterprise.features.map((feature, index) => (
                   <div key={index} className="self-stretch flex justify-start items-center gap-[13px]">
                     <div className="w-4 h-4 relative flex items-center justify-center">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">

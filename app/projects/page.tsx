@@ -61,7 +61,7 @@ export default async function ProjectsPage() {
           </p>
         </div>
         <Link href="/projects/new">
-          <Button>
+          <Button className="bg-green-600 hover:bg-green-700">
             <Plus className="mr-2 h-4 w-4" />
             New Project
           </Button>
@@ -79,7 +79,7 @@ export default async function ProjectsPage() {
               optimization opportunities.
             </p>
             <Link href="/projects/new">
-              <Button size="lg">
+              <Button size="lg" className="bg-green-600 hover:bg-green-700">
                 <Plus className="mr-2 h-5 w-5" />
                 Create Your First Project
               </Button>
