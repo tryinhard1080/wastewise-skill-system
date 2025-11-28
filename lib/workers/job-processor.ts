@@ -17,7 +17,7 @@ try { fs.appendFileSync('debug-worker.txt', '!!! LOADING JOB-PROCESSOR.TS !!!\n'
 console.log('!!! LOADING JOB-PROCESSOR.TS !!!')
 
 import { executeSkillWithProgress } from '@/lib/skills/executor'
-import type { SkillResult } from '@/lib/skills/types'
+import type { SkillResult, WasteWiseAnalyticsCompleteResult } from '@/lib/skills/types'
 import { JOB_TYPES } from '@/lib/constants/job-types'
 import {
   TimeoutError,
@@ -28,6 +28,7 @@ import {
   AuthenticationError,
   NotFoundError,
 } from '@/lib/types/errors'
+import { OptimizationRepository, type OpportunityType } from '@/lib/db'
 
 type AnalysisJob = Tables<'analysis_jobs'>
 
@@ -163,16 +164,16 @@ export class JobProcessor {
           break
 
         case JOB_TYPES.INVOICE_EXTRACTION:
-          // TODO: Implement invoice extraction job
-          throw new Error('Invoice extraction not yet implemented')
+          await this.processSkillJob(job)
+          break
 
         case JOB_TYPES.REGULATORY_RESEARCH:
-          // TODO: Implement regulatory research job
-          throw new Error('Regulatory research not yet implemented')
+          await this.processSkillJob(job)
+          break
 
         case JOB_TYPES.REPORT_GENERATION:
-          // TODO: Implement report-only generation job
-          throw new Error('Report generation not yet implemented')
+          await this.processSkillJob(job)
+          break
 
         default:
           throw new Error(`Unknown job type: ${job.job_type}`)
@@ -302,6 +303,15 @@ export class JobProcessor {
       throw new Error(errorMessage)
     }
 
+    // Persist derived data for UI consumption; non-fatal on failure
+    try {
+      await this.persistCompleteAnalysis(job, result.data as WasteWiseAnalyticsCompleteResult)
+    } catch (persistError) {
+      jobLogger.warn('Failed to persist analysis artifacts', undefined, {
+        error: (persistError as Error).message,
+      })
+    }
+
     jobLogger.info('Skill execution completed successfully', {
       executionTime: result.metadata.durationMs,
     })
@@ -327,5 +337,122 @@ export class JobProcessor {
     }
 
     jobLogger.info('Job marked as complete successfully')
+  }
+
+  /**
+   * Process non-complete job types using generic skill execution
+   */
+  private async processSkillJob(job: AnalysisJob): Promise<void> {
+    const jobLogger = logger.child({ jobId: job.id, projectId: job.project_id })
+
+    const result = await executeSkillWithProgress(
+      job.project_id,
+      job.job_type,
+      async (percent, step) => {
+        const { error: progressError } = await this.supabase.rpc('update_job_progress', {
+          job_id: job.id,
+          new_progress: percent,
+          step_name: step,
+        })
+
+        if (progressError) {
+          jobLogger.warn('Failed to update job progress', undefined, {
+            error: progressError.message,
+          })
+        }
+      },
+      job.user_id
+    )
+
+    if (!result.success || !result.data) {
+      const errorMessage = result.error?.message || 'Skill execution failed without message'
+      throw new Error(errorMessage)
+    }
+
+    const { error: completeError } = await this.supabase.rpc('complete_analysis_job', {
+      job_id: job.id,
+      result: result.data as any,
+      ai_usage: result.metadata.aiUsage
+        ? {
+          requests: result.metadata.aiUsage.requests,
+          tokens_input: result.metadata.aiUsage.tokensInput,
+          tokens_output: result.metadata.aiUsage.tokensOutput,
+          cost_usd: result.metadata.aiUsage.costUsd,
+        }
+        : null,
+    })
+
+    if (completeError) {
+      throw new Error(`Failed to complete job: ${completeError.message}`)
+    }
+
+    jobLogger.info('Generic skill job completed successfully')
+  }
+
+  /**
+   * Persist analysis artifacts to first-class tables for UI surfaces
+   */
+  private async persistCompleteAnalysis(
+    job: AnalysisJob,
+    result: WasteWiseAnalyticsCompleteResult
+  ): Promise<void> {
+    const projectId = job.project_id
+    const optimizationRepo = new OptimizationRepository(this.supabase as any)
+
+    // Update project summary
+    const { error: projectError } = await this.supabase
+      .from('projects')
+      .update({
+        status: 'completed',
+        progress: 100,
+        total_savings: result.summary.totalSavingsPotential,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', projectId)
+
+    if (projectError) {
+      logger.warn('Failed to update project summary after analysis', undefined, {
+        projectId,
+        error: projectError.message,
+      })
+    }
+
+    // Replace optimizations with the latest recommendations
+    await optimizationRepo.deleteByProjectId(projectId)
+
+    const records = (result.recommendations || []).map((rec) => {
+      const type: OpportunityType =
+        rec.type === 'compactor_monitors'
+          ? 'compactor_monitors'
+          : rec.type === 'contamination_reduction'
+            ? 'contamination_reduction'
+            : rec.type === 'bulk_subscription'
+              ? 'bulk_subscription'
+              : 'other'
+
+      return {
+        project_id: projectId,
+        opportunity_type: type,
+        recommend: rec.recommend ?? true,
+        priority: rec.priority,
+        title: rec.title,
+        description: rec.description,
+        calculation_breakdown: {
+          annual_savings: rec.savings ?? 0,
+          implementation: rec.implementation,
+        },
+        confidence: rec.confidence,
+      }
+    })
+
+    if (records.length > 0) {
+      const { error: optError } = await optimizationRepo.batchCreate(records)
+      if (optError) {
+        logger.warn('Failed to persist optimization recommendations', undefined, {
+          projectId,
+          error: optError,
+        })
+      }
+    }
   }
 }

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ChevronLeft, Home } from 'lucide-react'
+import { Home } from 'lucide-react'
 import Link from 'next/link'
 import { FileUploadSection } from '@/components/project/file-upload-section'
 import { JobsList } from '@/components/project/jobs-list'
@@ -81,16 +81,10 @@ export default async function ProjectDetailPage({
     redirect('/projects')
   }
 
-  const totalFiles = project.project_files?.length || 0
-  const totalJobs = project.analysis_jobs?.length || 0
-  const completedJobs =
-    project.analysis_jobs?.filter((job: any) => job.status === 'completed')
-      .length || 0
-
   // Transform real data
   const executiveData = transformExecutiveData(project, project.invoice_data || [], project.optimizations || [])
   const expenseData = transformExpenseData(project.invoice_data || [], project.units)
-  const opportunitiesData = transformOptimizations(project.optimizations || [])
+  const opportunitiesData = transformOptimizations(project.optimizations || [], project)
   const budgetData = transformBudgetData(project.invoice_data || [])
 
   // Calculate optimization totals

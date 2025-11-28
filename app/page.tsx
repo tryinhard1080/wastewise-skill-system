@@ -3,10 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import SmartSimpleBrilliant from "../components/smart-simple-brilliant"
-import YourWorkInSync from "../components/your-work-in-sync"
-import EffortlessIntegration from "../components/effortless-integration-updated"
-import NumbersThatSpeak from "../components/numbers-that-speak"
 import DocumentationSection from "../components/documentation-section"
 import TestimonialsSection from "../components/testimonials-section"
 import FAQSection from "../components/faq-section"
@@ -63,19 +59,6 @@ export default function LandingPage() {
     if (!mountedRef.current) return
     setActiveCard(index)
     setProgress(0)
-  }
-
-  const getDashboardContent = () => {
-    switch (activeCard) {
-      case 0:
-        return <div className="text-[#828387] text-sm">Customer Subscription Status and Details</div>
-      case 1:
-        return <div className="text-[#828387] text-sm">Analytics Dashboard - Real-time Insights</div>
-      case 2:
-        return <div className="text-[#828387] text-sm">Data Visualization - Charts and Metrics</div>
-      default:
-        return <div className="text-[#828387] text-sm">Customer Subscription Status and Details</div>
-    }
   }
 
   return (

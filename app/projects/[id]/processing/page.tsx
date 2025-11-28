@@ -27,7 +27,6 @@ export default function ProcessingPage() {
     const [progress, setProgress] = useState<number>(0)
     const [currentStep, setCurrentStep] = useState<string>('')
     const [error, setError] = useState<string | null>(null)
-    const [jobId, setJobId] = useState<string | null>(null)
 
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null
@@ -44,8 +43,6 @@ export default function ProcessingPage() {
                 if (error) throw error
 
                 if (jobs && jobs.length > 0) {
-                    setJobId(jobs[0].id)
-
                     // If job is already completed, redirect immediately
                     if (jobs[0].status === 'completed') {
                         router.push(`/projects/${projectId}/results`)
