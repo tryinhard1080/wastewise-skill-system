@@ -1,14 +1,17 @@
+import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileText, Download, Filter } from "lucide-react"
+import { format } from "date-fns"
+import Link from "next/link"
 
-export default function ReportsPage() {
-    const reports = [
-        { name: "Q3 2025 Portfolio Summary", date: "Oct 15, 2025", type: "PDF", size: "2.4 MB" },
-        { name: "September 2025 Expense Detail", date: "Oct 01, 2025", type: "Excel", size: "1.1 MB" },
-        { name: "Orion McKinney Optimization Plan", date: "Sep 28, 2025", type: "PDF", size: "3.2 MB" },
-        { name: "Q2 2025 Portfolio Summary", date: "Jul 15, 2025", type: "PDF", size: "2.3 MB" },
-    ]
+export default async function ReportsPage() {
+    const supabase = await createClient()
+
+    const { data: projects } = await supabase
+        .from('projects')
+        .select('id, property_name, updated_at, status')
+        .order('updated_at', { ascending: false })
 
     return (
         <div className="space-y-6">
@@ -25,27 +28,41 @@ export default function ReportsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Reports</CardTitle>
-                    <CardDescription>Documents generated in the last 90 days.</CardDescription>
+                    <CardTitle>Available Reports</CardTitle>
+                    <CardDescription>
+                        {projects?.length || 0} reports generated based on property analysis.
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        {reports.map((report, i) => (
-                            <div key={i} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+                        {projects?.map((project) => (
+                            <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors">
                                 <div className="flex items-center gap-4">
                                     <div className="h-10 w-10 rounded bg-slate-100 flex items-center justify-center text-slate-500">
                                         <FileText className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-slate-900">{report.name}</p>
-                                        <p className="text-sm text-slate-500">{report.date} • {report.type} • {report.size}</p>
+                                        <Link href={`/projects/${project.id}`} className="hover:underline">
+                                            <p className="font-medium text-slate-900">{project.property_name} Analysis Report</p>
+                                        </Link>
+                                        <p className="text-sm text-slate-500">
+                                            Generated {format(new Date(project.updated_at || new Date()), "MMM d, yyyy")} • PDF • 2.4 MB
+                                        </p>
                                     </div>
                                 </div>
-                                <Button variant="ghost" size="icon">
-                                    <Download className="h-4 w-4" />
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Link href={`/projects/${project.id}`}>
+                                        <Button variant="outline" size="sm">View</Button>
+                                    </Link>
+                                    <Button variant="ghost" size="icon">
+                                        <Download className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             </div>
                         ))}
+                        {(!projects || projects.length === 0) && (
+                            <p className="text-center text-slate-500 py-8">No reports found.</p>
+                        )}
                     </div>
                 </CardContent>
             </Card>

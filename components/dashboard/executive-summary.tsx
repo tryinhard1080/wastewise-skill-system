@@ -12,17 +12,23 @@ interface ExecutiveSummaryProps {
         yardsPerDoor: number
         budgetImpact: number
     }
+    propertyDetails: {
+        vendor: string
+        accountNumber: string
+        propertyType: string
+        units: number
+    }
 }
 
-export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
+export function ExecutiveSummary({ data, propertyDetails }: ExecutiveSummaryProps) {
     // Gauge Data
     const ypdData = [
         { name: "Value", value: data.yardsPerDoor },
-        { name: "Remaining", value: 3.0 - data.yardsPerDoor }, // Assuming max 3.0 for visual
+        { name: "Remaining", value: Math.max(0, 3.0 - data.yardsPerDoor) },
     ]
     const budgetData = [
         { name: "Increase", value: data.budgetImpact },
-        { name: "Remaining", value: 100 - data.budgetImpact },
+        { name: "Remaining", value: Math.max(0, 100 - data.budgetImpact) },
     ]
 
     const COLORS = {
@@ -43,7 +49,7 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
                             2025 Annual Spend
                         </h3>
                         <p className="text-3xl font-bold text-slate-900">
-                            ${data.annualSpend.toLocaleString()}
+                            ${data.annualSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-xs text-slate-500 mt-1">9 months of data</p>
                     </CardContent>
@@ -54,7 +60,7 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
                             Monthly Average
                         </h3>
                         <p className="text-3xl font-bold text-slate-900">
-                            ${data.monthlyAverage.toLocaleString()}
+                            ${data.monthlyAverage.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-xs text-slate-500 mt-1">Includes all fees</p>
                     </CardContent>
@@ -76,7 +82,7 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
                             2026 Savings
                         </h3>
                         <p className="text-3xl font-bold text-green-600">
-                            ${data.savings.toLocaleString()}
+                            ${data.savings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-xs text-slate-500 mt-1">Annual opportunity</p>
                     </CardContent>
@@ -113,7 +119,7 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
                             </ResponsiveContainer>
                             <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                                 <div className="text-4xl font-bold text-slate-800">
-                                    {data.yardsPerDoor}
+                                    {data.yardsPerDoor.toFixed(2)}
                                 </div>
                                 <div className="text-sm text-slate-500 mt-1">
                                     Target: 2.0-2.5 YPD
@@ -192,20 +198,20 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
                         <div>
                             <p className="text-sm text-slate-600">Vendor</p>
                             <p className="font-semibold text-slate-900">
-                                Frontier Waste Solutions
+                                {propertyDetails.vendor}
                             </p>
                         </div>
                         <div>
                             <p className="text-sm text-slate-600">Account #</p>
-                            <p className="font-semibold text-slate-900">239522</p>
+                            <p className="font-semibold text-slate-900">{propertyDetails.accountNumber}</p>
                         </div>
                         <div>
                             <p className="text-sm text-slate-600">Property Type</p>
-                            <p className="font-semibold text-slate-900">Garden-Style</p>
+                            <p className="font-semibold text-slate-900">{propertyDetails.propertyType}</p>
                         </div>
                         <div>
                             <p className="text-sm text-slate-600">Units</p>
-                            <p className="font-semibold text-slate-900">453</p>
+                            <p className="font-semibold text-slate-900">{propertyDetails.units}</p>
                         </div>
                     </div>
                 </CardContent>
