@@ -3,6 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
+
+// Demo URL - uses environment variable in production, localhost in development
+const DEMO_URL = process.env.NEXT_PUBLIC_DEMO_URL || "http://localhost:5173"
 import DocumentationSection from "../components/documentation-section"
 import TestimonialsSection from "../components/testimonials-section"
 import FAQSection from "../components/faq-section"
@@ -509,12 +512,14 @@ export default function LandingPage() {
                       </div>
 
                       {/* Demo iframe */}
-                      <div className="relative w-full" style={{ paddingBottom: '66.67%' }}>
+                      <div className="relative w-full aspect-video md:aspect-[3/2]">
                         <iframe
-                          src="http://localhost:5173"
+                          src={DEMO_URL}
                           className="absolute inset-0 w-full h-full border-0"
-                          title="WasteWise Interactive Demo"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          title="WasteWise Interactive Demo - Explore dashboard features and invoice scanning"
+                          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          loading="lazy"
                         />
                       </div>
                     </div>
@@ -522,9 +527,10 @@ export default function LandingPage() {
                     {/* Demo call-to-action */}
                     <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                       <a
-                        href="http://localhost:5173"
+                        href={DEMO_URL}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label="Open WasteWise demo in new tab (opens in new window)"
                         className="group inline-flex items-center gap-2 px-6 py-3 bg-[#2C5F2D] hover:bg-[#1f4220] text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

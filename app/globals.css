@@ -42,6 +42,9 @@
   --forest-dark: #1f4220;
   --success-green: #22C55E;
   --light-green: #90EE90;
+  --deep-green: #1a4d1c;
+  --bourbon-orange: #FF8C00;
+  --dark-navy: #1f4220;
   /* Updated font variables with explicit fallbacks for deployment */
   --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-instrument-serif: "Instrument Serif", ui-serif, serif;
@@ -87,6 +90,14 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* WasteWise Brand Color Mappings */
+  --color-forest-green: var(--forest-green);
+  --color-forest-dark: var(--forest-dark);
+  --color-success-green: var(--success-green);
+  --color-light-green: var(--light-green);
+  --color-deep-green: var(--deep-green);
+  --color-bourbon-orange: var(--bourbon-orange);
+  --color-dark-navy: var(--dark-navy);
 }
 
 @layer base {
