@@ -1,900 +1,179 @@
-# WasteWise Project Instructions
+# CLAUDE.md
 
-## 🎯 Project Overview
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-WasteWise is a **skills-based SaaS platform** for waste management optimization in multifamily properties. This is NOT a standard template - it contains specific business logic and critical calculation formulas that MUST be preserved.
+## Project Overview
+
+WasteWise is a skills-based SaaS platform for waste management optimization in multifamily properties. It uses AI to extract invoice data, analyze optimization opportunities, research regulatory compliance, and generate comprehensive reports.
 
 **Branding**: "WasteWise by THE Trash Hub" (NEVER "Advantage Waste")
 
-## 🏗️ Architecture
-
-### Skills-Based System
-- **Dynamic module loading**: Request type determines which skill executes at runtime
-- **5 Core Skills**: wastewise-analytics, compactor-optimization, contract-extractor, regulatory-research, batch-extractor
-- **Request Flow**: User Request → Request Analyzer → Skill Selector → Skill Executor → Results
-- **Admin-only modifications**: Skills are fixed for all users; only admins/developers can update
-
-### Technology Stack
-- **Frontend**: Next.js 14 + React 19 + TypeScript + Tailwind CSS + shadcn/ui
-- **Backend**: Supabase (PostgreSQL + Auth + Storage + Edge Functions)
-- **AI Services**: All via Anthropic (Claude Vision for invoices, Claude Sonnet for regulatory)
-- **Reports**: ExcelJS (workbooks) + custom HTML (dashboards)
-- **Testing**: Vitest (unit) + Playwright (E2E) + custom evals framework
-
-### Async Job Architecture
-
-**Problem**: AI operations take 30s-5 minutes, exceeding API route timeouts (10s Vercel, 30s self-hosted)
-
-**Solution**: Background job queue with polling-based status checks
-
-```
-┌─────────────┐       ┌──────────────┐       ┌─────────────┐
-│   Client    │──1──▶ │ POST /api/   │──2──▶ │ analysis_   │
-│  (Browser)  │       │ analyze      │       │ jobs table  │
-│             │       └──────────────┘       └─────────────┘
-│             │              │                      │
-│             │              │ 3. Return job_id     │
-│             │◀─────────────┘                      │
-│             │                                     │
-│             │       ┌──────────────┐              │
-│             │──4──▶ │ GET /api/    │──5──────────▶│
-│             │       │ jobs/[id]    │              │
-│             │       └──────────────┘              │
-│             │              │                      │
-│   Repeat    │◀─────────6───┘                      │
-│  every 2s   │       (status + progress)           │
-│             │                                     │
-│             │       ┌──────────────┐              │
-│             │       │ Background   │──7──────────▶│
-│             │       │ Worker       │              │
-│             │       │ (picks up    │              │
-│             │       │  pending)    │              │
-│             │       └──────────────┘              │
-│             │              │                      │
-│             │              │ 8. Update progress   │
-│             │              └─────────────────────▶│
-│             │                                     │
-│             │              │ 9. Save results      │
-│             │              └─────────────────────▶│
-└─────────────┘                                     └─────────────┘
-```
-
-**Client-Side Pattern**:
-```typescript
-// 1. Start analysis
-const { jobId } = await fetch('/api/analyze', {
-  method: 'POST',
-  body: JSON.stringify({ projectId })
-}).then(r => r.json())
-
-// 2. Poll for status (every 2 seconds)
-const pollStatus = async () => {
-  const job = await fetch(`/api/jobs/${jobId}`).then(r => r.json())
-
-  if (job.status === 'completed') {
-    return job.result_data
-  } else if (job.status === 'failed') {
-    throw new Error(job.error_message)
-  } else {
-    // Still processing - show progress
-    updateProgressBar(job.progress_percent)
-    showCurrentStep(job.current_step)
-    setTimeout(pollStatus, 2000)
-  }
-}
-```
-
-**Backend Pattern**:
-```typescript
-// API Route: Start job
-export async function POST(req: Request) {
-  const { projectId } = await req.json()
-
-  // Create job record
-  const { data: job } = await supabase
-    .from('analysis_jobs')
-    .insert({
-      user_id: userId,
-      project_id: projectId,
-      job_type: 'complete_analysis',
-      status: 'pending',
-      input_data: { projectId }
-    })
-    .select()
-    .single()
-
-  // Background worker will pick this up
-  return Response.json({ jobId: job.id })
-}
-
-// API Route: Check status
-export async function GET(req: Request, { params }) {
-  const { data: job } = await supabase
-    .from('analysis_jobs')
-    .select('*')
-    .eq('id', params.id)
-    .single()
-
-  return Response.json(job)
-}
-```
-
-**Background Worker** (runs in separate process/container):
-```typescript
-// Continuously poll for pending jobs
-while (true) {
-  const { data: jobs } = await supabase
-    .from('analysis_jobs')
-    .select('*')
-    .eq('status', 'pending')
-    .order('created_at', { ascending: true })
-    .limit(1)
-
-  if (jobs.length > 0) {
-    await processJob(jobs[0])
-  }
-
-  await sleep(1000) // Check every second
-}
-
-async function processJob(job: AnalysisJob) {
-  try {
-    // Mark as processing
-    await supabase.rpc('start_analysis_job', { job_id: job.id })
-
-    // Execute skill with progress updates
-    const result = await executeSkill(job.job_type, job.input_data, {
-      onProgress: async (percent, step) => {
-        await supabase.rpc('update_job_progress', {
-          job_id: job.id,
-          new_progress: percent,
-          step_name: step
-        })
-      }
-    })
-
-    // Mark as completed
-    await supabase.rpc('complete_analysis_job', {
-      job_id: job.id,
-      result,
-      ai_usage: { /* token counts, costs */ }
-    })
-  } catch (error) {
-    // Mark as failed (with retry logic)
-    await supabase.rpc('fail_analysis_job', {
-      job_id: job.id,
-      error_msg: error.message,
-      error_cd: error.code
-    })
-  }
-}
-```
-
-**Key Benefits**:
-- ✅ No timeout issues (jobs can run for hours if needed)
-- ✅ Progress tracking (user sees real-time updates)
-- ✅ Error handling (retry logic, failure tracking)
-- ✅ Cost tracking (AI token usage per job)
-- ✅ Scalability (multiple workers can process jobs in parallel)
-
-### Database Schema
-8 core tables: `projects`, `project_files`, `invoice_data`, `haul_log`, `optimizations`, `contract_terms`, `regulatory_compliance`, `ordinance_database`
-
-**CRITICAL TABLE**: `skills_config`
-```sql
-create table skills_config (
-  id uuid primary key default uuid_generate_v4(),
-  skill_name text unique not null,
-  skill_version text not null,
-  conversion_rates jsonb not null,
-  thresholds jsonb not null,
-  enabled boolean default true,
-  last_validated timestamp with time zone
-);
-```
-
-## 🚨 Critical Business Rules (NEVER VIOLATE)
-
-**Formula Reference**: All calculations MUST use formulas from `WASTE_FORMULAS_REFERENCE.md` (v2.0) - the canonical source of truth.
-
-### Non-Negotiable Thresholds
-
-1. **Compactor Optimization**: Average tons/haul < **6.0** (per WASTE_FORMULAS_REFERENCE.md v2.0)
-   - If avg tons < 6.0 AND max interval ≤ 14 days → Recommend monitors
-   - Target optimization: 8.5 tons/haul
-
-2. **Contamination**: > **3%** of total spend
-   - Recommend reduction program if exceeded
-
-3. **Bulk Subscription**: > **$500/month** average
-   - Recommend subscription if average > $500
-
-4. **Lease-up Detection**: > **40%** below benchmark
-   - NO optimization recommendations if property is in lease-up
-
-### Critical Formulas (MUST MATCH PYTHON)
-
-```typescript
-// Yards Per Door - Compactor
-yardsPerDoor = (totalTons * 14.49) / units
-
-// Yards Per Door - Dumpster
-yardsPerDoor = (qty * size * frequency * 4.33) / units
-
-// Cost Per Door
-costPerDoor = monthlyTotal / units
-
-// Capacity Utilization (Compactor)
-utilization = (avgTonsPerHaul / 8.5) * 100  // 8.5 = target tons (industry standard)
-```
-
-### Conversion Rates (MUST BE CONSISTENT)
-
-**CRITICAL**: These MUST be identical across all skills (per WASTE_FORMULAS_REFERENCE.md):
-- **Compactor YPD**: 14.49 (cubic yards per ton: 2000 lbs/ton ÷ 138 lbs/yd³)
-- **Dumpster YPD**: 4.33 (weeks per month constant)
-- **Target compactor capacity**: 8.5 tons (industry standard midpoint of 8-9)
-- **Optimization threshold**: <6.0 tons (canonical per v2.0)
-
-### Formula Reference Protocol
-
-**Single Source of Truth**:
-- **Documentation**: `WASTE_FORMULAS_REFERENCE.md` (version controlled, explains derivations)
-- **Code**: `lib/constants/formulas.ts` (exported constants used by all calculations)
-- **Database**: `skills_config` table (validated on startup, synced with formulas.ts)
-
-**NEVER Hardcode Formula Values**:
-```typescript
-// ❌ WRONG - Hardcoded threshold
-if (avgTons < 6.0) { ... }
-
-// ✅ CORRECT - Import from canonical source
-import { COMPACTOR_OPTIMIZATION_THRESHOLD } from '@/lib/constants/formulas'
-if (avgTons < COMPACTOR_OPTIMIZATION_THRESHOLD) { ... }
-```
-
-**When Formulas Must Change**:
-1. Update `WASTE_FORMULAS_REFERENCE.md` with new value and justification
-2. Update `lib/constants/formulas.ts` with new constant value
-3. Run `FORMULA_CHANGE_CHECKLIST.md` to validate all affected areas
-4. Update database seed data and migrations
-5. Update all agent documentation (orchestrator, backend, skills, testing)
-6. Run full eval suite to ensure calculations still match expected results
-7. Update test fixtures and expected values
-8. Document the change in git commit with clear rationale
-
-**Validation Requirements**:
-- Runtime validation: `validateFormulaConstants()` runs on app startup
-- Test validation: Evals compare TypeScript vs Python reference (<0.01% tolerance)
-- Database validation: Skills config must match formulas.ts values
-- Documentation validation: All agent docs reference formulas.ts, not hardcoded values
-
-### Benchmarks by Property Type
-
-| Property Type | Yards/Door/Week | Cost/Door/Month |
-|---------------|-----------------|-----------------|
-| Garden-Style  | 2.0-2.5         | $15-25          |
-| Mid-Rise      | 1.8-2.3         | $12-22          |
-| High-Rise     | 1.5-2.0         | $10-20          |
-
-## 🤖 Agent-Orchestrated Development
-
-### Development Workflow
-
-This project uses **specialized agents** coordinated by an orchestrator:
-
-1. **Orchestrator Agent**: Coordinates all development, manages branches, validates merges
-2. **Frontend Agent**: UI components, pages, responsiveness (`frontend/*` branches)
-3. **Backend Agent**: API routes, database, AI integrations (`backend/*` branches)
-4. **Skills Agent**: Port Python logic, ensure conversion rate consistency (`skills/*` branches)
-5. **Testing Agent**: Unit tests, E2E tests, evals (`testing/*` branches)
-
-### GitHub Branch Strategy
-
-**Note**: This repository uses `master` as the main branch (not `main`).
-
-```
-master (protected - requires PR + tests + evals)
-├── frontend/landing-rebrand
-├── frontend/auth-ui
-├── frontend/dashboard-shell
-├── frontend/project-wizard
-├── frontend/processing-page
-├── frontend/results-page
-├── backend/initial-schema
-├── backend/auth-setup
-├── backend/claude-vision-extraction
-├── backend/regulatory-research
-├── backend/report-generation
-├── skills/core-system
-├── skills/router-executor
-├── skills/[skill-name]
-├── testing/framework-setup
-└── testing/comprehensive-suite
-```
-
-### Merge Protocol
-
-1. Agent creates feature branch
-2. Agent commits work
-3. Agent opens PR to main (template auto-fills from `.github/PULL_REQUEST_TEMPLATE.md`)
-4. **Complete ALL PR checklist items**:
-   - Type of change specified
-   - Related phase checked
-   - Testing completed (unit, TypeScript, lint)
-   - **Formula validation** (if calculations changed - CRITICAL!)
-   - Database changes documented (if schema changed)
-   - Code quality checks passed
-   - WasteWise-specific validations (container types, conversion rates)
-   - Agent context specified
-5. **Automated checks** run (once GitHub Actions configured):
-   - Unit tests pass (`pnpm test`)
-   - TypeScript compiles (`pnpm tsc --noEmit`)
-   - Linting passes (`pnpm lint`)
-   - **Evals pass** (calculations match Python within 0.01%)
-   - **Conversion rates validated** (must match reference)
-6. Self-review or orchestrator reviews
-7. Merge to master
-
-**Git Workflow Documentation**: See `docs/git/` for complete workflow guides:
-- `GIT_QUICK_REFERENCE.md` - Daily workflow cheatsheet
-- `GIT_VISUAL_WORKFLOW.md` - Visual diagrams and examples
-
-## 🔧 MCP Integration
-
-### Chrome DevTools MCP
-- **Purpose**: Front-end debugging and performance validation
-- **Usage**: Validate responsiveness, check console errors, profile performance
-- **Install**: `npm install -g chrome-devtools-mcp`
-- **Config**: Added to `.claude/mcp-servers.json`
-
-### When to Use Chrome MCP
-- Debugging UI layout issues
-- Validating mobile responsiveness
-- Performance profiling (Lighthouse audits)
-- Checking for console errors
-- Automated browser testing
-
-## 📝 Code Quality Standards
-
-### Modularity
-- **Max 500 lines per file**
-- **Single responsibility** per function/component
-- **Clear, descriptive names** (no abbreviations unless industry-standard)
-
-### Testing
-- **TDD approach**: Write tests before implementation
-- **Evals for calculations**: Every calculation must match Python reference
-- **E2E for workflows**: Complete user flows tested end-to-end
-- **Performance tests**: Lighthouse score >90
-
-### Documentation
-- **Comment complex logic** with "why" not "what"
-- **Use file:line references** when discussing code
-- **Keep README updated** with setup instructions
-
-### Error Handling
-- **Meaningful error messages** for users
-- **Graceful failures** - never crash silently
-- **Retry logic** for API calls (max 3 attempts)
-- **Log errors** for debugging
-
-## 🔍 Quality Gates & Validation (MANDATORY)
-
-**Added**: 2025-11-14 after Phase 3 critical fixes
-
-**Purpose**: Prevent runtime failures by catching schema/type mismatches at development time
-
-**See**: `.claude/quality-checklist.md` for complete validation steps
-
-### Pre-Development Validation (REQUIRED)
-
-**BEFORE writing code, ALWAYS**:
-1. ✅ Read database schema in `supabase/migrations/` for exact constraints
-2. ✅ Read API contracts in `app/api/` for response shapes
-3. ✅ Import types from `lib/skills/types.ts` (never redefine)
-4. ✅ Import constants from `lib/constants/formulas.ts` (never hardcode)
-
-### Agent-Based Development (MANDATORY)
-
-**ALL development MUST use specialized agents** - Never make changes directly.
-
-**Agent Selection**:
-- **Frontend changes** → Use `frontend-dev` agent
-- **Backend changes** → Use `backend-dev` agent
-- **Before ANY commit** → Use `code-analyzer` agent (validates schema, types, API contracts)
-- **Complex tasks** → Use `planner` agent first
-
-### Common Pitfalls & Solutions
-
-#### 1. Schema Mismatch ⚠️ CRITICAL
-**Problem**: Form values don't match database CHECK constraints → 100% INSERT failures
-
-❌ **WRONG**:
-```typescript
-property_type: 'multifamily'  // Database expects 'Garden-Style'
-equipment_type: 'compactor'   // Database expects 'COMPACTOR' (uppercase)
-status: 'active'              // Database expects 'draft'
-```
-
-✅ **CORRECT**:
-```typescript
-// Read supabase/migrations/*.sql FIRST
-property_type: 'Garden-Style'  // Exact match to CHECK constraint
-equipment_type: 'COMPACTOR'    // Exact case match
-status: 'draft'                // Valid enum value
-```
-
-#### 2. API Shape Mismatch ⚠️ CRITICAL
-**Problem**: Component expects snake_case, API returns camelCase → SWR breaks
-
-❌ **WRONG**:
-```typescript
-interface Job {
-  job_type: string           // API returns jobType
-  progress_percent: number   // API returns progress.percent
-}
-```
-
-✅ **CORRECT**:
-```typescript
-interface Job {
-  jobType: string            // Matches API response
-  progress: {
-    percent: number          // Nested as API provides
-  }
-}
-```
-
-#### 3. Duplicate Type Definitions ⚠️ HIGH
-**Problem**: Redefining types causes field mismatches
-
-❌ **WRONG**:
-```typescript
-interface CompactorResult {
-  dsqMonitorCost?: { install: number }  // Skill doesn't return this
-}
-```
-
-✅ **CORRECT**:
-```typescript
-import type { CompactorOptimizationResult } from '@/lib/skills/types'
-import { DSQ_MONITOR_INSTALL } from '@/lib/constants/formulas'
-
-// Use imported types and constants
-const cost = DSQ_MONITOR_INSTALL
-```
-
-### Mandatory Build Checks
-
-#### Pre-Commit (MUST PASS)
-```bash
-# All must pass with 0 errors
-pnpm tsc --noEmit      # TypeScript validation
-pnpm lint              # ESLint
-pnpm test:unit         # Unit tests
-```
-
-#### Never Use
-```typescript
-// ❌ CRITICAL - These hide errors
-typescript: { ignoreBuildErrors: true }
-eslint: { ignoreDuringBuilds: true }
-```
-
-### Validation Workflow
-
-```
-┌─────────────────┐
-│ Start Feature   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Read Schema &   │  ← MANDATORY FIRST STEP
-│ API Contracts   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Use Agent       │  ← Frontend/Backend/Skills
-│ (Not Direct)    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Code Analyzer   │  ← BEFORE COMMIT
-│ Agent Review    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ tsc --noEmit    │  ← MUST PASS
-│ (0 errors)      │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Commit          │
-└─────────────────┘
-```
-
-### Phased Quality Enforcement (NEW - Phase 1.5)
-
-**Philosophy**: Start light, add rigor progressively as codebase matures.
-
-**Phase 1.5 (Foundation - Current)**:
-- ✅ Core types defined (Skill interface, SkillContext, SkillResult)
-- ✅ Base skill class with common functionality
-- ✅ Structured logging (logger)
-- ✅ Standardized error types (AppError hierarchy)
-- ✅ Basic metrics tracking (in-memory)
-- ✅ Async job infrastructure (analysis_jobs table)
-- ⏸️ **Not enforced yet**: Strict type coverage, 100% test coverage, mandatory evals
-
-**Phase 2 (Implementation)**:
-- Implement concrete skills using BaseSkill class
-- Use logger and error types consistently
-- Track metrics for skill executions
-- Begin writing unit tests (no coverage requirements yet)
-
-**Phase 3 (Validation)**:
-- Run evals on completed skills
-- Fix calculation discrepancies
-- Add integration tests for API routes
-- Enforce <0.01% deviation tolerance
-
-**Phase 4 (Production Readiness)**:
-- ✅ 100% test coverage for calculations
-- ✅ All evals passing
-- ✅ Lighthouse score >90
-- ✅ Security audit complete
-- ✅ Error handling comprehensive
-- ✅ Monitoring integrated (replace console with service)
-
-**Current Expectations (Phase 1.5)**:
-- **DO**: Use provided types and base classes when creating new skills
-- **DO**: Use logger for important events (errors, job progress)
-- **DO**: Use standardized error types in API routes
-- **DO**: Track metrics for AI usage and execution time
-- **DON'T**: Worry about perfect test coverage yet
-- **DON'T**: Block on missing evals (write placeholder tests)
-- **DON'T**: Over-engineer observability (console logging is fine for now)
-
-**Example of Gradual Adoption**:
-
-```typescript
-// Phase 1.5: Basic implementation with new infrastructure
-import { BaseSkill } from '@/lib/skills/base-skill'
-import { logger } from '@/lib/observability/logger'
-import { metrics } from '@/lib/observability/metrics'
-import type { SkillContext, SkillResult } from '@/lib/skills/types'
-
-export class MySkill extends BaseSkill<MyResult> {
-  readonly name = 'my-skill'
-  readonly version = '1.0.0'
-  readonly description = 'Example skill'
-
-  protected async executeInternal(context: SkillContext): Promise<MyResult> {
-    // Use logger for key events
-    logger.info('Starting skill execution', { skillName: this.name, projectId: context.projectId })
-
-    // Track metrics
-    const timerId = metrics.startTimer('skill.my-skill.execution')
-
-    try {
-      // ... business logic here ...
-
-      const result = { /* ... */ }
-
-      metrics.stopTimer(timerId)
-      metrics.increment('skill.my-skill.success')
-
-      return result
-    } catch (error) {
-      metrics.stopTimer(timerId)
-      metrics.increment('skill.my-skill.failed')
-
-      logger.error('Skill execution failed', error as Error, { skillName: this.name })
-      throw error
-    }
-  }
-}
-
-// Phase 2: Add proper validation
-async validate(context: SkillContext): Promise<ValidationResult> {
-  // ... add skill-specific validation ...
-}
-
-// Phase 3: Add comprehensive tests and evals
-// __tests__/skills/my-skill.test.ts
-// lib/evals/my-skill-eval.ts
-
-// Phase 4: Production hardening
-// - Add performance monitoring
-// - Integrate with error tracking service (Sentry)
-// - Add rate limiting
-// - Security audit
-```
-
-**Benefits of This Approach**:
-- ✅ Move fast without being blocked by testing requirements
-- ✅ Build good patterns from the start (types, errors, logging)
-- ✅ Avoid technical debt (structured foundation in place)
-- ✅ Can tighten enforcement later (types already exist)
-- ✅ Focus on business logic first (UX and calculations)
-
-## 🧪 Testing & Validation
-
-### Test Coverage Requirements
-- **Unit tests**: 100% coverage for calculations
-- **Integration tests**: All API routes
-- **E2E tests**: Complete workflows (signup → analysis → download)
-
-### Evals Framework
-
-**Purpose**: Validate TypeScript calculations match Python reference
-
-```typescript
-// lib/evals/calculation-evals.ts
-
-// Compare TypeScript output vs Python reference
-export async function evaluateCompactorOptimization(
-  input: CompactorData,
-  expectedOutput: OptimizationResult
-): Promise<EvalResult> {
-  const tsResult = await calculateCompactorOptimization(input);
-  const tolerance = 0.0001; // 0.01% tolerance
-
-  return {
-    pass: Math.abs(tsResult.savings - expectedOutput.savings) < tolerance,
-    tsValue: tsResult.savings,
-    pythonValue: expectedOutput.savings,
-    difference: tsResult.savings - expectedOutput.savings
-  };
-}
-```
-
-**Run Before Every Merge**:
-- All evals must pass
-- Conversion rates must match
-- No deviation >0.01%
-
-### Continuous Validation
-
-**Pre-merge checks** (automated in CI/CD):
-```yaml
-# .github/workflows/validate-merge.yml
-- Run unit tests
-- Run integration tests
-- Run calculation evals
-- Validate conversion rates
-- Check Lighthouse score >90
-- Block merge if any fail
-```
-
-## 📦 File Structure
-
-```
-wastewise-saas/
-├── .claude/
-│   ├── CLAUDE.md (this file)
-│   ├── agents/
-│   │   ├── orchestrator.md
-│   │   ├── frontend-agent.md
-│   │   ├── backend-agent.md
-│   │   ├── skills-agent.md
-│   │   └── testing-agent.md
-│   └── mcp-servers.json
-├── app/
-│   ├── (auth)/
-│   │   ├── login/
-│   │   ├── signup/
-│   │   └── forgot-password/
-│   ├── dashboard/
-│   ├── projects/
-│   │   ├── new/
-│   │   ├── [id]/
-│   │   │   ├── processing/
-│   │   │   └── results/
-│   ├── settings/
-│   ├── pricing/
-│   ├── api/
-│   │   ├── projects/
-│   │   ├── extract-invoices/
-│   │   ├── analyze-optimizations/
-│   │   ├── regulatory-research/
-│   │   └── generate-reports/
-│   ├── layout.tsx
-│   └── page.tsx (landing)
-├── components/
-│   ├── ui/ (shadcn components)
-│   ├── auth/
-│   ├── dashboard/
-│   ├── wizard/
-│   ├── processing/
-│   ├── results/
-│   └── charts/
-├── lib/
-│   ├── skills/
-│   │   ├── registry.ts
-│   │   ├── executor.ts
-│   │   ├── analyzer.ts
-│   │   ├── validator.ts
-│   │   └── skills/
-│   │       ├── wastewise-analytics.ts
-│   │       ├── compactor-optimization.ts
-│   │       ├── contract-extractor.ts
-│   │       ├── regulatory-research.ts
-│   │       └── batch-extractor.ts
-│   ├── calculations/
-│   │   ├── compactor-optimization.ts
-│   │   ├── yards-per-door.ts
-│   │   └── benchmarks.ts
-│   ├── ai/
-│   │   ├── anthropic-client.ts
-│   │   ├── invoice-extractor.ts
-│   │   └── ordinance-extractor.ts
-│   ├── reports/
-│   │   ├── excel-generator.ts
-│   │   └── html-generator.ts
-│   ├── evals/
-│   │   ├── calculation-evals.ts
-│   │   └── test-data/
-│   ├── supabase/
-│   │   ├── client.ts
-│   │   └── server.ts
-│   ├── validations/
-│   │   └── schemas.ts
-│   └── utils/
-│       └── formatting.ts
-├── supabase/
-│   ├── migrations/
-│   │   └── 00001_initial_schema.sql
-│   └── seed.sql
-├── __tests__/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-├── waste-skills-complete/ (Python reference implementations)
-├── .env.local (git-ignored)
-├── .env.template
-└── package.json
-```
-
-## 🔐 Environment Variables
-
-```bash
-# .env.local (never commit)
-
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_KEY=
-
-# AI Services (all Anthropic)
-ANTHROPIC_API_KEY=
-
-# Search (TBD: Exa, Tavily, or cache-first)
-SEARCH_API_KEY=
-
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NODE_ENV=development
-```
-
-## 🚀 Quick Commands
+## Commands
 
 ```bash
 # Development
-pnpm dev                    # Start dev server
-pnpm test                   # Run all tests
-pnpm test:unit              # Unit tests only
-pnpm test:e2e               # E2E tests only
-pnpm eval                   # Run calculation evals
+pnpm dev                # Start Next.js dev server (http://localhost:3000)
+pnpm worker             # Start background job worker (separate terminal)
+
+# Testing
+pnpm test               # Run all Vitest tests
+pnpm test:unit          # Unit tests only (skills, calculations)
+pnpm test:integration   # Integration tests only
+pnpm test:watch         # Watch mode
+pnpm test:e2e           # Run E2E tests with Puppeteer
+pnpm test:ui            # Run E2E with visible browser
+
+# Build & Lint
+pnpm build              # Production build
+pnpm lint               # ESLint
+pnpm tsc --noEmit       # TypeScript validation (0 errors required)
 
 # Database (Supabase CLI)
-supabase start              # Start local Supabase
-supabase db reset           # Reset database
+supabase start          # Start local Supabase
+supabase db reset       # Reset database
 supabase migration new [name]  # Create migration
 
-# Git Workflow (Agent-based)
-git checkout -b frontend/feature-name
-# ... make changes ...
-git add .
-git commit -m "feat(frontend): add feature"
-git push origin frontend/feature-name
-# Create PR, wait for checks, merge
+# Data Seeding
+pnpm seed               # Seed test project with sample data
 ```
 
-## 📊 Success Metrics
+## Architecture
 
-**Calculation Accuracy**:
-- All formulas match Python reference within 0.01%
-- Conversion rates consistent across all skills
-- Evals pass on every commit
+### Skills-Based System
+Request type determines which skill executes at runtime:
+- **wastewise-analytics**: Full analysis orchestrator
+- **compactor-optimization**: Compactor monitoring recommendations
+- **contract-extractor**: Contract term extraction via Claude Vision
+- **batch-extractor**: Invoice/haul log extraction via Claude Vision
+- **regulatory-research**: Municipal ordinance research
 
-**Performance**:
-- Lighthouse score >90
-- Page load time <2s
-- Mobile responsive (375px-1440px)
+Skills are located in `lib/skills/skills/` and implement the `Skill` interface from `lib/skills/types.ts`.
 
-**Code Quality**:
-- 100% test coverage for calculations
-- No console errors
-- All linters passing
-- TypeScript strict mode
+### Async Job Architecture
+AI operations exceed API route timeouts (10s Vercel, 30s self-hosted), so we use:
+1. **API creates job** → `POST /api/analyze` inserts into `analysis_jobs` table
+2. **Client polls status** → `GET /api/jobs/[id]` every 2 seconds
+3. **Worker processes** → `pnpm worker` picks up pending jobs and executes skills
+4. **Progress updates** → Worker calls `onProgress` callback to update job status
 
-**User Experience**:
-- Complete workflow: signup → create → process → results → download
-- Processing time: <5 minutes
-- Download both reports (Excel + HTML) successfully
-- Reports match exact specifications from template
+### Key Directories
+- `app/api/` - API routes (Next.js App Router)
+- `lib/skills/` - Skill system (types, registry, executor, implementations)
+- `lib/constants/formulas.ts` - **CANONICAL** calculation constants (never hardcode values)
+- `lib/reports/` - Excel and HTML report generation
+- `lib/workers/` - Background job processor
+- `supabase/migrations/` - Database schema (CHECK constraints define valid enum values)
 
-## 🎯 Current Phase
+## Critical Business Rules
 
-**Phase**: 7 - Integration Testing & Production Deployment
-**Status**: In Progress (85% Complete)
-**Started**: 2025-11-17
+### Formula Constants (from `lib/constants/formulas.ts`)
+**NEVER hardcode these values - always import from formulas.ts:**
+- `TONS_TO_YARDS = 14.49` - cubic yards per ton
+- `WEEKS_PER_MONTH = 4.33` - industry standard
+- `COMPACTOR_OPTIMIZATION_THRESHOLD = 6.0` - recommend monitors if avg tons/haul < 6.0
+- `COMPACTOR_TARGET_TONS = 8.5` - target capacity
+- `CONTAMINATION_THRESHOLD_PCT = 0.03` - 3% of spend triggers recommendation
+- `BULK_SUBSCRIPTION_THRESHOLD = 500` - $500/month triggers subscription recommendation
 
-### Completed Phases (0-6)
-- ✅ **Phase 0**: Foundation (Next.js, Supabase, Auth)
-- ✅ **Phase 1**: Core Infrastructure (Error handling, logging, database schema)
-- ✅ **Phase 2.1**: Compactor Optimization Vertical Slice
-- ✅ **Phase 2.2**: API Endpoints with rate limiting
-- ✅ **Phase 3-5**: Report generation, async jobs, workers
-- ✅ **Phase 6**: Complete Analytics Integration (Excel/HTML reports, frontend results page)
+### Key Formulas
+```typescript
+// Yards per door (compactor): (total_tons × 14.49) / units
+import { calculateCompactorYardsPerDoor } from '@/lib/constants/formulas'
 
-### Phase 7 Progress
-**Goal**: Validate entire system through integration testing and prepare for production deployment
+// Yards per door (dumpster): (qty × size × freq × 4.33) / units
+import { calculateDumpsterYardsPerDoor } from '@/lib/constants/formulas'
 
-**Completed**:
-- ✅ Worker startup validation (environment checks)
-- ✅ Test data seed script (test user, 250-unit property, 6 invoices, 22 haul logs)
-- ✅ All systems running (Supabase, dev server, worker)
-- ✅ Automated test framework setup
+// Recommend compactor monitors if:
+// avgTonsPerHaul < 6.0 AND maxDaysBetween <= 14 AND hasCompactor
+import { shouldRecommendMonitoring } from '@/lib/constants/formulas'
+```
 
-**In Progress**:
-- 🔄 Manual E2E workflow testing (login → analyze → results → download)
-- ⏳ API endpoint integration tests
-- ⏳ Frontend responsiveness validation
-- ⏳ Performance & load testing
+### Database Schema Constraints
+Read `supabase/migrations/*.sql` before writing code - forms must match CHECK constraints exactly:
+```sql
+-- property_type: 'Garden-Style' | 'Mid-Rise' | 'High-Rise' (exact case)
+-- equipment_type: 'COMPACTOR' | 'DUMPSTER' | 'OPEN_TOP' (uppercase)
+-- status: 'draft' | 'processing' | 'completed' | 'failed'
+```
 
-**Remaining**:
-- Security validation (auth, RLS, input validation)
-- Production deployment configuration
-- Monitoring & health checks setup
-- Documentation (API docs, deployment guide)
+## Development Workflow
+
+### Before Writing Code
+1. Read database schema in `supabase/migrations/` for exact constraints
+2. Read API contracts in `app/api/` for response shapes
+3. Import types from `lib/skills/types.ts` (never redefine)
+4. Import constants from `lib/constants/formulas.ts` (never hardcode)
+
+### Pre-Commit Validation (MUST PASS)
+```bash
+pnpm tsc --noEmit      # 0 type errors
+pnpm lint              # 0 lint errors
+pnpm test:unit         # All tests pass
+```
+
+### Common Pitfalls
+1. **Schema mismatch**: Form values don't match DB CHECK constraints → 100% INSERT failures
+2. **Case sensitivity**: `'compactor'` vs `'COMPACTOR'` - check migrations
+3. **API shape mismatch**: Component expects snake_case but API returns camelCase
+4. **Duplicate types**: Redefining types instead of importing from `lib/skills/types.ts`
+
+## Testing
+
+### Test Structure
+- `__tests__/skills/` - Skill unit tests
+- `__tests__/calculations/` - Formula calculation tests
+- `__tests__/integration/` - API route integration tests
+- `scripts/test-e2e.ts` - End-to-end workflow tests
 
 ### Test Credentials (Local Development)
-```bash
-# Test User
+```
 Email: test@wastewise.local
 Password: TestPassword123!
-
-# Test Project
-ID: d82e2314-7ccf-404e-a133-0caebb154c7e
-Name: Riverside Gardens Apartments
-Units: 250 units
-Equipment: COMPACTOR
-Location: Austin, TX
-Data: 6 invoices (Jan-Jun 2025), 22 haul log entries
+Test Project ID: d82e2314-7ccf-404e-a133-0caebb154c7e
 ```
 
-### Production Readiness: 85%
-- ✅ Complete end-to-end workflow implemented
-- ✅ Real Excel and HTML report generation
-- ✅ Async job processing with background workers
-- ✅ Frontend results page with downloads
-- ✅ Database migrations and RPC functions
-- ⏳ Comprehensive integration testing needed
-- ⏳ Production deployment configuration needed
-- ⏳ Monitoring and health checks needed
+### Evals Framework
+TypeScript calculations must match Python reference within 0.01% tolerance. See `lib/evals/` for validation tests.
 
-**Next Phase**: Phase 8 - Production Launch & User Feedback
+## Git Workflow
 
----
+**Main branch**: `master` (not `main`)
 
-**Last Updated**: 2025-11-18
-**Version**: 7.0.0
-**Maintained By**: Orchestrator Agent
+**Branch naming**: `{agent}/{feature}` (e.g., `frontend/auth-ui`, `backend/report-generation`)
+
+**Commit message format**:
+```
+feat(scope): add feature
+fix(scope): fix bug
+docs(scope): update documentation
+```
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local`:
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_KEY=
+ANTHROPIC_API_KEY=
+```
+
+## Key Types
+
+All skill implementations must use types from `lib/skills/types.ts`:
+- `Skill<TResult>` - Core skill interface
+- `SkillContext` - Execution context with project data
+- `SkillResult<TData>` - Standardized result shape
+- `CompactorOptimizationResult` - Compactor analysis output
+- `WasteWiseAnalyticsCompleteResult` - Full analysis output
+
+## Report Generation
+
+Reports are generated in `lib/reports/`:
+- `excel-generator.ts` - 8-tab Excel workbook (ExcelJS)
+- `html-generator.ts` - 6-tab interactive HTML dashboard
+- Reports are stored in Supabase Storage under `reports/{projectId}/`
+
+Excel tabs: SUMMARY, SUMMARY_FULL, EXPENSE_ANALYSIS, HAUL_LOG, OPTIMIZATION, CONTRACT_TERMS, REGULATORY_COMPLIANCE, INSTRUCTIONS
+
+HTML tabs: Dashboard, Expense Analysis, Haul Log, Optimization, Contract Terms, Regulatory Compliance
