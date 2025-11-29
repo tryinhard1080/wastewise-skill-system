@@ -19,6 +19,7 @@ import {
   transformOptimizations,
   transformBudgetData
 } from '@/lib/transformers/dashboard-data'
+import type { Database } from '@/types/database.types'
 
 interface ProjectDetailPageProps {
   params: {
@@ -26,8 +27,10 @@ interface ProjectDetailPageProps {
   }
 }
 
+type AnalysisJobRow = Database['public']['Tables']['analysis_jobs']['Row']
+
 // Transform database jobs to API format
-function transformJobsForDisplay(jobs: any[]) {
+function transformJobsForDisplay(jobs: AnalysisJobRow[]) {
   return jobs.map((job) => ({
     id: job.id,
     projectId: job.project_id,

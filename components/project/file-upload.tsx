@@ -14,7 +14,6 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import {
-  FileText,
   Upload,
   X,
   CheckCircle2,
@@ -62,97 +61,100 @@ export function FileUpload({
   const storageBucket =
     process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'project-files'
 
-  const uploadFile = async (file: File) => {
-    const fileId = `${file.name}-${Date.now()}`
+  const uploadFile = useCallback(
+    async (file: File) => {
+      const fileId = `${file.name}-${Date.now()}`
 
-    // Initialize upload status
-    setUploadingFiles((prev) => {
-      const next = new Map(prev)
-      next.set(fileId, {
-        file,
-        progress: 0,
-        status: 'uploading',
-      })
-      return next
-    })
-
-    try {
-      // Upload to Supabase Storage
-      const storagePath = `projects/${projectId}/${fileType}/${file.name}`
-
-      const { error: uploadError } = await supabase.storage
-        .from(storageBucket)
-        .upload(storagePath, file, {
-          cacheControl: '3600',
-          upsert: false,
+      // Initialize upload status
+      setUploadingFiles((prev) => {
+        const next = new Map(prev)
+        next.set(fileId, {
+          file,
+          progress: 0,
+          status: 'uploading',
         })
-
-      if (uploadError) {
-        throw uploadError
-      }
-
-      // Update progress
-      setUploadingFiles((prev) => {
-        const next = new Map(prev)
-        const current = next.get(fileId)
-        if (current) {
-          next.set(fileId, { ...current, progress: 50 })
-        }
         return next
       })
 
-      // Create database record
-      const { error: dbError } = await supabase.from('project_files').insert({
-        project_id: projectId,
-        file_name: file.name,
-        file_type: fileType,
-        storage_path: storagePath,
-        mime_type: file.type,
-        file_size: file.size,
-        processing_status: 'pending',
-      })
+      try {
+        // Upload to Supabase Storage
+        const storagePath = `projects/${projectId}/${fileType}/${file.name}`
 
-      if (dbError) {
-        throw dbError
-      }
+        const { error: uploadError } = await supabase.storage
+          .from(storageBucket)
+          .upload(storagePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+          })
 
-      // Mark as complete
-      setUploadingFiles((prev) => {
-        const next = new Map(prev)
-        const current = next.get(fileId)
-        if (current) {
-          next.set(fileId, { ...current, progress: 100, status: 'success' })
+        if (uploadError) {
+          throw uploadError
         }
-        return next
-      })
 
-      // Auto-remove after 3 seconds
-      setTimeout(() => {
+        // Update progress
         setUploadingFiles((prev) => {
           const next = new Map(prev)
-          next.delete(fileId)
+          const current = next.get(fileId)
+          if (current) {
+            next.set(fileId, { ...current, progress: 50 })
+          }
           return next
         })
-      }, 3000)
 
-      onUploadComplete?.()
-    } catch (error) {
-      console.error('Upload error:', error)
-      setUploadingFiles((prev) => {
-        const next = new Map(prev)
-        const current = next.get(fileId)
-        if (current) {
-          next.set(fileId, {
-            ...current,
-            status: 'error',
-            error:
-              error instanceof Error ? error.message : 'Failed to upload file',
-          })
+        // Create database record
+        const { error: dbError } = await supabase.from('project_files').insert({
+          project_id: projectId,
+          file_name: file.name,
+          file_type: fileType,
+          storage_path: storagePath,
+          mime_type: file.type,
+          file_size: file.size,
+          processing_status: 'pending',
+        })
+
+        if (dbError) {
+          throw dbError
         }
-        return next
-      })
-    }
-  }
+
+        // Mark as complete
+        setUploadingFiles((prev) => {
+          const next = new Map(prev)
+          const current = next.get(fileId)
+          if (current) {
+            next.set(fileId, { ...current, progress: 100, status: 'success' })
+          }
+          return next
+        })
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+          setUploadingFiles((prev) => {
+            const next = new Map(prev)
+            next.delete(fileId)
+            return next
+          })
+        }, 3000)
+
+        onUploadComplete?.()
+      } catch (error) {
+        console.error('Upload error:', error)
+        setUploadingFiles((prev) => {
+          const next = new Map(prev)
+          const current = next.get(fileId)
+          if (current) {
+            next.set(fileId, {
+              ...current,
+              status: 'error',
+              error:
+                error instanceof Error ? error.message : 'Failed to upload file',
+            })
+          }
+          return next
+        })
+      }
+    },
+    [fileType, onUploadComplete, projectId, storageBucket, supabase]
+  )
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -167,7 +169,7 @@ export function FileUpload({
         await uploadFile(file)
       }
     },
-    [uploadingFiles.size, maxFiles]
+    [maxFiles, uploadFile, uploadingFiles.size]
   )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

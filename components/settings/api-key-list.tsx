@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Copy, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -36,6 +36,7 @@ export function ApiKeyList({ onApiKeyCreated }: { onApiKeyCreated: () => void })
       const data = await response.json()
       setApiKeys(data.apiKeys || [])
     } catch (error) {
+      console.error('Failed to load API keys:', error)
       toast.error('Failed to load API keys')
     } finally {
       setIsLoading(false)
@@ -47,6 +48,7 @@ export function ApiKeyList({ onApiKeyCreated }: { onApiKeyCreated: () => void })
       await navigator.clipboard.writeText(text)
       toast.success('API key copied to clipboard')
     } catch (error) {
+      console.error('Failed to copy API key:', error)
       toast.error('Failed to copy API key')
     }
   }
@@ -60,6 +62,7 @@ export function ApiKeyList({ onApiKeyCreated }: { onApiKeyCreated: () => void })
       toast.success('API key regenerated')
       fetchApiKeys()
     } catch (error) {
+      console.error('Failed to regenerate API key:', error)
       toast.error('Failed to regenerate API key')
     }
   }
@@ -73,6 +76,7 @@ export function ApiKeyList({ onApiKeyCreated }: { onApiKeyCreated: () => void })
       toast.success('API key deleted')
       fetchApiKeys()
     } catch (error) {
+      console.error('Failed to delete API key:', error)
       toast.error('Failed to delete API key')
     }
   }
@@ -95,7 +99,7 @@ export function ApiKeyList({ onApiKeyCreated }: { onApiKeyCreated: () => void })
     return (
       <div className="text-center py-8">
         <div className="text-sm text-muted-foreground">
-          You haven't created any API keys yet
+          You haven&apos;t created any API keys yet
         </div>
         <p className="text-xs text-muted-foreground mt-1">
           Create an API key to get started with programmatic access

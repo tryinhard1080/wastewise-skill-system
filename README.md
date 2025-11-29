@@ -1,7 +1,71 @@
-WasteWise Complete Suite Agent
-==============================
+# WasteWise - AI-Powered Waste Management Optimization Platform
 
-This agent codifies the WasteWise Complete Suite protocol to deliver consistent, expert-grade waste consulting outputs. It works from property data, invoices, and contracts to produce an Excel workbook (8 tabs) and an HTML dashboard (6 tabs), along with a concise executive summary.
+**Version**: 2.0  
+**Status**: Production Ready (94%)  
+**Last Updated**: 2025-11-29
+
+> Transform waste management from cost center to competitive advantage with AI-powered analysis, regulatory compliance, and actionable insights.
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/wastewise.git
+cd wastewise
+
+# Install dependencies
+pnpm install
+
+# Set up environment
+cp .env.example .env.local
+# Edit .env.local with your keys
+
+# Start development server
+pnpm dev
+
+# Run background worker (separate terminal)
+pnpm worker
+```
+
+Visit **http://localhost:3000** to start analyzing waste!
+
+---
+
+## ✨ Features
+
+### Core Analysis Engine
+- **AI-Powered Invoice Extraction** - Upload CSV, PDF, or Excel invoices for automatic data extraction
+- **Smart Optimization Recommendations** - Compactor monitoring, service level adjustments, contamination reduction
+- **Regulatory Compliance Checking** - Automatic municipal ordinance research and compliance assessment
+- **Contract Analysis** - Extract terms, risks, and renewal dates from waste contracts
+- **Comprehensive Reporting** - Generate Excel workbooks (8 tabs) and interactive HTML dashboards (6 tabs)
+
+### User Features
+- **Multi-Project Management** - Organize analyses by property
+- **Real-Time Progress Tracking** - Monitor analysis jobs with live updates
+- **User Account Management** - Profile, security settings, notifications
+- **API Key Management** - Programmatic access with secure key generation
+- **Report Downloads** - Excel and HTML reports with detailed insights
+
+### Technical Capabilities
+- **5 Specialized AI Skills** - Modular architecture for extensibility
+- **Async Job Processing** - Background workers for long-running tasks
+- **Database-Backed** - PostgreSQL via Supabase with RLS
+- **Type-Safe** - Full TypeScript with Zod validation
+- **Tested** - 66 unit tests, comprehensive E2E coverage
+
+---
+
+## 📚 Documentation
+
+- **[Deployment Guide](PRODUCTION_DEPLOYMENT_GUIDE.md)** - Complete production deployment instructions
+- **[Phase 9.2 Summary](PHASE_9.2_SETTINGS_COMPLETE.md)** - Latest features and updates
+- **[API Integration](API_INTEGRATION_STATUS.md)** - API documentation
+- **[Testing Guide](docs/TESTING.md)** - Test suite and procedures
+
+This agent codifies the WasteWise Complete Suite protocol to deliver consistent, expert-grade waste consulting outputs.
 
 Workflow
 --------

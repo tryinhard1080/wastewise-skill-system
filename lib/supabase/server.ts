@@ -30,7 +30,7 @@ import { cookies } from 'next/headers'
 import { Database } from '@/types/database.types'
 
 export async function createClient() {
-  let cookieStore: any
+  let cookieStore: ReturnType<typeof cookies> | undefined
 
   try {
     cookieStore = await cookies()

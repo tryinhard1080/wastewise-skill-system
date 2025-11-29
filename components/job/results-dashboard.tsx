@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   TrendingDown,
   DollarSign,
@@ -32,31 +31,54 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
 } from 'recharts'
 
 interface ResultsDashboardProps {
-  results: CompactorOptimizationResult | any
+  results: unknown
   jobType: string
-  project: any
 }
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
+function isCompactorOptimizationResult(
+  results: unknown,
+): results is CompactorOptimizationResult {
+  if (!results || typeof results !== 'object') return false
+  return (
+    'avgTonsPerHaul' in results &&
+    'targetTonsPerHaul' in results &&
+    'netYear1Savings' in results
+  )
+}
 
 export function ResultsDashboard({
   results,
   jobType,
-  project,
 }: ResultsDashboardProps) {
   // Handle different job types
+  if (
+    (jobType === 'complete_analysis' || jobType.includes('compactor')) &&
+    isCompactorOptimizationResult(results)
+  ) {
+    return <CompactorOptimizationDashboard results={results} />
+  }
+
   if (jobType === 'complete_analysis' || jobType.includes('compactor')) {
-    return <CompactorOptimizationDashboard results={results} project={project} />
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Analysis Results</CardTitle>
+          <CardDescription>
+            Compactor optimization results are unavailable for this job.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            We could not parse compactor optimization metrics from the job output.
+            Please retry the analysis or contact support if the issue persists.
+          </p>
+        </CardContent>
+      </Card>
+    )
   }
 
   // Default generic results display
@@ -79,10 +101,8 @@ export function ResultsDashboard({
 
 function CompactorOptimizationDashboard({
   results,
-  project,
 }: {
   results: CompactorOptimizationResult
-  project: any
 }) {
   // Prepare chart data
   const performanceData = [

@@ -25,12 +25,17 @@ import {
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { ResultsDashboard } from '@/components/job/results-dashboard'
+import type { Database } from '@/types/database.types'
 
 interface JobResultsPageProps {
   params: {
     id: string
   }
 }
+
+type AnalysisJobRow = Database['public']['Tables']['analysis_jobs']['Row']
+type ProjectRow = Database['public']['Tables']['projects']['Row']
+type AnalysisJobWithProject = AnalysisJobRow & { projects: ProjectRow | null }
 
 export default async function JobResultsPage({ params }: JobResultsPageProps) {
   const supabase = await createClient()
@@ -54,13 +59,18 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
     )
     .eq('id', params.id)
     .eq('user_id', user.id)
-    .single()
+    .single<AnalysisJobWithProject>()
 
   if (error || !job) {
     redirect('/dashboard')
   }
 
+  if (!job.projects) {
+    redirect('/dashboard')
+  }
+
   const project = job.projects
+  const resultData = job.result_data as AnalysisJobWithProject['result_data']
 
   return (
     <div className="space-y-6">
@@ -155,9 +165,8 @@ export default async function JobResultsPage({ params }: JobResultsPageProps) {
       {/* Results or Error */}
       {job.status === 'completed' && job.result_data ? (
         <ResultsDashboard
-          results={job.result_data as any}
+          results={resultData ?? {}}
           jobType={job.job_type}
-          project={project}
         />
       ) : job.status === 'failed' ? (
         <Card>

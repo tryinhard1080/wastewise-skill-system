@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import type { User } from '@supabase/supabase-js'
 
 const profileFormSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters').max(100),
@@ -27,12 +26,17 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-interface ProfileFormProps {
-  user: User
-  profile: any
+type ProfileData = {
+  full_name?: string | null
+  company?: string | null
+  phone?: string | null
 }
 
-export function ProfileForm({ user, profile }: ProfileFormProps) {
+interface ProfileFormProps {
+  profile?: ProfileData | null
+}
+
+export function ProfileForm({ profile }: ProfileFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -82,7 +86,7 @@ export function ProfileForm({ user, profile }: ProfileFormProps) {
                 <Input placeholder="John Doe" {...field} />
               </FormControl>
               <FormDescription>
-                Your full name as you'd like it to appear
+                Your full name as you&apos;d like it to appear
               </FormDescription>
               <FormMessage />
             </FormItem>

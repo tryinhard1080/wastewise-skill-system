@@ -11,11 +11,12 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { AnalysisSummary } from '@/components/results/analysis-summary'
 import { RecommendationsList } from '@/components/results/recommendations-list'
 import { DownloadButtons } from '@/components/results/download-buttons'
+import type { Database } from '@/types/database.types'
 
 interface DashboardClientProps {
-    project: any
-    result: WasteWiseAnalyticsCompleteResult
-    completedAt: string
+  project: Pick<Database['public']['Tables']['projects']['Row'], 'id' | 'property_name' | 'units'>
+  result: WasteWiseAnalyticsCompleteResult
+  completedAt: string
 }
 
 type Tab = 'dashboard' | 'recommendations' | 'original'

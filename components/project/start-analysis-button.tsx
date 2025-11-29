@@ -8,7 +8,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -36,7 +35,6 @@ interface StartAnalysisButtonProps {
 
 export function StartAnalysisButton({ projectId }: StartAnalysisButtonProps) {
   const router = useRouter()
-  const supabase = createClient()
   const [open, setOpen] = useState(false)
   const [jobType, setJobType] = useState<string>('complete_analysis')
   const [isCreating, setIsCreating] = useState(false)
@@ -61,7 +59,7 @@ export function StartAnalysisButton({ projectId }: StartAnalysisButtonProps) {
         throw new Error(error.error || 'Failed to start analysis')
       }
 
-      const data = await response.json()
+      await response.json()
 
       // Show success toast
       toast.success('Analysis started!')

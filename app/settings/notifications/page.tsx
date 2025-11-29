@@ -71,7 +71,7 @@ export default function NotificationsPage() {
         <CardHeader>
           <CardTitle>Notification Preferences</CardTitle>
           <CardDescription>
-            Choose which notifications you'd like to receive
+            Choose which notifications you&apos;d like to receive
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

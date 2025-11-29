@@ -76,7 +76,7 @@ export function DeleteAccountButton() {
         </AlertDialogHeader>
         
         <div className="space-y-2 my-4">
-          <Label htmlFor="confirmation">Type "DELETE" to confirm</Label>
+          <Label htmlFor="confirmation">Type &quot;DELETE&quot; to confirm</Label>
           <Input
             id="confirmation"
             value={confirmation}
