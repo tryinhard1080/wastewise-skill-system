@@ -466,6 +466,80 @@ export default function LandingPage() {
                 </div>
               </div>
 
+              {/* Interactive Demo Section */}
+              <div className="w-full border-b border-[rgba(55,50,47,0.12)] flex flex-col justify-center items-center bg-gradient-to-b from-white to-emerald-50/30">
+                <div className="self-stretch px-4 sm:px-6 md:px-8 lg:px-0 lg:max-w-[1060px] lg:w-[1060px] py-12 sm:py-16 md:py-20 flex flex-col justify-center items-center gap-8">
+                  {/* Section Header */}
+                  <div className="w-full max-w-[616px] lg:w-[616px] flex flex-col justify-start items-center gap-4">
+                    <Badge
+                      icon={
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" fill="#37322F" />
+                          <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#37322F" strokeWidth="1.5" fill="none" />
+                        </svg>
+                      }
+                      text="Live Demo"
+                    />
+                    <div className="text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
+                      See WasteWise in Action
+                    </div>
+                    <div className="text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans max-w-md">
+                      Explore our interactive demo to see how WasteWise transforms your waste data into actionable insights.
+                    </div>
+                  </div>
+
+                  {/* Demo Embed Container */}
+                  <div className="w-full max-w-5xl mx-auto">
+                    <div className="relative rounded-xl overflow-hidden shadow-2xl border border-[rgba(55,50,47,0.12)] bg-white">
+                      {/* Browser-like header */}
+                      <div className="bg-[#1f4220] px-4 py-3 flex items-center gap-3">
+                        <div className="flex gap-2">
+                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div className="flex-1 flex justify-center">
+                          <div className="bg-[#2C5F2D] rounded-md px-4 py-1.5 flex items-center gap-2 max-w-md w-full">
+                            <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span className="text-white/80 text-sm truncate">demo.wastewise.app</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Demo iframe */}
+                      <div className="relative w-full" style={{ paddingBottom: '66.67%' }}>
+                        <iframe
+                          src="http://localhost:5173"
+                          className="absolute inset-0 w-full h-full border-0"
+                          title="WasteWise Interactive Demo"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Demo call-to-action */}
+                    <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                      <a
+                        href="http://localhost:5173"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-flex items-center gap-2 px-6 py-3 bg-[#2C5F2D] hover:bg-[#1f4220] text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Open Demo in New Tab
+                      </a>
+                      <span className="text-[#605A57] text-sm">
+                        No signup required - explore freely
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Documentation Section */}
               <DocumentationSection />
 

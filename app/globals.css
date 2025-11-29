@@ -4,39 +4,44 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.98 0.01 240); /* Slate-50-ish */
-  --foreground: oklch(0.21 0.03 260); /* Slate-800-ish */
+  --background: oklch(0.98 0.01 145); /* Light green-tinted background */
+  --foreground: oklch(0.21 0.03 145); /* Dark green-tinted text */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.03 260);
+  --card-foreground: oklch(0.21 0.03 145);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 260);
-  --primary: oklch(0.45 0.2 260); /* Blue-600-ish */
+  --popover-foreground: oklch(0.21 0.03 145);
+  --primary: oklch(0.40 0.12 145); /* Forest Green #2C5F2D */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.97 0.02 145); /* Light green tint */
+  --secondary-foreground: oklch(0.205 0.05 145);
+  --muted: oklch(0.97 0.01 145);
+  --muted-foreground: oklch(0.556 0.03 145);
+  --accent: oklch(0.97 0.02 145);
+  --accent-foreground: oklch(0.205 0.05 145);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --border: oklch(0.922 0.02 145);
+  --input: oklch(0.922 0.02 145);
+  --ring: oklch(0.50 0.12 145); /* Forest green ring */
+  --chart-1: oklch(0.40 0.12 145); /* Forest Green */
+  --chart-2: oklch(0.65 0.18 145); /* Success Green */
+  --chart-3: oklch(0.35 0.10 145); /* Forest Dark */
+  --chart-4: oklch(0.70 0.15 70); /* Orange accent */
+  --chart-5: oklch(0.55 0.20 27); /* Danger/warning */
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.40 0.12 145); /* Forest Green */
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-accent: oklch(0.97 0.02 145);
+  --sidebar-accent-foreground: oklch(0.30 0.08 145);
+  --sidebar-border: oklch(0.922 0.02 145);
+  --sidebar-ring: oklch(0.50 0.12 145);
+  /* WasteWise Brand Colors */
+  --forest-green: #2C5F2D;
+  --forest-dark: #1f4220;
+  --success-green: #22C55E;
+  --light-green: #90EE90;
   /* Updated font variables with explicit fallbacks for deployment */
   --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-instrument-serif: "Instrument Serif", ui-serif, serif;
