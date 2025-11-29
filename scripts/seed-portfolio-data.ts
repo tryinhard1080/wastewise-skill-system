@@ -134,13 +134,51 @@ async function seedInvoices(workbook: ExcelJS.Workbook, projectMap: Record<strin
 
         console.log(`Processing sheet: ${sheet.name}`);
 
+        // Map headers to column indices
+        const headerMap: Record<string, number> = {};
+        const headerRow = sheet.getRow(1);
+        headerRow.eachCell((cell, colNumber) => {
+            const val = cell.text?.toLowerCase().trim();
+            if (val) headerMap[val] = colNumber;
+        });
+
+        if (sheet.name.includes('Springs')) {
+            console.log(`Debug Springs Header Map:`, JSON.stringify(headerMap));
+        }
+
+        // Helper to get value by header name
+        const getVal = (row: ExcelJS.Row, header: string, fallbackIndex: number) => {
+            // Try exact match
+            let idx = headerMap[header.toLowerCase()];
+            // Try partial match if not found
+            if (!idx) {
+                const key = Object.keys(headerMap).find(k => k.includes(header.toLowerCase()));
+                if (key) idx = headerMap[key];
+            }
+
+            const finalIdx = idx || fallbackIndex;
+            const cell = row.getCell(finalIdx);
+            let val = cell.text || cell.value?.toString();
+
+            // Fallback to row.values if cell is empty but values array has data
+            if (!val && row.values && Array.isArray(row.values)) {
+                const values = row.values as any[];
+                if (values[finalIdx]) {
+                    val = values[finalIdx]?.toString();
+                }
+            }
+
+            return val || '';
+        };
+
         // Group rows by Invoice Number
         const invoiceGroups: Record<string, any[]> = {};
 
         sheet.eachRow((row, rowNumber) => {
             if (rowNumber === 1) return;
 
-            const invoiceNum = row.getCell(5).text;
+            // Invoice # is usually Col 5
+            const invoiceNum = getVal(row, 'invoice #', 5);
             if (!invoiceNum) return;
 
             if (!invoiceGroups[invoiceNum]) {
@@ -151,35 +189,81 @@ async function seedInvoices(workbook: ExcelJS.Workbook, projectMap: Record<strin
 
         for (const [invoiceNum, rows] of Object.entries(invoiceGroups)) {
             const firstRow = rows[0];
-            const propertyName = firstRow.getCell(1).text;
+            const propertyName = getVal(firstRow, 'property', 1).trim();
 
             let projectId = projectMap[propertyName];
             if (!projectId) {
-                projectId = projectMap[sheet.name];
+                projectId = projectMap[sheet.name.trim()];
             }
 
             if (!projectId) {
                 continue;
             }
 
-            const invoiceDateStr = firstRow.getCell(6).text;
+            const invoiceDateStr = getVal(firstRow, 'invoice date', 6);
             const invoiceDate = new Date(invoiceDateStr);
             if (isNaN(invoiceDate.getTime())) {
                 continue;
             }
 
-            const vendorName = firstRow.getCell(3).text || 'Unknown Vendor';
-            const totalAmount = parseFloat(firstRow.getCell(7).text || '0');
+            const vendorName = getVal(firstRow, 'vendor', 3) || 'Unknown Vendor';
+            const totalAmount = parseFloat(getVal(firstRow, 'total amount', 7) || '0');
 
-            const charges = rows.map(row => ({
-                description: row.getCell(10).text,
-                category: row.getCell(11).text,
-                amount: parseFloat(row.getCell(14).text || '0'),
-                quantity: parseFloat(row.getCell(12).text || '0'),
-                rate: parseFloat(row.getCell(13).text || '0')
-            })).filter(c => c.description && !c.description.toLowerCase().includes('payment'));
+            const rawCharges = rows.map(row => {
+                let desc = getVal(row, 'description', 10);
+                // Fallback to service notes if description is empty
+                if (!desc || desc.trim() === '') {
+                    desc = getVal(row, 'service notes', 19);
+                }
+
+                const cat = getVal(row, 'category', 11);
+                const amt = getVal(row, 'amount', 14);
+
+                return {
+                    description: desc,
+                    category: cat,
+                    amount: parseFloat(amt || '0'),
+                    quantity: parseFloat(getVal(row, 'quantity', 12) || '0'),
+                    rate: parseFloat(getVal(row, 'rate', 13) || '0'),
+                    _rowNumber: row.number,
+                    _rowValues: row.values
+                };
+            });
+
+            if (sheet.name.includes('Springs')) {
+                console.log(`  Raw Charges Count: ${rawCharges.length}`);
+                if (rawCharges.length > 0) {
+                    const first = rawCharges[0];
+                    console.log(`  First Raw Charge Row #${first._rowNumber}:`);
+                    console.log(`    Desc='${first.description}'`);
+                    console.log(`    Cat='${first.category}'`);
+                    console.log(`    Values=${JSON.stringify(first._rowValues)}`);
+                }
+            }
+
+            const charges = rawCharges.filter(c => {
+                const hasDesc = !!c.description;
+                const isPayment = c.description && c.description.toLowerCase().includes('payment');
+                const keep = hasDesc && !isPayment;
+
+                if (sheet.name.includes('Springs')) {
+                    const rowNum = (c as any)._rowNumber;
+                    console.log(`  Row ${rowNum} Filter: Desc='${c.description}', Keep=${keep}, HasDesc=${hasDesc}, IsPayment=${isPayment}`);
+                }
+
+                // Remove internal debug props before returning
+                delete (c as any)._rowNumber;
+                delete (c as any)._rowValues;
+
+                return keep;
+            });
+
+            if (sheet.name.includes('Springs')) {
+                console.log(`  Filtered Charges Count: ${charges.length}`);
+            }
 
             if (charges.length === 0) {
+                if (sheet.name.includes('Springs')) console.log('  SKIPPING: No charges found');
                 continue;
             }
 
@@ -191,6 +275,7 @@ async function seedInvoices(workbook: ExcelJS.Workbook, projectMap: Record<strin
                 .single();
 
             if (existing) {
+                if (sheet.name.includes('Springs')) console.log('  SKIPPING: Already exists');
                 continue;
             }
 
@@ -209,6 +294,8 @@ async function seedInvoices(workbook: ExcelJS.Workbook, projectMap: Record<strin
 
             if (error) {
                 console.error(`Failed to insert invoice ${invoiceNum}:`, error);
+            } else {
+                if (sheet.name.includes('Springs')) console.log('  SUCCESS: Inserted invoice');
             }
         }
     }

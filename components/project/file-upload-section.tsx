@@ -59,7 +59,7 @@ export function FileUploadSection({
           <FileUpload
             key={refreshKey}
             projectId={projectId}
-            fileType="other"
+            fileType="invoice"
             onUploadComplete={handleUploadComplete}
           />
         </CardContent>

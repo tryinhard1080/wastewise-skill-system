@@ -1,0 +1,118 @@
+[dotenv@17.2.3] injecting env (18) from .env.local -- tip: ≡ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+Reading Excel file...
+Excel file loaded.
+Using User ID: ef356347-e384-4eb0-915e-e5483e5f88eb
+Seeding Projects...
+Project Bella Mirage already exists.
+Project Pavilions at Arrowhead already exists.
+Project Springs at Alta Mesa already exists.
+Project Mandarina already exists.
+Project Tempe Vista already exists.
+Project The Club at Millenia already exists.
+Project Orion Prosper Lakes already exists.
+Project McCord Park already exists.
+Project Orion McKinney already exists.
+Project Orion Prosper already exists.
+Project PORTFOLIO TOTAL already exists.
+Seeding Invoices...
+Processing sheet: Orion Prosper
+Processing sheet: McCord Park FL
+Processing sheet: Orion McKinney
+Processing sheet: The Club at Millenia
+Processing sheet: Bella Mirage
+Processing sheet: Orion Prosper Lakes
+Processing sheet: Mandarina
+Processing sheet: Pavilions at Arrowhead
+Processing sheet: Springs at Alta Mesa
+Debug Springs Header Map: {"property":1,"source file":2,"vendor":3,"account number":4,"invoice number":5,"invoice date":6,"invoice amount":7,"billing period":8,"description":9,"service type":10,"data source":11,"container count":12,"container size":13,"container type":14,"service frequency":15,"service days":16,"total yards":17,"ypd":18,"service notes":19}
+  Raw Charges Count: 1
+  First Raw Charge Row #12:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",42519,"2024-11-01",357.21,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 12 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #11:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",45072,"2024-12-01",552.21,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 11 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #10:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",48422,"2025-01-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 10 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #9:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",51176,"2025-02-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 9 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #8:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",54713,"2025-03-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 8 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #7:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",57206,"2025-04-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 7 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #6:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",59041,"2025-05-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 6 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #5:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",62351,"2025-06-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 5 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #4:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",65439,"2025-07-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 4 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #3:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",68309,"2025-08-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 3 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+  Raw Charges Count: 1
+  First Raw Charge Row #2:
+    Desc=''
+    Cat='Arizona Excel'
+    Values=[null,"Springs at Alta Mesa","Springs at Alta Mesa - Ally Waste.xlsx","Ally Waste","AW-pg67",71251,"2025-09-01",495,null,null,null,"Arizona Excel",16,"Mixed","Mixed","Mixed","3x per week + Bulk Thursday",600.63162,3,"5├ù6YD + 4├ù4YD Dumpsters + 7├ù90-gal bins @ 3x/week. Bulk: Every Thursday"]
+  Row 2 Filter: Desc='', Keep=false, HasDesc=false, IsPayment=
+  Filtered Charges Count: 0
+  SKIPPING: No charges found
+Processing sheet: Tempe Vista
+Seeding Analysis Jobs...
+Seeding complete.

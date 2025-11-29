@@ -55,6 +55,13 @@ Required HTML tabs (6)
 5) Contract Terms — risk analysis and action items.  
 6) Regulatory Compliance — ordinance requirements and checklist.
 
+Front-end upload & IO flow
+--------------------------
+- UI: upload invoices (CSV/PDF via your parser), haul logs, and optional contract; capture property profile (units, type, occupancy, status), equipment, charges, and location.  
+- API shape: send structured JSON matching `agent_spec.yaml` to the agent.  
+- Outputs: agent returns (a) workbook payload (tab name → rows/fields), (b) HTML dashboard sections, (c) executive summary + savings + compliance status + download links.  
+- Connect file generation: pipe workbook payload into your Excel writer (openpyxl/xlsxwriter) and HTML sections into your front-end renderer; surface download links after generation.
+
 Regulatory research (8 sections)
 --------------------------------
 1) Ordinance Summary; 2) Waste Collection Requirements; 3) Recycling Requirements; 4) Composting/Organics; 5) Penalties & Enforcement; 6) Licensed Haulers (3–5 with contacts); 7) Regulatory Contacts; 8) Research Confidence (HIGH/MEDIUM/LOW).  
