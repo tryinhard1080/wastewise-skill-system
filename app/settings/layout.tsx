@@ -1,3 +1,6 @@
+// Force dynamic rendering - this layout uses cookies for auth
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SettingsNav } from '@/components/settings/settings-nav'
