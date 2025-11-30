@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { generateApiKey, generateKeyPreview } from '../../route'
+import { generateApiKey, generateKeyPreview } from '@/lib/utils/api-key-generator'
 
 export async function POST(
   request: Request,

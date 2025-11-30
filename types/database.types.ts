@@ -34,6 +34,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          key: string
+          key_preview: string
+          created_at: string
+          updated_at: string
+          last_used_at: string | null
+          expires_at: string | null
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          key: string
+          key_preview: string
+          created_at?: string
+          updated_at?: string
+          last_used_at?: string | null
+          expires_at?: string | null
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          key?: string
+          key_preview?: string
+          created_at?: string
+          updated_at?: string
+          last_used_at?: string | null
+          expires_at?: string | null
+          is_active?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string | null
+          company: string | null
+          avatar_url: string | null
+          notification_preferences: Json | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name?: string | null
+          company?: string | null
+          avatar_url?: string | null
+          notification_preferences?: Json | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string | null
+          company?: string | null
+          avatar_url?: string | null
+          notification_preferences?: Json | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       analysis_jobs: {
         Row: {
           ai_cost_usd: number | null
@@ -617,6 +689,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_cascade: {
+        Args: { user_id_param: string }
+        Returns: undefined
+      }
       claim_next_analysis_job: {
         Args: never
         Returns: {

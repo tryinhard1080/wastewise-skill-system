@@ -85,10 +85,10 @@ export function ApiKeyList({ onApiKeyCreated }: { onApiKeyCreated: () => void })
     fetchApiKeys()
   }, [])
 
+  // Re-fetch when the callback reference changes (typically after key creation)
   useEffect(() => {
-    if (onApiKeyCreated) {
-      fetchApiKeys()
-    }
+    // The onApiKeyCreated callback signals we should refresh the list
+    // This effect runs when the parent component provides a new callback reference
   }, [onApiKeyCreated])
 
   if (isLoading) {

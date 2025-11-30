@@ -2,11 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/settings/profile-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-type ProfileRow = {
+interface ProfileData {
   id: string
+  user_id: string
   full_name?: string | null
   company?: string | null
-  phone?: string | null
+  avatar_url?: string | null
   notification_preferences?: Record<string, unknown> | null
   created_at?: string | null
   updated_at?: string | null
@@ -22,13 +23,14 @@ export default async function ProfilePage() {
     return null
   }
 
-  // Get user profile from profiles table (if exists)
-  // Note: profiles table may not be in generated types yet
-  const { data: profile } = await supabase
-    .from<ProfileRow>('profiles')
+  // Get user profile from profiles table
+  const { data } = await supabase
+    .from('profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('user_id', user.id)
     .single()
+
+  const profile: ProfileData | null = data as ProfileData | null
 
   return (
     <div className="space-y-6">

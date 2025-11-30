@@ -20,10 +20,10 @@ export async function PUT(request: Request) {
       .from('profiles')
       .upsert({
         id: user.id,
+        user_id: user.id,
         notification_preferences: settings,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
 
     if (error) {
       console.error('Notification settings error:', error)
