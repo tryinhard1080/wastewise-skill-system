@@ -1,3 +1,6 @@
+// Force dynamic rendering - this page uses cookies for auth
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import type { WasteWiseAnalyticsCompleteResult } from '@/lib/skills/types'

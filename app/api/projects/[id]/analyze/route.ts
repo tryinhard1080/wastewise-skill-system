@@ -15,6 +15,9 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+
+// Force dynamic rendering - this route uses cookies for auth
+export const dynamic = 'force-dynamic'
 import { logger } from '@/lib/observability/logger'
 
 export async function POST(

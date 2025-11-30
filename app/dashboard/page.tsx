@@ -4,6 +4,9 @@
  * Main dashboard view with project overview and quick actions
  */
 
+// Force dynamic rendering - this page uses cookies for auth
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import {

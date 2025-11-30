@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { generateApiKey, generateKeyPreview } from '@/lib/utils/api-key-generator'
 
+// Force dynamic rendering - this route uses cookies for auth
+export const dynamic = 'force-dynamic'
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }

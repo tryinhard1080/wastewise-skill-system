@@ -9,6 +9,9 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+
+// Force dynamic rendering - this route uses cookies for auth
+export const dynamic = 'force-dynamic'
 import { z } from 'zod'
 import { rateLimiters } from '@/lib/api/rate-limit'
 import { VALID_JOB_TYPES } from '@/lib/constants/job-types'
